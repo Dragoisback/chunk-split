@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text/JSON Chunker</title>
+  <!-- Removed jszip.min.js and epub.min.js as they are no longer needed for this functionality -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    textarea {
+      width: calc(100% - 22px); /* Adjusted for padding/border */
+      height: 200px; /* Increased default height */
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .input-group {
+        border: 1px solid #e0e0e0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    .input-group h3 {
+        margin-top: 0;
+    }
+
+    .input-container {
+      margin-bottom: 15px;
+      margin-right: 20px;
+    }
+    .input-container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    .input-container input[type="number"],
+    .input-container select,
+    .input-container textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .input-container textarea { /* Specific styling for smaller textareas in input-container */
+        height: 80px;
+    }
+
+
+    .chunk-container {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start; /* Align items to the top */
+    }
+
+    .chunk-title {
+      font-weight: bold;
+      margin-right: 10px;
+      min-width: 80px; /* Ensure title doesn't wrap too soon */
+      padding-top: 5px; /* Align with textarea */
+    }
+
+    .chunk-textarea-wrapper {
+        flex-grow: 1;
+        margin-right: 10px;
+    }
+    .chunk-textarea-wrapper textarea {
+        height: 150px; /* Default height for output chunks */
+        width: 100%;
+    }
+
+
+    .copy-button {
+      padding: 8px 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      margin-top: 5px; /* Align with textarea content start */
+    }
+
+    .copy-button.green {
+      background-color: #28a745;
+    }
+
+    .copy-button .tick {
+      display: none;
+      margin-left: 5px;
+      font-size: 16px;
+    }
+
+    .copy-button.green .tick {
+      display: inline-block;
+    }
+
+    #chunkedTextContainer {
+      margin-top: 30px;
+    }
+
+    #loadingIndicator {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Text/JSON Chunker</h1>
+
+  <div class="input-container">
+    <label for="splitModeSelect">Splitting Mode:</label>
+    <select id="splitModeSelect">
+      <option value="json">JSON Objects (One chunk per object)</option>
+      <option value="text">Plain Text (Split by max characters)</option>
+    </select>
+  </div>
+
+  <div id="jsonInputSection" class="input-group">
+    <h3>JSON Input Mode</h3>
+    <p>Paste your array of JSON objects below. Each object in the root array will become a separate chunk.</p>
+    <textarea id="jsonInputArea" placeholder="[ { ... }, { ... } ]"></textarea>
+  </div>
+
+  <div id="plainTextInputSection" class="input-group" style="display:none;">
+    <h3>Plain Text Input Mode</h3>
+    <p>Paste your plain text below. It will be split based on 'Max characters per chunk'.</p>
+    <textarea id="plainTextInputArea" placeholder="Paste plain text here..."></textarea>
+    <div class="input-container">
+      <label for="formatSelect">Format text (for Plain Text Mode):</label>
+      <select id="formatSelect">
+        <option value="as-is">Show text as is</option>
+        <option value="pretty">Pretty (trim lines, join with double newlines)</option>
+      </select>
+    </div>
+    <div class="input-container">
+      <label for="maxChars">Max characters per chunk (for Plain Text Mode):</label>
+      <input type="number" id="maxChars" value="1800">
+    </div>
+  </div>
+
+
+  <div class="input-container">
+    <label for="addToTop">Add to top of each chunk:</label>
+    <textarea id="addToTop"
+      placeholder="Text to add to the top of each chunk (use $X for part number, $Y for total parts)..."></textarea>
+  </div>
+
+  <div class="input-container">
+    <label for="addToBottom">Add to bottom of each chunk:</label>
+    <textarea id="addToBottom"
+      placeholder="Text to add to the bottom of each chunk (use $X for part number, $Y for total parts)..."></textarea>
+  </div>
+
+  <button onclick="processAndChunk()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Split Text</button>
+
+  <div id="chunkedTextContainer"></div>
+
+  <div id="loadingIndicator">Loading...</div>
+
+  <script>
+    let lastClickedButton = null;
+    let originalPlainTextInput = ""; // Store the original unformatted text for the plain text input
+
+    function showLoading() {
+      document.getElementById('loadingIndicator').style.display = 'block';
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingIndicator').style.display = 'none';
+    }
+
+    function updateButtonState(button) {
+      if (lastClickedButton && lastClickedButton !== button) {
+        lastClickedButton.classList.remove('green');
+        lastClickedButton.querySelector('.tick').style.display = 'none';
+      }
+
+      button.classList.add('green');
+      button.querySelector('.tick').style.display = 'inline-block';
+      lastClickedButton = button;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const maxCharsInput = document.getElementById('maxChars');
+      const addToTopInput = document.getElementById('addToTop');
+      const addToBottomInput = document.getElementById('addToBottom');
+      const formatSelect = document.getElementById('formatSelect');
+      const splitModeSelect = document.getElementById('splitModeSelect');
+      const plainTextInputArea = document.getElementById('plainTextInputArea');
+
+      // Load common settings
+      addToTopInput.value = localStorage.getItem('addToTop') || 'Translate to English (part $X of $Y):';
+      addToBottomInput.value = localStorage.getItem('addToBottom') || '';
+
+      // Load Plain Text Mode specific settings
+      maxCharsInput.value = localStorage.getItem('maxChars') || '1800';
+      formatSelect.value = localStorage.getItem('formatSelect') || 'pretty';
+
+      // Load Split Mode
+      splitModeSelect.value = localStorage.getItem('splitModeSelect') || 'json';
+      toggleInputSections(); // Show/hide sections based on loaded mode
+
+      // Event Listeners for saving settings
+      maxCharsInput.addEventListener('input', () => localStorage.setItem('maxChars', maxCharsInput.value));
+      addToTopInput.addEventListener('input', () => localStorage.setItem('addToTop', addToTopInput.value));
+      addToBottomInput.addEventListener('input', () => localStorage.setItem('addToBottom', addToBottomInput.value));
+      
+      formatSelect.addEventListener('change', () => {
+        localStorage.setItem('formatSelect', formatSelect.value);
+        formatPlainText(); // Apply formatting immediately to plain text input
+      });
+
+      splitModeSelect.addEventListener('change', () => {
+        localStorage.setItem('splitModeSelect', splitModeSelect.value);
+        toggleInputSections();
+      });
+      
+      plainTextInputArea.addEventListener('input', () => {
+          originalPlainTextInput = plainTextInputArea.value; // Update original text on manual input
+          if (formatSelect.value === 'pretty') { // If pretty is selected, re-apply
+              formatPlainText();
+          }
+      });
+
+      // Initial format on load for plain text area
+      originalPlainTextInput = plainTextInputArea.value;
+      formatPlainText();
+    });
+
+    function toggleInputSections() {
+        const splitMode = document.getElementById('splitModeSelect').value;
+        const jsonSection = document.getElementById('jsonInputSection');
+        const plainTextSection = document.getElementById('plainTextInputSection');
+
+        if (splitMode === 'json') {
+            jsonSection.style.display = 'block';
+            plainTextSection.style.display = 'none';
+        } else { // 'text'
+            jsonSection.style.display = 'none';
+            plainTextSection.style.display = 'block';
+        }
+    }
+
+
+    function formatPlainText() {
+      const formatSelect = document.getElementById('formatSelect');
+      const textArea = document.getElementById('plainTextInputArea');
+
+      // If originalPlainTextInput is empty and textArea has content, it might be from page load/localStorage
+      if (!originalPlainTextInput && textArea.value) {
+          originalPlainTextInput = textArea.value;
+      }
+      
+      if (formatSelect.value === 'pretty') {
+        const paragraphs = originalPlainTextInput.split('\n');
+        const formattedText = paragraphs.map(p => p.trim()).filter(p => p).join('\n\n');
+        textArea.value = formattedText;
+      } else {
+        textArea.value = originalPlainTextInput; // Show as is
+      }
+    }
+
+    function processAndChunk() {
+      showLoading();
+      // Use a timeout to allow the loading indicator to render before potentially heavy processing
+      setTimeout(() => {
+        try {
+          const splitMode = document.getElementById('splitModeSelect').value;
+          const addToTop = document.getElementById('addToTop').value.trim();
+          const addToBottom = document.getElementById('addToBottom').value.trim();
+          const chunkedTextContainer = document.getElementById('chunkedTextContainer');
+          chunkedTextContainer.innerHTML = ''; // Clear previous chunks
+
+          if (splitMode === 'json') {
+            chunkJsonInput(addToTop, addToBottom, chunkedTextContainer);
+          } else { // 'text'
+            chunkPlainTextInput(addToTop, addToBottom, chunkedTextContainer);
+          }
+        } catch (error) {
+          console.error("Error during chunking:", error);
+          alert("An error occurred during chunking: " + error.message);
+        } finally {
+          hideLoading();
+        }
+      }, 10); 
+    }
+
+    function chunkJsonInput(addToTop, addToBottom, container) {
+      const jsonString = document.getElementById('jsonInputArea').value;
+      if (!jsonString.trim()) {
+        alert("JSON input is empty.");
+        return;
+      }
+
+      let jsonData;
+      try {
+        jsonData = JSON.parse(jsonString);
+      } catch (e) {
+        alert("Invalid JSON format: " + e.message);
+        console.error("JSON Parsing Error:", e);
+        return;
+      }
+
+      if (!Array.isArray(jsonData)) {
+        alert("The root JSON structure must be an array. e.g., [ { ... }, { ... } ]");
+        return;
+      }
+
+      const totalChunks = jsonData.length;
+      const digits = String(totalChunks).length;
+
+      jsonData.forEach((item, index) => {
+        const partNumber = String(item.id !== undefined ? item.id : index).padStart(digits, '0'); // Use item.id if available, else index
+        const chunkContent = JSON.stringify(item, null, 2); // Pretty print JSON object
+
+        let finalChunk = (addToTop.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks) + '\n\n' + chunkContent + '\n\n' + addToBottom.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks)).trim();
+        
+        const chunkTitleText = `Segment ${partNumber}`;
+        displayChunk(finalChunk, chunkTitleText, container);
+      });
+    }
+
+    function chunkPlainTextInput(addToTop, addToBottom, container) {
+      const text = document.getElementById('plainTextInputArea').value;
+      const maxChars = parseInt(document.getElementById('maxChars').value);
+
+      if (!text.trim()) {
+        alert("Plain text input is empty.");
+        return;
+      }
+      if (isNaN(maxChars) || maxChars <= 0) {
+        alert("Max characters per chunk must be a positive number.");
+        return;
+      }
+
+      const paragraphs = text.split('\n');
+      const chunks = [];
+      let currentChunk = "";
+
+      for (const paragraph of paragraphs) {
+        // Check if adding the current paragraph (plus a newline if currentChunk is not empty) exceeds maxChars
+        const lengthWithParagraph = currentChunk.length + (currentChunk.length > 0 ? 1 : 0) + paragraph.length;
+        
+        if (currentChunk.length > 0 && lengthWithParagraph > maxChars) {
+          // If currentChunk is not empty and adding the new paragraph would exceed maxChars, push currentChunk
+          chunks.push(currentChunk.trim());
+          currentChunk = paragraph; // Start new chunk with current paragraph
+        } else if (lengthWithParagraph <= maxChars) {
+          // If it fits, or if currentChunk is empty, add paragraph to currentChunk
+          if (currentChunk.length > 0) {
+            currentChunk += '\n' + paragraph;
+          } else {
+            currentChunk = paragraph;
+          }
+        } else { 
+          // Single paragraph is too long, push previous chunk (if any) and then push the long paragraph as its own chunk
+          if (currentChunk.trim()) {
+            chunks.push(currentChunk.trim());
+          }
+          chunks.push(paragraph); // This paragraph itself is a chunk
+          currentChunk = ""; // Reset currentChunk
+        }
+      }
+
+      if (currentChunk.trim()) {
+        chunks.push(currentChunk.trim());
+      }
+
+      const totalChunks = chunks.length;
+      const digits = String(totalChunks).length;
+
+      chunks.forEach((chunk, index) => {
+        const partNumber = String(index + 1).padStart(digits, '0');
+        let finalChunk = (addToTop.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks) + '\n\n' + chunk + '\n\n' + addToBottom.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks)).trim();
+        
+        const chunkTitleText = `Part ${partNumber}`;
+        displayChunk(finalChunk, chunkTitleText, container);
+      });
+    }
+
+    function displayChunk(content, title, container) {
+        const chunkContainerDiv = document.createElement('div');
+        chunkContainerDiv.classList.add('chunk-container');
+
+        const chunkTitleDiv = document.createElement('div');
+        chunkTitleDiv.classList.add('chunk-title');
+        chunkTitleDiv.textContent = title;
+
+        const textareaWrapper = document.createElement('div');
+        textareaWrapper.classList.add('chunk-textarea-wrapper');
+
+        const chunkTextarea = document.createElement('textarea');
+        chunkTextarea.value = content;
+        chunkTextarea.readOnly = true;
+        textareaWrapper.appendChild(chunkTextarea);
+
+        const copyButton = document.createElement('button');
+        copyButton.classList.add('copy-button');
+        copyButton.innerHTML = 'Copy to Clipboard<span class="tick">✔️</span>';
+        copyButton.addEventListener('click', function () {
+          copyToClipboard(chunkTextarea.value);
+          updateButtonState(copyButton);
+        });
+
+        chunkContainerDiv.appendChild(chunkTitleDiv);
+        chunkContainerDiv.appendChild(textareaWrapper);
+        chunkContainerDiv.appendChild(copyButton);
+        container.appendChild(chunkContainerDiv);
+    }
+
+
+    function copyToClipboard(text) {
+      const hiddenInput = document.createElement('textarea');
+      hiddenInput.value = text;
+      document.body.appendChild(hiddenInput);
+      hiddenInput.select();
+      hiddenInput.setSelectionRange(0, 99999); // For mobile devices
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Copy to clipboard failed:', err);
+        // Fallback for modern browsers if execCommand fails or for more control
+        navigator.clipboard.writeText(text).then(() => {
+          // console.log('Async copy successful');
+        }).catch(err => {
+          console.error('Async copy to clipboard failed:', err);
+        });
+      }
+      document.body.removeChild(hiddenInput);
+    }
+
+  </script>
+</body>
+</html>
