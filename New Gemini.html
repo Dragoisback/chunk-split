@@ -77,7 +77,6 @@
         margin-bottom: 10px;
         padding: 5px;
         border-radius: 4px;
-        /* background-color: #f9f9f9; */
     }
     .find-replace-pair input[type="text"] {
         flex-grow: 1;
@@ -97,7 +96,7 @@
         border: 1px solid #ccc;
         background-color: #e9ecef;
         color: #333;
-        min-width: 30px; /* For consistency */
+        min-width: 30px;
         text-align: center;
     }
     #addFindReplacePairButton {
@@ -131,10 +130,10 @@
     .chunk-title {
       font-weight: bold;
       margin-right: 10px;
-      min-width: 100px; /* Adjusted for potentially longer titles */
+      min-width: 100px;
       padding-top: 8px;
       color: #007BFF;
-      flex-shrink: 0; /* Prevent title from shrinking too much */
+      flex-shrink: 0;
     }
 
     .chunk-textarea-wrapper {
@@ -163,11 +162,17 @@
         background-color: #218838;
     }
 
+    .button-action-wrapper { /* Wrapper for copy button and its count */
+        display: flex;
+        align-items: center;
+        margin-top: 8px; /* Consistent with original copy-button margin-top */
+    }
+
     .copy-button {
       background-color: #007BFF;
       font-size: 14px;
       padding: 8px 12px;
-      margin-top: 8px;
+      /* margin-top: 8px; Removed as button-action-wrapper now handles this group's top margin */
       display: flex;
       align-items: center;
     }
@@ -188,13 +193,19 @@
     .copy-button.green .tick {
       display: inline-block;
     }
+    .copy-count-display {
+        margin-left: 5px;
+        font-size: 0.9em;
+        color: #666;
+        white-space: nowrap; /* Prevent wrapping if count gets large */
+    }
 
     #glossaryFindReplaceSection button#applyPairedReplacementsButton {
         background-color: #ffc107;
         color: black;
         font-size: 14px;
         padding: 8px 15px;
-        margin-top: 10px; /* Add some space before the button */
+        margin-top: 10px;
     }
     #glossaryFindReplaceSection button#applyPairedReplacementsButton:hover {
         background-color: #e0a800;
@@ -218,6 +229,15 @@
       font-size: 1.1em;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
+    .info-counter {
+        font-size: 0.9em;
+        padding: 4px 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        color: #333;
+        border: 1px solid #ced4da;
+        display: inline-block;
+    }
   </style>
 </head>
 
@@ -234,7 +254,10 @@
 
   <div id="jsonInputSection" class="input-group">
     <h3>JSON Input Mode</h3>
-    <p>Paste your array of JSON objects below. Each object in the root array will become a separate chunk by default, or grouped based on the setting below.</p>
+    <p>Paste your array of JSON objects below. Each object in the root array will become a separate chunk by default, or grouped based on the setting below. The counter updates automatically.</p>
+    <div style="text-align: right; margin-bottom: 5px;">
+        <span id="jsonObjectsCount" class="info-counter">Objects: 0</span>
+    </div>
     <textarea id="jsonInputArea" placeholder="[ { ... }, { ... } ]"></textarea>
 
     <div class="input-container" style="margin-top: 10px; margin-bottom: 20px;">
@@ -258,7 +281,6 @@
         Define find and replace pairs below. Rules are applied sequentially for each term's translation within the JSON objects.
       </p>
       <div id="findReplacePairsContainer">
-        <!-- Initial 3 pairs will be added by JavaScript -->
       </div>
       <button type="button" id="addFindReplacePairButton" onclick="addFindReplacePair()">+ Add Replacement Rule</button>
       <button type="button" id="applyPairedReplacementsButton" onclick="performPairedGlossaryReplace()" style="margin-left:10px;">Apply All Replacement Rules</button>
@@ -268,7 +290,10 @@
 
   <div id="plainTextInputSection" class="input-group" style="display:none;">
     <h3>Plain Text Input Mode</h3>
-    <p>Paste your plain text below. It will be split based on 'Max characters per chunk'.</p>
+    <p>Paste your plain text below. It will be split based on 'Max characters per chunk'. Character count and approximate chunk estimate update automatically.</p>
+    <div style="text-align: right; margin-bottom: 5px;">
+        <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
+    </div>
     <textarea id="plainTextInputArea" placeholder="Paste plain text here..."></textarea>
     <div class="input-container">
       <label for="formatSelect">Format text (for Plain Text Mode):</label>
@@ -306,7 +331,7 @@
   <script>
     let lastClickedButton = null;
     let originalPlainTextInput = "";
-    let findReplacePairCount = 0; // To give unique IDs to dynamic elements if needed
+    let findReplacePairCount = 0;
 
     function showLoading() {
       document.getElementById('loadingIndicator').style.display = 'block';
@@ -350,6 +375,60 @@
         button.parentElement.remove();
     }
 
+    function updateJsonObjectCount() {
+        const jsonInputArea = document.getElementById('jsonInputArea');
+        const countElement = document.getElementById('jsonObjectsCount');
+        if (!jsonInputArea || !countElement) return;
+
+        const jsonString = jsonInputArea.value.trim();
+        countElement.style.color = '#333';
+
+        if (!jsonString) {
+            countElement.textContent = 'Objects: 0';
+            return;
+        }
+
+        try {
+            if (!jsonString.startsWith('[')) {
+                 countElement.textContent = 'Objects: (Not an array)';
+                 countElement.style.color = 'orange';
+                 return;
+            }
+            const jsonData = JSON.parse(jsonString);
+            if (Array.isArray(jsonData)) {
+                countElement.textContent = `Objects: ${jsonData.length}`;
+            } else {
+                countElement.textContent = 'Objects: (Not an array)';
+                countElement.style.color = 'orange';
+            }
+        } catch (e) {
+            countElement.textContent = 'Objects: (Invalid JSON)';
+            countElement.style.color = 'red';
+        }
+    }
+
+    function updatePlainTextInfo() {
+        const plainTextInputArea = document.getElementById('plainTextInputArea');
+        const infoElement = document.getElementById('plainTextInfo');
+        const maxCharsInput = document.getElementById('maxChars');
+
+        if (!plainTextInputArea || !infoElement || !maxCharsInput) return;
+
+        const text = plainTextInputArea.value;
+        const charCount = text.length;
+        const maxChars = parseInt(maxCharsInput.value, 10);
+        infoElement.style.color = '#333';
+
+        let potentialChunks = 0;
+        if (charCount > 0 && maxChars > 0) {
+            potentialChunks = Math.ceil(charCount / maxChars);
+        } else if (charCount > 0 && (isNaN(maxChars) || maxChars <= 0)) {
+            potentialChunks = 1; 
+        }
+
+        infoElement.textContent = `Chars: ${charCount} / Approx. Chunks: ${potentialChunks}`;
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
       const maxCharsInput = document.getElementById('maxChars');
@@ -358,30 +437,85 @@
       const formatSelect = document.getElementById('formatSelect');
       const splitModeSelect = document.getElementById('splitModeSelect');
       const plainTextInputArea = document.getElementById('plainTextInputArea');
-      const jsonObjectsPerChunkSelect = document.getElementById('jsonObjectsPerChunk'); // New
+      const jsonInputArea = document.getElementById('jsonInputArea');
+      const jsonObjectsPerChunkSelect = document.getElementById('jsonObjectsPerChunk');
 
-      addToTopInput.value = localStorage.getItem('addToTop') || 'Content (Part $X of $Y):\n---';
+      const newDefaultAddToTopPreset = `Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis.
+
+GO STEP BY STEP  VERY VERY STRICTLY THROUGHOUT THE CHAT:
+
+1. Analyze raw Passage and Translation: \\[As Deep Thinking]
+
+* FOR EACH line, summarize its meaning and compare it very thoroughly to the translation.
+* Note if the translation matches the original or deviates, explaining any ambiguities or potential errors.
+  -Check if phrases are adapted naturally (e.g., idiomatic expressions retain flavor without literal awkwardness or being too formal and literal).
+
+2. Identify Errors: \\[As Deep Thinking]
+
+* Spot issues related to:
+
+  * Accuracy: Missing, Overly condensed sentences or lines, added, or incorrect glossary terms
+
+* Note : Only ignore glossary if certain it's wrong, if certain its not appropriately conveying the meaning or have grammatical error
+
+  * Logic: Pronoun mistakes, wrong speaker, or mixed-up character names.
+
+* Language: Awkward or unnatural English or Overly condensed sentences.
+  \\- Analyze every line thoroughly.
+
+3. Verify Errors: \\[As Deep Thinking]
+
+* Double-check all identified errors, ensuring each has clear evidence.
+* keep all the minor and major valid errors.
+* Verify if the tone matches the context (majestic for epic scenes, colloquial for dialogue).
+
+4. Fix the Translation : \\[As Deep Thinking]
+
+* Correct the verified errors and use English major level proficiency to make the prose flows smoothly with Rich descriptive and faithful rendering of key dialogue
+* Don't use Only colon and bullet points in your translation and while during their removal make sure the English is natural and idiomatic.
+* "DO NOT transliterate the honorifics unless the glossary says so. For example, you should use 'Senior Brother X' instead of 'X-shixiong'."
+* Do not over condense the sentence and dialogue while making sure the English is natural and idiomatic.
+* Where necessary for comprehension, add brief, unobtrusive context or explanations for cultural terms or implied meanings. Avoid overly complex or literary phrasing if it sacrifices clarity
+
+5. Give only the Fixed human like English translation as output and not the Whole JSON format. and Separately mention when a glossary is wrong or have variations and is fixed in the output.`;
+
+
+      addToTopInput.value = localStorage.getItem('addToTop') || newDefaultAddToTopPreset;
       addToBottomInput.value = localStorage.getItem('addToBottom') || '---\nEnd of Part $X';
       maxCharsInput.value = localStorage.getItem('maxChars') || '1800';
       formatSelect.value = localStorage.getItem('formatSelect') || 'pretty';
       splitModeSelect.value = localStorage.getItem('splitModeSelect') || 'json';
       
-      if (jsonObjectsPerChunkSelect) { // New
+      if (jsonObjectsPerChunkSelect) {
           jsonObjectsPerChunkSelect.value = localStorage.getItem('jsonObjectsPerChunk') || '1';
       }
       
-      // Add initial 3 find/replace pairs
       for (let i = 0; i < 3; i++) {
           addFindReplacePair();
       }
 
       toggleInputSections(); 
 
+      if (splitModeSelect.value === 'json') {
+        updateJsonObjectCount();
+      } else {
+        updatePlainTextInfo();
+      }
+
+      if (jsonInputArea) {
+        jsonInputArea.addEventListener('input', updateJsonObjectCount);
+      }
+      if (plainTextInputArea) {
+        plainTextInputArea.addEventListener('input', updatePlainTextInfo);
+      }
+      maxCharsInput.addEventListener('input', updatePlainTextInfo);
+
+
       maxCharsInput.addEventListener('input', () => localStorage.setItem('maxChars', maxCharsInput.value));
       addToTopInput.addEventListener('input', () => localStorage.setItem('addToTop', addToTopInput.value));
       addToBottomInput.addEventListener('input', () => localStorage.setItem('addToBottom', addToBottomInput.value));
       
-      if (jsonObjectsPerChunkSelect) { // New
+      if (jsonObjectsPerChunkSelect) {
           jsonObjectsPerChunkSelect.addEventListener('change', () => {
               localStorage.setItem('jsonObjectsPerChunk', jsonObjectsPerChunkSelect.value);
           });
@@ -395,18 +529,23 @@
       splitModeSelect.addEventListener('change', () => {
         localStorage.setItem('splitModeSelect', splitModeSelect.value);
         toggleInputSections();
+        if (splitModeSelect.value === 'json') {
+            updateJsonObjectCount();
+        } else {
+            updatePlainTextInfo();
+        }
       });
       
       if (plainTextInputArea) {
           plainTextInputArea.addEventListener('input', () => {
               originalPlainTextInput = plainTextInputArea.value;
-              if (formatSelect.value === 'pretty') {
-                  formatPlainText();
+              if (formatSelect.value === 'pretty') { 
+                  formatPlainText(); 
               }
           });
-          if (plainTextInputArea.value) { // Ensure original is set if there's pre-filled text
+          if (plainTextInputArea.value) {
               originalPlainTextInput = plainTextInputArea.value;
-              formatPlainText(); // Apply initial format if needed
+              formatPlainText();
           }
       }
     });
@@ -440,7 +579,7 @@
             const replaceInput = pairElements[i].querySelector('.replace-text');
             if (!findInput || !replaceInput) continue;
 
-            const findText = findInput.value; // Don't trim findText to allow searching for spaces
+            const findText = findInput.value; 
             const replaceText = replaceInput.value; 
 
             if (findText) { 
@@ -455,7 +594,7 @@
             }
         }
         
-        if (rules.length === 0 && pairElements.length > 0) { // Only show if user attempted to create rules but all were invalid
+        if (rules.length === 0 && pairElements.length > 0) {
             let allFindFieldsEmpty = true;
             pairElements.forEach(pairEl => {
                 if(pairEl.querySelector('.find-text').value) allFindFieldsEmpty = false;
@@ -466,13 +605,12 @@
                 return;
             }
         }
-        if(rules.length === 0) { // If no rules and no pairs, just silently do nothing or specific message
+        if(rules.length === 0) {
             statusElement.textContent = 'No replacement rules to apply.';
             statusElement.style.color = 'grey';
             setTimeout(() => { if (statusElement) statusElement.textContent = ''; }, 5000);
             return;
         }
-
 
         let jsonData;
         try {
@@ -493,26 +631,31 @@
         let ruleApplicationStats = rules.map(rule => ({ find: rule.find, replacedInstances: 0 }));
 
         jsonData.forEach(obj => {
-            if (obj && Array.isArray(obj.terms)) {
-                obj.terms.forEach(term => {
-                    if (term && typeof term.translation === 'string') {
-                        let currentTermTranslation = term.translation;
-                        
-                        rules.forEach((rule, ruleIndex) => {
-                            let matchOccurrences = (currentTermTranslation.match(rule.findRegExp) || []).length;
-                            if (matchOccurrences > 0) {
-                                currentTermTranslation = currentTermTranslation.replace(rule.findRegExp, rule.replace);
-                                ruleApplicationStats[ruleIndex].replacedInstances += matchOccurrences;
-                                totalInstancesReplacedThisRun += matchOccurrences;
-                            }
-                        });
-                        term.translation = currentTermTranslation;
-                    }
-                });
-            }
+            const itemsToProcess = Array.isArray(obj) ? obj : [obj]; 
+            
+            itemsToProcess.forEach(actualItem => {
+                if (actualItem && Array.isArray(actualItem.terms)) {
+                    actualItem.terms.forEach(term => {
+                        if (term && typeof term.translation === 'string') {
+                            let currentTermTranslation = term.translation;
+                            
+                            rules.forEach((rule, ruleIndex) => {
+                                let matchOccurrences = (currentTermTranslation.match(rule.findRegExp) || []).length;
+                                if (matchOccurrences > 0) {
+                                    currentTermTranslation = currentTermTranslation.replace(rule.findRegExp, rule.replace);
+                                    ruleApplicationStats[ruleIndex].replacedInstances += matchOccurrences;
+                                    totalInstancesReplacedThisRun += matchOccurrences;
+                                }
+                            });
+                            term.translation = currentTermTranslation;
+                        }
+                    });
+                }
+            });
         });
 
         jsonInputArea.value = JSON.stringify(jsonData, null, 2);
+        updateJsonObjectCount();
 
         let statsSummary = ruleApplicationStats.filter(s => s.replacedInstances > 0)
                                    .map(s => `'${s.find}': ${s.replacedInstances}`)
@@ -536,10 +679,10 @@
       const textArea = document.getElementById('plainTextInputArea');
       if (!formatSelect || !textArea) return;
       
-      // Ensure originalPlainTextInput is correctly initialized if textarea has content on load
       if (!originalPlainTextInput && textArea.value) {
           originalPlainTextInput = textArea.value;
       }
+      const previousValue = textArea.value;
 
       if (formatSelect.value === 'pretty') {
         const paragraphs = originalPlainTextInput.split('\n');
@@ -547,6 +690,9 @@
         textArea.value = formattedText;
       } else {
         textArea.value = originalPlainTextInput;
+      }
+      if (textArea.value !== previousValue) {
+          textArea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
       }
     }
 
@@ -561,7 +707,7 @@
           if (!chunkedTextContainer) {
               hideLoading(); return;
           }
-          chunkedTextContainer.innerHTML = ''; // Clear previous chunks
+          chunkedTextContainer.innerHTML = '';
           if (splitMode === 'json') {
             chunkJsonInput(addToTop, addToBottom, chunkedTextContainer);
           } else {
@@ -621,13 +767,12 @@
 
         if (currentGroupOfObjects.length === 0) continue; 
 
-        const newChunkNumber = Math.floor(i / objectsToGroup) + 1; // 1-based index for the new chunk
+        const newChunkNumber = Math.floor(i / objectsToGroup) + 1;
         const newChunkPartNumberForPlaceholders = String(newChunkNumber).padStart(newChunkDigits, '0');
 
-        // Create a title for the chunk
         let chunkDisplayTitle = `Segment ${newChunkPartNumberForPlaceholders}`;
         if (currentGroupOfObjects.length > 0) {
-            const firstObjOriginalId = currentGroupOfObjects[0].id !== undefined ? currentGroupOfObjects[0].id : i; // Original index 'i' as fallback
+            const firstObjOriginalId = currentGroupOfObjects[0].id !== undefined ? currentGroupOfObjects[0].id : i; 
             
             if (objectsToGroup > 1 || currentGroupOfObjects.length > 1) { 
                  const lastObjOriginalId = currentGroupOfObjects[currentGroupOfObjects.length - 1].id !== undefined
@@ -668,53 +813,41 @@
       const maxCharsInput = document.getElementById('maxChars');
       if (!plainTextInputArea || !maxCharsInput) { alert("Plain text elements not found."); hideLoading(); return; }
       
-      // Use the currently displayed text in the textarea, which might have been formatted
       const text = plainTextInputArea.value; 
       const maxChars = parseInt(maxCharsInput.value);
 
       if (!text.trim()) { alert("Plain text input is empty."); hideLoading(); return; }
       if (isNaN(maxChars) || maxChars <= 0) { alert("Max characters must be positive."); hideLoading(); return; }
 
-      const paragraphs = text.split('\n'); // Split by single newline, as "pretty" format uses double newlines between paragraphs
+      const paragraphs = text.split('\n'); 
       const chunks = [];
       let currentChunk = "";
 
       for (const paragraph of paragraphs) {
-        // Calculate length if paragraph is added. Consider current chunk might be empty.
-        // A newline is added between currentChunk and paragraph IF currentChunk is not empty AND paragraph is not empty.
-        // The "pretty" format already ensures paragraphs are separated by double newlines (which means a single empty string paragraph).
-        // So, we mainly check currentChunk length.
-        
         const lengthWithParagraph = currentChunk.length + (currentChunk.length > 0 && paragraph.length > 0 ? 1 : 0) + paragraph.length;
 
         if (currentChunk.length > 0 && lengthWithParagraph > maxChars && paragraph.length <= maxChars) {
-          // Current chunk + new paragraph exceeds maxChars, but new paragraph itself fits.
-          // So, push current chunk and start new chunk with the paragraph.
           chunks.push(currentChunk.trim());
           currentChunk = paragraph;
         } else if (lengthWithParagraph <= maxChars) {
-          // Fits, or paragraph is empty (like a blank line from double newline split)
           if (currentChunk.length > 0) {
-            if (paragraph.length > 0) { // Only add newline if paragraph isn't empty
+            if (paragraph.length > 0) {
                 currentChunk += '\n' + paragraph;
-            } else { // if paragraph is empty, means it was a double newline. Add one newline.
+            } else { 
                 currentChunk += '\n';
             }
           } else {
-            currentChunk = paragraph; // Start new chunk
+            currentChunk = paragraph;
           }
         } else { 
-          // Current chunk + new paragraph exceeds maxChars, AND new paragraph itself exceeds maxChars.
-          // This means the paragraph is too long. Push current chunk (if any), then push the long paragraph as its own chunk.
           if (currentChunk.trim()) {
             chunks.push(currentChunk.trim());
           }
-          chunks.push(paragraph); // The long paragraph becomes its own chunk
+          chunks.push(paragraph); 
           currentChunk = ""; 
         }
       }
       if (currentChunk.trim()) chunks.push(currentChunk.trim());
-
 
       const totalChunks = chunks.length;
       const digits = String(totalChunks).length > 0 ? String(totalChunks).length : 1;
@@ -733,57 +866,85 @@
     function displayChunk(content, title, container) {
         const chunkContainerDiv = document.createElement('div');
         chunkContainerDiv.classList.add('chunk-container');
+        
         const chunkTitleDiv = document.createElement('div');
         chunkTitleDiv.classList.add('chunk-title');
         chunkTitleDiv.textContent = title;
+        
         const textareaWrapper = document.createElement('div');
         textareaWrapper.classList.add('chunk-textarea-wrapper');
         const chunkTextarea = document.createElement('textarea');
         chunkTextarea.value = content;
         chunkTextarea.readOnly = true;
         textareaWrapper.appendChild(chunkTextarea);
+        
+        const buttonActionWrapper = document.createElement('div');
+        buttonActionWrapper.classList.add('button-action-wrapper');
+
         const copyButton = document.createElement('button');
         copyButton.classList.add('copy-button');
         copyButton.innerHTML = 'Copy<span class="tick" style="display:none;"> ✔️</span>';
+        copyButton.dataset.copyCount = "0"; // Initialize copy count
+
+        const copyCountDisplay = document.createElement('span');
+        copyCountDisplay.classList.add('copy-count-display');
+        copyCountDisplay.textContent = '(0)'; // Initial count display
+
         copyButton.addEventListener('click', function () {
-          copyToClipboard(chunkTextarea.value, copyButton);
+          copyToClipboard(chunkTextarea.value, this, copyCountDisplay); // 'this' refers to copyButton
         });
+
+        buttonActionWrapper.appendChild(copyButton);
+        buttonActionWrapper.appendChild(copyCountDisplay);
+        
         chunkContainerDiv.appendChild(chunkTitleDiv);
         chunkContainerDiv.appendChild(textareaWrapper);
-        chunkContainerDiv.appendChild(copyButton);
+        chunkContainerDiv.appendChild(buttonActionWrapper);
         container.appendChild(chunkContainerDiv);
     }
 
-    function copyToClipboard(text, buttonElement) {
+    function copyToClipboard(text, buttonElement, countDisplayElement) {
       const hiddenInput = document.createElement('textarea');
       hiddenInput.value = text;
       document.body.appendChild(hiddenInput);
       hiddenInput.select();
-      hiddenInput.setSelectionRange(0, 99999); // For mobile devices
+      hiddenInput.setSelectionRange(0, 99999);
       let success = false;
       try { 
           success = document.execCommand('copy'); 
           if (success && buttonElement) {
               updateButtonState(buttonElement);
+              if (countDisplayElement) {
+                  let currentCount = parseInt(buttonElement.dataset.copyCount, 10);
+                  currentCount++;
+                  buttonElement.dataset.copyCount = currentCount.toString();
+                  countDisplayElement.textContent = `(${currentCount})`;
+              }
           }
       } 
       catch (err) { 
           console.warn('Fallback: execCommand copy failed:', err); 
-          success = false; // Ensure success is false if execCommand fails
+          success = false;
       }
       
-      // If execCommand failed or wasn't fully supported, try navigator.clipboard
       if (!success && navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text)
             .then(() => { 
-                if (buttonElement) updateButtonState(buttonElement); 
+                if (buttonElement) {
+                    updateButtonState(buttonElement);
+                    if (countDisplayElement) {
+                        let currentCount = parseInt(buttonElement.dataset.copyCount, 10);
+                        currentCount++;
+                        buttonElement.dataset.copyCount = currentCount.toString();
+                        countDisplayElement.textContent = `(${currentCount})`;
+                    }
+                }
             })
             .catch(err => {
                 console.error('Async copy failed:', err);
                 alert('Failed to copy text. Your browser might not support this feature or there was an error.');
             });
       } else if (!success) {
-          // If both methods failed
           alert('Failed to copy text. Please try manual copy.');
       }
       document.body.removeChild(hiddenInput);
