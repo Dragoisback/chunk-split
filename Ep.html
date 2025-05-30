@@ -286,8 +286,8 @@
     <div class="ship-container">
         <div class="scroll-card" style="text-align:center;">
             <!-- TODO: One Piece Jolly Roger or "EPUB Splitter" in One Piece font style image -->
-            <h1>🏴‍☠️ One Piece EPUB Splitter 🗺️</h1>
-            <p class="small-note">The Grand Line of EPUB Splitting! Divide your Poneglyphs (EPUBs) into manageable scrolls!</p>
+            <h1>🏴‍☠️ Drago's EPUB Splitter 🗺️</h1>
+            <p class="small-note">The Grand Line of EPUB Splitting! Divide your Poneglyphs into manageable scrolls!</p>
         </div>
 
         <div class="scroll-card">
@@ -299,12 +299,12 @@
             </div>
 
             <div id="epubInfo" class="crew-info-container hidden">
-                <h2>Poneglyph Details (EPUB Info)</h2>
+                <h2>Poneglyph Details </h2>
                 <!-- TODO: Maybe a small chibi character (e.g., Robin) next to this section title -->
                 <p><strong>Scroll Title:</strong> <span id="epubInfoTitle"></span></p>
                 <p><strong>Scribe (Author):</strong> <span id="epubInfoAuthor"></span></p>
-                <p><strong>Ancient Tongue (Language):</strong> <span id="epubInfoLanguage"></span></p>
-                <p><strong>Total Verses (Spine Items):</strong> <span id="epubInfoSpineCount"></span></p>
+                <p><strong>Ancient Tongue :</strong> <span id="epubInfoLanguage"></span></p>
+                <p><strong>Total Verses :</strong> <span id="epubInfoSpineCount"></span></p>
                 <p class="small-note" id="epubCoverInfo"></p>
             </div>
         </div>
@@ -321,14 +321,14 @@
 
 
         <div class="scroll-card">
-            <h2>Chart Your Course (Split Config)</h2>
+            <h2>Chart Your Course</h2>
             <!-- TODO: Nami Chibi with a map next to this title -->
             <label for="splitType">Splitting Strategy:</label>
             <select id="splitType" disabled title="Choose your splitting strategy">
                 <option value="chaptersPerPart">By Number of Verses per Scroll</option>
                 <option value="numberOfParts">Into Fixed Number of Scrolls</option>
                 <option value="approxSize">By Approx. Scroll Size (MB)</option>
-                <option value="customRanges">Into Custom "Saga Arcs" (Volumes)</option>
+                <option value="customRanges">Into Custom "Saga Arcs"</option>
             </select>
 
             <div id="chaptersPerPartOptions" class="options-group">
@@ -347,7 +347,7 @@
             </div>
 
             <div id="customRangesOptions" class="options-group hidden">
-                <label>Define Your Sagas (Volumes):</label>
+                <label>Define Your Saga Arcs :</label>
                 <div id="volumeDefinitionsContainer">
                     <!-- Volume definition rows will be added here -->
                 </div>
@@ -355,7 +355,7 @@
                 <small id="tocLoadingStatus" class="small-note">Load a Poneglyph to chart your sagas.</small>
             </div>
             <!-- TODO: Button with a "Set Sail!" or "Cannon Fire!" icon -->
-            <button id="splitButton" disabled title="Execute the splitting strategy"> تقسیم شد! (Split!) </button>
+            <button id="splitButton" disabled title="Execute the splitting strategy"> Split! </button>
         </div>
 
 
@@ -557,7 +557,7 @@
             endGroup.appendChild(endLabel); endGroup.appendChild(endSelect);
             
             const removeButton = document.createElement('button');
-            removeButton.type = 'button'; removeButton.textContent = '🗑️ Remove Saga'; removeButton.className = 'remove-volume-btn button-styled'; removeButton.title="Remove this saga definition";
+            removeButton.type = 'button'; removeButton.textContent = '🗑️ Purge the Chronicle'; removeButton.className = 'remove-volume-btn button-styled'; removeButton.title="Remove this saga definition";
             removeButton.onclick = () => { row.remove(); refreshAllVolumeRangeDropdowns(); };
 
             row.appendChild(nameGroup); row.appendChild(startGroup); row.appendChild(endGroup); row.appendChild(removeButton);
