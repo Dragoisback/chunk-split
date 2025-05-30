@@ -154,7 +154,6 @@
         button img, .button-styled img { /* Style for images inside buttons */
             height: 1.1em; /* Default, can be adjusted per button */
             margin-right: 0.5em;
-            /* vertical-align: middle; No longer needed with flex */
         }
 
         button:hover, .button-styled:hover {
@@ -224,7 +223,7 @@
             margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
             font-size: 1em; border-left: 4px solid var(--secondary-accent);
         }
-        #selectedCommonPagesList li .remove-common-page-btn img { /* Smaller cross icon */
+        #selectedCommonPagesList li .remove-common-page-btn img { 
             height: 0.8em; 
             margin-right: 0.2em;
         }
@@ -235,11 +234,10 @@
             background-color: var(--text-main);
             color: var(--bg-main);
             border-radius: 50%; width: 50px; height: 50px;
-            font-size: 1.5em; /* Will contain emoji */
-            /* line-height: 50px; Already handled by flex */
+            font-size: 1.5em; 
             box-shadow: 0 2px 5px var(--shadow-color);
             z-index: 1000;
-            padding: 0; /* Reset padding to center emoji in button */
+            padding: 0; 
         }
         
         /* EPUB Info - "Bounty Poster Details" */
@@ -251,7 +249,7 @@
         body.dark-mode .small-note { color: #a7b4c1; }
 
         /* Responsive Design */
-        @media (max-width: 992px) { /* Tablet */
+        @media (max-width: 992px) { 
             .volume-definition-row {
                 grid-template-columns: 1fr 1fr; 
                 gap: 10px;
@@ -260,7 +258,7 @@
             .volume-definition-row .remove-volume-btn { grid-column: 1 / -1; width: 100%; margin-top: 10px; }
         }
 
-        @media (max-width: 768px) { /* Smaller tablets and landscape phones */
+        @media (max-width: 768px) { 
             h1 { font-size: 2.2em; }
             h2 { font-size: 1.7em; }
             .ship-container { padding: 0 10px; margin-top:10px; }
@@ -269,7 +267,7 @@
              #splitButton { padding: 12px; font-size: 1.1em; }
         }
 
-        @media (max-width: 576px) { /* Mobile */
+        @media (max-width: 576px) { 
             h1 { font-size: 1.8em; }
             h2 { font-size: 1.4em; }
              .scroll-card { margin-bottom: 20px; }
@@ -300,7 +298,7 @@
 
     <div class="ship-container">
         <div class="scroll-card" style="text-align:center;">
-            <h1><img src="luffy_icon.png" alt="Drago" class="main-title-icon" style="margin-right: 0.2em;"> Drago’s EPUB Splitter <img src="luffy_icon.png" alt="Drago" class="main-title-icon" style="margin-left: 0.2em; margin-right:0;"></h1>
+            <h1><img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-right: 0.2em;"> Drago’s EPUB Splitter <img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-left: 0.2em; margin-right:0;"></h1>
             <p class="small-note">The Grand Line of EPUB Splitting! Divide your Tomes into manageable scrolls!</p>
         </div>
 
@@ -309,12 +307,12 @@
                 <p>Chart a New Adventure! Drop Your Tome Here or...</p>
                 <input type="file" id="epubFile" accept=".epub" required class="hidden">
                 <button type="button" id="browseFileButton" class="button-styled">
-                    <img src="scroll_map_icon.png" alt="Scroll Map Icon"> Search for Tomes
+                    <img src="image4.jpeg" alt="Scroll Map Icon"> Search for Tomes
                 </button>
             </div>
 
             <div id="epubInfo" class="crew-info-container hidden">
-                <h2><img src="poneglyph_magnify_icon.png" alt="Poneglyph Magnify Icon">Tome Details (EPUB Info)</h2>
+                <h2><img src="image8.jpeg" alt="Poneglyph Magnify Icon">Tome Details (EPUB Info)</h2>
                 <p><strong>Scroll Title:</strong> <span id="epubInfoTitle"></span></p>
                 <p><strong>Scribe (Author):</strong> <span id="epubInfoAuthor"></span></p>
                 <p><strong>Ancient Tongue (Language):</strong> <span id="epubInfoLanguage"></span></p>
@@ -329,7 +327,7 @@
             <div class="common-pages-selector-container">
                 <select id="commonPageCandidateSelector" disabled title="Select sections for the Captain's Decree"></select>
                 <button type="button" id="addCommonPageButton" disabled title="Add selected section to Decree">
-                    <img src="quill_scroll_icon.png" alt="Quill and Scroll Icon">Add to Decree
+                    <img src="image7.jpeg" alt="Quill and Scroll Icon">Add to Decree
                 </button>
             </div>
             <ul id="selectedCommonPagesList"></ul>
@@ -337,7 +335,7 @@
 
 
         <div class="scroll-card">
-            <h2><img src="nami_icon.png" alt="Nami Icon">Chart Your Course (Split Config)</h2>
+            <h2><img src="image2.jpeg" alt="Nami Icon">Chart Your Course (Split Config)</h2>
             <label for="splitType">Splitting Strategy:</label>
             <select id="splitType" disabled title="Choose your splitting strategy">
                 <option value="chaptersPerPart">By Number of Sections per Scroll</option>
@@ -367,12 +365,12 @@
                     <!-- Volume definition rows will be added here -->
                 </div>
                 <button type="button" id="addVolumeButton" style="margin-top: 10px;" disabled title="Add a new chronicle/volume definition">
-                    <img src="logpose_icon.png" alt="Log Pose Icon">Chronicle Expansion
+                    <img src="image6.jpeg" alt="Log Pose Icon">Chronicle Expansion
                 </button>
                 <small id="tocLoadingStatus" class="small-note">Load a Tome to chart your chronicles.</small>
             </div>
             <button id="splitButton" disabled title="Execute the splitting strategy">
-                 <img src="cannon_scroll_icon.png" alt="Cannon Icon" style="height:1.3em;"> Split It!
+                 <img src="image5.jpeg" alt="Cannon Icon" style="height:1.3em;"> Split It!
             </button>
         </div>
 
@@ -380,7 +378,7 @@
         <div class="scroll-card">
             <div id="status" class="small-note">Awaiting Tome...</div>
             <h2 id="downloadTitle" class="hidden" style="font-size: 1.5em; margin-bottom:10px;">
-                <img src="treasure_chest_icon.png" alt="Treasure Chest Icon">Your New Scrolls! (Downloads)
+                <img src="treasure_chest_icon.png.jpeg" alt="Treasure Chest Icon">Your New Scrolls! (Downloads)
             </h2>
             <div id="downloadLinks"></div>
         </div>
@@ -540,7 +538,7 @@
             currentEpubTocForSelection.forEach((item, index) => {
                 if (!selectedCommonPageIndices.has(item.value)) { 
                     const option = document.createElement('option'); option.value = item.value; 
-                    option.textContent = `(${index + 1}) ${item.title}`; // Displaying original index and title from ToC
+                    option.textContent = `(${index + 1}) ${item.title}`; 
                     commonPageCandidateSelector.appendChild(option);
                     hasAvailableOptions = true;
                 }
@@ -622,7 +620,7 @@
             }
 
             availableTocEntriesForThisVolume.forEach((tocEntry) => { 
-                const originalItemData = currentEpubTocForSelection[tocEntry.value]; // This assumes currentEpubTocForSelection is indexed 0..N and entry.value is that index
+                const originalItemData = currentEpubTocForSelection[tocEntry.value]; 
                 const option = document.createElement('option'); option.value = tocEntry.value; 
                 option.textContent = `(${tocEntry.value + 1}) ${originalItemData.title}`;
                 startSelect.appendChild(option.cloneNode(true));
@@ -739,7 +737,7 @@
             splitButton.disabled = true; splitTypeSelect.disabled = true; addVolumeButton.disabled = true;
             epubInfoDiv.classList.add('hidden'); commonPagesCard.classList.add('hidden');
             volumeDefinitionsContainer.innerHTML = ''; 
-            allOptionsDivs.forEach(div => div.classList.add('hidden')); optionsMap[splitTypeSelect.value].classList.remove('hidden'); // Ensure default is shown
+            allOptionsDivs.forEach(div => div.classList.add('hidden')); optionsMap[splitTypeSelect.value].classList.remove('hidden'); 
             tocLoadingStatus.textContent = 'Load a Tome to chart your chronicles.';
             populateCommonPageCandidateSelector();
             statusDiv.textContent = 'Awaiting Tome...'; statusDiv.className = '';
@@ -831,7 +829,7 @@
                     if (partData.isCustomName) { filename = `${sanitizeFilename(partData.name)}.epub`; linkText = `${partData.name}`; }
                     else { filename = `${sanitizeFilename(originalTitle)}_Scroll_${partData.partNum}.epub`; linkText = `Scroll ${partData.partNum}`; }
                     link.download = filename; 
-                    link.innerHTML = `<img src="treasure_chest_icon.png" alt="Treasure Chest Icon"> ${linkText}`; 
+                    link.innerHTML = `<img src="treasure_chest_icon.png.jpeg" alt="Treasure Chest Icon"> ${linkText}`; 
                     downloadLinksDiv.appendChild(link); 
                 }
                 statusDiv.textContent = '🎉 All Scrolls Charted! Treasures (Downloads) below!'; statusDiv.className = 'success';
@@ -910,7 +908,7 @@
             chapterFilesFromSpine.forEach((spineItem, index) => {
                 let title = hrefToTocTitleMap.get(spineItem.href); 
                 if (!title) { title = spineItem.href.split('/').pop().replace(/\.(xhtml|html)$/i, '') || `Section ${index + 1}`; title = `(No Title in Log) ${title}`; }
-                tocForSelection.push({ title: title, value: index }); // value is the original index in chapterFilesFromSpine
+                tocForSelection.push({ title: title, value: index }); 
             }); return tocForSelection;
         }
         function getMetadataField(opfDoc, fieldName) { 
