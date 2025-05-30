@@ -90,13 +90,31 @@
         h2 { font-size: 2em; margin-top: 30px; padding-bottom: 10px; border-bottom: 2px dashed var(--border-color); }
         
         h1 img, h2 img { /* Style for images within headers */
-            height: 1.1em; /* Adjust as needed */
-            vertical-align: -0.1em; /* Fine-tune vertical alignment */
+            height: 1.1em; 
+            vertical-align: -0.1em; 
             margin-right: 0.3em;
         }
         h1 img.main-title-icon {
              height: 1.3em;
              vertical-align: -0.15em;
+        }
+        
+        .main-title-container {
+            position: relative; 
+            display: inline-block; 
+            margin-bottom: 10px; 
+        }
+
+        .title-topper-icon {
+            position: absolute;
+            top: -35px;  
+            left: 50%;
+            transform: translateX(-50%); 
+            height: 60px; 
+            z-index: 10; 
+        }
+        .main-title-container h1 {
+            margin-top: 25px; /* Adjusted to make space for topper icon */
         }
 
 
@@ -145,19 +163,19 @@
             margin-top: 10px;
             transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
             text-decoration: none;
-            display: inline-flex; /* For icon and text alignment */
-            align-items: center; /* For icon and text alignment */
-            justify-content: center; /* For icon and text alignment */
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        button img, .button-styled img { /* Style for images inside buttons */
-            height: 1.1em; /* Default, can be adjusted per button */
+        button img, .button-styled img { 
+            height: 1.1em; 
             margin-right: 0.5em;
         }
 
         button:hover, .button-styled:hover {
-            background-color: #1f6999; /* Darker blue */
+            background-color: #1f6999; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             transform: translateY(-1px);
         }
@@ -179,11 +197,16 @@
         #status { margin-top: 20px; text-align: center; font-size: 1.1em; padding: 10px; border-radius: 4px; }
         #status.success { background-color: var(--success-color); color: white;}
         #status.error { background-color: var(--danger-color); color: white;}
+        #status img { /* For zoro in status */
+            height: 1.2em; 
+            vertical-align: middle; 
+            margin-right: 0.3em;
+        }
         #downloadLinks { margin-top: 20px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         #downloadLinks a {
             background-color: var(--primary-accent);
         }
-        #downloadLinks a img { /* Icon inside download links */
+        #downloadLinks a img { 
             height: 1em;
             margin-right: 0.3em;
         }
@@ -228,7 +251,7 @@
             margin-right: 0.2em;
         }
         
-        /* Dark Mode Toggle - "Den Den Mushi" Button? */
+        /* Dark Mode Toggle */
         #darkModeToggle {
             position: fixed; top: 20px; right: 20px;
             background-color: var(--text-main);
@@ -240,48 +263,33 @@
             padding: 0; 
         }
         
-        /* EPUB Info - "Bounty Poster Details" */
+        /* EPUB Info */
         .crew-info-container p { margin: 8px 0; font-size: 1.05em; }
         .crew-info-container strong { color: var(--text-header); font-weight: 600; }
         
-        /* Small Notes / Helper text */
+        /* Small Notes */
         .small-note { font-size: 0.9em; color: #605147; display: block; margin-top: 5px;}
         body.dark-mode .small-note { color: #a7b4c1; }
 
         /* Responsive Design */
         @media (max-width: 992px) { 
-            .volume-definition-row {
-                grid-template-columns: 1fr 1fr; 
-                gap: 10px;
-            }
+            .volume-definition-row { grid-template-columns: 1fr 1fr; gap: 10px; }
             .volume-definition-row .input-group:nth-child(1) { grid-column: 1 / -1; } 
             .volume-definition-row .remove-volume-btn { grid-column: 1 / -1; width: 100%; margin-top: 10px; }
         }
-
         @media (max-width: 768px) { 
-            h1 { font-size: 2.2em; }
-            h2 { font-size: 1.7em; }
-            .ship-container { padding: 0 10px; margin-top:10px; }
-            .scroll-card { padding: 15px; }
-             button, .button-styled { padding: 10px 15px; font-size: 1em;}
-             #splitButton { padding: 12px; font-size: 1.1em; }
+            h1 { font-size: 2.2em; } h2 { font-size: 1.7em; }
+            .ship-container { padding: 0 10px; margin-top:10px; } .scroll-card { padding: 15px; }
+            button, .button-styled { padding: 10px 15px; font-size: 1em;}
+            #splitButton { padding: 12px; font-size: 1.1em; }
         }
-
         @media (max-width: 576px) { 
-            h1 { font-size: 1.8em; }
-            h2 { font-size: 1.4em; }
-             .scroll-card { margin-bottom: 20px; }
-
-            .volume-definition-row {
-                grid-template-columns: 1fr; 
-            }
-            .volume-definition-row .input-group, .volume-definition-row .remove-volume-btn {
-                grid-column: auto; 
-                width: auto;
-            }
+            h1 { font-size: 1.8em; } h2 { font-size: 1.4em; }
+            .scroll-card { margin-bottom: 20px; }
+            .volume-definition-row { grid-template-columns: 1fr; }
+            .volume-definition-row .input-group, .volume-definition-row .remove-volume-btn { grid-column: auto; width: auto; }
             .common-pages-selector-container { flex-direction: column; align-items: stretch; }
             .common-pages-selector-container button { width: 100%; margin-top: 8px; }
-
             #darkModeToggle { width: 40px; height: 40px; font-size: 1.2em; top:10px; right:10px; }
             #downloadLinks a { width: calc(100% - 10px); margin-left:0; margin-right:0; } 
         }
@@ -298,7 +306,10 @@
 
     <div class="ship-container">
         <div class="scroll-card" style="text-align:center;">
-            <h1><img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-right: 0.2em;"> Drago’s EPUB Splitter <img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-left: 0.2em; margin-right:0;"></h1>
+            <div class="main-title-container">
+                <img src="image3.jpeg" alt="Zoro Topper" class="title-topper-icon">
+                <h1><img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-right: 0.2em;"> Drago’s EPUB Splitter <img src="image.jpeg" alt="Drago" class="main-title-icon" style="margin-left: 0.2em; margin-right:0;"></h1>
+            </div>
             <p class="small-note">The Grand Line of EPUB Splitting! Divide your Tomes into manageable scrolls!</p>
         </div>
 
@@ -549,13 +560,20 @@
 
 
         // --- Volume Definition UI Logic ---
-        function addVolumeDefinitionRow(volumeName = "", defaultStartSpineIdx = -1, defaultEndSpineIdx = -1) { 
+        function addVolumeDefinitionRow(originalEpubTitle = "Untitled Tome", volumeName = "", defaultStartSpineIdx = -1, defaultEndSpineIdx = -1) { 
             const row = document.createElement('div'); row.className = 'volume-definition-row';
+            const existingVolumeRows = volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').length;
+            const defaultGeneratedName = `${originalEpubTitle} - Volume ${existingVolumeRows + 1}`;
+
             row.dataset.volumeId = `vol-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
             const nameGroup = document.createElement('div'); nameGroup.className = 'input-group';
             const nameLabel = document.createElement('label'); nameLabel.textContent = 'Chronicle Name:';
-            const nameInput = document.createElement('input'); nameInput.type = 'text'; nameInput.placeholder = 'e.g., Dawn Island Chronicle';
-            nameInput.value = volumeName; nameInput.className = 'volume-name-input';
+            const nameInput = document.createElement('input'); nameInput.type = 'text'; 
+            
+            nameInput.value = volumeName ? volumeName : defaultGeneratedName;
+            nameInput.placeholder = defaultGeneratedName; 
+            nameInput.className = 'volume-name-input';
+
             nameGroup.appendChild(nameLabel); nameGroup.appendChild(nameInput);
 
             const startGroup = document.createElement('div'); startGroup.className = 'input-group';
@@ -570,7 +588,10 @@
             
             const removeButton = document.createElement('button');
             removeButton.type = 'button'; removeButton.textContent = '🗑️ Purge the Chronicle'; removeButton.className = 'remove-volume-btn button-styled'; removeButton.title="Remove this chronicle definition";
-            removeButton.onclick = () => { row.remove(); refreshAllVolumeRangeDropdowns(); };
+            removeButton.onclick = () => { 
+                row.remove(); 
+                refreshAllVolumeRangeDropdowns(); 
+            };
 
             row.appendChild(nameGroup); row.appendChild(startGroup); row.appendChild(endGroup); row.appendChild(removeButton);
             volumeDefinitionsContainer.appendChild(row);
@@ -593,6 +614,7 @@
             });
             endSelect.addEventListener('change', refreshAllVolumeRangeDropdowns);
         }
+
         function getClaimedIndicesByOtherVolumes(currentRowId) { 
             const claimed = new Set();
             volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').forEach(row => {
@@ -662,9 +684,9 @@
         }
 
         addVolumeButton.addEventListener('click', () => { 
-            let smartStartIdx = 0; const volumeRows = volumeDefinitionsContainer.querySelectorAll('.volume-definition-row');
+            let smartStartIdx = 0; 
             const allCurrentlyClaimedIndices = new Set(selectedCommonPageIndices);
-            volumeRows.forEach(row => {
+            volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').forEach(row => { 
                 const startSelect = row.querySelector('.volume-start-select'); const endSelect = row.querySelector('.volume-end-select');
                 if (startSelect.value && endSelect.value) { const start = parseInt(startSelect.value); const end = parseInt(endSelect.value);
                     if (!isNaN(start) && !isNaN(end) && start <=end) { for(let i=start; i<=end; i++) allCurrentlyClaimedIndices.add(i); }}
@@ -681,8 +703,14 @@
             if (!foundStart && currentChapterFiles.length > 0) smartStartIdx = 0; 
              else if (!foundStart && currentChapterFiles.length === 0) smartStartIdx = -1; 
 
-            addVolumeDefinitionRow(`Chronicle ${volumeRows.length + 1}`, smartStartIdx, smartStartIdx);
+            let epubTitle = "Untitled Tome"; 
+            if (originalOpfDoc) {
+                epubTitle = getMetadataField(originalOpfDoc, "dc:title") || "Untitled Tome";
+            }
+            
+            addVolumeDefinitionRow(epubTitle, "", smartStartIdx, smartStartIdx); 
         });
+
         splitTypeSelect.addEventListener('change', function() { 
             allOptionsDivs.forEach(div => div.classList.add('hidden'));
             if (optionsMap[this.value]) optionsMap[this.value].classList.remove('hidden');
@@ -700,7 +728,7 @@
             try {  
                 originalZipInstance = await JSZip.loadAsync(file); const { opfPath, opfContent, opfDir } = await getOpfData(originalZipInstance);
                 originalOpfPath = opfPath; originalOpfDir = opfDir; const parser = new DOMParser();
-                originalOpfDoc = parser.parseFromString(opfContent, "application/xml");
+                originalOpfDoc = parser.parseFromString(opfContent, "application/xml"); 
                 manifestItemsStore = parseManifest(originalOpfDoc); const spineItemRefs = parseSpine(originalOpfDoc);
                 currentChapterFiles = spineItemRefs.map(idref => manifestItemsStore.find(item => item.id === idref)).filter(item => item && (item.mediaType === 'application/xhtml+xml' || item.mediaType === 'application/html'));
                 if (currentChapterFiles.length === 0) { statusDiv.textContent = '🚫 Error: No sections (content documents) found in this Tome!'; statusDiv.className='error'; clearEpubData(); return; }
@@ -711,8 +739,8 @@
                 if (coverId) coverImageManifestItem = manifestItemsStore.find(item => item.id === coverId);
                 if (!coverImageManifestItem) coverImageManifestItem = manifestItemsStore.find(item => item.properties && item.properties.includes("cover-image"));
                 
+                epubInfoTitle.textContent = getMetadataField(originalOpfDoc, "dc:title") || "N/A"; 
                 epubCoverInfo.textContent = coverImageManifestItem ? `📜 Cover section found (${coverImageManifestItem.href}).` : "🚫 No cover section explicitly defined.";
-                epubInfoTitle.textContent = getMetadataField(originalOpfDoc, "dc:title") || "N/A";
                 epubInfoAuthor.textContent = getMetadataField(originalOpfDoc, "dc:creator") || "N/A";
                 epubInfoLanguage.textContent = getMetadataField(originalOpfDoc, "dc:language") || "N/A";
                 epubInfoSpineCount.textContent = currentChapterFiles.length;
@@ -721,8 +749,12 @@
                 splitButton.disabled = false; splitTypeSelect.disabled = false; addVolumeButton.disabled = false;
                 statusDiv.textContent = '✅ Tome Loaded! Chart your course below.'; statusDiv.className = 'success';
                 
-                populateCommonPageCandidateSelector(); refreshAllVolumeRangeDropdowns(); 
-                if (splitTypeSelect.value === 'customRanges' && volumeDefinitionsContainer.children.length === 0 && currentEpubTocForSelection.length > 0) { addVolumeButton.click(); }
+                populateCommonPageCandidateSelector(); 
+                volumeDefinitionsContainer.innerHTML = ''; 
+                refreshAllVolumeRangeDropdowns(); 
+                if (splitTypeSelect.value === 'customRanges' && currentEpubTocForSelection.length > 0) { 
+                    addVolumeButton.click(); 
+                }
 
             } catch (error) {
                 console.error("EPUB Loading Error:", error);
@@ -737,7 +769,13 @@
             splitButton.disabled = true; splitTypeSelect.disabled = true; addVolumeButton.disabled = true;
             epubInfoDiv.classList.add('hidden'); commonPagesCard.classList.add('hidden');
             volumeDefinitionsContainer.innerHTML = ''; 
-            allOptionsDivs.forEach(div => div.classList.add('hidden')); optionsMap[splitTypeSelect.value].classList.remove('hidden'); 
+            allOptionsDivs.forEach(div => div.classList.add('hidden')); 
+            if (optionsMap[splitTypeSelect.value]) { 
+                optionsMap[splitTypeSelect.value].classList.remove('hidden');
+            } else if (optionsMap['chaptersPerPart']) { 
+                 optionsMap['chaptersPerPart'].classList.remove('hidden');
+            }
+
             tocLoadingStatus.textContent = 'Load a Tome to chart your chronicles.';
             populateCommonPageCandidateSelector();
             statusDiv.textContent = 'Awaiting Tome...'; statusDiv.className = '';
@@ -796,9 +834,9 @@
                     const volumeRows = volumeDefinitionsContainer.querySelectorAll('.volume-definition-row');
                     if (volumeRows.length === 0) { statusDiv.textContent = '🚫 Error: Please define at least one Chronicle.'; statusDiv.className='error'; return; }
                     let errorInSelections = false;
-                    volumeRows.forEach((row) => { if (errorInSelections) return;
+                    volumeRows.forEach((row, index) => { if (errorInSelections) return; 
                         const nameInput = row.querySelector('.volume-name-input'); const startSelect = row.querySelector('.volume-start-select'); const endSelect = row.querySelector('.volume-end-select');
-                        const volumeName = nameInput.value.trim() || `Chronicle ${partsToCreate.length + 1}`;
+                        const volumeName = nameInput.value.trim() || `${originalTitle} - Volume ${index + 1}`;
                         if (!startSelect.value || !endSelect.value) { statusDiv.textContent = `🚫 Error: Chronicle "${volumeName}" has no sections selected or available.`; statusDiv.className='error'; errorInSelections = true; return; }
                         const startIndex = parseInt(startSelect.value); const endIndex = parseInt(endSelect.value);   
                         if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < 0 || startIndex >= currentChapterFiles.length || endIndex >= currentChapterFiles.length || startIndex > endIndex) {
@@ -832,7 +870,9 @@
                     link.innerHTML = `<img src="treasure_chest_icon.png.jpeg" alt="Treasure Chest Icon"> ${linkText}`; 
                     downloadLinksDiv.appendChild(link); 
                 }
-                statusDiv.textContent = '🎉 All Scrolls Charted! Treasures (Downloads) below!'; statusDiv.className = 'success';
+                statusDiv.innerHTML = `<img src="image3.jpeg" alt="Success Icon" style="height: 1.2em; vertical-align: middle; margin-right: 0.3em;"> All Scrolls Charted! Treasures (Downloads) below!`;
+                statusDiv.className = 'success';
+
 
             } catch (error) { console.error("EPUB Splitting Error:", error); statusDiv.textContent = `🚫 Error during voyage: ${error.message}. Check console log.`; statusDiv.className = 'error';}
         });
@@ -912,6 +952,7 @@
             }); return tocForSelection;
         }
         function getMetadataField(opfDoc, fieldName) { 
+             if (!opfDoc) return null; 
              const metadataNode = opfDoc.getElementsByTagName("metadata")[0]; if (metadataNode) {
                 const nsPrefix = "dc"; 
                 const localName = fieldName.startsWith(nsPrefix + ":") ? fieldName.substring(nsPrefix.length + 1) : fieldName;
