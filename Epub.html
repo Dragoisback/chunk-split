@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Drago’s EPUB Splitter 🏴‍☠️</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-header: 'Pirata One', cursive;
+            --font-body: 'Nunito Sans', sans-serif;
+
+            /* Light Mode (Default - Straw Hat Sunny Theme) */
+            --bg-main: #f0e6d2; /* Parchment / Light sand */
+            --bg-card: #fff8e1; /* Lighter parchment / Cream */
+            --text-main: #4a3b31; /* Dark Brown */
+            --text-header: #c0392b; /* Luffy's Red */
+            --primary-accent: #2980b9; /* Sea Blue */
+            --secondary-accent: #f39c12; /* Gold / Sunny Orange */
+            --border-color: #d3c0a5; /* Sandy Brown */
+            --input-bg: #fdfdfd;
+            --input-border: #c8ba9a;
+            --shadow-color: rgba(74, 59, 49, 0.2);
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --selected-item-bg: #e0dacb; /* Darker Parchment for selected */
+        }
+
+        body.dark-mode {
+            /* Dark Mode (Thousand Sunny at Night / Dark Sea Theme) */
+            --bg-main: #2c3e50; /* Dark Slate Blue */
+            --bg-card: #34495e; /* Slightly Lighter Slate Blue */
+            --text-main: #ecf0f1; /* Light Gray/Silver */
+            --text-header: #e74c3c; /* Red (stands out) */
+            --primary-accent: #3498db; /* Brighter Blue */
+            --secondary-accent: #f1c40f; /* Brighter Gold */
+            --border-color: #4e6070;
+            --input-bg: #283747;
+            --input-border: #465869;
+            --shadow-color: rgba(0,0,0,0.3);
+            --danger-color: #c0392b;
+            --success-color: #2ecc71;
+            --selected-item-bg: #41586d;
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: var(--font-body);
+            line-height: 1.7;
+            margin: 0;
+            background-color: var(--bg-main);
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-main);
+            padding: 15px;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Main Container */
+        .ship-container { 
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Card Styling (Scrolls/Planks) */
+        .scroll-card { 
+            background-color: var(--bg-card);
+            padding: 20px 25px;
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            position: relative; 
+        }
+
+        /* Headings */
+        h1, h2 {
+            font-family: var(--font-header);
+            text-align: center;
+            color: var(--text-header);
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        h1 { font-size: 2.8em; text-shadow: 1px 1px 2px var(--shadow-color); }
+        h2 { font-size: 2em; margin-top: 30px; padding-bottom: 10px; border-bottom: 2px dashed var(--border-color); }
+        
+        h1 img, h2 img { /* Style for images within headers */
+            height: 1.1em; /* Adjust as needed */
+            vertical-align: -0.1em; /* Fine-tune vertical alignment */
+            margin-right: 0.3em;
+        }
+        h1 img.main-title-icon {
+             height: 1.3em;
+             vertical-align: -0.15em;
+        }
+
+
+        /* Labels and Inputs */
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--primary-accent);
+        }
+        input[type="file"], input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 5px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1em;
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="file"] { padding: 10px; }
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--secondary-accent);
+            box-shadow: 0 0 0 3px rgba(var(--secondary-accent-rgb, 243, 156, 18), 0.3); 
+        }
+         body.dark-mode select:focus, body.dark-mode input:focus {
+            box-shadow: 0 0 0 3px rgba(var(--secondary-accent-rgb-dark, 241, 196, 15), 0.4);
+        }
+
+        /* Buttons - Themed */
+        button, .button-styled {
+            font-family: var(--font-header); 
+            background-color: var(--primary-accent);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px; 
+            cursor: pointer;
+            font-size: 1.1em; 
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            text-decoration: none;
+            display: inline-flex; /* For icon and text alignment */
+            align-items: center; /* For icon and text alignment */
+            justify-content: center; /* For icon and text alignment */
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        button img, .button-styled img { /* Style for images inside buttons */
+            height: 1.1em; /* Default, can be adjusted per button */
+            margin-right: 0.5em;
+            /* vertical-align: middle; No longer needed with flex */
+        }
+
+        button:hover, .button-styled:hover {
+            background-color: #1f6999; /* Darker blue */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-1px);
+        }
+        body.dark-mode button:hover, body.dark-mode .button-styled:hover { background-color: #2c7bb6; }
+
+        #splitButton { background-color: var(--secondary-accent); color: var(--text-main); width: 100%; padding: 15px; font-size: 1.3em; margin-top: 30px; }
+        #splitButton:hover { background-color: #d48c0a; }
+        body.dark-mode #splitButton { color: #2c2c2c; }
+        body.dark-mode #splitButton:hover { background-color: #e6a910; }
+        #splitButton:disabled { background-color: #a0a0a0; color: #e0e0e0; box-shadow: none; transform: none; cursor: not-allowed; }
+        body.dark-mode #splitButton:disabled { background-color: #555; color: #888;}
+
+
+        /* Options Group & Containers */
+        .options-group, .crew-info-container, .common-manifest-container { margin-top: 20px; padding: 20px; }
+        .hidden { display: none !important; }
+
+        /* Status & Downloads */
+        #status { margin-top: 20px; text-align: center; font-size: 1.1em; padding: 10px; border-radius: 4px; }
+        #status.success { background-color: var(--success-color); color: white;}
+        #status.error { background-color: var(--danger-color); color: white;}
+        #downloadLinks { margin-top: 20px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        #downloadLinks a {
+            background-color: var(--primary-accent);
+        }
+        #downloadLinks a img { /* Icon inside download links */
+            height: 1em;
+            margin-right: 0.3em;
+        }
+
+
+        /* Drag and Drop Area - "Wanted Poster" Style */
+        #dropArea {
+            border: 3px dashed var(--text-main);
+            border-radius: 8px; padding: 30px 20px; text-align: center; margin-bottom: 20px;
+            background-color: rgba(var(--primary-accent-rgb, 41, 128, 185), 0.08);
+            cursor: pointer;
+            position: relative;
+        }
+        #dropArea p { font-size: 1.4em; margin-bottom: 20px; font-family: var(--font-header); color: var(--text-main);}
+        #dropArea #browseFileButton { font-family: var(--font-body); background-color: var(--secondary-accent); color: var(--text-main); margin-top:0;}
+        body.dark-mode #dropArea #browseFileButton { color: #2c2c2c;}
+        body.dark-mode #dropArea { border-color: var(--primary-accent); background-color: rgba(var(--primary-accent-rgb-dark, 52, 152, 219), 0.15); }
+        #dropArea.dragover { background-color: rgba(var(--primary-accent-rgb, 41, 128, 185), 0.2); border-style: solid; }
+        body.dark-mode #dropArea.dragover { background-color: rgba(var(--primary-accent-rgb-dark, 52, 152, 219), 0.3); }
+
+        /* Volume Definitions - "Log Pose" style rows */
+        .volume-definition-row {
+            display: grid; grid-template-columns: minmax(150px, 1.5fr) 1fr 1fr auto; gap: 15px; 
+            align-items: end; margin-bottom: 15px; padding: 15px;
+            border: 1px solid var(--border-color); border-radius: 8px; background-color: rgba(0,0,0,0.02);
+        }
+        body.dark-mode .volume-definition-row { background-color: rgba(255,255,255,0.03); }
+        .remove-volume-btn, .remove-common-page-btn { background-color: var(--danger-color); font-family: var(--font-body); font-size: 0.9em; }
+        #addVolumeButton, #addCommonPageButton { background-color: var(--primary-accent); font-family: var(--font-body); }
+        #addVolumeButton img { height: 1.2em; }
+        #addCommonPageButton img { height: 1.2em;}
+        
+        /* Common Pages - "Captain's Log" List */
+        #selectedCommonPagesList { list-style: none; padding-left: 0; }
+        #selectedCommonPagesList li {
+            background-color: var(--selected-item-bg); padding: 10px 15px; border-radius: 6px;
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 1em; border-left: 4px solid var(--secondary-accent);
+        }
+        #selectedCommonPagesList li .remove-common-page-btn img { /* Smaller cross icon */
+            height: 0.8em; 
+            margin-right: 0.2em;
+        }
+        
+        /* Dark Mode Toggle - "Den Den Mushi" Button? */
+        #darkModeToggle {
+            position: fixed; top: 20px; right: 20px;
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            border-radius: 50%; width: 50px; height: 50px;
+            font-size: 1.5em; /* Will contain emoji */
+            /* line-height: 50px; Already handled by flex */
+            box-shadow: 0 2px 5px var(--shadow-color);
+            z-index: 1000;
+            padding: 0; /* Reset padding to center emoji in button */
+        }
+        
+        /* EPUB Info - "Bounty Poster Details" */
+        .crew-info-container p { margin: 8px 0; font-size: 1.05em; }
+        .crew-info-container strong { color: var(--text-header); font-weight: 600; }
+        
+        /* Small Notes / Helper text */
+        .small-note { font-size: 0.9em; color: #605147; display: block; margin-top: 5px;}
+        body.dark-mode .small-note { color: #a7b4c1; }
+
+        /* Responsive Design */
+        @media (max-width: 992px) { /* Tablet */
+            .volume-definition-row {
+                grid-template-columns: 1fr 1fr; 
+                gap: 10px;
+            }
+            .volume-definition-row .input-group:nth-child(1) { grid-column: 1 / -1; } 
+            .volume-definition-row .remove-volume-btn { grid-column: 1 / -1; width: 100%; margin-top: 10px; }
+        }
+
+        @media (max-width: 768px) { /* Smaller tablets and landscape phones */
+            h1 { font-size: 2.2em; }
+            h2 { font-size: 1.7em; }
+            .ship-container { padding: 0 10px; margin-top:10px; }
+            .scroll-card { padding: 15px; }
+             button, .button-styled { padding: 10px 15px; font-size: 1em;}
+             #splitButton { padding: 12px; font-size: 1.1em; }
+        }
+
+        @media (max-width: 576px) { /* Mobile */
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.4em; }
+             .scroll-card { margin-bottom: 20px; }
+
+            .volume-definition-row {
+                grid-template-columns: 1fr; 
+            }
+            .volume-definition-row .input-group, .volume-definition-row .remove-volume-btn {
+                grid-column: auto; 
+                width: auto;
+            }
+            .common-pages-selector-container { flex-direction: column; align-items: stretch; }
+            .common-pages-selector-container button { width: 100%; margin-top: 8px; }
+
+            #darkModeToggle { width: 40px; height: 40px; font-size: 1.2em; top:10px; right:10px; }
+            #downloadLinks a { width: calc(100% - 10px); margin-left:0; margin-right:0; } 
+        }
+        :root {
+            --primary-accent-rgb: 41, 128, 185; 
+            --primary-accent-rgb-dark: 52, 152, 219; 
+            --secondary-accent-rgb: 243, 156, 18;
+            --secondary-accent-rgb-dark: 241, 196, 15;
+        }
+    </style>
+</head>
+<body>
+    <button id="darkModeToggle" title="Toggle Dark Mode">🌊</button> 
+
+    <div class="ship-container">
+        <div class="scroll-card" style="text-align:center;">
+            <h1><img src="luffy_icon.png" alt="Drago" class="main-title-icon" style="margin-right: 0.2em;"> Drago’s EPUB Splitter <img src="luffy_icon.png" alt="Drago" class="main-title-icon" style="margin-left: 0.2em; margin-right:0;"></h1>
+            <p class="small-note">The Grand Line of EPUB Splitting! Divide your Tomes into manageable scrolls!</p>
+        </div>
+
+        <div class="scroll-card">
+            <div id="dropArea">
+                <p>Chart a New Adventure! Drop Your Tome Here or...</p>
+                <input type="file" id="epubFile" accept=".epub" required class="hidden">
+                <button type="button" id="browseFileButton" class="button-styled">
+                    <img src="scroll_map_icon.png" alt="Scroll Map Icon"> Search for Tomes
+                </button>
+            </div>
+
+            <div id="epubInfo" class="crew-info-container hidden">
+                <h2><img src="poneglyph_magnify_icon.png" alt="Poneglyph Magnify Icon">Tome Details (EPUB Info)</h2>
+                <p><strong>Scroll Title:</strong> <span id="epubInfoTitle"></span></p>
+                <p><strong>Scribe (Author):</strong> <span id="epubInfoAuthor"></span></p>
+                <p><strong>Ancient Tongue (Language):</strong> <span id="epubInfoLanguage"></span></p>
+                <p><strong>Total Sections (Spine Items):</strong> <span id="epubInfoSpineCount"></span></p>
+                <p class="small-note" id="epubCoverInfo"></p>
+            </div>
+        </div>
+
+        <div class="scroll-card common-manifest-container hidden" id="commonPagesCard">
+            <h2>Captain's Decree (Common Sections)</h2>
+            <p class="small-note">These sections will appear at the start of every new scroll. Select their order carefully, like charting a course!</p>
+            <div class="common-pages-selector-container">
+                <select id="commonPageCandidateSelector" disabled title="Select sections for the Captain's Decree"></select>
+                <button type="button" id="addCommonPageButton" disabled title="Add selected section to Decree">
+                    <img src="quill_scroll_icon.png" alt="Quill and Scroll Icon">Add to Decree
+                </button>
+            </div>
+            <ul id="selectedCommonPagesList"></ul>
+        </div>
+
+
+        <div class="scroll-card">
+            <h2><img src="nami_icon.png" alt="Nami Icon">Chart Your Course (Split Config)</h2>
+            <label for="splitType">Splitting Strategy:</label>
+            <select id="splitType" disabled title="Choose your splitting strategy">
+                <option value="chaptersPerPart">By Number of Sections per Scroll</option>
+                <option value="numberOfParts">Into Fixed Number of Scrolls</option>
+                <option value="approxSize">By Approx. Scroll Size (MB)</option>
+                <option value="customRanges">Into Custom "Chronicles" (Volumes)</option>
+            </select>
+
+            <div id="chaptersPerPartOptions" class="options-group">
+                <label for="numChapters">Sections per Scroll:</label>
+                <input type="number" id="numChapters" value="5" min="1" title="Number of spine items for each part">
+            </div>
+
+            <div id="numberOfPartsOptions" class="options-group hidden">
+                <label for="numParts">Total Number of Scrolls:</label>
+                <input type="number" id="numParts" value="2" min="2" title="How many parts to divide into">
+            </div>
+
+            <div id="approxSizeOptions" class="options-group hidden">
+                <label for="partSize">Approx. Scroll Size (MB):</label>
+                <input type="number" id="partSize" value="1" min="0.1" step="0.1" title="Approximate size in Megabytes for each part">
+            </div>
+
+            <div id="customRangesOptions" class="options-group hidden">
+                <label>Define Your Chronicles (Volumes):</label>
+                <div id="volumeDefinitionsContainer">
+                    <!-- Volume definition rows will be added here -->
+                </div>
+                <button type="button" id="addVolumeButton" style="margin-top: 10px;" disabled title="Add a new chronicle/volume definition">
+                    <img src="logpose_icon.png" alt="Log Pose Icon">Chronicle Expansion
+                </button>
+                <small id="tocLoadingStatus" class="small-note">Load a Tome to chart your chronicles.</small>
+            </div>
+            <button id="splitButton" disabled title="Execute the splitting strategy">
+                 <img src="cannon_scroll_icon.png" alt="Cannon Icon" style="height:1.3em;"> Split It!
+            </button>
+        </div>
+
+
+        <div class="scroll-card">
+            <div id="status" class="small-note">Awaiting Tome...</div>
+            <h2 id="downloadTitle" class="hidden" style="font-size: 1.5em; margin-bottom:10px;">
+                <img src="treasure_chest_icon.png" alt="Treasure Chest Icon">Your New Scrolls! (Downloads)
+            </h2>
+            <div id="downloadLinks"></div>
+        </div>
+        
+        <footer style="text-align: center; margin-top: 30px; padding: 20px 0; border-top: 1px solid var(--border-color);">
+            <p class="small-note">© 2023-Future - Your Friendly Nakama Coder. Set sail for new adventures!</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- JS Variables for RGB values of CSS Variables (for opacity in box-shadow) ---
+        function updateRgbCssVariables() {
+            const style = getComputedStyle(document.documentElement);
+            function setRgbVar(varName, colorVarName) {
+                const colorValue = style.getPropertyValue(colorVarName).trim();
+                let r=0, g=0, b=0;
+                if (colorValue.startsWith('#')) {
+                    const bigint = parseInt(colorValue.substring(1), 16);
+                    r = (bigint >> 16) & 255;
+                    g = (bigint >> 8) & 255;
+                    b = bigint & 255;
+                } else if (colorValue.startsWith('rgb')) {
+                    const parts = colorValue.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                    if (parts) {
+                        r = parseInt(parts[1]); g = parseInt(parts[2]); b = parseInt(parts[3]);
+                    }
+                }
+                document.documentElement.style.setProperty(`--${varName}-rgb`, `${r}, ${g}, ${b}`);
+            }
+            setRgbVar('primary-accent', '--primary-accent');
+            setRgbVar('secondary-accent', '--secondary-accent');
+        }
+        updateRgbCssVariables(); 
+
+
+        // --- Global State ---
+        let currentEpubTocForSelection = []; 
+        let currentChapterFiles = [];      
+        let originalOpfDoc = null;
+        let originalOpfPath = '', originalOpfDir = '';
+        let originalZipInstance = null;
+        let manifestItemsStore = [];
+        let tocDetailsStore = null;
+        let coverImageManifestItem = null;
+        
+        let selectedCommonPageIndices = new Set(); 
+        let selectedCommonPagesOrdered = [];    
+
+        // --- UI Elements ---
+        const body = document.body;
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const dropArea = document.getElementById('dropArea');
+        const epubFileInput = document.getElementById('epubFile');
+        const browseFileButton = document.getElementById('browseFileButton');
+        
+        const epubInfoDiv = document.getElementById('epubInfo');
+        const epubInfoTitle = document.getElementById('epubInfoTitle');
+        const epubInfoAuthor = document.getElementById('epubInfoAuthor');
+        const epubInfoLanguage = document.getElementById('epubInfoLanguage');
+        const epubInfoSpineCount = document.getElementById('epubInfoSpineCount');
+        const epubCoverInfo = document.getElementById('epubCoverInfo');
+        const commonPagesCard = document.getElementById('commonPagesCard');
+        const downloadTitle = document.getElementById('downloadTitle');
+
+        const commonPageCandidateSelector = document.getElementById('commonPageCandidateSelector');
+        const addCommonPageButton = document.getElementById('addCommonPageButton');
+        const selectedCommonPagesListUI = document.getElementById('selectedCommonPagesList');
+
+        const splitTypeSelect = document.getElementById('splitType');
+        const allOptionsDivs = document.querySelectorAll('.options-group');
+        const splitButton = document.getElementById('splitButton');
+        const statusDiv = document.getElementById('status');
+        const downloadLinksDiv = document.getElementById('downloadLinks');
+        const volumeDefinitionsContainer = document.getElementById('volumeDefinitionsContainer');
+        const addVolumeButton = document.getElementById('addVolumeButton');
+        const tocLoadingStatus = document.getElementById('tocLoadingStatus');
+        
+        const optionsMap = {
+            'chaptersPerPart': document.getElementById('chaptersPerPartOptions'),
+            'numberOfParts': document.getElementById('numberOfPartsOptions'),
+            'approxSize': document.getElementById('approxSizeOptions'),
+            'customRanges': document.getElementById('customRangesOptions')
+        };
+
+        // --- Dark Mode ---
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+            darkModeToggle.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌊'; 
+             updateRgbCssVariables(); 
+        });
+        if (localStorage.getItem('darkMode') === 'true') {
+            body.classList.add('dark-mode');
+        }
+        darkModeToggle.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌊'; 
+
+
+        // --- Drag and Drop & File Input ---
+        dropArea.addEventListener('click', () => epubFileInput.click());
+        browseFileButton.addEventListener('click', () => epubFileInput.click());
+        dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('dragover');});
+        dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault(); dropArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length && files[0].type === "application/epub+zip") {
+                epubFileInput.files = files; 
+                handleFileLoad(files[0]);    
+            } else if (files.length) {
+                statusDiv.textContent = "🚫 Not a Tome! (Invalid file type. Please select an .epub file).";
+                statusDiv.className = 'error'; 
+            }
+        });
+        epubFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                if (e.target.files[0].type === "application/epub+zip") {
+                    handleFileLoad(e.target.files[0]);
+                } else {
+                    statusDiv.textContent = "🚫 Not a Tome! (Invalid file type. Please select an .epub file).";
+                    statusDiv.className = 'error';
+                }
+            }
+        });
+        
+        // --- Common Pages UI Logic ---
+        addCommonPageButton.addEventListener('click', () => {  
+            const selectedIndex = parseInt(commonPageCandidateSelector.value);
+            if (isNaN(selectedIndex) || selectedCommonPageIndices.has(selectedIndex)) return;
+            const selectedItem = currentEpubTocForSelection.find(item => item.value === selectedIndex);
+            if (!selectedItem) return;
+            selectedCommonPageIndices.add(selectedIndex); selectedCommonPagesOrdered.push(selectedItem);
+            renderSelectedCommonPages(); refreshAllVolumeRangeDropdowns(); populateCommonPageCandidateSelector();
+        });
+
+        function renderSelectedCommonPages() { 
+            selectedCommonPagesListUI.innerHTML = '';
+            selectedCommonPagesOrdered.forEach((item, displayOrder) => {
+                const li = document.createElement('li');
+                li.textContent = `📜 (${displayOrder + 1}) ${item.title}`;
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '❌'; 
+                removeBtn.className = 'remove-common-page-btn'; removeBtn.title = "Remove from Decree";
+                removeBtn.onclick = () => {
+                    selectedCommonPageIndices.delete(item.value);
+                    selectedCommonPagesOrdered = selectedCommonPagesOrdered.filter(i => i.value !== item.value);
+                    renderSelectedCommonPages(); refreshAllVolumeRangeDropdowns(); populateCommonPageCandidateSelector();
+                };
+                li.appendChild(removeBtn); selectedCommonPagesListUI.appendChild(li);
+            });
+        }
+        
+        function populateCommonPageCandidateSelector() { 
+            commonPageCandidateSelector.innerHTML = '';
+            if (currentEpubTocForSelection.length === 0) { commonPageCandidateSelector.disabled = true; addCommonPageButton.disabled = true; return; }
+            commonPageCandidateSelector.disabled = false; addCommonPageButton.disabled = false;
+            let hasAvailableOptions = false;
+            currentEpubTocForSelection.forEach((item, index) => {
+                if (!selectedCommonPageIndices.has(item.value)) { 
+                    const option = document.createElement('option'); option.value = item.value; 
+                    option.textContent = `(${index + 1}) ${item.title}`; // Displaying original index and title from ToC
+                    commonPageCandidateSelector.appendChild(option);
+                    hasAvailableOptions = true;
+                }
+            });
+             commonPageCandidateSelector.disabled = !hasAvailableOptions;
+             addCommonPageButton.disabled = !hasAvailableOptions;
+        }
+
+
+        // --- Volume Definition UI Logic ---
+        function addVolumeDefinitionRow(volumeName = "", defaultStartSpineIdx = -1, defaultEndSpineIdx = -1) { 
+            const row = document.createElement('div'); row.className = 'volume-definition-row';
+            row.dataset.volumeId = `vol-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+            const nameGroup = document.createElement('div'); nameGroup.className = 'input-group';
+            const nameLabel = document.createElement('label'); nameLabel.textContent = 'Chronicle Name:';
+            const nameInput = document.createElement('input'); nameInput.type = 'text'; nameInput.placeholder = 'e.g., Dawn Island Chronicle';
+            nameInput.value = volumeName; nameInput.className = 'volume-name-input';
+            nameGroup.appendChild(nameLabel); nameGroup.appendChild(nameInput);
+
+            const startGroup = document.createElement('div'); startGroup.className = 'input-group';
+            const startLabel = document.createElement('label'); startLabel.textContent = 'Start Section:';
+            const startSelect = document.createElement('select'); startSelect.className = 'volume-start-select';
+            startGroup.appendChild(startLabel); startGroup.appendChild(startSelect);
+
+            const endGroup = document.createElement('div'); endGroup.className = 'input-group';
+            const endLabel = document.createElement('label'); endLabel.textContent = 'End Section:';
+            const endSelect = document.createElement('select'); endSelect.className = 'volume-end-select';
+            endGroup.appendChild(endLabel); endGroup.appendChild(endSelect);
+            
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button'; removeButton.textContent = '🗑️ Purge the Chronicle'; removeButton.className = 'remove-volume-btn button-styled'; removeButton.title="Remove this chronicle definition";
+            removeButton.onclick = () => { row.remove(); refreshAllVolumeRangeDropdowns(); };
+
+            row.appendChild(nameGroup); row.appendChild(startGroup); row.appendChild(endGroup); row.appendChild(removeButton);
+            volumeDefinitionsContainer.appendChild(row);
+            populateDropdownsForVolumeRow(row, defaultStartSpineIdx, defaultEndSpineIdx);
+            startSelect.addEventListener('change', () => {
+                const currentStart = parseInt(startSelect.value);
+                const currentEnd = parseInt(endSelect.value);
+                if (currentStart > currentEnd || isNaN(currentEnd)) { 
+                    let foundNewEnd = false;
+                    for (let i = 0; i < endSelect.options.length; i++) {
+                        if (parseInt(endSelect.options[i].value) >= currentStart) {
+                            endSelect.value = endSelect.options[i].value;
+                            foundNewEnd = true;
+                            break;
+                        }
+                    }
+                     if (!foundNewEnd && endSelect.options.length > 0) endSelect.value = endSelect.options[endSelect.options.length -1].value;
+                }
+                refreshAllVolumeRangeDropdowns();
+            });
+            endSelect.addEventListener('change', refreshAllVolumeRangeDropdowns);
+        }
+        function getClaimedIndicesByOtherVolumes(currentRowId) { 
+            const claimed = new Set();
+            volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').forEach(row => {
+                if (row.dataset.volumeId === currentRowId) return; 
+                const startSelect = row.querySelector('.volume-start-select'); const endSelect = row.querySelector('.volume-end-select');
+                if (startSelect.value && endSelect.value) {
+                    const startIndex = parseInt(startSelect.value); const endIndex = parseInt(endSelect.value);
+                    if (!isNaN(startIndex) && !isNaN(endIndex) && startIndex <= endIndex) {
+                        for (let i = startIndex; i <= endIndex; i++) claimed.add(i);
+                    }}});
+            return claimed;
+        }
+        function populateDropdownsForVolumeRow(rowElement, requestedStartIdx = -1, requestedEndIdx = -1) { 
+            const startSelect = rowElement.querySelector('.volume-start-select'); const endSelect = rowElement.querySelector('.volume-end-select');
+            const oldStartValue = startSelect.value ? parseInt(startSelect.value) : -1; 
+            const oldEndValue = endSelect.value ? parseInt(endSelect.value) : -1;
+            startSelect.innerHTML = ''; endSelect.innerHTML = '';
+            const claimedByOthers = getClaimedIndicesByOtherVolumes(rowElement.dataset.volumeId);
+            const availableTocEntriesForThisVolume = currentEpubTocForSelection.filter(entry => 
+                !selectedCommonPageIndices.has(entry.value) && !claimedByOthers.has(entry.value)
+            );
+            if (availableTocEntriesForThisVolume.length === 0) { 
+                 const placeholder = document.createElement('option'); placeholder.textContent = "No Sections Available"; placeholder.disabled = true;
+                 startSelect.appendChild(placeholder.cloneNode(true)); endSelect.appendChild(placeholder); return;
+            }
+
+            availableTocEntriesForThisVolume.forEach((tocEntry) => { 
+                const originalItemData = currentEpubTocForSelection[tocEntry.value]; // This assumes currentEpubTocForSelection is indexed 0..N and entry.value is that index
+                const option = document.createElement('option'); option.value = tocEntry.value; 
+                option.textContent = `(${tocEntry.value + 1}) ${originalItemData.title}`;
+                startSelect.appendChild(option.cloneNode(true));
+                endSelect.appendChild(option.cloneNode(true)); 
+            });
+
+            let finalStartIdx = -1;
+            if (oldStartValue !== -1 && availableTocEntriesForThisVolume.some(e => e.value === oldStartValue)) {
+                finalStartIdx = oldStartValue;
+            } else if (requestedStartIdx !== -1 && availableTocEntriesForThisVolume.some(e => e.value === requestedStartIdx)) {
+                finalStartIdx = requestedStartIdx;
+            } else {
+                finalStartIdx = availableTocEntriesForThisVolume.length > 0 ? availableTocEntriesForThisVolume[0].value : -1;
+            }
+            if (finalStartIdx !== -1) startSelect.value = finalStartIdx; else if (startSelect.options.length > 0) startSelect.selectedIndex = 0;
+
+
+            let finalEndIdx = -1;
+            if (oldEndValue !== -1 && availableTocEntriesForThisVolume.some(e => e.value === oldEndValue) && oldEndValue >= finalStartIdx) {
+                finalEndIdx = oldEndValue;
+            } else if (requestedEndIdx !== -1 && availableTocEntriesForThisVolume.some(e => e.value === requestedEndIdx) && requestedEndIdx >= finalStartIdx) {
+                 finalEndIdx = requestedEndIdx;
+            } else if (finalStartIdx !== -1) {
+                const firstValidEndOption = availableTocEntriesForThisVolume.find(e => e.value >= finalStartIdx);
+                finalEndIdx = firstValidEndOption ? firstValidEndOption.value : (availableTocEntriesForThisVolume.length > 0 ? availableTocEntriesForThisVolume[availableTocEntriesForThisVolume.length -1].value : -1);
+            } else { 
+                 finalEndIdx = availableTocEntriesForThisVolume.length > 0 ? availableTocEntriesForThisVolume[availableTocEntriesForThisVolume.length -1].value : -1;
+            }
+
+            if (finalEndIdx !== -1) endSelect.value = finalEndIdx; else if (endSelect.options.length > 0) endSelect.selectedIndex = endSelect.options.length -1;
+
+            if (finalStartIdx !== -1 && finalEndIdx !== -1 && finalStartIdx > finalEndIdx) {
+                endSelect.value = finalStartIdx;
+            }
+        }
+
+        function refreshAllVolumeRangeDropdowns() { 
+            volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').forEach(row => populateDropdownsForVolumeRow(row));
+        }
+
+        addVolumeButton.addEventListener('click', () => { 
+            let smartStartIdx = 0; const volumeRows = volumeDefinitionsContainer.querySelectorAll('.volume-definition-row');
+            const allCurrentlyClaimedIndices = new Set(selectedCommonPageIndices);
+            volumeRows.forEach(row => {
+                const startSelect = row.querySelector('.volume-start-select'); const endSelect = row.querySelector('.volume-end-select');
+                if (startSelect.value && endSelect.value) { const start = parseInt(startSelect.value); const end = parseInt(endSelect.value);
+                    if (!isNaN(start) && !isNaN(end) && start <=end) { for(let i=start; i<=end; i++) allCurrentlyClaimedIndices.add(i); }}
+            });
+            
+            let foundStart = false;
+            for(let i=0; i < currentChapterFiles.length; i++){
+                if(!allCurrentlyClaimedIndices.has(i)){
+                    smartStartIdx = i;
+                    foundStart = true;
+                    break;
+                }
+            }
+            if (!foundStart && currentChapterFiles.length > 0) smartStartIdx = 0; 
+             else if (!foundStart && currentChapterFiles.length === 0) smartStartIdx = -1; 
+
+            addVolumeDefinitionRow(`Chronicle ${volumeRows.length + 1}`, smartStartIdx, smartStartIdx);
+        });
+        splitTypeSelect.addEventListener('change', function() { 
+            allOptionsDivs.forEach(div => div.classList.add('hidden'));
+            if (optionsMap[this.value]) optionsMap[this.value].classList.remove('hidden');
+            if (this.value === 'customRanges' && volumeDefinitionsContainer.children.length === 0 && currentEpubTocForSelection.length > 0) { addVolumeButton.click(); }
+        });
+
+
+        // --- EPUB File Processing Logic (handleFileLoad) ---
+        async function handleFileLoad(file) {  
+             if (!file) { clearEpubData(); return; }
+            statusDiv.textContent = '⏳ Setting sail! Loading Tome structure...'; statusDiv.className = ''; 
+            splitButton.disabled = true; downloadLinksDiv.innerHTML = ''; downloadTitle.classList.add('hidden');
+            epubInfoDiv.classList.add('hidden'); commonPagesCard.classList.add('hidden');
+
+            try {  
+                originalZipInstance = await JSZip.loadAsync(file); const { opfPath, opfContent, opfDir } = await getOpfData(originalZipInstance);
+                originalOpfPath = opfPath; originalOpfDir = opfDir; const parser = new DOMParser();
+                originalOpfDoc = parser.parseFromString(opfContent, "application/xml");
+                manifestItemsStore = parseManifest(originalOpfDoc); const spineItemRefs = parseSpine(originalOpfDoc);
+                currentChapterFiles = spineItemRefs.map(idref => manifestItemsStore.find(item => item.id === idref)).filter(item => item && (item.mediaType === 'application/xhtml+xml' || item.mediaType === 'application/html'));
+                if (currentChapterFiles.length === 0) { statusDiv.textContent = '🚫 Error: No sections (content documents) found in this Tome!'; statusDiv.className='error'; clearEpubData(); return; }
+                tocDetailsStore = await getTocDetails(originalZipInstance, originalOpfDoc, originalOpfDir, manifestItemsStore);
+                currentEpubTocForSelection = await generateTocForSelection(currentChapterFiles, tocDetailsStore, opfDir);
+
+                const metaCover = originalOpfDoc.querySelector("metadata meta[name='cover']"); let coverId = metaCover ? metaCover.getAttribute("content") : null;
+                if (coverId) coverImageManifestItem = manifestItemsStore.find(item => item.id === coverId);
+                if (!coverImageManifestItem) coverImageManifestItem = manifestItemsStore.find(item => item.properties && item.properties.includes("cover-image"));
+                
+                epubCoverInfo.textContent = coverImageManifestItem ? `📜 Cover section found (${coverImageManifestItem.href}).` : "🚫 No cover section explicitly defined.";
+                epubInfoTitle.textContent = getMetadataField(originalOpfDoc, "dc:title") || "N/A";
+                epubInfoAuthor.textContent = getMetadataField(originalOpfDoc, "dc:creator") || "N/A";
+                epubInfoLanguage.textContent = getMetadataField(originalOpfDoc, "dc:language") || "N/A";
+                epubInfoSpineCount.textContent = currentChapterFiles.length;
+                epubInfoDiv.classList.remove('hidden'); commonPagesCard.classList.remove('hidden');
+                tocLoadingStatus.textContent = `${currentChapterFiles.length} sections available to chart.`;
+                splitButton.disabled = false; splitTypeSelect.disabled = false; addVolumeButton.disabled = false;
+                statusDiv.textContent = '✅ Tome Loaded! Chart your course below.'; statusDiv.className = 'success';
+                
+                populateCommonPageCandidateSelector(); refreshAllVolumeRangeDropdowns(); 
+                if (splitTypeSelect.value === 'customRanges' && volumeDefinitionsContainer.children.length === 0 && currentEpubTocForSelection.length > 0) { addVolumeButton.click(); }
+
+            } catch (error) {
+                console.error("EPUB Loading Error:", error);
+                statusDiv.textContent = `🚫 Error loading Tome: ${error.message}`; statusDiv.className = 'error';
+                clearEpubData();
+            }
+        }
+        function clearEpubData() { 
+            currentEpubTocForSelection = []; currentChapterFiles = []; originalOpfDoc = null; originalZipInstance = null;
+            manifestItemsStore = []; tocDetailsStore = null; coverImageManifestItem = null;
+            selectedCommonPageIndices.clear(); selectedCommonPagesOrdered = []; renderSelectedCommonPages();
+            splitButton.disabled = true; splitTypeSelect.disabled = true; addVolumeButton.disabled = true;
+            epubInfoDiv.classList.add('hidden'); commonPagesCard.classList.add('hidden');
+            volumeDefinitionsContainer.innerHTML = ''; 
+            allOptionsDivs.forEach(div => div.classList.add('hidden')); optionsMap[splitTypeSelect.value].classList.remove('hidden'); // Ensure default is shown
+            tocLoadingStatus.textContent = 'Load a Tome to chart your chronicles.';
+            populateCommonPageCandidateSelector();
+            statusDiv.textContent = 'Awaiting Tome...'; statusDiv.className = '';
+            downloadLinksDiv.innerHTML = ''; downloadTitle.classList.add('hidden');
+        }
+
+        // --- Core EPUB Splitting Logic (Button Click) ---
+        splitButton.addEventListener('click', async () => { 
+            if (!originalZipInstance || !originalOpfDoc || currentChapterFiles.length === 0) { 
+                statusDiv.textContent = '🚫 No Tome loaded or Tome has no content!'; statusDiv.className='error'; return; 
+            }
+            statusDiv.textContent = '⏳ Charting new scrolls (Processing)...'; statusDiv.className = ''; downloadLinksDiv.innerHTML = ''; downloadTitle.classList.add('hidden');
+            try { 
+                const commonPagesContent = selectedCommonPagesOrdered.map(item => currentChapterFiles[item.value]); 
+                let partsToCreate = [];
+                const splitType = splitTypeSelect.value; const originalTitle = getMetadataField(originalOpfDoc, "dc:title") || "Untitled Tome";
+                const originalIdentifier = getMetadataField(originalOpfDoc, "dc:identifier") || generateUUID();
+
+                const splittableChapterFiles = currentChapterFiles.filter((_, index) => !selectedCommonPageIndices.has(index));
+
+                if (splitType === 'chaptersPerPart') { 
+                     const numItems = parseInt(document.getElementById('numChapters').value) || 1; let partNum = 1;
+                     for (let i = 0; i < splittableChapterFiles.length; i += numItems) {
+                         partsToCreate.push({ partNum: partNum++, chapters: [...commonPagesContent, ...splittableChapterFiles.slice(i, i + numItems)], isCustomName: false });
+                     }
+                } else if (splitType === 'numberOfParts') { 
+                    const numParts = parseInt(document.getElementById('numParts').value) || 2;
+                    if (numParts <=0 ) { statusDiv.textContent = "🚫 Number of parts must be at least 1."; statusDiv.className='error'; return; }
+                    if (splittableChapterFiles.length === 0 && numParts > 0 && commonPagesContent.length > 0) { 
+                        partsToCreate.push({ partNum: 1, chapters: [...commonPagesContent], isCustomName: false });
+                    } else if (splittableChapterFiles.length > 0) {
+                         if (numParts > splittableChapterFiles.length && splittableChapterFiles.length > 0) {
+                             statusDiv.textContent = `⚠️ Warning: Trying to split ${splittableChapterFiles.length} sections into ${numParts} parts. Some parts might be based on fewer sections.`;
+                         }
+                        const itemsPerPartRaw = splittableChapterFiles.length / numParts; let currentIndex = 0;
+                        for (let i = 0; i < numParts; i++) {
+                            const itemsInThisPartCount = (i === numParts -1) ? splittableChapterFiles.length - currentIndex : Math.round(itemsPerPartRaw * (i+1)) - Math.round(itemsPerPartRaw * i);
+                            if (itemsInThisPartCount > 0 || (i === 0 && commonPagesContent.length > 0) ) { 
+                                partsToCreate.push({ partNum: i + 1, chapters: [...commonPagesContent, ...splittableChapterFiles.slice(currentIndex, currentIndex + itemsInThisPartCount)], isCustomName: false });
+                            } currentIndex += itemsInThisPartCount;
+                        }}
+                } else if (splitType === 'approxSize') { 
+                    const targetSizeMB = parseFloat(document.getElementById('partSize').value) || 1; const targetSizeBytes = targetSizeMB * 1024 * 1024;
+                    let currentGroup = []; let currentGroupSize = 0; let partNum = 1;
+                    for (const chapter of splittableChapterFiles) {
+                        const fileData = await originalZipInstance.file(originalOpfDir + chapter.href)?.async("uint8array");
+                        const fileSize = fileData ? fileData.byteLength : 0;
+                        if (currentGroup.length > 0 && currentGroupSize + fileSize > targetSizeBytes && currentGroup.length > 0) {
+                            partsToCreate.push({ partNum: partNum++, chapters: [...commonPagesContent, ...currentGroup], isCustomName: false });
+                            currentGroup = []; currentGroupSize = 0;
+                        } currentGroup.push(chapter); currentGroupSize += fileSize;
+                    } if (currentGroup.length > 0 || (partsToCreate.length === 0 && commonPagesContent.length > 0)) { 
+                         partsToCreate.push({ partNum: partNum++, chapters: [...commonPagesContent, ...currentGroup], isCustomName: false });
+                    }
+                } else if (splitType === 'customRanges') { 
+                    const volumeRows = volumeDefinitionsContainer.querySelectorAll('.volume-definition-row');
+                    if (volumeRows.length === 0) { statusDiv.textContent = '🚫 Error: Please define at least one Chronicle.'; statusDiv.className='error'; return; }
+                    let errorInSelections = false;
+                    volumeRows.forEach((row) => { if (errorInSelections) return;
+                        const nameInput = row.querySelector('.volume-name-input'); const startSelect = row.querySelector('.volume-start-select'); const endSelect = row.querySelector('.volume-end-select');
+                        const volumeName = nameInput.value.trim() || `Chronicle ${partsToCreate.length + 1}`;
+                        if (!startSelect.value || !endSelect.value) { statusDiv.textContent = `🚫 Error: Chronicle "${volumeName}" has no sections selected or available.`; statusDiv.className='error'; errorInSelections = true; return; }
+                        const startIndex = parseInt(startSelect.value); const endIndex = parseInt(endSelect.value);   
+                        if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < 0 || startIndex >= currentChapterFiles.length || endIndex >= currentChapterFiles.length || startIndex > endIndex) {
+                            statusDiv.textContent = `🚫 Error: Invalid section selection for Chronicle "${volumeName}".`; statusDiv.className='error'; errorInSelections = true; return; }
+                        const volumeSpecificChapters = [];
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            if(selectedCommonPageIndices.has(i)){ statusDiv.textContent = `🚫 Error: Chronicle "${volumeName}" range includes a page from Captain's Decree. Decree pages are added automatically.`; statusDiv.className='error'; errorInSelections = true; return;}
+                            volumeSpecificChapters.push(currentChapterFiles[i]);
+                        }
+                        if (volumeSpecificChapters.length === 0 && commonPagesContent.length === 0) { console.warn(`Chronicle "${volumeName}" would be empty. Skipping.`); return; }
+                        partsToCreate.push({ name: volumeName, chapters: [...commonPagesContent, ...volumeSpecificChapters], isCustomName: true });
+                    }); if (errorInSelections) return;
+                }
+                partsToCreate = partsToCreate.filter(p => p.chapters.length > 0);
+                if (partsToCreate.length === 0 ) { statusDiv.textContent = '🚫 Error: Splitting resulted in no scrolls with content. Adjust settings.'; statusDiv.className='error'; return; }
+                
+                downloadTitle.classList.remove('hidden');
+                for (let i = 0; i < partsToCreate.length; i++) { 
+                    const partData = partsToCreate[i]; const uniqueChapterSet = new Set(); const finalChaptersForPart = [];
+                    partData.chapters.forEach(chap => { if(!uniqueChapterSet.has(chap.id)){ finalChaptersForPart.push(chap); uniqueChapterSet.add(chap.id); }}); 
+                    partData.chapters = finalChaptersForPart;
+                    const partIdentifier = partData.isCustomName ? partData.name : partData.partNum;
+                    const totalPartsInSet = partData.isCustomName ? partsToCreate.length : (partsToCreate.findLast(p => !p.isCustomName)?.partNum || partsToCreate.length);
+                    const newEpubZip = await createNewEpubPart( originalZipInstance, originalOpfDoc, originalOpfPath, originalOpfDir, manifestItemsStore, partData.chapters, tocDetailsStore, partIdentifier, totalPartsInSet, originalTitle, originalIdentifier, partData.isCustomName, coverImageManifestItem);
+                    const blob = await newEpubZip.generateAsync({ type: "blob", mimeType: "application/epub+zip" }); const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a'); link.href = downloadUrl; link.className = 'button-styled'; 
+                    let filename, linkText;
+                    if (partData.isCustomName) { filename = `${sanitizeFilename(partData.name)}.epub`; linkText = `${partData.name}`; }
+                    else { filename = `${sanitizeFilename(originalTitle)}_Scroll_${partData.partNum}.epub`; linkText = `Scroll ${partData.partNum}`; }
+                    link.download = filename; 
+                    link.innerHTML = `<img src="treasure_chest_icon.png" alt="Treasure Chest Icon"> ${linkText}`; 
+                    downloadLinksDiv.appendChild(link); 
+                }
+                statusDiv.textContent = '🎉 All Scrolls Charted! Treasures (Downloads) below!'; statusDiv.className = 'success';
+
+            } catch (error) { console.error("EPUB Splitting Error:", error); statusDiv.textContent = `🚫 Error during voyage: ${error.message}. Check console log.`; statusDiv.className = 'error';}
+        });
+        
+        // --- EPUB Parsing Helper Functions ---
+        async function getOpfData(zip) { 
+            const containerFile = zip.file("META-INF/container.xml"); if (!containerFile) throw new Error("META-INF/container.xml not found.");
+            const containerContent = await containerFile.async("string"); const parser = new DOMParser();
+            const containerDoc = parser.parseFromString(containerContent, "application/xml");
+            const rootfilePath = containerDoc.getElementsByTagName("rootfile")[0]?.getAttribute("full-path"); if (!rootfilePath) throw new Error("Rootfile path not found in container.xml.");
+            const opfFile = zip.file(rootfilePath); if (!opfFile) throw new Error(`OPF file (${rootfilePath}) not found.`);
+            const opfContent = await opfFile.async("string"); const opfDir = rootfilePath.substring(0, rootfilePath.lastIndexOf('/') + 1);
+            return { opfPath: rootfilePath, opfContent, opfDir };
+        }
+        function parseManifest(opfDoc) { 
+            const items = []; const manifestNode = opfDoc.getElementsByTagName("manifest")[0];
+            if (manifestNode) { for (const itemNode of manifestNode.getElementsByTagName("item")) {
+                items.push({ id: itemNode.getAttribute("id"), href: itemNode.getAttribute("href"), mediaType: itemNode.getAttribute("media-type"), properties: itemNode.getAttribute("properties") });
+            }} return items;
+        }
+        function parseSpine(opfDoc) { 
+            const itemRefs = []; const spineNode = opfDoc.getElementsByTagName("spine")[0];
+            if (spineNode) { for (const itemrefNode of spineNode.getElementsByTagName("itemref")) {
+                itemRefs.push(itemrefNode.getAttribute("idref"));
+            }} return itemRefs;
+        }
+        async function getTocDetails(zip, opfDoc, opfDir, manifestItems) {  
+            let tocPath, tocContentStr, tocType, tocDocParsed, tocFileDir = opfDir;
+            const spineNode = opfDoc.getElementsByTagName("spine")[0]; const ncxId = spineNode?.getAttribute("toc");
+            const parser = new DOMParser();
+            if (ncxId) { const ncxItem = manifestItems.find(item => item.id === ncxId); if (ncxItem) { tocPath = opfDir + ncxItem.href; tocType = 'ncx'; }}
+            else { const navItem = manifestItems.find(item => item.properties && item.properties.includes("nav")); if (navItem) { tocPath = opfDir + navItem.href; tocType = 'nav'; }}
+            if (tocPath) { const tocFile = zip.file(tocPath); 
+                if (tocFile) { tocContentStr = await tocFile.async("string"); const mimeType = tocType === 'ncx' ? "application/xml" : "application/xhtml+xml";
+                    try { tocDocParsed = parser.parseFromString(tocContentStr, mimeType); if (tocDocParsed.getElementsByTagName("parsererror").length > 0) {
+                           console.warn("Parser error in ToC document:", tocPath, tocDocParsed.getElementsByTagName("parsererror")[0].textContent); tocDocParsed = null; }} 
+                    catch (e) { console.warn("Error parsing ToC document:", tocPath, e); tocDocParsed = null; }
+                    tocFileDir = tocPath.substring(0, tocPath.lastIndexOf('/') + 1); } 
+                else console.warn(`ToC file ${tocPath} not found in zip.`); } 
+            else { console.warn("No ToC (NCX or NAV) found in OPF."); }
+            return { path: tocPath, contentString: tocContentStr, type: tocType, dir: tocFileDir, doc: tocDocParsed };
+        }
+        function normalizePath(relativePath, baseFileFullPath, targetBaseDirForOutput) { 
+             if (!relativePath || !baseFileFullPath) return relativePath; 
+            try {
+                const baseUrl = new URL(baseFileFullPath, 'file:///'); 
+                const resolvedUrl = new URL(relativePath.split('#')[0], baseUrl);
+                let fullPathFromRoot = decodeURIComponent(resolvedUrl.pathname); 
+                if (fullPathFromRoot.startsWith('/')) fullPathFromRoot = fullPathFromRoot.substring(1);
+
+                if (targetBaseDirForOutput && fullPathFromRoot.startsWith(targetBaseDirForOutput)) {
+                    const finalRelativePath = fullPathFromRoot.substring(targetBaseDirForOutput.length);
+                    return finalRelativePath + (relativePath.includes('#') ? '#' + relativePath.split('#')[1] : '');
+                }
+                return fullPathFromRoot + (relativePath.includes('#') ? '#' + relativePath.split('#')[1] : '');
+            } catch (e) {
+                console.warn(`Error normalizing path: rel='${relativePath}', base='${baseFileFullPath}', target='${targetBaseDirForOutput}' Error: ${e}`);
+                return relativePath; 
+            }
+        }
+        async function generateTocForSelection(chapterFilesFromSpine, tocDetails, opfDir) { 
+            const tocForSelection = []; const hrefToTocTitleMap = new Map();
+            if (tocDetails && tocDetails.doc) { const tocDoc = tocDetails.doc; const tocType = tocDetails.type; const tocFileFullPath = tocDetails.path;
+                if (tocType === 'ncx') { const navPoints = tocDoc.getElementsByTagName('navPoint');
+                    for (const navPoint of navPoints) { const navLabel = navPoint.getElementsByTagName('navLabel')[0]; const content = navPoint.getElementsByTagName('content')[0];
+                        if (navLabel && content) { const title = navLabel.getElementsByTagName('text')[0]?.textContent.trim(); const src = content.getAttribute('src');
+                            if (title && src) { const opfRelativeSrc = normalizePath(src, tocFileFullPath, opfDir).split('#')[0];
+                                if (!hrefToTocTitleMap.has(opfRelativeSrc)) hrefToTocTitleMap.set(opfRelativeSrc, title); }}}}
+                else if (tocType === 'nav') { const navLinks = tocDoc.querySelectorAll("nav[epub\\:type='toc'] ol a, nav[role='doc-toc'] ol a");
+                    for (const link of navLinks) { const title = link.textContent.trim(); const href = link.getAttribute('href');
+                        if (title && href) { const opfRelativeHref = normalizePath(href, tocFileFullPath, opfDir).split('#')[0];
+                            if (!hrefToTocTitleMap.has(opfRelativeHref)) hrefToTocTitleMap.set(opfRelativeHref, title); }}}}
+            chapterFilesFromSpine.forEach((spineItem, index) => {
+                let title = hrefToTocTitleMap.get(spineItem.href); 
+                if (!title) { title = spineItem.href.split('/').pop().replace(/\.(xhtml|html)$/i, '') || `Section ${index + 1}`; title = `(No Title in Log) ${title}`; }
+                tocForSelection.push({ title: title, value: index }); // value is the original index in chapterFilesFromSpine
+            }); return tocForSelection;
+        }
+        function getMetadataField(opfDoc, fieldName) { 
+             const metadataNode = opfDoc.getElementsByTagName("metadata")[0]; if (metadataNode) {
+                const nsPrefix = "dc"; 
+                const localName = fieldName.startsWith(nsPrefix + ":") ? fieldName.substring(nsPrefix.length + 1) : fieldName;
+                
+                let elements = metadataNode.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", localName);
+                if (elements.length > 0) return elements[0].textContent;
+
+                elements = metadataNode.getElementsByTagName(fieldName); 
+                if (elements.length > 0) return elements[0].textContent;
+                
+                elements = metadataNode.getElementsByTagName(localName);
+                if (elements.length > 0) return elements[0].textContent;
+            } return null;
+        }
+        function generateUUID() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {let r = Math.random()*16|0; let v = c=='x'?r:(r&0x3|0x8); return v.toString(16)});}
+        
+        async function createNewEpubPart(
+            originalZip, opfDoc, originalOpfPath, opfDir,
+            allManifestItems, chapterItemsForPart, tocDetailsInput, 
+            partIdentifier, totalPartsInSet, originalTitle, originalIdentifierVal,
+            isCustomName, coverItem 
+        ) {
+            const newZip = new JSZip(); const serializer = new XMLSerializer();
+            newZip.file("mimetype", "application/epub+zip", { compression: "STORE" });
+            const containerContent = await originalZip.file("META-INF/container.xml").async("string");
+            newZip.file("META-INF/container.xml", containerContent);
+            const newOpfDoc = opfDoc.cloneNode(true);
+            const metadataNode = newOpfDoc.getElementsByTagName("metadata")[0];
+            if (metadataNode) {
+                let titleNode = newOpfDoc.querySelector("metadata > dc\\:title, metadata > title");
+                if (!titleNode) { titleNode = newOpfDoc.createElementNS("http://purl.org/dc/elements/1.1/", "title"); metadataNode.appendChild(titleNode); }
+                titleNode.textContent = isCustomName ? `${partIdentifier}` : `${originalTitle} - Scroll ${partIdentifier}/${totalPartsInSet}`;
+                
+                let identifierNode = newOpfDoc.querySelector("metadata > dc\\:identifier, metadata > identifier");
+                const newUuid = generateUUID(); const safePartIdStr = String(partIdentifier).replace(/[^a-zA-Z0-9_-]/g, '');
+                const newBookIdAttr = `BookIdPart-${safePartIdStr}-${Date.now()}`;
+                if (!identifierNode) { identifierNode = newOpfDoc.createElementNS("http://purl.org/dc/elements/1.1/", "identifier"); metadataNode.appendChild(identifierNode); }
+                identifierNode.textContent = `urn:uuid:${newUuid}`;
+                identifierNode.setAttribute("id", newBookIdAttr); 
+                newOpfDoc.documentElement.setAttribute('unique-identifier', newBookIdAttr); 
+
+                if (coverItem && coverItem.id) {
+                    let metaCoverNode = metadataNode.querySelector("meta[name='cover']");
+                    if (!metaCoverNode) { metaCoverNode = newOpfDoc.createElement("meta"); metaCoverNode.setAttribute("name", "cover"); metadataNode.insertBefore(metaCoverNode, metadataNode.firstChild); }
+                    metaCoverNode.setAttribute("content", coverItem.id); 
+                }
+            }
+            const manifestNode = newOpfDoc.getElementsByTagName("manifest")[0];
+            const chapterItemIdsInPart = new Set(chapterItemsForPart.map(item => item.id));
+            const itemsToKeep = new Set(chapterItemIdsInPart);
+            if (coverItem && coverItem.id) itemsToKeep.add(coverItem.id);
+            allManifestItems.forEach(item => {
+                if (!item.mediaType.includes('xhtml') && !item.mediaType.includes('html')) itemsToKeep.add(item.id);
+                if (tocDetailsInput && tocDetailsInput.path && (opfDir + item.href === tocDetailsInput.path)) itemsToKeep.add(item.id);
+            });
+            Array.from(manifestNode.getElementsByTagName("item")).forEach(itemNode => {
+                const itemId = itemNode.getAttribute("id");
+                if (!itemsToKeep.has(itemId)) itemNode.remove();
+                else if (coverItem && itemId === coverItem.id && coverItem.properties?.includes("cover-image")) {
+                    let props = itemNode.getAttribute("properties") || ""; if (!props.includes("cover-image")) itemNode.setAttribute("properties", (props + " cover-image").trim());
+                }
+            });
+            const spineNode = newOpfDoc.getElementsByTagName("spine")[0];
+            Array.from(spineNode.getElementsByTagName("itemref")).forEach(itemrefNode => {
+                if (!chapterItemIdsInPart.has(itemrefNode.getAttribute("idref"))) itemrefNode.remove();
+            });
+            
+            let finalTocPathForZip = tocDetailsInput ? tocDetailsInput.path : null; 
+            let finalTocContentForZip = tocDetailsInput ? tocDetailsInput.contentString : null;
+            const chapterHrefsInThisPart = new Set(chapterItemsForPart.map(item => item.href)); 
+            if (tocDetailsInput && tocDetailsInput.doc && tocDetailsInput.path && finalTocContentForZip) { 
+                const currentPartTocDoc = tocDetailsInput.doc.cloneNode(true); 
+                const tocFileFullPathForNormalization = tocDetailsInput.path; 
+                if (tocDetailsInput.type === 'ncx') {
+                    const navMapNode = currentPartTocDoc.getElementsByTagName("navMap")[0];
+                    if (navMapNode) {
+                        const filterNavPoints = (parentElement) => {
+                             Array.from(parentElement.children).forEach(navPointNode => {
+                                if (navPointNode.nodeName.toLowerCase() !== 'navpoint') return;
+                                const contentNode = navPointNode.getElementsByTagName("content")[0];
+                                const src = contentNode?.getAttribute("src");
+                                if (src) {
+                                    const opfRelativeSrc = normalizePath(src, tocFileFullPathForNormalization, opfDir).split('#')[0];
+                                    if (!chapterHrefsInThisPart.has(opfRelativeSrc)) navPointNode.remove();
+                                    else filterNavPoints(navPointNode); 
+                                } else { 
+                                   filterNavPoints(navPointNode);
+                                   if (navPointNode.getElementsByTagName('navPoint').length === 0 && !navPointNode.getElementsByTagName("content")[0]?.getAttribute("src")) navPointNode.remove();
+                                }
+                            });
+                        };
+                        filterNavPoints(navMapNode);
+                        let playOrder = 1; Array.from(currentPartTocDoc.getElementsByTagName("navPoint")).forEach(np => np.setAttribute("playOrder", String(playOrder++)));
+                        finalTocContentForZip = serializer.serializeToString(currentPartTocDoc);
+                    }
+                } else if (tocDetailsInput.type === 'nav') {
+                    const tocNavElement = currentPartTocDoc.querySelector("nav[epub\\:type='toc'], nav[role='doc-toc']");
+                    if (tocNavElement) {
+                         const filterNavLis = (parentElement) => {
+                            Array.from(parentElement.children).forEach(liNode => {
+                                if (liNode.nodeName.toLowerCase() !== 'li') return;
+                                const anchor = liNode.querySelector("a"); 
+                                const href = anchor?.getAttribute("href");
+                                if (href) {
+                                    const opfRelativeHref = normalizePath(href, tocFileFullPathForNormalization, opfDir).split('#')[0];
+                                    if (!chapterHrefsInThisPart.has(opfRelativeHref)) liNode.remove();
+                                    else { const nestedOl = liNode.querySelector("ol"); if (nestedOl) filterNavLis(nestedOl); }
+                                } else { 
+                                    const nestedOl = liNode.querySelector("ol");
+                                    if (nestedOl) { filterNavLis(nestedOl); if(nestedOl.children.length === 0) liNode.remove(); } 
+                                    else liNode.remove(); 
+                                }
+                            });
+                        };
+                        const mainOl = tocNavElement.querySelector("ol"); if (mainOl) filterNavLis(mainOl);
+                        finalTocContentForZip = serializer.serializeToString(currentPartTocDoc);
+                    }
+                }
+            }
+            if (finalTocPathForZip && finalTocContentForZip) newZip.file(finalTocPathForZip, finalTocContentForZip);
+            newZip.file(originalOpfPath, serializer.serializeToString(newOpfDoc));
+            const finalManifestItemsInNewOpf = parseManifest(newOpfDoc);
+            for (const item of finalManifestItemsInNewOpf) {
+                const fullFilePathInEpub = opfDir + item.href;
+                if (fullFilePathInEpub === finalTocPathForZip && finalTocContentForZip) continue; 
+                const fileInOriginalZip = originalZip.file(fullFilePathInEpub); 
+                if (fileInOriginalZip) { const data = await fileInOriginalZip.async("uint8array"); newZip.file(fullFilePathInEpub, data); } 
+                else { console.warn(`File ${fullFilePathInEpub} (ID: ${item.id}) from new manifest not found in original. Part: ${partIdentifier}.`); }
+            }
+            return newZip;
+        }
+        function sanitizeFilename(name) { let s = String(name).replace(/[^\p{L}\p{N}\s.-_]/gu, '').replace(/\s+/g, '_'); return s.length > 150 ? s.substring(0, 150) : s; }
+
+
+        // --- Initial UI Setup ---
+        clearEpubData(); 
+        splitTypeSelect.dispatchEvent(new Event('change')); 
+    </script>
+</body>
+</html>
