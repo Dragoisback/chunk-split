@@ -72,12 +72,12 @@
         </select>
 
         <div id="chaptersPerPartOptions" class="options-group">
-            <label for="numChapters">Chapters per Part:</label>
+            <label for="numChapters">Chapters per Part (based on spine items):</label>
             <input type="number" id="numChapters" value="5" min="1">
         </div>
 
         <div id="numberOfPartsOptions" class="options-group hidden">
-            <label for="numParts">Number of Parts:</label>
+            <label for="numParts">Number of Parts (dividing spine items):</label>
             <input type="number" id="numParts" value="2" min="2">
         </div>
 
@@ -88,12 +88,12 @@
         </div>
 
         <div id="customRangesOptions" class="options-group hidden">
-            <label>Define Volumes (select chapters from EPUB's ToC):</label>
+            <label>Define Volumes (select items from EPUB's reading order/spine):</label>
             <div id="volumeDefinitionsContainer">
                 <!-- Volume definition rows will be added here -->
             </div>
             <button type="button" id="addVolumeButton" style="margin-top: 10px;">+ Add Volume</button>
-            <small id="tocLoadingStatus" style="display:block; margin-top:5px; color: #666;">Load an EPUB to populate chapter lists.</small>
+            <small id="tocLoadingStatus" style="display:block; margin-top:5px; color: #666;">Load an EPUB to populate item lists.</small>
         </div>
 
         <button id="splitButton" disabled>Split EPUB</button>
@@ -105,12 +105,12 @@
     <script>
         // --- Global State ---
         let currentEpubTocForSelection = []; // Array of { title: "Chapter Title", value: spineIndex }
-        let currentChapterFiles = []; // Array of manifest items from spine
+        let currentChapterFiles = []; // Array of manifest items from spine (actual content files in reading order)
         let originalOpfDoc = null;
         let originalOpfPath = '', originalOpfDir = '';
         let originalZipInstance = null;
         let manifestItemsStore = [];
-        let tocDetailsStore = null; // { path, content, type, dir, doc (parsed XML/HTML) }
+        let tocDetailsStore = null; // { path, contentString, type, dir, doc (parsed XML/HTML) }
         let coverImageManifestItem = null; // { id, href, mediaType, properties }
 
         // --- UI Elements ---
@@ -151,7 +151,7 @@
             const startGroup = document.createElement('div');
             startGroup.className = 'input-group';
             const startLabel = document.createElement('label');
-            startLabel.textContent = 'Start Chapter:';
+            startLabel.textContent = 'Start Item:';
             const startSelect = document.createElement('select');
             startSelect.className = 'volume-start-select';
             startGroup.appendChild(startLabel);
@@ -160,7 +160,7 @@
             const endGroup = document.createElement('div');
             endGroup.className = 'input-group';
             const endLabel = document.createElement('label');
-            endLabel.textContent = 'End Chapter:';
+            endLabel.textContent = 'End Item:';
             const endSelect = document.createElement('select');
             endSelect.className = 'volume-end-select';
             endGroup.appendChild(endLabel);
@@ -183,8 +183,8 @@
         }
 
         function populateTocDropdowns(startSelect, endSelect, defaultStartIdx = 0, defaultEndIdx = 0) {
-            startSelect.innerHTML = ''; // Clear existing
-            endSelect.innerHTML = '';   // Clear existing
+            startSelect.innerHTML = ''; 
+            endSelect.innerHTML = '';   
 
             if (currentEpubTocForSelection.length === 0) {
                 const placeholderOption = document.createElement('option');
@@ -195,28 +195,31 @@
                 return;
             }
 
-            currentEpubTocForSelection.forEach((tocEntry, index) => {
+            currentEpubTocForSelection.forEach((tocEntry, index) => { // index here IS tocEntry.value
                 const option = document.createElement('option');
-                option.value = tocEntry.value; // This is spineIndex
-                option.textContent = `(${index + 1}) ${tocEntry.title}`; // Display 1-based index and title
+                option.value = tocEntry.value; // This is the 0-based spineIndex
+                option.textContent = `(${index + 1}) ${tocEntry.title}`; // Display 1-based index for user
                 startSelect.appendChild(option.cloneNode(true));
                 endSelect.appendChild(option);
             });
-            startSelect.value = defaultStartIdx;
-            endSelect.value = defaultEndIdx;
+            
+            const maxIndex = currentEpubTocForSelection.length > 0 ? currentEpubTocForSelection.length - 1 : 0;
+            startSelect.value = Math.min(Math.max(0, defaultStartIdx), maxIndex);
+            endSelect.value = Math.min(Math.max(0, defaultEndIdx), maxIndex);
         }
 
         function updateAllVolumeTocDropdowns() {
             volumeDefinitionsContainer.querySelectorAll('.volume-definition-row').forEach(row => {
                 const startSelect = row.querySelector('.volume-start-select');
                 const endSelect = row.querySelector('.volume-end-select');
-                // Preserve selected values if possible, otherwise default
-                const currentStartVal = startSelect.value;
-                const currentEndVal = endSelect.value;
-                populateTocDropdowns(startSelect, endSelect, 
-                    currentEpubTocForSelection.find(e => e.value == currentStartVal) ? currentStartVal : 0,
-                    currentEpubTocForSelection.find(e => e.value == currentEndVal) ? currentEndVal : (currentEpubTocForSelection.length > 0 ? currentEpubTocForSelection.length - 1 : 0)
-                );
+                const currentStartVal = parseInt(startSelect.value); // Ensure it's number for comparison
+                const currentEndVal = parseInt(endSelect.value);
+                
+                // Check if current values are valid within the new ToC list
+                const newDefaultStart = currentEpubTocForSelection.find(e => e.value === currentStartVal) ? currentStartVal : 0;
+                const newDefaultEnd = currentEpubTocForSelection.find(e => e.value === currentEndVal) ? currentEndVal : (currentEpubTocForSelection.length > 0 ? currentEpubTocForSelection.length - 1 : 0);
+
+                populateTocDropdowns(startSelect, endSelect, newDefaultStart, newDefaultEnd);
             });
         }
 
@@ -237,7 +240,6 @@
                 addVolumeDefinitionRow(`Volume 1`, 0, currentEpubTocForSelection.length > 0 ? currentEpubTocForSelection.length - 1 : 0);
             }
         });
-        // Initialize visibility
         optionsMap[splitTypeSelect.value].classList.remove('hidden');
 
 
@@ -264,44 +266,42 @@
                 manifestItemsStore = parseManifest(originalOpfDoc);
                 const spineItemRefs = parseSpine(originalOpfDoc);
                 
-                currentChapterFiles = spineItemRefs
+                currentChapterFiles = spineItemRefs // This IS the spine
                     .map(idref => manifestItemsStore.find(item => item.id === idref))
                     .filter(item => item && (item.mediaType === 'application/xhtml+xml' || item.mediaType === 'application/html'));
 
                 if (currentChapterFiles.length === 0) {
-                    statusDiv.textContent = 'Error: No chapters found in the EPUB spine.';
+                    statusDiv.textContent = 'Error: No content documents found in the EPUB spine.';
                     clearEpubData();
                     return;
                 }
                 
                 tocDetailsStore = await getTocDetails(originalZipInstance, originalOpfDoc, originalOpfDir, manifestItemsStore);
                 
+                // Generate the list for dropdowns based on the full spine (currentChapterFiles)
                 currentEpubTocForSelection = await generateTocForSelection(currentChapterFiles, tocDetailsStore, originalOpfDir);
 
-                // Identify cover image
                 const metaCover = originalOpfDoc.querySelector("metadata meta[name='cover']");
                 let coverId = metaCover ? metaCover.getAttribute("content") : null;
                 if (coverId) {
                     coverImageManifestItem = manifestItemsStore.find(item => item.id === coverId);
                 }
-                if (!coverImageManifestItem) { // Fallback to property
+                if (!coverImageManifestItem) { 
                     coverImageManifestItem = manifestItemsStore.find(item => item.properties && item.properties.includes("cover-image"));
                 }
                 if (coverImageManifestItem) {
-                    console.log("Cover image found:", coverImageManifestItem);
+                    console.log("Cover image identified:", coverImageManifestItem.href);
                 } else {
                     console.warn("No cover image identified in EPUB metadata.");
                 }
 
-
-                tocLoadingStatus.textContent = `EPUB loaded. ${currentChapterFiles.length} chapters in spine. ${currentEpubTocForSelection.length} ToC entries for selection.`;
+                tocLoadingStatus.textContent = `EPUB loaded. ${currentChapterFiles.length} spine items available for selection.`;
                 splitButton.disabled = false;
                 statusDiv.textContent = 'EPUB loaded. Configure split options.';
-                updateAllVolumeTocDropdowns(); // Populate dropdowns in existing rows
+                updateAllVolumeTocDropdowns(); 
                 if (splitTypeSelect.value === 'customRanges' && volumeDefinitionsContainer.children.length === 0) {
                      addVolumeDefinitionRow(`Volume 1`, 0, currentEpubTocForSelection.length > 0 ? currentEpubTocForSelection.length - 1 : 0);
                 }
-
 
             } catch (error) {
                 console.error("EPUB Loading Error:", error);
@@ -319,8 +319,8 @@
             tocDetailsStore = null;
             coverImageManifestItem = null;
             splitButton.disabled = true;
-            tocLoadingStatus.textContent = 'Load an EPUB to populate chapter lists.';
-            updateAllVolumeTocDropdowns(); // Clear/disable dropdowns
+            tocLoadingStatus.textContent = 'Load an EPUB to populate item lists.';
+            updateAllVolumeTocDropdowns(); 
         }
 
         // --- Core EPUB Logic (Split Button Click) ---
@@ -337,13 +337,12 @@
                 let partsToCreate = [];
                 const splitType = splitTypeSelect.value;
                 const originalTitle = getMetadataField(originalOpfDoc, "dc:title") || "Untitled";
-                const originalIdentifier = getMetadataField(originalOpfDoc, "dc:identifier") || generateUUID(); // Use UUID for identifier
+                const originalIdentifier = getMetadataField(originalOpfDoc, "dc:identifier") || generateUUID(); 
 
                 if (splitType === 'chaptersPerPart') {
-                    // ... (same as before)
                     const numChapters = parseInt(document.getElementById('numChapters').value) || 1;
                     let partNum = 1;
-                    for (let i = 0; i < currentChapterFiles.length; i += numChapters) {
+                    for (let i = 0; i < currentChapterFiles.length; i += numChapters) { // currentChapterFiles IS the spine
                         partsToCreate.push({
                             partNum: partNum++,
                             chapters: currentChapterFiles.slice(i, i + numChapters),
@@ -351,9 +350,8 @@
                         });
                     }
                 } else if (splitType === 'numberOfParts') {
-                    // ... (same as before)
                      const numParts = parseInt(document.getElementById('numParts').value) || 2;
-                    const chaptersPerPartRaw = currentChapterFiles.length / numParts;
+                    const chaptersPerPartRaw = currentChapterFiles.length / numParts; // currentChapterFiles IS the spine
                     let currentIndex = 0;
                     for (let i = 0; i < numParts; i++) {
                          const chaptersInThisPart = (i === numParts -1) ? 
@@ -370,13 +368,12 @@
                         currentIndex += chaptersInThisPart;
                     }
                 } else if (splitType === 'approxSize') {
-                    // ... (same as before)
                     const targetSizeMB = parseFloat(document.getElementById('partSize').value) || 1;
                     const targetSizeBytes = targetSizeMB * 1024 * 1024;
                     let currentGroup = [];
                     let currentGroupSize = 0;
                     let partNum = 1;
-                    for (const chapter of currentChapterFiles) {
+                    for (const chapter of currentChapterFiles) { // currentChapterFiles IS the spine
                         const fileData = await originalZipInstance.file(originalOpfDir + chapter.href)?.async("uint8array");
                         const fileSize = fileData ? fileData.byteLength : 0;
                         if (currentGroup.length > 0 && currentGroupSize + fileSize > targetSizeBytes && currentGroup.length > 0) {
@@ -405,22 +402,22 @@
                         const endSelect = row.querySelector('.volume-end-select');
                         
                         const volumeName = nameInput.value.trim() || `Volume ${index + 1}`;
-                        const startIndex = parseInt(startSelect.value); // This is spineIndex
-                        const endIndex = parseInt(endSelect.value);   // This is spineIndex
+                        const startIndex = parseInt(startSelect.value); // This is 0-based spine index
+                        const endIndex = parseInt(endSelect.value);   // This is 0-based spine index
 
                         if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < 0 || startIndex >= currentChapterFiles.length || endIndex >= currentChapterFiles.length) {
-                            statusDiv.textContent = `Error: Invalid chapter selection for "${volumeName}". Please check dropdowns.`;
+                            statusDiv.textContent = `Error: Invalid item selection for "${volumeName}". Start: ${startIndex + 1}, End: ${endIndex + 1}. Available: 1 to ${currentChapterFiles.length}.`;
                             errorInSelections = true;
                             return;
                         }
                         if (startIndex > endIndex) {
-                            statusDiv.textContent = `Error: Start chapter cannot be after end chapter for "${volumeName}".`;
+                            statusDiv.textContent = `Error: Start item cannot be after end item for "${volumeName}".`;
                             errorInSelections = true;
                             return;
                         }
                         partsToCreate.push({
                             name: volumeName,
-                            chapters: currentChapterFiles.slice(startIndex, endIndex + 1),
+                            chapters: currentChapterFiles.slice(startIndex, endIndex + 1), // endIndex+1 because slice is exclusive
                             isCustomName: true
                         });
                     });
@@ -428,7 +425,7 @@
                 }
 
                 if (partsToCreate.length === 0 || partsToCreate.every(p => p.chapters.length === 0)) {
-                    statusDiv.textContent = 'Error: Splitting resulted in no valid parts with chapters. Check your settings.';
+                    statusDiv.textContent = 'Error: Splitting resulted in no valid parts with content. Check your settings.';
                     return;
                 }
                 partsToCreate = partsToCreate.filter(p => p.chapters.length > 0);
@@ -470,7 +467,7 @@
         });
 
         // --- EPUB Parsing Helper Functions ---
-        async function getOpfData(zip) { /* ... same as before ... */ 
+        async function getOpfData(zip) { 
             const containerFile = zip.file("META-INF/container.xml");
             if (!containerFile) throw new Error("META-INF/container.xml not found.");
             const containerContent = await containerFile.async("string");
@@ -485,7 +482,7 @@
             const opfDir = rootfilePath.substring(0, rootfilePath.lastIndexOf('/') + 1);
             return { opfPath: rootfilePath, opfContent, opfDir };
         }
-        function parseManifest(opfDoc) { /* ... same as before ... */
+        function parseManifest(opfDoc) {
             const items = [];
             const manifestNode = opfDoc.getElementsByTagName("manifest")[0];
             if (manifestNode) {
@@ -500,7 +497,7 @@
             }
             return items;
         }
-        function parseSpine(opfDoc) { /* ... same as before ... */
+        function parseSpine(opfDoc) {
             const itemRefs = [];
             const spineNode = opfDoc.getElementsByTagName("spine")[0];
             if (spineNode) {
@@ -521,24 +518,33 @@
             if (ncxId) {
                 const ncxItem = manifestItems.find(item => item.id === ncxId);
                 if (ncxItem) {
-                    tocPath = opfDir + ncxItem.href;
+                    tocPath = opfDir + ncxItem.href; // tocPath is absolute from EPUB root
                     tocType = 'ncx';
                 }
             } else {
                 const navItem = manifestItems.find(item => item.properties && item.properties.includes("nav"));
                 if (navItem) {
-                    tocPath = opfDir + navItem.href;
+                    tocPath = opfDir + navItem.href; // tocPath is absolute from EPUB root
                     tocType = 'nav';
                 }
             }
 
             if (tocPath) {
-                const tocFile = zip.file(tocPath);
+                const tocFile = zip.file(tocPath); // Use absolute path to get file from zip
                 if (tocFile) {
                     tocContentStr = await tocFile.async("string");
                     const mimeType = tocType === 'ncx' ? "application/xml" : "application/xhtml+xml";
-                    tocDocParsed = parser.parseFromString(tocContentStr, mimeType);
-                    tocFileDir = tocPath.substring(0, tocPath.lastIndexOf('/') + 1);
+                    try {
+                        tocDocParsed = parser.parseFromString(tocContentStr, mimeType);
+                        if (tocDocParsed.getElementsByTagName("parsererror").length > 0) {
+                           console.warn("Parser error in ToC document:", tocDocParsed.getElementsByTagName("parsererror")[0].textContent);
+                           tocDocParsed = null; // Don't use a broken doc
+                        }
+                    } catch (e) {
+                        console.warn("Error parsing ToC document:", e);
+                        tocDocParsed = null;
+                    }
+                    tocFileDir = tocPath.substring(0, tocPath.lastIndexOf('/') + 1); // Directory of the ToC file itself
                 } else console.warn(`ToC file ${tocPath} not found in zip.`);
             } else {
                  console.warn("No ToC (NCX or NAV) found in OPF.");
@@ -546,99 +552,89 @@
             return { path: tocPath, contentString: tocContentStr, type: tocType, dir: tocFileDir, doc: tocDocParsed };
         }
 
-        function normalizePath(path, baseFileFullPath, targetBaseDir) {
-            if (!path || !baseFileFullPath) return path;
-            // Create a pseudo-URL for path resolution
+        function normalizePath(relativePath, baseFileFullPath, targetBaseDirForOutput) {
+            if (!relativePath || !baseFileFullPath) return relativePath;
+            
+            // 1. Create absolute URL from EPUB root for the relativePath using baseFileFullPath as context
+            // baseFileFullPath is like 'OEBPS/toc.ncx' or 'OEBPS/content.opf'
+            // relativePath is like '../Images/img.jpg' or 'chapter1.xhtml'
             const baseUrl = new URL(baseFileFullPath, 'file:///'); // e.g., file:///OEBPS/toc.ncx
-            const resolvedUrl = new URL(path.split('#')[0], baseUrl); // Resolve path part only
-            let fullPath = resolvedUrl.pathname;
-            if (fullPath.startsWith('/')) fullPath = fullPath.substring(1); // Remove leading / from pathname
+            const resolvedUrl = new URL(relativePath.split('#')[0], baseUrl); // Resolve path part only, e.g. file:///Images/img.jpg
+            
+            let fullPathFromRoot = resolvedUrl.pathname;
+            if (fullPathFromRoot.startsWith('/')) fullPathFromRoot = fullPathFromRoot.substring(1); // Remove leading /, e.g. Images/img.jpg
 
-            // Make relative to targetBaseDir (e.g., OEBPS/)
-            if (targetBaseDir && fullPath.startsWith(targetBaseDir)) {
-                return fullPath.substring(targetBaseDir.length) + (path.includes('#') ? '#' + path.split('#')[1] : '');
+            // 2. Make this path relative to the targetBaseDirForOutput (usually opfDir)
+            // targetBaseDirForOutput is like 'OEBPS/'
+            if (targetBaseDirForOutput && fullPathFromRoot.startsWith(targetBaseDirForOutput)) {
+                const finalRelativePath = fullPathFromRoot.substring(targetBaseDirForOutput.length);
+                return finalRelativePath + (relativePath.includes('#') ? '#' + relativePath.split('#')[1] : '');
             }
-            return fullPath + (path.includes('#') ? '#' + path.split('#')[1] : '');
+            // If not under targetBaseDir, it might be an error or an unusual structure. Return full path from root.
+            console.warn(`Path ${fullPathFromRoot} could not be made relative to ${targetBaseDirForOutput}. Using full path.`);
+            return fullPathFromRoot + (relativePath.includes('#') ? '#' + relativePath.split('#')[1] : '');
         }
 
-        async function generateTocForSelection(chapterFiles, tocDetails, opfDir) {
-            const tocForSelection = [];
-            if (!tocDetails || !tocDetails.doc) { // No ToC file, use spine files directly
-                return chapterFiles.map((chapFile, index) => ({
-                    title: chapFile.href.split('/').pop() || `Chapter ${index + 1}`, // Fallback title
-                    value: index // spineIndex
-                }));
-            }
 
-            const tocDoc = tocDetails.doc;
-            const tocType = tocDetails.type;
-            const tocFileFullPath = tocDetails.path; // Full path from EPUB root, e.g., OEBPS/toc.ncx
+        async function generateTocForSelection(chapterFilesFromSpine, tocDetails, opfDir) {
+            const tocForSelection = []; 
+            const hrefToTocTitleMap = new Map();
 
-            // Create a map of spine hrefs for quick lookup
-            const spineHrefToindex = new Map();
-            chapterFiles.forEach((chapFile, index) => {
-                spineHrefToindex.set(chapFile.href, index); // chapFile.href is already opfDir-relative
-            });
-            
-            // This is a simplified ToC parser for titles. It doesn't handle deep nesting for display perfectly,
-            // but aims to get a flat list of primary chapter titles corresponding to spine items.
-            if (tocType === 'ncx') {
-                const navPoints = tocDoc.getElementsByTagName('navPoint');
-                for (const navPoint of navPoints) {
-                    const navLabel = navPoint.getElementsByTagName('navLabel')[0];
-                    const content = navPoint.getElementsByTagName('content')[0];
-                    if (navLabel && content) {
-                        const title = navLabel.textContent.trim();
-                        const src = content.getAttribute('src');
-                        if (src) {
-                            const opfRelativeSrc = normalizePath(src, tocFileFullPath, opfDir).split('#')[0];
-                            if (spineHrefToindex.has(opfRelativeSrc)) {
-                                tocForSelection.push({ title: title, value: spineHrefToindex.get(opfRelativeSrc) });
+            if (tocDetails && tocDetails.doc) {
+                const tocDoc = tocDetails.doc;
+                const tocType = tocDetails.type;
+                const tocFileFullPath = tocDetails.path; // Absolute path of ToC file from EPUB root (e.g., OEBPS/toc.ncx)
+
+                if (tocType === 'ncx') {
+                    const navPoints = tocDoc.getElementsByTagName('navPoint');
+                    for (const navPoint of navPoints) {
+                        const navLabel = navPoint.getElementsByTagName('navLabel')[0];
+                        const content = navPoint.getElementsByTagName('content')[0];
+                        if (navLabel && content) {
+                            const title = navLabel.getElementsByTagName('text')[0]?.textContent.trim();
+                            const src = content.getAttribute('src');
+                            if (title && src) {
+                                // src is relative to the NCX file. Normalize it to be relative to OPF dir.
+                                const opfRelativeSrc = normalizePath(src, tocFileFullPath, opfDir).split('#')[0];
+                                if (!hrefToTocTitleMap.has(opfRelativeSrc)) { 
+                                    hrefToTocTitleMap.set(opfRelativeSrc, title);
+                                }
+                            }
+                        }
+                    }
+                } else if (tocType === 'nav') {
+                    const navLinks = tocDoc.querySelectorAll("nav[epub\\:type='toc'] ol a, nav[role='doc-toc'] ol a");
+                    for (const link of navLinks) {
+                        const title = link.textContent.trim();
+                        const href = link.getAttribute('href');
+                        if (title && href) {
+                            // href is relative to the NAV file. Normalize it to be relative to OPF dir.
+                            const opfRelativeHref = normalizePath(href, tocFileFullPath, opfDir).split('#')[0];
+                            if (!hrefToTocTitleMap.has(opfRelativeHref)) { 
+                                hrefToTocTitleMap.set(opfRelativeHref, title);
                             }
                         }
                     }
                 }
-            } else if (tocType === 'nav') {
-                const navLinks = tocDoc.querySelectorAll("nav[epub\\:type='toc'] ol a, nav[role='doc-toc'] ol a");
-                for (const link of navLinks) {
-                    const title = link.textContent.trim();
-                    const href = link.getAttribute('href');
-                    if (href) {
-                        const opfRelativeHref = normalizePath(href, tocFileFullPath, opfDir).split('#')[0];
-                        if (spineHrefToindex.has(opfRelativeHref)) {
-                            tocForSelection.push({ title: title, value: spineHrefToindex.get(opfRelativeHref) });
-                        }
-                    }
-                }
             }
-            
-            // Ensure all spine items have a representation, even if not in ToC explicitly
-            const coveredSpineIndices = new Set(tocForSelection.map(item => item.value));
-            chapterFiles.forEach((chapFile, index) => {
-                if (!coveredSpineIndices.has(index)) {
-                    tocForSelection.push({
-                        title: chapFile.href.split('/').pop() || `(Spine) Chapter ${index + 1}`, // Fallback title
-                        value: index
-                    });
-                }
-            });
 
-            // Sort by spine index to ensure dropdown order matches reading order
-            tocForSelection.sort((a, b) => a.value - b.value);
-            
-            // Deduplicate based on value (spineIndex), keeping first title found
-            const uniqueTocForSelection = [];
-            const seenValues = new Set();
-            for (const item of tocForSelection) {
-                if (!seenValues.has(item.value)) {
-                    uniqueTocForSelection.push(item);
-                    seenValues.add(item.value);
+            chapterFilesFromSpine.forEach((spineItem, index) => {
+                // spineItem.href is already relative to opfDir
+                let title = hrefToTocTitleMap.get(spineItem.href); 
+                if (!title) {
+                    title = spineItem.href.split('/').pop().replace(/\.(xhtml|html)$/i, '') || `Item ${index + 1}`;
+                    title = `(No ToC Title) ${title}`;
                 }
-            }
-            return uniqueTocForSelection;
+                
+                tocForSelection.push({
+                    title: title,
+                    value: index // value is the direct 0-based index in chapterFilesFromSpine
+                });
+            });
+            return tocForSelection;
         }
 
-        function getMetadataField(opfDoc, fieldName) { /* ... same as before ... */
+        function getMetadataField(opfDoc, fieldName) { 
             const metadataNode = opfDoc.getElementsByTagName("metadata")[0];
             if (metadataNode) {
                 const elements = metadataNode.getElementsByTagName(fieldName); 
@@ -648,7 +644,7 @@
             }
             return null;
         }
-        function generateUUID() { /* ... same as before ... */
+        function generateUUID() { 
              return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
@@ -657,9 +653,9 @@
 
         async function createNewEpubPart(
             originalZip, opfDoc, originalOpfPath, opfDir,
-            allManifestItems, chapterItemsForPart, tocDetails, // tocDetails has { path, contentString, type, dir, doc }
+            allManifestItems, chapterItemsForPart, tocDetails, 
             partIdentifier, totalPartsInSet, originalTitle, originalIdentifier,
-            isCustomName, coverItem // Pass the identified cover manifest item
+            isCustomName, coverItem 
         ) {
             const newZip = new JSZip();
             const serializer = new XMLSerializer();
@@ -678,7 +674,7 @@
                     metadataNode.appendChild(titleNode);
                 }
                 if (isCustomName) {
-                    titleNode.textContent = `${partIdentifier}`; // Use custom name directly for title
+                    titleNode.textContent = `${partIdentifier}`; 
                 } else {
                     titleNode.textContent = `${originalTitle} - Part ${partIdentifier}/${totalPartsInSet}`;
                 }
@@ -694,7 +690,7 @@
                         identifierNode.setAttribute('id', newBookIdAttr);
                         newOpfDoc.documentElement.setAttribute('unique-identifier', newBookIdAttr);
                     } else if (identifierNode.getAttribute('id')) {
-                         identifierNode.setAttribute('id', newBookIdAttr); // Ensure any ID is unique
+                         identifierNode.setAttribute('id', newBookIdAttr); 
                     }
                 } else { 
                     const newIdElement = newOpfDoc.createElementNS("http://purl.org/dc/elements/1.1/", "dc:identifier");
@@ -704,13 +700,11 @@
                     newOpfDoc.documentElement.setAttribute('unique-identifier', newBookIdAttr);
                 }
 
-                // Handle Cover Metadata
                 if (coverItem && coverItem.id) {
                     let metaCoverNode = metadataNode.querySelector("meta[name='cover']");
                     if (!metaCoverNode) {
-                        metaCoverNode = newOpfDoc.createElement("meta");
+                        metaCoverNode = newOpfDoc.createElement("meta"); // No NS needed for meta
                         metaCoverNode.setAttribute("name", "cover");
-                        // Find a dc:identifier or the first metadata child to insert before/after
                         const firstMetaChild = metadataNode.firstChild;
                         if (firstMetaChild) metadataNode.insertBefore(metaCoverNode, firstMetaChild);
                         else metadataNode.appendChild(metaCoverNode);
@@ -724,26 +718,26 @@
             const itemsToKeep = new Set();
             chapterItemsForPart.forEach(item => itemsToKeep.add(item.id));
             
-            // Always keep cover item if it exists
             if (coverItem && coverItem.id) {
                 itemsToKeep.add(coverItem.id);
             }
 
             allManifestItems.forEach(item => {
-                if (!item.mediaType.includes('xhtml') && !item.mediaType.includes('html')) { // Keep all non-content files (CSS, images, fonts, etc.)
+                if (!item.mediaType.includes('xhtml') && !item.mediaType.includes('html')) { 
                     itemsToKeep.add(item.id);
                 }
-                // Keep original ToC manifest item (NCX or NAV)
-                if (tocDetails.path && (opfDir + item.href === tocDetails.path || item.href === tocDetails.path.substring(opfDir.length) )) {
+                // originalOpfDir + item.href should be the full path from root if item.href is opf-relative
+                // tocDetails.path is also full path from root
+                if (tocDetails && tocDetails.path && (originalOpfDir + item.href === tocDetails.path)) {
                     itemsToKeep.add(item.id);
                 }
             });
+
             Array.from(manifestNode.getElementsByTagName("item")).forEach(itemNode => {
                 const itemId = itemNode.getAttribute("id");
                 if (!itemsToKeep.has(itemId)) {
                     itemNode.remove();
                 } else {
-                    // Ensure cover item in manifest has 'cover-image' property if that's how it was identified
                     if (coverItem && itemId === coverItem.id && coverItem.properties && coverItem.properties.includes("cover-image")) {
                         let props = itemNode.getAttribute("properties") || "";
                         if (!props.includes("cover-image")) {
@@ -758,12 +752,14 @@
                 if (!chapterItemIds.has(itemrefNode.getAttribute("idref"))) itemrefNode.remove();
             });
             
-            let newTocPath = tocDetails.path;
-            let newTocContent = tocDetails.contentString; // Use original string content for modification
-            const chapterHrefsInPart = new Set(chapterItemsForPart.map(item => item.href)); // Relative to OPF
+            let newTocPath = tocDetails ? tocDetails.path : null; // Absolute path from EPUB root
+            let newTocContent = tocDetails ? tocDetails.contentString : null;
+            const chapterHrefsInPart = new Set(chapterItemsForPart.map(item => item.href)); // These are OPF-relative
 
-            if (tocDetails.doc && tocDetails.path && newTocContent) { // If ToC was successfully parsed
-                const currentTocDoc = tocDetails.doc.cloneNode(true); // Work on a clone for filtering
+            if (tocDetails && tocDetails.doc && tocDetails.path && newTocContent) { 
+                const currentTocDoc = tocDetails.doc.cloneNode(true); 
+                const tocFileFullPathForNorm = tocDetails.path; // e.g. OEBPS/toc.ncx
+                
                 if (tocDetails.type === 'ncx') {
                     const navMapNode = currentTocDoc.getElementsByTagName("navMap")[0];
                     if (navMapNode) {
@@ -771,19 +767,19 @@
                              Array.from(parentElement.children).forEach(navPointNode => {
                                 if (navPointNode.nodeName.toLowerCase() !== 'navpoint') return;
                                 const contentNode = navPointNode.getElementsByTagName("content")[0];
-                                const src = contentNode?.getAttribute("src");
+                                const src = contentNode?.getAttribute("src"); // src is relative to NCX file
                                 if (src) {
-                                    const opfRelativeSrc = normalizePath(src, tocDetails.path, opfDir).split('#')[0];
+                                    // Normalize src to be OPF-relative for comparison with chapterHrefsInPart
+                                    const opfRelativeSrc = normalizePath(src, tocFileFullPathForNorm, opfDir).split('#')[0];
                                     if (!chapterHrefsInPart.has(opfRelativeSrc)) {
                                         navPointNode.remove();
                                     } else {
-                                        filterNavPoints(navPointNode); // Recurse
+                                        filterNavPoints(navPointNode); 
                                     }
-                                } else { // No src, potentially a container navPoint, keep if children exist
+                                } else { 
                                    filterNavPoints(navPointNode);
-                                   if (navPointNode.getElementsByTagName('navPoint').length === 0) {
-                                        // If it was a container and all children removed, remove it too, unless it itself points to a valid chapter.
-                                        // This case can be complex; for now, if it's empty and had no direct src, it might be removed.
+                                   if (navPointNode.getElementsByTagName('navPoint').length === 0 && !navPointNode.getElementsByTagName("content")[0]?.getAttribute("src")) {
+                                        navPointNode.remove(); 
                                    }
                                 }
                             });
@@ -802,23 +798,24 @@
                          const filterNavLis = (parentElement) => {
                             Array.from(parentElement.children).forEach(liNode => {
                                 if (liNode.nodeName.toLowerCase() !== 'li') return;
-                                const anchor = liNode.querySelector("a"); // Direct child anchor
-                                const href = anchor?.getAttribute("href");
+                                const anchor = liNode.querySelector("a"); 
+                                const href = anchor?.getAttribute("href"); // href is relative to NAV file
                                 if (href) {
-                                    const opfRelativeHref = normalizePath(href, tocDetails.path, opfDir).split('#')[0];
+                                    // Normalize href to be OPF-relative
+                                    const opfRelativeHref = normalizePath(href, tocFileFullPathForNorm, opfDir).split('#')[0];
                                     if (!chapterHrefsInPart.has(opfRelativeHref)) {
                                         liNode.remove();
                                     } else {
                                         const nestedOl = liNode.querySelector("ol");
                                         if (nestedOl) filterNavLis(nestedOl);
                                     }
-                                } else { // No href on direct anchor, check nested or remove if empty
+                                } else { 
                                     const nestedOl = liNode.querySelector("ol");
                                     if (nestedOl) {
                                         filterNavLis(nestedOl);
-                                        if(nestedOl.children.length === 0) liNode.remove(); // remove if it became empty
+                                        if(nestedOl.children.length === 0) liNode.remove(); 
                                     } else {
-                                        liNode.remove(); // No link, no children, remove
+                                        liNode.remove(); 
                                     }
                                 }
                             });
@@ -828,40 +825,39 @@
                         newTocContent = serializer.serializeToString(currentTocDoc);
                     }
                 }
-                if (newTocPath && newTocContent) {
+                if (newTocPath && newTocContent) { // newTocPath is absolute from EPUB root
                      newZip.file(newTocPath, newTocContent); 
                 }
             }
+            // originalOpfPath is absolute from EPUB root
             newZip.file(originalOpfPath, serializer.serializeToString(newOpfDoc));
 
-            const finalManifestItems = parseManifest(newOpfDoc);
+            const finalManifestItems = parseManifest(newOpfDoc); // Re-parse the modified OPF
             for (const item of finalManifestItems) {
-                const filePathInEpub = opfDir + item.href;
-                // Skip if it's the ToC file we've already (re)written
-                if (filePathInEpub === newTocPath && newTocContent) continue;
+                const filePathInEpub = opfDir + item.href; // item.href is opf-relative, so this is absolute
+                
+                if (filePathInEpub === newTocPath && newTocContent) continue; // Already added modified ToC
 
-                const fileInOriginalZip = originalZip.file(filePathInEpub);
+                const fileInOriginalZip = originalZip.file(filePathInEpub); // Use absolute path
                 if (fileInOriginalZip) {
                     const data = await fileInOriginalZip.async("uint8array");
-                    newZip.file(filePathInEpub, data);
+                    newZip.file(filePathInEpub, data); // Use absolute path
                 } else {
-                    // This warning might appear if a resource (e.g. image) was only referenced by a ToC entry of a *removed* chapter
-                    // and our ToC filtering isn't perfect at removing those resource links too. Usually benign.
-                    console.warn(`File ${filePathInEpub} from manifest not found in original EPUB for part ${partIdentifier}.`);
+                    console.warn(`File ${filePathInEpub} (ID: ${item.id}) from manifest not found in original EPUB for part ${partIdentifier}.`);
                 }
             }
             return newZip;
         }
 
         function sanitizeFilename(name) {
-            let sane = name.replace(/[^\w\s.-]/g, ''); 
+            let sane = String(name).replace(/[^\w\s.-]/g, ''); 
             sane = sane.replace(/\s+/g, '_'); 
             return sane;
         }
 
         // Initial UI setup
         splitTypeSelect.dispatchEvent(new Event('change'));
-        splitButton.disabled = true; // Disabled until EPUB is loaded
+        splitButton.disabled = true; 
     </script>
 </body>
 </html>
