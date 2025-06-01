@@ -3,42 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Novel Term Extractor v3.0</title>
+    <title>Nexus Term Extractor v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
-            --bg-color: #f4f7f9;
+            --bg-color: #f8f9fa; /* Lighter background */
             --card-bg-color: #ffffff;
-            --primary-color: #4A90E2; /* Professional Blue */
-            --primary-hover-color: #357ABD;
-            --secondary-color: #50E3C2; /* Teal accent for success */
-            --secondary-hover-color: #38C1A5;
-            --tertiary-color: #9013FE; /* Purple for specific actions */
-            --tertiary-hover-color: #7B0FD0;
-            --text-primary: #2c3e50; /* Dark Grey Blue */
-            --text-secondary: #7f8c8d; /* Lighter Grey */
-            --border-color: #dfe6e9;
-            --shadow-color: rgba(44, 62, 80, 0.1);
-            --success-color: var(--secondary-color);
-            --error-color: #e74c3c;
-            --warning-color: #f39c12;
-            --info-color: var(--primary-color);
+            --primary-color: #007bff; /* Classic Blue */
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6f42c1; /* Purple accent */
+            --secondary-hover-color: #5a32a3;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --text-primary: #212529; 
+            --text-secondary: #6c757d; 
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.075);
             --font-family: 'Inter', sans-serif;
             --base-font-size: 16px;
-            --border-radius: 8px;
-            --transition-speed: 0.25s;
+            --border-radius: 0.5rem; /* 8px */
+            --transition-speed: 0.2s;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            font-size: var(--base-font-size);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: var(--base-font-size); }
 
         body {
             font-family: var(--font-family);
@@ -49,391 +40,327 @@
         }
 
         .app-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 25px 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
-            color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 6px 12px var(--shadow-color);
+            text-align: center; margin-bottom: 35px; padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white; border-radius: var(--border-radius);
+            box-shadow: 0 0.5rem 1rem var(--shadow-color);
         }
-        .app-header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .app-header p {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-top: 5px;
+        .app-header h1 { font-size: 2rem; font-weight: 700; }
+        .app-header p { font-size: 0.95rem; opacity: 0.9; margin-top: 8px; }
+
+        .main-content-grid {
+            display: grid; grid-template-columns: 1fr; gap: 25px;
+            max-width: 1300px; margin: 0 auto;
         }
 
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 992px) {
-            .main-layout {
-                grid-template-columns: 1fr 1fr; /* Two columns for inputs */
-            }
-            .full-width-panel {
-                grid-column: 1 / -1; /* Span across both columns */
-            }
+        @media (min-width: 1024px) { /* Adjust breakpoint as needed */
+            .main-content-grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+            .panel-full-width { grid-column: 1 / -1; }
         }
         
         .panel {
-            background-color: var(--card-bg-color);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 8px var(--shadow-color);
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-        }
-        .panel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px var(--shadow-color);
+            background-color: var(--card-bg-color); padding: 20px;
+            border-radius: var(--border-radius); border: 1px solid var(--border-color);
+            box-shadow: 0 0.25rem 0.5rem var(--shadow-color);
         }
         .panel-header {
-            display: flex;
-            align-items: center;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            padding-bottom: 10px;
+            display: flex; align-items: center; font-size: 1.2rem; font-weight: 600;
+            margin-bottom: 18px; color: var(--text-primary); padding-bottom: 12px;
             border-bottom: 1px solid var(--border-color);
         }
-        .panel-header i { margin-right: 10px; }
+        .panel-header i { margin-right: 10px; color: var(--primary-color); }
 
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
+        .form-group { margin-bottom: 18px; }
+        .form-group label, .input-label { /* For labels outside form-group */
+            display: block; font-size: 0.875rem; font-weight: 500;
+            margin-bottom: 6px; color: var(--text-secondary);
         }
 
         textarea, .file-input-display {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-family: var(--font-family);
-            background-color: #fdfdfe;
+            width: 100%; padding: 0.625rem 0.75rem; /* 10px 12px */
+            border: 1px solid var(--border-color); border-radius: 0.375rem; /* 6px */
+            font-size: 0.9rem; font-family: var(--font-family);
+            background-color: var(--card-bg-color); 
             transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
             resize: vertical;
         }
         textarea:focus, .file-input-display:focus-within {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
             outline: none;
         }
         
-        .file-input-container {
-            position: relative;
-        }
+        .file-input-container { position: relative; }
         .file-input-container input[type="file"] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
+            position: absolute; left: 0; top: 0; opacity: 0;
+            width: 100%; height: 100%; cursor: pointer;
         }
         .file-input-display {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
         }
         .file-input-display .placeholder { color: var(--text-secondary); }
         .file-input-display i { color: var(--primary-color); }
 
-        .button-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            align-items: center;
-            flex-wrap: wrap;
+        .button-row, .output-actions {
+            display: flex; gap: 0.625rem; /* 10px */
+            margin-top: 12px; align-items: center; flex-wrap: wrap;
         }
+        .output-actions { justify-content: flex-end; margin-bottom: 10px;}
 
         .btn {
-            padding: 8px 15px; /* Smaller padding for normal buttons */
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: 0 2px 4px var(--shadow-color);
+            padding: 0.5rem 0.9375rem; /* 8px 15px */
+            border: 1px solid transparent; border-radius: 0.375rem; /* 6px */
+            cursor: pointer; font-size: 0.875rem; font-weight: 500;
+            transition: all var(--transition-speed) ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none; line-height: 1.5;
         }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 6px var(--shadow-color); }
-        .btn:active { transform: translateY(0); box-shadow: 0 1px 2px var(--shadow-color); }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:focus { outline: none; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);}
 
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover-color); }
-
-        .btn-secondary { background-color: var(--secondary-color); color: white; }
-        .btn-secondary:hover { background-color: var(--secondary-hover-color); }
-        
-        .btn-tertiary { background-color: var(--tertiary-color); color: white; }
-        .btn-tertiary:hover { background-color: var(--tertiary-hover-color); }
-        
-        .btn-danger { background-color: var(--error-color); color: white; }
-        .btn-danger:hover { background-color: #c0392b; }
-
-        .btn-icon { padding: 8px 10px; } /* Even smaller for icon only */
-        .btn-icon .btn-text { display: none; }
-        @media (min-width: 768px) {
-            .btn-icon.responsive-text .btn-text { display: inline; margin-left: 5px; }
-        }
+        .btn-primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color);}
+        .btn-primary:hover { background-color: var(--primary-hover-color); border-color:var(--primary-hover-color); }
+        .btn-secondary { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
+        .btn-secondary:hover { background-color: var(--secondary-hover-color); border-color:var(--secondary-hover-color);}
+        .btn-danger { background-color: var(--error-color); color: white; border-color: var(--error-color);}
+        .btn-danger:hover { background-color: #c82333; border-color:#bd2130;}
+        .btn-outline-primary { color: var(--primary-color); border-color: var(--primary-color); background-color:transparent; }
+        .btn-outline-primary:hover { background-color: var(--primary-color); color: white; }
 
 
-        .main-action-panel { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .main-action-button-container { margin-top: 20px; text-align: center;}
         .main-action-button {
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600;
         }
         .main-action-button .spinner {
-            display: none; width: 18px; height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%; border-top-color: #fff;
-            animation: spin 0.8s ease-in-out infinite;
+            display: none; width: 1.125rem; height: 1.125rem; /* 18px */
+            border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; 
+            border-top-color: #fff; animation: spin 0.8s linear infinite;
         }
-        .main-action-button.loading .spinner { display: inline-block; }
-        .main-action-button.loading .btn-text { margin-left: 8px; }
+        .main-action-button.loading .spinner { display: inline-block; margin-right: 8px; }
+        /* .main-action-button.loading .btn-text {  } */ /* text visible with spinner */
 
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .toggle-switch-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px; /* Smaller switch */
-            height: 24px;
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s; border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute; content: "";
-            height: 18px; width: 18px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--primary-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-
+        
         .status-message {
-            margin-top: 10px; padding: 10px 15px; border-radius: 6px;
-            font-size: 0.9rem; display: flex; align-items: center;
+            margin-top: 10px; padding: 0.75rem 1rem; border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; display: flex; align-items: center;
             gap: 8px; border: 1px solid transparent;
         }
-        .status-message i { font-size: 1.1em; }
-        .status-message.success { background-color: #e6fff8; color: #008d6e; border-color: var(--success-color); }
-        .status-message.warning { background-color: #fff8e1; color: #c47d00; border-color: var(--warning-color); }
-        .status-message.error   { background-color: #fdecea; color: #c03329; border-color: var(--error-color); }
-        .status-message.info    { background-color: #e7f3fe; color: #357ABD; border-color: var(--info-color); }
+        .status-message i { font-size: 1rem; }
+        .status-message.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb;}
+        .status-message.warning { background-color: #fff3cd; color: #856404; border-color: #ffeeba;}
+        .status-message.error   { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;}
+        .status-message.info    { background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb;}
 
-        .instructions {
-            font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;
-            padding: 10px; background-color: #f8f9fa;
-            border-left: 3px solid var(--secondary-color); border-radius: 4px;
-        }
-        
         #processingStatusLog ul { list-style-type: none; padding-left: 0; max-height: 150px; overflow-y: auto;}
         #processingStatusLog li { padding: 4px 0; font-size: 0.85rem; border-bottom: 1px dotted #eee;}
         #processingStatusLog li:last-child { border-bottom: none; }
 
-        .output-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
+        .tooltip { position: relative; display: inline-block; }
         .tooltip .tooltiptext {
-            visibility: hidden; width: 100px;
-            background-color: #555; color: #fff; text-align: center;
-            border-radius: 6px; padding: 5px 0;
-            position: absolute; z-index: 1; bottom: 125%; left: 50%;
-            margin-left: -50px; opacity: 0; transition: opacity 0.3s;
+            visibility: hidden; width: 100px; background-color: #555; color: #fff; text-align: center;
+            border-radius: 6px; padding: 5px 0; position: absolute; z-index: 100; bottom: 125%; left: 50%;
+            margin-left: -50px; opacity: 0; transition: opacity 0.3s; font-size: 0.8rem;
         }
         .tooltip .tooltiptext::after {
-            content: ""; position: absolute; top: 100%; left: 50%;
-            margin-left: -5px; border-width: 5px; border-style: solid;
-            border-color: #555 transparent transparent transparent;
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; 
+            border-width: 5px; border-style: solid; border-color: #555 transparent transparent transparent;
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1;}
 
-        .app-footer {
-            text-align: center; padding: 20px; font-size: 0.9rem;
-            color: var(--text-secondary); border-top: 1px solid var(--border-color); margin-top: 40px;
+        .chapter-input-item {
+            padding: 10px; border: 1px dashed var(--border-color); 
+            border-radius:var(--border-radius); margin-bottom: 15px; background-color: #fdfdfd;
         }
+        .chapter-input-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .chapter-input-item-header .chapter-label { font-weight: 500; color: var(--text-primary); font-size: 0.9rem;}
 
+        .custom-header-section .form-group { margin-bottom: 8px; }
+        #editablePresetTextarea { min-height: 120px; }
+
+        .app-footer {
+            text-align: center; padding: 25px; font-size: 0.875rem;
+            color: var(--text-secondary); border-top: 1px solid var(--border-color); margin-top: 35px;
+        }
     </style>
 </head>
 <body>
     <header class="app-header">
-        <h1><i class="fas fa-rocket"></i> Elite Novel Term Extractor v3.0</h1>
-        <p>Advanced Chapter Parsing, Deduplication, and Custom Output Formatting</p>
+        <h1><i class="fas fa-atom"></i> Nexus Term Extractor v4.0</h1>
+        <p>Modular Chapter Input, Customizable Headers, and Advanced Term Management</p>
     </header>
 
-    <div class="main-layout">
-        <!-- JSON Input Panel -->
-        <div class="panel json-input-panel">
-            <div class="panel-header"><i class="fas fa-file-alt"></i>Chapter Data Input</div>
-            <div class="instructions">
-                Paste JSON arrays for chapters below. <strong>Separate each chapter's JSON block with at least one blank line.</strong>
+    <div class="main-content-grid">
+        <!-- Chapter Data Input Panel -->
+        <div class="panel">
+            <div class="panel-header"><i class="fas fa-book-open"></i>Chapter Data Input</div>
+            <div id="chapterInputsContainer">
+                <!-- Initial chapter input box will be added by JS -->
             </div>
-            <div class="form-group">
-                <label for="jsonInput">Chapters' JSON Data:</label>
-                <textarea id="jsonInput" rows="15" placeholder="[{"id":0, "terms":[...]}, ...] 
-
-(Blank line) 
-
-[{"id":0, "terms":[...]}, ...]"></textarea>
+            <div class="button-row" style="margin-top: 15px;">
+                <button onclick="addChapterInput()" class="btn btn-outline-primary"><i class="fas fa-plus-circle"></i>Add Chapter Box</button>
             </div>
-            <div id="jsonStatus" class="status-message" style="display:none;"></div>
+            <div id="jsonStatus" class="status-message" style="display:none; margin-top: 15px;"></div>
         </div>
 
-        <!-- Deduplication List Panel -->
-        <div class="panel deduplication-panel">
-            <div class="panel-header"><i class="fas fa-tasks"></i>Deduplication List (Optional)</div>
-            <div class="instructions">
-                Provide an existing list to exclude terms. Format: <code>raw, translation[, gender]</code>. Match is on English translation (case-insensitive).
-            </div>
+        <!-- Deduplication & Header Panel -->
+        <div class="panel">
+            <div class="panel-header"><i class="fas fa-cogs"></i>Configuration</div>
+            
             <div class="form-group">
-                <label for="csvFile">Upload CSV file:</label>
+                <label class="input-label">Deduplication List (Optional)</label>
                 <div class="file-input-container">
                     <input type="file" id="csvFile" accept=".csv" onchange="updateFileNameDisplay(this)">
                     <div class="file-input-display">
-                        <span id="fileNamePlaceholder">Choose a .csv file...</span>
-                        <i class="fas fa-paperclip"></i>
+                        <span id="fileNamePlaceholder" class="placeholder">Upload a .csv file...</span>
+                        <i class="fas fa-upload" style="color: var(--secondary-color);"></i>
                     </div>
                 </div>
+                 <textarea id="pastedCsv" rows="4" placeholder="Or paste CSV: raw,translation[,gender]"></textarea>
+                <div class="button-row">
+                    <button onclick="loadExternalList()" class="btn btn-secondary"><i class="fas fa-list-check"></i>Load Dedupe List</button>
+                    <button onclick="clearExternalList()" class="btn btn-danger"><i class="fas fa-times-circle"></i>Clear</button>
+                    <div class="tooltip">
+                        <button onclick="copyToClipboard('pastedCsv', 'dedupeTooltip')" class="btn btn-outline-primary btn-icon">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span class="tooltiptext" id="dedupeTooltip">Copy List</span>
+                    </div>
+                </div>
+                <div id="externalListStatus" class="status-message" style="margin-top:10px; display:none;"></div>
             </div>
-            <div class="form-group">
-                <label for="pastedCsv">Or paste CSV content (and copy from here):</label>
-                <textarea id="pastedCsv" rows="7" placeholder="大明, Great Ming, Neuter
-道人, Daoist, Male"></textarea>
-            </div>
-            <div class="button-row">
-                <button onclick="loadExternalList()" class="btn btn-secondary"><i class="fas fa-list-check"></i>Load List</button>
-                <button onclick="clearExternalList()" class="btn btn-danger"><i class="fas fa-eraser"></i>Clear</button>
-                <div class="tooltip">
-                    <button onclick="copyToClipboard('pastedCsv', 'dedupeTooltip')" class="btn btn-tertiary btn-icon responsive-text">
-                        <i class="fas fa-copy"></i><span class="btn-text">Copy List</span>
-                    </button>
-                    <span class="tooltiptext" id="dedupeTooltip">Copy to clipboard</span>
+            <hr style="margin: 20px 0; border-color: var(--border-color); opacity: 0.5;">
+            <div class="custom-header-section">
+                 <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="includeCustomHeaderCheckbox" onchange="toggleCustomHeaderInput(this.checked)" style="width: auto; height: auto; margin-top: -2px;">
+                    <label for="includeCustomHeaderCheckbox" style="margin-bottom: 0; font-weight: 500;">Include Custom Header in Output</label>
+                </div>
+                <div id="customHeaderInputArea" style="display:none;">
+                    <textarea id="editablePresetTextarea" rows="6"></textarea>
                 </div>
             </div>
-            <div id="externalListStatus" class="status-message" style="margin-top:15px; display:none;"></div>
         </div>
 
         <!-- Action and Output Panel -->
-        <div class="panel full-width-panel">
-            <div class="panel-header"><i class="fas fa-cogs"></i>Actions & Results</div>
+        <div class="panel panel-full-width">
+            <div class="panel-header"><i class="fas fa-tasks-alt"></i>Extraction & Results</div>
             
-            <div class="main-action-panel">
-                <div class="button-row" style="justify-content: space-between; margin-bottom: 20px;">
-                     <button onclick="processAllData()" class="btn btn-primary main-action-button">
-                        <span class="btn-text"><i class="fas fa-bolt"></i>Extract Terms</span>
-                        <span class="spinner"></span>
-                    </button>
-                    <div class="toggle-switch-container">
-                        <label for="addPresetToggle" style="font-size:0.9rem; margin-bottom: 0;">Add Header Preset:</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="addPresetToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
+            <div class="main-action-button-container">
+                 <button onclick="processAllData()" class="btn btn-primary main-action-button">
+                    <span class="spinner"></span>
+                    <span class="btn-text"><i class="fas fa-bolt"></i>Extract Terms</span>
+                </button>
             </div>
-            <div id="processingStatusLog" class="status-message info" style="display:none; margin-top: 0;">
+            <div id="processingStatusLog" class="status-message info" style="display:none; margin-top: 15px;">
                 <strong>Processing Log:</strong>
                 <ul id="processingSteps"></ul>
             </div>
 
-            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 25px 0;">
+            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
             
-            <div class="output-actions">
-                <div class="tooltip">
-                    <button onclick="copyToClipboard('outputText', 'outputTooltip')" class="btn btn-tertiary btn-icon responsive-text">
-                        <i class="fas fa-copy"></i><span class="btn-text">Copy Output</span>
-                    </button>
-                    <span class="tooltiptext" id="outputTooltip">Copy to clipboard</span>
-                </div>
-            </div>
             <div class="form-group">
-                <label for="outputText">Extracted Terms:</label>
+                <label for="outputText" class="input-label">Extracted Terms:</label>
                 <textarea id="outputText" rows="15" readonly placeholder="Results will appear here..."></textarea>
+            </div>
+             <div class="output-actions" style="justify-content: flex-start; margin-top:-5px; margin-bottom:10px;">
+                <div class="tooltip">
+                    <button onclick="copyOutput('termsOnly')" class="btn btn-outline-primary">
+                        <i class="fas fa-copy"></i>Copy Terms Only
+                    </button>
+                    <span class="tooltiptext" id="copyTermsTooltip">Copy terms</span>
+                </div>
+                <div class="tooltip">
+                     <button onclick="copyOutput('withHeader')" class="btn btn-outline-primary">
+                        <i class="fas fa-file-export"></i>Copy with Current Header
+                    </button>
+                    <span class="tooltiptext" id="copyHeaderTooltip">Copy with header</span>
+                </div>
             </div>
             <div id="outputSummary" class="status-message" style="display:none;"></div>
         </div>
     </div>
 
     <footer class="app-footer">
-        <p>© 2024 Elite Term Extractor. Precision Engineered.</p>
+        <p>© 2024 Nexus Term Extractor. Streamlining Your Workflow.</p>
     </footer>
 
     <script>
         let externalListTranslations = new Set();
-        const PRESET_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."
+        let chapterInputCount = 0;
+        let lastExtractedTermsPure = []; // Store only the "raw, translation, gender" lines
+
+        const DEFAULT_PRESET_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."
  Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`;
 
+        document.addEventListener('DOMContentLoaded', () => {
+            addChapterInput(); // Add the first chapter input box automatically
+            document.getElementById('editablePresetTextarea').value = DEFAULT_PRESET_TEXT;
+        });
 
-        function displayStatus(elementId, message, type, iconClass = '') {
+        function addChapterInput() {
+            chapterInputCount++;
+            const container = document.getElementById('chapterInputsContainer');
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'chapter-input-item';
+            itemDiv.id = `chapter_item_${chapterInputCount}`;
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'chapter-input-item-header';
+            
+            const label = document.createElement('span');
+            label.className = 'chapter-label';
+            label.textContent = `Chapter ${chapterInputCount} JSON:`;
+            headerDiv.appendChild(label);
+
+            if (chapterInputCount > 1) { // Don't allow removing the very first box
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+                removeBtn.className = 'btn btn-danger btn-icon'; // Making it small
+                removeBtn.style.padding = '0.25rem 0.5rem'; // Even smaller for icon
+                removeBtn.onclick = () => itemDiv.remove(); // chapterInputCount doesn't need decrementing here as IDs are for uniqueness
+                headerDiv.appendChild(removeBtn);
+            }
+            itemDiv.appendChild(headerDiv);
+
+            const textarea = document.createElement('textarea');
+            textarea.rows = 6;
+            textarea.placeholder = `Paste JSON for Chapter ${chapterInputCount} here...`;
+            textarea.id = `chapter_json_${chapterInputCount}`;
+            itemDiv.appendChild(textarea);
+
+            container.appendChild(itemDiv);
+        }
+
+        function toggleCustomHeaderInput(isChecked) {
+            const area = document.getElementById('customHeaderInputArea');
+            area.style.display = isChecked ? 'block' : 'none';
+        }
+
+
+        function displayStatus(elementId, message, type, iconClass = '') { /* ... (same as before) ... */ 
             const el = document.getElementById(elementId);
             const iconHtml = iconClass ? `<i class="fas ${iconClass}" style="margin-right:5px;"></i>` : '';
             el.innerHTML = `${iconHtml} ${message}`;
             el.className = 'status-message ' + type;
             el.style.display = 'flex';
         }
-        
-        function hideStatus(elementId) {
+        function hideStatus(elementId) { /* ... (same as before) ... */ 
             const el = document.getElementById(elementId);
             el.style.display = 'none';
         }
-
-        function updateFileNameDisplay(fileInput) {
+        function updateFileNameDisplay(fileInput) { /* ... (same as before) ... */ 
             const placeholder = document.getElementById('fileNamePlaceholder');
             if (fileInput.files.length > 0) {
                 placeholder.textContent = fileInput.files[0].name;
                 placeholder.style.color = 'var(--text-primary)';
             } else {
-                placeholder.textContent = 'Choose a .csv file...';
+                placeholder.textContent = 'Upload a .csv file...';
                 placeholder.style.color = 'var(--text-secondary)';
             }
         }
-        
-        function addProcessingStep(message, type = 'info') {
+        function addProcessingStep(message, type = 'info') { /* ... (same as before) ... */ 
             const logContainer = document.getElementById('processingStatusLog');
             logContainer.style.display = 'block'; // Ensure it's visible
             const stepsList = document.getElementById('processingSteps');
@@ -449,14 +376,11 @@
             stepsList.appendChild(listItem);
             stepsList.scrollTop = stepsList.scrollHeight; // Auto-scroll
         }
-
-        function clearProcessingLog() {
+        function clearProcessingLog() { /* ... (same as before) ... */ 
             document.getElementById('processingSteps').innerHTML = '';
             hideStatus('processingStatusLog');
         }
-
-
-        function loadExternalList() {
+        function loadExternalList() { /* ... (same as before, using new displayStatus) ... */
             const fileInput = document.getElementById('csvFile');
             const pastedCsv = document.getElementById('pastedCsv').value;
             
@@ -507,8 +431,7 @@
                 displayStatus('externalListStatus', 'No dedupe list provided.', 'info', 'fa-info-circle');
             }
         }
-
-        function clearExternalList() {
+        function clearExternalList() { /* ... (same as before, using new displayStatus) ... */ 
             externalListTranslations.clear();
             const fileInput = document.getElementById('csvFile');
             fileInput.value = ''; 
@@ -524,63 +447,60 @@
 
             clearProcessingLog();
             addProcessingStep("Initializing extraction...");
+            lastExtractedTermsPure = []; // Reset
 
-            const jsonInputString = document.getElementById('jsonInput').value;
+            const chapterTextareas = document.querySelectorAll('#chapterInputsContainer textarea');
             const outputTextarea = document.getElementById('outputText');
             
             outputTextarea.value = ''; 
             hideStatus('jsonStatus');
             hideStatus('outputSummary');
 
-            if (!jsonInputString.trim()) {
-                displayStatus('jsonStatus', "JSON input is empty.", 'warning', 'fa-exclamation-triangle');
-                addProcessingStep("JSON input empty. Aborted.", 'error');
+            if (chapterTextareas.length === 0 || Array.from(chapterTextareas).every(ta => !ta.value.trim())) {
+                displayStatus('jsonStatus', "No chapter JSON data provided.", 'warning', 'fa-exclamation-triangle');
+                addProcessingStep("No chapter JSON. Aborted.", 'error');
                 finalizeExtraction(extractButton); return;
             }
-
-            const chapterJsonStrings = jsonInputString.split(/\n\s*\n/).filter(s => s.trim() !== "");
-            addProcessingStep(`Detected ${chapterJsonStrings.length} chapter block(s).`);
-
-            if (chapterJsonStrings.length === 0) {
-                displayStatus('jsonStatus', "No chapter blocks found (separate by blank lines).", 'warning', 'fa-exclamation-triangle');
-                addProcessingStep("No chapter blocks. Aborted.", 'error');
-                finalizeExtraction(extractButton); return;
-            }
+            
+            addProcessingStep(`Found ${chapterTextareas.length} chapter input box(es).`);
 
             let allChunks = [];
             let chaptersSuccessfullyParsed = 0;
 
-            for (let i = 0; i < chapterJsonStrings.length; i++) {
-                const chapterStr = chapterJsonStrings[i];
-                addProcessingStep(`Parsing Chapter ${i + 1}...`);
+            for (let i = 0; i < chapterTextareas.length; i++) {
+                const chapterStr = chapterTextareas[i].value;
+                if (!chapterStr.trim()) {
+                    addProcessingStep(`Chapter Box ${i + 1} is empty. Skipped.`);
+                    continue;
+                }
+                addProcessingStep(`Parsing Chapter from Box ${i + 1}...`);
                 await new Promise(resolve => setTimeout(resolve, 20)); 
 
                 try {
                     const parsedChapter = JSON.parse(chapterStr);
                     if (!Array.isArray(parsedChapter)) {
-                        addProcessingStep(`Chapter ${i + 1} not a JSON array. Skipped.`, 'error'); continue;
+                        addProcessingStep(`Chapter Box ${i + 1} not a JSON array. Skipped.`, 'error'); continue;
                     }
                      const firstChunk = parsedChapter[0];
                     if (parsedChapter.length > 0 && (typeof firstChunk !== 'object' || firstChunk === null || !('id' in firstChunk) || !Array.isArray(firstChunk.terms))) {
-                        addProcessingStep(`Chapter ${i+1} chunk structure error. Skipped.`, 'warning'); continue;
+                        addProcessingStep(`Chapter Box ${i+1} chunk structure error. Skipped.`, 'warning'); continue;
                     }
                     allChunks.push(...parsedChapter);
                     chaptersSuccessfullyParsed++;
-                    addProcessingStep(`Chapter ${i + 1} parsed (${parsedChapter.length} chunks).`, 'success');
+                    addProcessingStep(`Chapter from Box ${i + 1} parsed (${parsedChapter.length} chunks).`, 'success');
                 } catch (error) {
-                    addProcessingStep(`Error in Chapter ${i + 1} JSON: ${error.message}. Skipped.`, 'error');
+                    addProcessingStep(`Error in Box ${i + 1} JSON: ${error.message}. Skipped.`, 'error');
                 }
             }
             
-            if (chaptersSuccessfullyParsed === 0 && chapterJsonStrings.length > 0) {
-                 displayStatus('jsonStatus', `Failed to parse any chapter blocks.`, 'error', 'fa-times-circle');
+            if (chaptersSuccessfullyParsed === 0) {
+                 displayStatus('jsonStatus', `Failed to parse any chapter data. Check JSON.`, 'error', 'fa-times-circle');
                  addProcessingStep("All chapter parsing failed. Aborted.", 'error');
                  finalizeExtraction(extractButton); return;
             }
             addProcessingStep(`${chaptersSuccessfullyParsed} chapter(s) processed. Extracting terms...`);
             await new Promise(resolve => setTimeout(resolve, 20)); 
 
-            const extractedTermsList = [];
             const seenTranslationsInJson = new Set(); 
 
             allChunks.forEach(chunk => {
@@ -599,42 +519,126 @@
                                 if (term.tags.includes("#male")) gender = "Male";
                                 else if (term.tags.includes("#female")) gender = "Female";
                             }
-                            extractedTermsList.push(`${raw}, ${translation}, ${gender}`);
+                            lastExtractedTermsPure.push(`${raw}, ${translation}, ${gender}`);
                         }
                     });
                 }
             });
             
             let finalOutputString = "";
-            if (document.getElementById('addPresetToggle').checked) {
-                finalOutputString += PRESET_TEXT + "\n\n";
-                 addProcessingStep("Preset header added.", 'info');
+            const includeHeader = document.getElementById('includeCustomHeaderCheckbox').checked;
+            const customHeaderText = document.getElementById('editablePresetTextarea').value;
+
+            if (includeHeader && customHeaderText.trim()) {
+                finalOutputString += customHeaderText.trim() + "\n\n";
+                addProcessingStep("Custom header added.", 'info');
             }
 
-            if (extractedTermsList.length > 0) {
-                finalOutputString += extractedTermsList.join('\n');
-                outputTextarea.value = finalOutputString;
-                displayStatus('outputSummary', `Extraction Complete! ${extractedTermsList.length} unique terms.`, 'success', 'fa-check-double');
-                addProcessingStep(`Extracted ${extractedTermsList.length} unique terms.`, 'success');
+            if (lastExtractedTermsPure.length > 0) {
+                finalOutputString += lastExtractedTermsPure.join('\n');
+                displayStatus('outputSummary', `Extraction Complete! ${lastExtractedTermsPure.length} unique terms.`, 'success', 'fa-check-double');
+                addProcessingStep(`Extracted ${lastExtractedTermsPure.length} unique terms.`, 'success');
             } else {
-                if (document.getElementById('addPresetToggle').checked) { // If only preset is there
-                     outputTextarea.value = finalOutputString;
-                }
                 displayStatus('outputSummary', `Processed ${chaptersSuccessfullyParsed} chapter(s). No new unique terms found.`, 'info', 'fa-info-circle');
                 addProcessingStep("No new unique terms.", 'info');
             }
+            outputTextarea.value = finalOutputString; // Set output textarea content based on extraction choices
             finalizeExtraction(extractButton);
         }
 
-        function finalizeExtraction(button) {
-            button.classList.remove('loading');
+        function finalizeExtraction(button) { /* ... (same as before) ... */
+             button.classList.remove('loading');
             button.disabled = false;
         }
 
-        function copyToClipboard(elementId, tooltipId) {
+        function copyOutput(type) {
+            let contentToCopy = "";
+            let tooltipId = "";
+
+            if (type === 'termsOnly') {
+                contentToCopy = lastExtractedTermsPure.join('\n');
+                tooltipId = 'copyTermsTooltip';
+            } else if (type === 'withHeader') {
+                contentToCopy = lastExtractedTermsPure.join('\n');
+                const includeHeader = document.getElementById('includeCustomHeaderCheckbox').checked;
+                const customHeaderText = document.getElementById('editablePresetTextarea').value;
+                if (includeHeader && customHeaderText.trim()) {
+                    contentToCopy = customHeaderText.trim() + "\n\n" + contentToCopy;
+                }
+                tooltipId = 'copyHeaderTooltip';
+            }
+
+            if (!contentToCopy && type === 'termsOnly') { // If only terms and no terms exist
+                 const tooltip = document.getElementById(tooltipId);
+                 const originalText = tooltip.textContent;
+                 tooltip.textContent = "Nothing to copy!";
+                 setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                 return;
+            }
+             if (!contentToCopy && type === 'withHeader' && !document.getElementById('includeCustomHeaderCheckbox').checked ) {
+                 const tooltip = document.getElementById(tooltipId);
+                 const originalText = tooltip.textContent;
+                 tooltip.textContent = "No terms or header selected!";
+                 setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                 return;
+             }
+             // If copying with header, and header is enabled but empty, AND no terms, also nothing.
+             if (!contentToCopy && type === 'withHeader' && document.getElementById('includeCustomHeaderCheckbox').checked && !document.getElementById('editablePresetTextarea').value.trim()) {
+                  const tooltip = document.getElementById(tooltipId);
+                 const originalText = tooltip.textContent;
+                 tooltip.textContent = "No terms or header text!";
+                 setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                 return;
+             }
+
+
+            // Use a temporary textarea to copy
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = contentToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            tempTextArea.setSelectionRange(0, 99999);
+            
+            try {
+                navigator.clipboard.writeText(tempTextArea.value).then(() => {
+                    if (tooltipId) {
+                        const tooltip = document.getElementById(tooltipId);
+                        const originalText = tooltip.textContent;
+                        tooltip.textContent = "Copied!";
+                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                    }
+                }).catch(err => {
+                    console.error('Async: Could not copy text: ', err);
+                    if (tooltipId) document.getElementById(tooltipId).textContent = "Copy Failed!";
+                });
+            } catch (e) { // Fallback for older browsers
+                 try {
+                    document.execCommand('copy');
+                    if (tooltipId) {
+                        const tooltip = document.getElementById(tooltipId);
+                        const originalText = tooltip.textContent;
+                        tooltip.textContent = "Copied! (fallback)";
+                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                    }
+                } catch (execErr) {
+                    console.error('Fallback: Oops, unable to copy', execErr);
+                    if (tooltipId) document.getElementById(tooltipId).textContent = "Copy Failed!";
+                }
+            }
+            document.body.removeChild(tempTextArea);
+        }
+        
+        function copyToClipboard(elementId, tooltipId) { /* Fallback general copy for CSV if needed, but prefer above more specific one */
             const textarea = document.getElementById(elementId);
+             if (!textarea.value.trim()){
+                const tooltip = document.getElementById(tooltipId);
+                const originalText = tooltip.textContent;
+                tooltip.textContent = "Nothing to copy!";
+                setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                return;
+            }
             textarea.select();
-            textarea.setSelectionRange(0, 99999); // For mobile devices
+            textarea.setSelectionRange(0, 99999);
             
             try {
                 navigator.clipboard.writeText(textarea.value).then(() => {
@@ -643,40 +647,21 @@
                     tooltip.textContent = "Copied!";
                     setTimeout(() => { tooltip.textContent = originalText; }, 1500);
                 }).catch(err => {
-                    console.error('Fallback: Oops, unable to copy via navigator.clipboard', err);
-                     // Fallback for older browsers (less reliable)
-                    try {
-                        document.execCommand('copy');
-                        const tooltip = document.getElementById(tooltipId);
-                        const originalText = tooltip.textContent;
-                        tooltip.textContent = "Copied!";
-                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
-                    } catch (execErr) {
-                        console.error('Fallback execCommand: Oops, unable to copy', execErr);
-                        const tooltip = document.getElementById(tooltipId);
-                        const originalText = tooltip.textContent;
-                        tooltip.textContent = "Copy Failed!";
-                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
-                    }
+                    if (tooltipId) document.getElementById(tooltipId).textContent = "Copy Failed!";
                 });
             } catch (e) {
-                console.error('Error with navigator.clipboard: ', e);
-                 // Fallback for older browsers or environments without navigator.clipboard
                  try {
                     document.execCommand('copy');
                     const tooltip = document.getElementById(tooltipId);
                     const originalText = tooltip.textContent;
-                    tooltip.textContent = "Copied!";
+                    tooltip.textContent = "Copied! (fallback)";
                     setTimeout(() => { tooltip.textContent = originalText; }, 1500);
                 } catch (execErr) {
-                    console.error('Fallback execCommand: Oops, unable to copy', execErr);
-                    const tooltip = document.getElementById(tooltipId);
-                    const originalText = tooltip.textContent;
-                    tooltip.textContent = "Copy Failed!";
-                    setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                    if (tooltipId) document.getElementById(tooltipId).textContent = "Copy Failed!";
                 }
             }
         }
+
     </script>
 </body>
 </html>
