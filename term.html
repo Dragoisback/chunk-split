@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenith Term Processor v5.0</title>
+    <title>Zenith Term Processor v5.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -16,6 +16,7 @@
             --secondary-600: #7c3aed; /* Violet 600 */
             --success-500: #10b981; /* Emerald 500 */
             --danger-500: #ef4444;  /* Red 500 */
+            --danger-600: #dc2626;  /* Red 600 for hover */
             --warning-500: #f59e0b; /* Amber 500 */
             --neutral-700: #374151; /* Gray 700 for text */
             --neutral-500: #6b7280; /* Gray 500 for secondary text */
@@ -44,17 +45,18 @@
         .app-title-bar p { font-size: 0.875rem; opacity: 0.9; margin-top: 0.25rem; }
 
         .grid-layout { display: grid; gap: 1.5rem; }
-        @media (min-width: 1024px) {
+        @media (min-width: 1024px) { /* Large screens */
             .grid-layout { grid-template-columns: repeat(3, 1fr); }
             .grid-layout .col-span-1 { grid-column: span 1 / span 1; }
             .grid-layout .col-span-2 { grid-column: span 2 / span 2; }
             .grid-layout .col-span-3 { grid-column: span 3 / span 3; }
         }
-         @media (min-width: 768px) and (max-width: 1023px) {
+         @media (min-width: 768px) and (max-width: 1023px) { /* Medium screens */
             .grid-layout { grid-template-columns: repeat(2, 1fr); }
-            .grid-layout .col-span-1-md { grid-column: span 1 / span 1; }
-            .grid-layout .col-span-2-md { grid-column: span 2 / span 2; }
+            .grid-layout .md-col-span-1 { grid-column: span 1 / span 1; }
+            .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
         }
+        /* Default (small screens) is single column for all panels */
 
 
         .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.5rem; }
@@ -71,7 +73,7 @@
         }
         input[type="text"]:focus, textarea:focus {
             outline: 2px solid transparent; outline-offset: 2px;
-            border-color: var(--primary-500); box-shadow: 0 0 0 2px var(--primary-500_alpha, rgba(59,130,246,0.3));
+            border-color: var(--primary-500); box-shadow: 0 0 0 2px rgba(59,130,246,0.3); /* Primary-500 with alpha */
         }
         textarea { resize: vertical; min-height: 80px; }
 
@@ -89,7 +91,7 @@
             box-shadow: var(--shadow-sm); border: 1px solid transparent;
         }
         .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px var(--primary-500_alpha, rgba(59,130,246,0.4)); }
+        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(59,130,246,0.4); } /* Primary-500 with alpha */
         .btn i { font-size:0.9em; }
 
         .btn-primary { background-color: var(--primary-500); color: white; }
@@ -97,9 +99,12 @@
         .btn-secondary { background-color: var(--secondary-500); color: white; }
         .btn-secondary:hover { background-color: var(--secondary-600); }
         .btn-danger { background-color: var(--danger-500); color: white; }
-        .btn-danger:hover { background-color: #d03030; } /* Slightly darker red */
+        .btn-danger:hover { background-color: var(--danger-600); }
         .btn-outline { background-color: transparent; border-color: var(--neutral-300); color: var(--neutral-500); }
         .btn-outline:hover { background-color: var(--neutral-100); border-color: var(--neutral-500); color:var(--neutral-700); }
+        .btn-outline.btn-danger { color: var(--danger-500); border-color: var(--danger-500); }
+        .btn-outline.btn-danger:hover { background-color: var(--danger-500); color:white; }
+
 
         .btn-icon { padding: 0.5rem; }
         .btn-main-action { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; }
@@ -108,7 +113,7 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: var(--neutral-100_alpha, rgba(243,244,246,0.5));}
+        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: rgba(243,244,246,0.5); } /* neutral-100 with alpha */
         .chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
         .chapter-label { font-weight: 500; font-size:0.9rem; color: var(--secondary-500);}
 
@@ -117,10 +122,10 @@
             display: flex; align-items: center; gap: 0.5rem; border: 1px solid;
         }
         .status-message i { font-size: 1.1em; }
-        .status-success { background-color: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-        .status-warning { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; }
-        .status-danger  { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-        .status-info    { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .status-success { background-color: #d1fae5; color: #065f46; border-color: #6ee7b7; } /* Emerald 100, 800, 300 */
+        .status-warning { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; } /* Amber 100, 800, 300 */
+        .status-danger  { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; } /* Red 100, 800, 300 */
+        .status-info    { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; } /* Blue 100, 800, 300 */
 
         #processingLog ul { list-style: none; padding: 0; max-height: 120px; overflow-y: auto; font-size: 0.8rem; color:var(--neutral-500);}
         #processingLog li { padding: 0.25rem 0; border-bottom: 1px dotted var(--neutral-100);}
@@ -150,13 +155,13 @@
 <body>
     <div class="app-container">
         <header class="app-title-bar">
-            <h1><i class="fas fa-meteor"></i> Zenith Term Processor v5.0</h1>
+            <h1><i class="fas fa-meteor"></i> Zenith Term Processor v5.1</h1>
             <p>Intelligent Term Extraction with Persistent Project Deduplication</p>
         </header>
 
         <div class="grid-layout">
             <!-- Project Setup Panel -->
-            <div class="panel col-span-1 col-span-1-md">
+            <div class="panel col-span-1 md-col-span-1">
                 <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Setup & Storage</h2>
                 <div class="form-group">
                     <label for="novelNameInput" class="form-label">Novel/Project Name:</label>
@@ -175,13 +180,13 @@
             </div>
 
             <!-- Chapter Input Panel -->
-            <div class="panel col-span-2 col-span-1-md">
+            <div class="panel col-span-1 md-col-span-1">
                 <h2 class="panel-title"><i class="fas fa-book-reader"></i>Chapter JSON Input</h2>
                 <div id="chapterInputsContainer" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
                     <!-- Chapter input boxes dynamically added here -->
                 </div>
                 <div class="btn-group" style="margin-top:1rem;">
-                    <button onclick="addChapterInput()" class="btn btn-primary">
+                    <button onclick="addChapterInputUI()" class="btn btn-primary">
                         <i class="fas fa-plus"></i>Add Chapter Box
                     </button>
                 </div>
@@ -189,10 +194,13 @@
             </div>
 
             <!-- Current Session Dedupe & Header Panel -->
-            <div class="panel col-span-3 col-span-2-md">
+            <div class="panel col-span-1 md-col-span-2"> {/* Spans two on medium, one by default then handled by main 3-col layout on large */}
                 <h2 class="panel-title"><i class="fas fa-filter"></i>Session Configuration</h2>
-                <div class="grid-layout" style="gap: 1rem;"> <!-- Nested grid for side-by-side -->
-                    <div class="col-span-1">
+                <div class="grid-layout" style="gap: 1rem; grid-template-columns: 1fr;"> <!-- Force single column inside this panel if nested -->
+                     @media (min-width: 600px) { /* Or some other suitable breakpoint for this internal grid */
+                         .grid-layout { grid-template-columns: 1fr 1fr;}
+                     }
+                    <div> <!-- Dedupe Column -->
                         <div class="form-group">
                             <label class="form-label">Current Session Deduplication List:</label>
                              <div class="file-input-wrapper">
@@ -215,7 +223,7 @@
                             <div id="sessionDedupeStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
                         </div>
                     </div>
-                    <div class="col-span-1">
+                    <div> <!-- Header Column -->
                         <div class="form-group">
                             <div style="display:flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                                 <input type="checkbox" id="includeCustomHeaderCheckbox" onchange="toggleCustomHeaderInputUI(this.checked)" style="width:auto; height:auto; accent-color: var(--primary-500);">
@@ -230,7 +238,7 @@
             </div>
 
             <!-- Extraction Actions & Results Panel -->
-            <div class="panel col-span-3">
+            <div class="panel col-span-3 md-col-span-2"> {/* Spans two on medium, three by default (overridden if 3 col is active)*/}
                 <h2 class="panel-title"><i class="fas fa-magic-wand-sparkles"></i>Extraction Actions & Results</h2>
                 <div style="text-align:center; margin-bottom: 1.5rem;">
                     <button id="mainExtractBtn" onclick="processAllData()" class="btn btn-primary btn-main-action">
@@ -289,10 +297,10 @@
 
     <script>
         // --- Global State & Constants ---
-        let currentSessionDedupeTranslations = new Set(); // For terms from file/paste in this session
-        let persistentDedupeTranslations = new Set(); // For terms loaded from localStorage
+        let currentSessionDedupeTranslations = new Set(); 
+        let persistentDedupeTranslations = new Set(); 
         let chapterInputCounter = 0;
-        let lastExtractedPureTerms = []; // Only "raw, translation, gender"
+        let lastExtractedPureTerms = []; 
         const LS_NOVEL_NAME_KEY = 'zenithTermExtractor_lastNovelName';
         const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_';
 
@@ -305,7 +313,7 @@
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            addChapterInputUI(); // Add initial chapter box
+            addChapterInputUI(); // CORRECTED: Call this to add the first chapter box
             editablePresetTextarea.value = DEFAULT_HEADER_TEXT;
             const lastNovel = localStorage.getItem(LS_NOVEL_NAME_KEY);
             if (lastNovel) {
@@ -330,11 +338,15 @@
             label.textContent = `Chapter ${chapterInputCounter} JSON`;
             headerDiv.appendChild(label);
 
-            if (chapterInputCounter > 1) {
+            if (chapterInputCounter > 1) { // Only add remove button for boxes AFTER the first one
                 const removeBtn = document.createElement('button');
                 removeBtn.innerHTML = '<i class="fas fa-minus-circle"></i>';
-                removeBtn.className = 'btn btn-icon btn-outline btn-danger';
-                removeBtn.onclick = () => itemDiv.remove();
+                removeBtn.className = 'btn btn-icon btn-outline btn-danger'; // Re-added btn-outline
+                removeBtn.style.padding = '0.3rem 0.5rem'; 
+                removeBtn.title = 'Remove this chapter box';
+                removeBtn.onclick = () => {
+                    itemDiv.remove();
+                };
                 headerDiv.appendChild(removeBtn);
             }
             itemDiv.appendChild(headerDiv);
@@ -342,7 +354,7 @@
             const textarea = document.createElement('textarea');
             textarea.rows = 4;
             textarea.placeholder = `Paste JSON for Chapter ${chapterInputCounter}...`;
-            textarea.id = `chapterJson_${chapterInputCounter}`;
+            textarea.id = `chapterJson_${chapterInputCounter}`; 
             itemDiv.appendChild(textarea);
             container.appendChild(itemDiv);
         }
@@ -355,8 +367,8 @@
             const novelName = novelNameInput.value.trim() || "Project";
             document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load Stored for '${novelName}'`;
             document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear Storage for '${novelName}'`;
-            if (novelName !== "Project") {
-                localStorage.setItem(LS_NOVEL_NAME_KEY, novelName);
+            if (novelNameInput.value.trim()) { // Only save if not empty
+                localStorage.setItem(LS_NOVEL_NAME_KEY, novelNameInput.value.trim());
             }
             updateStoredTermsInfo();
         }
@@ -379,14 +391,14 @@
             const el = document.getElementById(elementId);
             let iconHtml = '';
             if (icon) iconHtml = `<i class="fas ${icon}"></i>`;
-            else { // Default icons based on type
+            else { 
                 if(type === 'success') iconHtml = '<i class="fas fa-check-circle"></i>';
                 else if(type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
-                else if(type === 'danger') iconHtml = '<i class="fas fa-times-circle"></i>';
+                else if(type === 'danger') iconHtml = '<i class="fas fa-times-circle"></i>'; // Corrected to 'danger'
                 else iconHtml = '<i class="fas fa-info-circle"></i>';
             }
             el.innerHTML = `${iconHtml} ${message}`;
-            el.className = `status-message status-${type}`; // Reset class list and add new
+            el.className = `status-message status-${type}`; 
             el.style.display = 'flex';
         }
         function hideStatus(elementId) { document.getElementById(elementId).style.display = 'none'; }
@@ -407,11 +419,14 @@
             if(!logUl) return;
             document.getElementById('processingLog').style.display = 'block';
             const li = document.createElement('li');
-            let iconClass = 'fa-info-circle';
-            if (type === 'success') iconClass = 'fa-check-circle text-green-500';
-            else if (type === 'danger') iconClass = 'fa-times-circle text-red-500';
-            else if (type === 'warning') iconClass = 'fa-exclamation-triangle text-yellow-500';
-            li.innerHTML = `<i class="fas ${iconClass}" style="margin-right:0.5rem;"></i> ${message}`;
+            let iconClass = 'fa-info-circle'; // Default for info
+            let iconColor = 'var(--neutral-500)'; // Default color
+
+            if (type === 'success') { iconClass = 'fa-check-circle'; iconColor = 'var(--success-500)';}
+            else if (type === 'danger') { iconClass = 'fa-times-circle'; iconColor = 'var(--danger-500)';}
+            else if (type === 'warning') { iconClass = 'fa-exclamation-triangle'; iconColor = 'var(--warning-500)';}
+            
+            li.innerHTML = `<i class="fas ${iconClass}" style="margin-right:0.5rem; color:${iconColor};"></i> ${message}`;
             logUl.appendChild(li);
             logUl.scrollTop = logUl.scrollHeight;
         }
@@ -426,7 +441,7 @@
             if (!novelName) return new Set();
             const key = LS_DEDUPE_PREFIX + novelName;
             const storedArray = JSON.parse(localStorage.getItem(key) || '[]');
-            return new Set(storedArray.map(term => term.toLowerCase()));
+            return new Set(storedArray.map(term => term.toLowerCase())); // Assuming storing only translation keys
         }
 
         function savePersistentDedupeSet(novelName, translationsSet) {
@@ -453,7 +468,7 @@
         function confirmClearStorage() {
             const novelName = novelNameInput.value.trim();
             if (!novelName) {
-                 displayStatus('outputSummary', "Please enter a Novel/Project Name to clear its storage.", 'warning'); // Or general status
+                 displayStatus('outputSummary', "Please enter a Novel/Project Name to clear its storage.", 'warning'); 
                 return;
             }
             showModal(
@@ -461,7 +476,7 @@
                 `This will permanently delete all ${getPersistentDedupeSet(novelName).size} stored deduplication terms for this project. This action cannot be undone.`,
                 () => {
                     localStorage.removeItem(LS_DEDUPE_PREFIX + novelName);
-                    persistentDedupeTranslations.clear(); // Clear in-memory copy too
+                    persistentDedupeTranslations.clear(); 
                     displayStatus('outputSummary', `Storage for '${novelName}' cleared successfully.`, 'success');
                     updateStoredTermsInfo();
                 }
@@ -473,7 +488,7 @@
             const fileInput = document.getElementById('csvFile');
             const pastedCsv = document.getElementById('pastedCsv').value;
             let localTermsLoaded = 0;
-            currentSessionDedupeTranslations.clear(); // Reset for this specific load operation
+            currentSessionDedupeTranslations.clear(); 
 
             const processContent = (content) => {
                 content.split('\n').forEach(line => {
@@ -505,7 +520,7 @@
             document.getElementById('csvFile').value = '';
             updateFileDisplay(document.getElementById('csvFile'), 'fileDisplayText_csv');
             document.getElementById('pastedCsv').value = '';
-            currentSessionDedupeTranslations.clear(); // Clear the set
+            currentSessionDedupeTranslations.clear(); 
             hideStatus('sessionDedupeStatus');
         }
 
@@ -516,7 +531,7 @@
             extractBtn.disabled = true;
             clearProcessingLog();
             hideStatus('jsonStatus'); hideStatus('outputSummary');
-            document.getElementById('saveToStorageBtnContainer').innerHTML = ''; // Clear previous save button
+            document.getElementById('saveToStorageBtnContainer').innerHTML = ''; 
             addProcessingLogStep('Extraction process initiated...', 'info');
             
             lastExtractedPureTerms = [];
@@ -527,7 +542,7 @@
                 finalizeExtractionUI(extractBtn); return;
             }
 
-            // Combine persistent and session dedupe lists for THIS extraction run
+            
             const combinedDedupeForRun = new Set([...persistentDedupeTranslations, ...currentSessionDedupeTranslations]);
             addProcessingLogStep(`Using ${combinedDedupeForRun.size} terms for deduplication (from storage & session).`, 'info');
 
@@ -537,11 +552,11 @@
                 const chapterJsonStr = chapterTextareas[i].value;
                 if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${i + 1} empty. Skipping.`, 'info'); continue; }
                 addProcessingLogStep(`Parsing Chapter from Box ${i + 1}...`, 'info');
-                await new Promise(r => setTimeout(r, 10)); // UI update tick
+                await new Promise(r => setTimeout(r, 10)); 
                 try {
                     const parsedChapter = JSON.parse(chapterJsonStr);
-                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !parsedChapter[0].terms))) {
-                         addProcessingLogStep(`Box ${i+1}: Invalid JSON structure or missing terms. Skipped.`, 'warning'); continue;
+                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !('terms' in parsedChapter[0]) || !Array.isArray(parsedChapter[0].terms)))) { // Check for terms array presence
+                         addProcessingLogStep(`Box ${i+1}: Invalid JSON structure or missing terms array. Skipped.`, 'warning'); continue;
                     }
                     allChunks.push(...parsedChapter);
                     chaptersParsedCount++;
@@ -598,7 +613,7 @@
         function createSaveToStorageButton() {
             const novelName = novelNameInput.value.trim();
             const container = document.getElementById('saveToStorageBtnContainer');
-            container.innerHTML = ''; // Clear previous
+            container.innerHTML = ''; 
             if (lastExtractedPureTerms.length > 0 && novelName) {
                 const btn = document.createElement('button');
                 btn.className = 'btn btn-secondary';
@@ -636,9 +651,7 @@
 
             if (savePersistentDedupeSet(novelName, currentPersistentSet)) {
                 displayStatus('outputSummary', `Successfully saved ${addedCount} new term translations to '${novelName}' storage. Total stored: ${currentPersistentSet.size}.`, 'success');
-                // Optionally, clear lastExtractedPureTerms or disable button after saving
-                 document.getElementById('saveToStorageBtnContainer').innerHTML = '<p class="status-message status-success"><i class="fas fa-check-circle"></i> New terms saved to storage!</p>';
-
+                document.getElementById('saveToStorageBtnContainer').innerHTML = '<p class="status-message status-success"><i class="fas fa-check-circle"></i> New terms saved to storage!</p>';
             } else {
                 displayStatus('outputSummary', `Failed to save new terms to '${novelName}' storage.`, 'danger');
             }
@@ -669,15 +682,18 @@
             if (!textToCopy && mode === 'termsOnly') {
                  showTooltipMessage(tooltipId, "Nothing to copy!"); return;
             }
-            if (!textToCopy && mode === 'withHeader' && 
-                !(document.getElementById('includeCustomHeaderCheckbox').checked && editablePresetTextarea.value.trim())) {
+             if (!textToCopy && mode === 'withHeader' && 
+                !(document.getElementById('includeCustomHeaderCheckbox').checked && editablePresetTextarea.value.trim()) &&
+                lastExtractedPureTerms.length === 0 // Edge case: header checked, empty, and no terms
+             ) {
                  showTooltipMessage(tooltipId, "No terms or header selected!"); return;
             }
+
 
             performCopy(textToCopy, tooltipId);
         }
         
-        function copyToClipboard(elementId, tooltipId) { // General purpose
+        function copyToClipboard(elementId, tooltipId) { 
             const el = document.getElementById(elementId);
             if (!el.value || !el.value.trim()) {
                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
