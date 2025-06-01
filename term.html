@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenith Term Processor v5.3</title> <!-- Version Bump -->
+    <title>Zenith Term Processor v5.4</title> <!-- Version Bump -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> <!-- Version bump for FA -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --bg-main: #f0f4f8; /* Slightly cooler background */
+            --bg-main: #f0f4f8; 
             --bg-panel: #ffffff;
-            --primary-500: #3b82f6; /* Blue 500 */
-            --primary-600: #2563eb; /* Blue 600 */
-            --primary-700: #1d4ed8; /* Blue 700 */
-            --secondary-500: #8b5cf6; /* Violet 500 */
-            --secondary-600: #7c3aed; /* Violet 600 */
-            --success-500: #10b981; /* Emerald 500 */
-            --danger-500: #ef4444;  /* Red 500 */
-            --danger-600: #dc2626;  /* Red 600 for hover */
-            --warning-500: #f59e0b; /* Amber 500 */
-            --warning-700: #b45309; /* Amber 700 for text */
-            --neutral-800: #1f2937; /* Gray 800 for titles */
-            --neutral-700: #374151; /* Gray 700 for text */
-            --neutral-500: #6b7280; /* Gray 500 for secondary text */
-            --neutral-300: #d1d5db; /* Gray 300 for borders */
-            --neutral-200: #e5e7eb; /* Gray 200 for light borders/dividers */
-            --neutral-100: #f3f4f6; /* Gray 100 for light backgrounds */
+            --primary-500: #3b82f6; 
+            --primary-600: #2563eb; 
+            --primary-700: #1d4ed8; 
+            --secondary-500: #8b5cf6; 
+            --secondary-600: #7c3aed; 
+            --success-500: #10b981; 
+            --danger-500: #ef4444;  
+            --danger-600: #dc2626;  
+            --warning-500: #f59e0b; 
+            --warning-700: #b45309; 
+            --neutral-800: #1f2937; 
+            --neutral-700: #374151; 
+            --neutral-500: #6b7280; 
+            --neutral-300: #d1d5db; 
+            --neutral-200: #e5e7eb; 
+            --neutral-100: #f3f4f6; 
             --font-sans: 'Inter', sans-serif;
-            --radius-md: 0.375rem; /* 6px */
-            --radius-lg: 0.5rem;   /* 8px */
+            --radius-md: 0.375rem; 
+            --radius-lg: 0.5rem;   
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
@@ -50,18 +50,17 @@
         .app-title-bar p { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
 
         .grid-layout { display: grid; gap: 1.5rem; }
-        @media (min-width: 1024px) { /* Large screens */
+        @media (min-width: 1024px) { 
             .grid-layout { grid-template-columns: repeat(3, 1fr); }
             .grid-layout .col-span-1 { grid-column: span 1 / span 1; }
             .grid-layout .col-span-2 { grid-column: span 2 / span 2; }
             .grid-layout .col-span-3 { grid-column: span 3 / span 3; }
         }
-         @media (min-width: 768px) and (max-width: 1023px) { /* Medium screens */
+         @media (min-width: 768px) and (max-width: 1023px) { 
             .grid-layout { grid-template-columns: repeat(2, 1fr); }
             .grid-layout .md-col-span-1 { grid-column: span 1 / span 1; }
             .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
         }
-        /* Default (small screens) is single column for all panels */
 
         .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.5rem; }
         .panel-title { display: flex; align-items: center; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--neutral-200); color: var(--neutral-800); }
@@ -80,6 +79,8 @@
             border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(59,130,246,0.3); 
         }
         textarea { resize: vertical; min-height: 80px; }
+        #pastedDedupeList { min-height: 120px; } /* Specific height for dedupe list */
+
 
         .file-input-wrapper { position: relative; display: block; }
         .file-input-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
@@ -102,12 +103,15 @@
         .btn-primary:hover { background-color: var(--primary-600); }
         .btn-secondary { background-color: var(--secondary-500); color: white; }
         .btn-secondary:hover { background-color: var(--secondary-600); }
+        .btn-success { background-color: var(--success-500); color: white; }
+        .btn-success:hover { background-color: #059669; /* Emerald 600 */ }
         .btn-danger { background-color: var(--danger-500); color: white; }
         .btn-danger:hover { background-color: var(--danger-600); }
         .btn-outline { background-color: transparent; border-color: var(--neutral-300); color: var(--neutral-500); }
         .btn-outline:hover { background-color: var(--neutral-100); border-color: var(--neutral-500); color:var(--neutral-700); }
         .btn-outline.btn-danger { color: var(--danger-500); border-color: var(--danger-500); }
         .btn-outline.btn-danger:hover { background-color: var(--danger-500); color:white; }
+
 
         .btn-icon { padding: 0.5rem; }
         .btn-main-action { 
@@ -123,8 +127,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         #chapterInputsContainer {
-            scrollbar-width: thin; /* Firefox */
-            scrollbar-color: var(--neutral-300) var(--neutral-100); /* Firefox */
+            scrollbar-width: thin; 
+            scrollbar-color: var(--neutral-300) var(--neutral-100); 
         }
         #chapterInputsContainer::-webkit-scrollbar { width: 8px; }
         #chapterInputsContainer::-webkit-scrollbar-track { background: var(--neutral-100); border-radius: 4px;}
@@ -141,7 +145,7 @@
             display: flex; align-items: center; gap: 0.6rem; border: 1px solid;
         }
         .status-message i { font-size: 1.2em; }
-        .status-success { background-color: #e0f2f1; color: #00796b; border-color: #a7d8c8; } /* Teal-like */
+        .status-success { background-color: #e0f2f1; color: #00796b; border-color: #a7d8c8; } 
         .status-warning { background-color: #fff8e1; color: var(--warning-700); border-color: #ffecb3; } 
         .status-danger  { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; } 
         .status-info    { background-color: #e3f2fd; color: #1565c0; border-color: #bbdefb; } 
@@ -150,7 +154,6 @@
             margin-top:1rem; padding-top: 1rem; border-top: 1px solid var(--neutral-200);
         }
         .storage-actions-group .form-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--neutral-500); margin-bottom: 0.5rem;}
-
 
         #processingLog { border: 1px solid var(--neutral-200); background-color: var(--neutral-100); }
         #processingLog strong { color: var(--neutral-700); }
@@ -161,7 +164,6 @@
 
         .output-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-bottom: 0.75rem; }
 
-        /* Modal Styles */
         .modal-overlay { position: fixed; inset: 0; background-color: rgba(17, 24, 39, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(5px); }
         .modal-overlay.active { display: flex; }
         .modal-content { background-color: var(--bg-panel); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 90%; max-width: 500px; text-align: center; }
@@ -188,47 +190,45 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+        .dedupe-list-actions .btn { flex-grow: 1; } /* Make buttons in dedupe list actions take full width in group */
 
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="app-title-bar">
-            <h1><i class="fas fa-microchip"></i> Zenith Term Processor v5.3</h1> <!-- Updated Icon -->
-            <p>Intelligent Term Extraction with Persistent Project Deduplication</p>
+            <h1><i class="fas fa-microchip"></i> Zenith Term Processor v5.4</h1>
+            <p>Intelligent Term Extraction with Centralized Project Deduplication</p>
         </header>
 
         <div class="grid-layout">
             <!-- Project Setup Panel -->
             <div class="panel col-span-1 md-col-span-1">
-                <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Setup & Storage</h2>
+                <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Control</h2>
                 <div class="form-group">
                     <label for="novelNameInput" class="form-label">Novel/Project Name:</label>
                     <input type="text" id="novelNameInput" placeholder="E.g., My Awesome Novel">
-                    <small class="form-label" style="margin-top:4px;font-size:0.75rem;">This name is used for storing deduplication data.</small>
+                    <small class="form-label" style="margin-top:4px;font-size:0.75rem;">Used for loading/saving the deduplication list below.</small>
                 </div>
-                <div id="storedTermsInfo" class="status-message status-info" style="display:none; font-size:0.8rem; flex-direction: column; align-items: flex-start;"></div>
+                <div id="storedTermsInfo" class="status-message status-info" style="display:none; font-size:0.8rem; flex-direction: column; align-items: flex-start;">
+                    <!-- Info about stored terms count and size warning appears here -->
+                </div>
                 
                 <div class="storage-actions-group">
-                    <h3 class="form-label">Storage Actions</h3>
-                    <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
-                        <button id="loadStoredBtn" onclick="loadPersistentDedupe()" class="btn btn-outline" style="width:100%;">
-                            <i class="fas fa-cloud-download-alt"></i>Load Stored for Project
+                    <h3 class="form-label">External Storage Actions</h3>
+                     <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
+                        <button id="exportStoredBtn" onclick="exportPersistentDedupe()" class="btn btn-outline" style="width:100%;">
+                            <i class="fas fa-file-export"></i>Export Dedupe List for Project
                         </button>
-                        <button id="clearStoredBtn" onclick="confirmClearStorage()" class="btn btn-outline btn-danger" style="width:100%;">
-                            <i class="fas fa-trash-alt"></i>Clear Storage for Project
-                        </button>
-                         <div style="display: flex; gap: 0.5rem; width:100%; margin-top:0.25rem;">
-                            <button id="exportStoredBtn" onclick="exportPersistentDedupe()" class="btn btn-outline" style="flex-grow:1;">
-                                <i class="fas fa-file-export"></i>Export Project Storage
-                            </button>
-                            <div class="file-input-wrapper" style="flex-grow:1;">
-                                <input type="file" id="importDedupeFile" accept=".json" onchange="handleImportDedupeFile(this)">
-                                <div class="btn btn-outline file-display-text" id="fileDisplayText_importDedupe" style="width:100%; text-align:left; justify-content: flex-start;">
-                                    <i class="fas fa-file-import"></i>Import to Project...
-                                </div>
+                        <div class="file-input-wrapper" style="width:100%;">
+                            <input type="file" id="importDedupeFile" accept=".json,.txt,.csv" onchange="handleImportDedupeFile(this)">
+                            <div class="btn btn-outline file-display-text" id="fileDisplayText_importDedupe" style="width:100%; text-align:left; justify-content: flex-start;">
+                                <i class="fas fa-file-import"></i>Import Dedupe List to Textbox...
                             </div>
                         </div>
+                        <button id="clearStoredBtn" onclick="confirmClearStorage()" class="btn btn-outline btn-danger" style="width:100%; margin-top: 0.25rem;">
+                            <i class="fas fa-trash-alt"></i>Clear Project's Stored Dedupe List
+                        </button>
                     </div>
                 </div>
             </div>
@@ -236,42 +236,43 @@
             <!-- Chapter Input Panel -->
             <div class="panel col-span-1 md-col-span-1">
                 <h2 class="panel-title"><i class="fas fa-book-reader"></i>Chapter JSON Input</h2>
-                <div id="chapterInputsContainer" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                <div id="chapterInputsContainer" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
                     <!-- Chapter input boxes dynamically added here -->
                 </div>
                 <div class="btn-group" style="margin-top:1rem;">
-                    <button onclick="addChapterInputUI()" class="btn btn-secondary"> <!-- Changed to btn-secondary -->
+                    <button onclick="addChapterInputUI()" class="btn btn-secondary">
                         <i class="fas fa-plus"></i>Add Chapter Box
                     </button>
                 </div>
                 <div id="jsonStatus" class="status-message" style="display:none; margin-top: 1rem;"></div>
             </div>
 
-            <!-- Current Session Dedupe & Header Panel -->
-            <div class="panel col-span-1 md-col-span-2"> <!-- Default md-col-span-2 for wider layouts -->
-                <h2 class="panel-title"><i class="fas fa-filter"></i>Session Configuration</h2>
+            <!-- Deduplication List & Header Panel -->
+            <div class="panel col-span-1 md-col-span-2"> 
+                <h2 class="panel-title"><i class="fas fa-filter"></i>Deduplication List & Output Header</h2>
                 <div class="session-config-grid-internal">
                     <div> <!-- Dedupe Column -->
                         <div class="form-group">
-                            <label class="form-label">Current Session Deduplication List:</label>
-                             <div class="file-input-wrapper">
-                                <input type="file" id="csvFile" accept=".csv" onchange="updateFileDisplay(this, 'fileDisplayText_csv')">
-                                <div class="file-display-text" id="fileDisplayText_csv"><i class="fas fa-file-csv"></i>Upload .csv file...</div>
-                            </div>
-                            <textarea id="pastedCsv" rows="3" placeholder="Or paste: raw,translation[,gender]"></textarea>
-                            <div class="btn-group">
-                                <button onclick="loadSessionDedupeList()" class="btn btn-secondary">
-                                    <i class="fas fa-list-ul"></i>Load to Session
+                            <label for="pastedDedupeList" class="form-label">Project Deduplication List (Active & Editable):</label>
+                            <textarea id="pastedDedupeList" rows="7" placeholder="Load or paste: term_translation (one per line) OR raw,term_translation[,gender]..."></textarea>
+                            <div id="dedupeListStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
+                            <div class="btn-group dedupe-list-actions" style="margin-top:0.75rem; gap:0.5rem;">
+                                <button id="loadStoredBtn" onclick="loadPersistentDedupeToList()" class="btn btn-outline">
+                                    <i class="fas fa-cloud-download-alt"></i>Load from Project Storage
                                 </button>
-                                <div class="tooltip">
-                                    <button onclick="copyToClipboard('pastedCsv', 'dedupeTooltip')" class="btn btn-outline btn-icon">
-                                        <i class="fas fa-copy"></i>
+                                <button id="saveListToStoredBtn" onclick="saveDedupeListToPersistentStorage()" class="btn btn-success">
+                                    <i class="fas fa-save"></i>Save List to Project Storage
+                                </button>
+                            </div>
+                             <div class="btn-group" style="margin-top:0.5rem;">
+                                <div class="tooltip" style="flex-grow:1;">
+                                    <button onclick="copyToClipboard('pastedDedupeList', 'dedupeTooltip')" class="btn btn-outline btn-icon" style="width:100%;">
+                                        <i class="fas fa-copy"></i> Copy Full List
                                     </button>
                                     <span class="tooltip-text" id="dedupeTooltip">Copy List</span>
                                 </div>
-                                 <button onclick="clearSessionDedupeVisuals()" class="btn btn-outline btn-danger"><i class="fas fa-times"></i>Clear Inputs</button>
+                                 <button onclick="clearDedupeListTextarea()" class="btn btn-outline btn-danger" style="flex-grow:1;"><i class="fas fa-times"></i>Clear Textbox</button>
                             </div>
-                            <div id="sessionDedupeStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
                         </div>
                     </div>
                     <div> <!-- Header Column -->
@@ -305,27 +306,25 @@
                 <hr style="margin: 1.5rem 0; border-color: var(--neutral-200);">
                 
                 <div class="output-actions">
-                    <div class="tooltip">
-                        <button onclick="copyOutput('termsOnly')" class="btn btn-outline">
-                            <i class="fas fa-clipboard-list"></i>Copy Terms Only
+                     <div class="tooltip">
+                        <button id="moveExtractedBtn" onclick="moveExtractedToDedupeList()" class="btn btn-secondary"> <!-- Changed behavior -->
+                            <i class="fas fa-share-square"></i>Move Extracted to Dedupe List
                         </button>
-                        <span class="tooltip-text" id="copyTermsTooltip">Copy terms</span>
+                        <span class="tooltip-text" id="moveExtractedTooltip">Add to list above</span>
                     </div>
                     <div class="tooltip">
                          <button onclick="copyOutput('withHeader')" class="btn btn-outline">
-                            <i class="fas fa-file-alt"></i>Copy with Header
+                            <i class="fas fa-file-alt"></i>Copy Output with Header
                         </button>
                         <span class="tooltip-text" id="copyHeaderTooltip">Copy with header</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="outputTextarea" class="form-label">Extracted Terms:</label>
-                    <textarea id="outputTextarea" rows="10" readonly placeholder="Extracted terms will appear here..."></textarea>
+                    <label for="outputTextarea" class="form-label">Extracted Terms (New & Unique for this session):</label>
+                    <textarea id="outputTextarea" rows="8" readonly placeholder="Extracted terms will appear here..."></textarea>
                 </div>
                 <div id="outputSummary" class="status-message" style="display:none;"></div>
-                <div id="saveToStorageBtnContainer" style="margin-top: 1rem; text-align: right;">
-                    <!-- "Save to [Novel Name] Storage" button will be dynamically added here -->
-                </div>
+                <!-- saveToStorageBtnContainer is removed as per new workflow -->
             </div>
         </div>
     </div>
@@ -336,7 +335,6 @@
             <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
             <p class="modal-body" id="modalMessageText">Are you sure you want to proceed?</p>
             <div class="modal-actions">
-                <!-- Buttons will be dynamically populated or handled by specific modal logic -->
                  <button class="btn btn-outline" id="modalCancelBtnGeneric">Cancel</button>
                  <button class="btn btn-danger" id="modalConfirmBtnGeneric">Confirm</button>
             </div>
@@ -350,14 +348,14 @@
     <script>
     (function() { // IIFE Start
         // --- Global State & Constants ---
-        let currentSessionDedupeTranslations = new Set(); 
-        let persistentDedupeTranslations = new Set(); 
+        // persistentDedupeTranslations is no longer used as a global set.
+        // The pastedDedupeList textarea becomes the primary source for current dedupe data.
         let chapterInputCounter = 0;
         let lastExtractedPureTerms = []; 
         const LS_NOVEL_NAME_KEY = 'zenithTermExtractor_lastNovelName';
-        const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_';
+        const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_'; // Stores array of full lines
         const LS_SIZE_WARNING_PREFIX = 'zenithTermExtractor_sizeWarning_';
-        const STORAGE_WARNING_THRESHOLD_BYTES = 3.5 * 1024 * 1024; // 3.5MB
+        const STORAGE_WARNING_THRESHOLD_BYTES = 3.5 * 1024 * 1024; 
 
         const DEFAULT_HEADER_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."\n Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`;
 
@@ -365,6 +363,7 @@
         const novelNameInput = document.getElementById('novelNameInput');
         const editablePresetTextarea = document.getElementById('editablePresetTextarea');
         const outputTextarea = document.getElementById('outputTextarea');
+        const pastedDedupeListTextarea = document.getElementById('pastedDedupeList');
         const modalOverlay = document.getElementById('confirmationModal');
         const modalTitleEl = document.getElementById('modalTitle');
         const modalMessageEl = document.getElementById('modalMessageText');
@@ -392,14 +391,10 @@
             if (lastNovel) {
                 novelNameInput.value = lastNovel;
             }
-            // Initial call for button labels and storage info
-            updateDynamicButtonLabels(); 
-            updateStoredTermsInfo();
+            updateDynamicButtonLabelsAndInfo(); 
 
-            // Debounced listener for novel name input
             novelNameInput.addEventListener('keyup', debounce(updateDynamicButtonLabelsAndInfo, 350));
 
-            // Generic Modal event listeners
             document.getElementById('modalCancelBtnGeneric').addEventListener('click', () => {
                 if(typeof generalCancelCallback === 'function') generalCancelCallback();
                 hideGenericModal();
@@ -412,7 +407,7 @@
         
         function updateDynamicButtonLabelsAndInfo() {
             updateDynamicButtonLabels();
-            updateStoredTermsInfo(); // Ensure this is also called
+            updateStoredTermsInfo(); 
         }
 
 
@@ -437,9 +432,7 @@
                 removeBtn.className = 'btn btn-icon btn-outline btn-danger';
                 removeBtn.style.padding = '0.3rem 0.5rem'; 
                 removeBtn.title = 'Remove this chapter box';
-                removeBtn.onclick = () => {
-                    itemDiv.remove();
-                };
+                removeBtn.onclick = () => { itemDiv.remove(); };
                 headerDiv.appendChild(removeBtn);
             }
             itemDiv.appendChild(headerDiv);
@@ -461,55 +454,59 @@
 
         function updateDynamicButtonLabels() {
             const novelName = novelNameInput.value.trim() || "Project";
-            document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load Stored for '${novelName}'`;
-            document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear Storage for '${novelName}'`;
-            document.getElementById('exportStoredBtn').innerHTML = `<i class="fas fa-file-export"></i>Export '${novelName}' Storage`;
+            const isProjectNamed = novelName !== "Project" && novelNameInput.value.trim();
+
+            document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load from '${novelName}' Storage`;
+            document.getElementById('saveListToStoredBtn').innerHTML = `<i class="fas fa-save"></i>Save List to '${novelName}' Storage`;
+            document.getElementById('exportStoredBtn').innerHTML = `<i class="fas fa-file-export"></i>Export List for '${novelName}'`;
+            document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear '${novelName}' Stored List`;
             
+            document.getElementById('loadStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('saveListToStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('exportStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('clearStoredBtn').disabled = !isProjectNamed;
+
             const importFileInput = document.getElementById('importDedupeFile');
             const importFileDisplayButton = document.getElementById('fileDisplayText_importDedupe');
             
-            if (novelName === "Project" || !novelNameInput.value.trim()) {
-                importFileInput.disabled = true;
-                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Name Project to Import`;
-                importFileDisplayButton.style.cursor = "not-allowed";
-                importFileDisplayButton.classList.add('disabled'); // You might need a .disabled CSS class
+            if (!isProjectNamed) { // Allow import to textbox even without project name, but other project actions disabled
+                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
             } else {
-                importFileInput.disabled = false;
-                if (!importFileInput.files || importFileInput.files.length === 0) {
-                     importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import to '${novelName}'...`;
-                } // else updateFileDisplay handles it
-                importFileDisplayButton.style.cursor = "pointer";
-                importFileDisplayButton.classList.remove('disabled');
+                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
             }
+             // Import is always to the textbox, so it's generally enabled.
+            importFileInput.disabled = false;
+            importFileDisplayButton.style.cursor = "pointer";
+            importFileDisplayButton.classList.remove('disabled');
 
-            if (novelNameInput.value.trim() && novelName !== "Project") {
+
+            if (isProjectNamed) {
                 localStorage.setItem(LS_NOVEL_NAME_KEY, novelNameInput.value.trim());
             }
-            // updateStoredTermsInfo(); // Called by the debounced wrapper
         }
         
         function updateStoredTermsInfo() {
             const novelName = novelNameInput.value.trim();
             const storedInfoDiv = document.getElementById('storedTermsInfo');
-            if (!novelName) {
+            if (!novelName || novelName === "Project") {
                 storedInfoDiv.style.display = 'none';
                 return;
             }
             const key = LS_DEDUPE_PREFIX + novelName;
-            const storedData = JSON.parse(localStorage.getItem(key) || '[]');
-            let mainInfo = `<div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-database"></i> ${storedData.length} terms stored for '${novelName}'.</div>`;
+            const storedLinesArray = JSON.parse(localStorage.getItem(key) || '[]');
+            let mainInfo = `<div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-database"></i> ${storedLinesArray.length} lines stored for '${novelName}'.</div>`;
             
             const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
             if (localStorage.getItem(warningKey) === 'true') {
                 mainInfo += `<div class="status-message status-warning" style="margin-top:0.5rem; padding:0.5rem 0.75rem; font-size:0.8em;">
                                 <i class="fas fa-hdd"></i><strong>Storage Alert:</strong> Project data is large.
-                                Please <strong>export your storage regularly</strong> to prevent data loss due to browser limits.
+                                Please <strong>export regularly</strong> and consider managing list size.
                              </div>`;
-                storedInfoDiv.classList.remove('status-info'); // Remove default class if warning exists
-                storedInfoDiv.classList.add('status-warning'); // Make whole box warning color
+                storedInfoDiv.classList.remove('status-info', 'status-success'); 
+                storedInfoDiv.classList.add('status-warning'); 
             } else {
                  storedInfoDiv.classList.remove('status-warning');
-                 storedInfoDiv.classList.add('status-info');
+                 storedInfoDiv.classList.add('status-info'); // Default or if no specific status
             }
 
             storedInfoDiv.innerHTML = mainInfo;
@@ -531,6 +528,14 @@
             el.innerHTML = `${iconHtml} ${message}`;
             el.className = `status-message status-${type}`; 
             el.style.display = 'flex';
+             // Auto-hide info/success messages after a few seconds
+            if (type === 'info' || type === 'success') {
+                setTimeout(() => {
+                    if (el.innerHTML.includes(message)) { // Check if message is still the same
+                        hideStatus(elementId);
+                    }
+                }, 4000);
+            }
         }
         function hideStatus(elementId) { 
             const el = document.getElementById(elementId);
@@ -538,27 +543,22 @@
         }
 
         function updateFileDisplay(input, displayId) {
-            const display = document.getElementById(displayId); // This is the text span/div inside the button for import
+            const display = document.getElementById(displayId); 
             if (!display) return;
             const novelName = novelNameInput.value.trim() || "Project";
 
             if (input.files && input.files.length > 0) {
-                const baseIcon = displayId === 'fileDisplayText_csv' ? 'fa-file-csv' : 'fa-file-import';
+                const baseIcon = 'fa-file-import'; // Only one type of import now
                 display.innerHTML = `<i class="fas ${baseIcon}"></i> ${input.files[0].name}`;
-                if(display.classList.contains('btn')) display.classList.add('has-file'); // If it's the button-like display
-                else display.classList.add('has-file');
+                display.classList.add('has-file');
             } else {
-                if (displayId === 'fileDisplayText_csv') {
-                    display.innerHTML = `<i class="fas fa-file-csv"></i> Upload .csv file...`;
-                } else if (displayId === 'fileDisplayText_importDedupe') {
-                    if (novelName === "Project" || !novelNameInput.value.trim()) {
-                         display.innerHTML = `<i class="fas fa-file-import"></i>Name Project to Import`;
-                    } else {
-                        display.innerHTML = `<i class="fas fa-file-import"></i>Import to '${novelName}'...`;
-                    }
+                // Text for import button
+                if (novelName === "Project" || !novelNameInput.value.trim()) {
+                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
+                } else {
+                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
                 }
-                if(display.classList.contains('btn')) display.classList.remove('has-file');
-                else display.classList.remove('has-file');
+                display.classList.remove('has-file');
             }
         }
         window.updateFileDisplay = updateFileDisplay; 
@@ -566,7 +566,7 @@
         function addProcessingLogStep(message, type = 'info') {
             const logUl = document.querySelector('#processingLog ul');
             if(!logUl) return;
-            document.getElementById('processingLog').style.display = 'flex'; // it's a flex container now
+            document.getElementById('processingLog').style.display = 'flex'; 
             const li = document.createElement('li');
             let iconClass = 'fa-info-circle'; 
             let iconColor = 'var(--neutral-500)';
@@ -585,62 +585,75 @@
             document.getElementById('processingLog').style.display = 'none';
         }
 
-        // --- LocalStorage Interaction ---
-        function getPersistentDedupeSet(novelName) {
-            if (!novelName) return new Set();
+        // --- LocalStorage Interaction (Stores array of full lines) ---
+        function getPersistentDedupeLines(novelName) {
+            if (!novelName) return [];
             const key = LS_DEDUPE_PREFIX + novelName;
-            const storedArray = JSON.parse(localStorage.getItem(key) || '[]');
-            return new Set(storedArray.map(term => String(term).toLowerCase())); 
+            return JSON.parse(localStorage.getItem(key) || '[]');
         }
 
-        function savePersistentDedupeSet(novelName, translationsSet) {
-            if (!novelName) {
-                displayStatus('outputSummary', "Novel name is required to save to storage.", 'danger');
+        function savePersistentDedupeLines(novelName, linesArray) {
+            if (!novelName || novelName === "Project") {
+                displayStatus('dedupeListStatus', "Project Name is required to save the list.", 'danger');
                 return false;
             }
             const key = LS_DEDUPE_PREFIX + novelName;
-            const dataStr = JSON.stringify(Array.from(translationsSet));
+            const dataStr = JSON.stringify(linesArray);
             
-            // Check storage size and set warning if needed
             const sizeInBytes = new TextEncoder().encode(dataStr).length;
             const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
             if (sizeInBytes > STORAGE_WARNING_THRESHOLD_BYTES) {
                 localStorage.setItem(warningKey, 'true');
             } else {
-                localStorage.removeItem(warningKey); // Clear warning if size reduces
+                localStorage.removeItem(warningKey); 
             }
-
             localStorage.setItem(key, dataStr);
-            updateStoredTermsInfo(); // This will now pick up the warning if set
+            updateStoredTermsInfo(); 
             return true;
         }
         
-        function loadPersistentDedupe() {
+        // Renamed from loadPersistentDedupe
+        function loadPersistentDedupeToList() {
             const novelName = novelNameInput.value.trim();
-            if (!novelName) {
-                displayStatus('storedTermsInfo', "Please enter a Novel/Project Name first.", 'warning', 'fa-exclamation-triangle');
+            if (!novelName || novelName === "Project") {
+                displayStatus('dedupeListStatus', "Please enter a valid Project Name first.", 'warning');
                 return;
             }
-            persistentDedupeTranslations = getPersistentDedupeSet(novelName);
-            displayStatus('storedTermsInfo', `${persistentDedupeTranslations.size} terms loaded from '${novelName}' storage. This will be used for the next extraction.`, 'success', 'fa-cloud-download-alt');
-            updateStoredTermsInfo(); // To refresh any warnings
+            const storedLines = getPersistentDedupeLines(novelName);
+            pastedDedupeListTextarea.value = storedLines.join('\n');
+            displayStatus('dedupeListStatus', `Loaded ${storedLines.length} lines from '${novelName}' storage into the textbox.`, 'success');
+            updateStoredTermsInfo(); 
         }
-        window.loadPersistentDedupe = loadPersistentDedupe;
+        window.loadPersistentDedupeToList = loadPersistentDedupeToList;
+
+        function saveDedupeListToPersistentStorage() {
+            const novelName = novelNameInput.value.trim();
+            if (!novelName || novelName === "Project") {
+                displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
+                return;
+            }
+            const linesToSave = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+            if (savePersistentDedupeLines(novelName, linesToSave)) {
+                displayStatus('dedupeListStatus', `Saved ${linesToSave.length} lines to '${novelName}' project storage.`, 'success');
+            } else {
+                // savePersistentDedupeLines will show its own error if novelName is missing
+            }
+        }
+        window.saveDedupeListToPersistentStorage = saveDedupeListToPersistentStorage;
         
         function confirmClearStorage() {
             const novelName = novelNameInput.value.trim();
-            if (!novelName) {
-                 displayStatus('storedTermsInfo', "Please enter a Novel/Project Name to clear its storage.", 'warning', 'fa-exclamation-triangle'); 
+            if (!novelName || novelName === "Project") {
+                 displayStatus('storedTermsInfo', "Please enter a valid Project Name to clear its storage.", 'warning'); 
                 return;
             }
             showGenericModal(
-                `Clear Storage for '${novelName}'?`,
-                `This will permanently delete all ${getPersistentDedupeSet(novelName).size} stored deduplication terms for this project. This action cannot be undone.`,
-                () => { // onConfirm
+                `Clear Stored Dedupe List for '${novelName}'?`,
+                `This will permanently delete all <strong>${getPersistentDedupeLines(novelName).length} stored lines</strong> for this project. This action cannot be undone. The content in the textbox will NOT be cleared.`,
+                () => { 
                     localStorage.removeItem(LS_DEDUPE_PREFIX + novelName);
-                    localStorage.removeItem(LS_SIZE_WARNING_PREFIX + novelName); // Also clear warning flag
-                    persistentDedupeTranslations.clear(); 
-                    displayStatus('storedTermsInfo', `Storage for '${novelName}' cleared successfully.`, 'success', 'fa-check-circle');
+                    localStorage.removeItem(LS_SIZE_WARNING_PREFIX + novelName); 
+                    displayStatus('storedTermsInfo', `Stored list for '${novelName}' cleared.`, 'success');
                     updateStoredTermsInfo();
                 }
             );
@@ -649,21 +662,20 @@
 
         function exportPersistentDedupe() {
             const novelName = novelNameInput.value.trim();
-            if (!novelName) {
-                displayStatus('storedTermsInfo', "Novel name is required to export storage.", 'warning', 'fa-exclamation-triangle');
+            if (!novelName || novelName === "Project") {
+                displayStatus('storedTermsInfo', "Project Name required to export.", 'warning');
                 return;
             }
-            const dedupeSet = getPersistentDedupeSet(novelName);
-            if (dedupeSet.size === 0) {
-                displayStatus('storedTermsInfo', `No terms stored for '${novelName}' to export.`, 'info', 'fa-info-circle');
+            const dedupeLines = getPersistentDedupeLines(novelName);
+            if (dedupeLines.length === 0) {
+                displayStatus('storedTermsInfo', `No lines stored for '${novelName}' to export.`, 'info');
                 return;
             }
 
-            const dataStr = JSON.stringify(Array.from(dedupeSet), null, 2);
+            const dataStr = JSON.stringify(dedupeLines, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
-            
-            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_')}_dedupe_export.json`;
+            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_')}_dedupe_list.json`;
             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', url);
@@ -672,24 +684,16 @@
             linkElement.click();
             document.body.removeChild(linkElement);
             URL.revokeObjectURL(url);
-            displayStatus('storedTermsInfo', `Exported ${dedupeSet.size} terms for '${novelName}'.`, 'success', 'fa-check-circle');
+            displayStatus('storedTermsInfo', `Exported ${dedupeLines.length} lines for '${novelName}'.`, 'success');
         }
         window.exportPersistentDedupe = exportPersistentDedupe;
 
         function handleImportDedupeFile(fileInput) {
-            const novelName = novelNameInput.value.trim();
+            // Imports directly into the pastedDedupeListTextarea
             const importDisplayId = 'fileDisplayText_importDedupe';
 
-            if (!novelName) {
-                displayStatus('storedTermsInfo', "Novel name is required to import storage.", 'warning', 'fa-exclamation-triangle');
-                fileInput.value = ''; 
-                updateFileDisplay(fileInput, importDisplayId); 
-                return;
-            }
-
             if (fileInput.files.length === 0) {
-                updateFileDisplay(fileInput, importDisplayId);
-                return;
+                updateFileDisplay(fileInput, importDisplayId); return;
             }
             const file = fileInput.files[0];
             updateFileDisplay(fileInput, importDisplayId);
@@ -697,77 +701,51 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 try {
-                    const importedArray = JSON.parse(event.target.result);
-                    if (!Array.isArray(importedArray) || !importedArray.every(item => typeof item === 'string')) {
-                        displayStatus('storedTermsInfo', 'Invalid file content. Expected a JSON array of strings.', 'danger', 'fa-times-circle');
-                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
-                        return;
+                    let importedLines = [];
+                    if (file.name.toLowerCase().endsWith('.json')) {
+                        const parsedJson = JSON.parse(event.target.result);
+                        if (!Array.isArray(parsedJson) || !parsedJson.every(item => typeof item === 'string')) {
+                            throw new Error('Invalid JSON file. Expected an array of strings.');
+                        }
+                        importedLines = parsedJson;
+                    } else { // Assume .txt or .csv is line-by-line
+                        importedLines = event.target.result.split('\n').map(l => l.trim()).filter(l => l);
                     }
 
-                    const currentStoredSet = getPersistentDedupeSet(novelName);
-                    const importedSet = new Set(importedArray.map(t => String(t).toLowerCase()));
+                    const currentText = pastedDedupeListTextarea.value.trim();
+                    const currentLines = currentText ? currentText.split('\n') : [];
 
-                    showImportOptionsModal(novelName, currentStoredSet, importedSet, () => {
-                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId); // Reset on cancel/close
+                    showImportOptionsModalToTextarea(importedLines, currentLines.length, (action) => {
+                        if (action === 'replace') {
+                            pastedDedupeListTextarea.value = importedLines.join('\n');
+                            displayStatus('dedupeListStatus', `Replaced textbox with ${importedLines.length} imported lines. Remember to SAVE to project storage if needed.`, 'info');
+                        } else if (action === 'merge') {
+                            const newText = (currentText ? currentText + '\n' : '') + importedLines.join('\n');
+                            pastedDedupeListTextarea.value = newText;
+                             displayStatus('dedupeListStatus', `Appended ${importedLines.length} imported lines to textbox. Remember to SAVE to project storage if needed.`, 'info');
+                        }
+                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
                     });
 
                 } catch (e) {
-                    displayStatus('storedTermsInfo', `Error parsing import file: ${e.message}`, 'danger', 'fa-times-circle');
+                    displayStatus('dedupeListStatus', `Error processing import file: ${e.message}`, 'danger');
                     fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
                 }
             };
             reader.onerror = function() {
-                displayStatus('storedTermsInfo', 'Error reading import file.', 'danger', 'fa-times-circle');
+                displayStatus('dedupeListStatus', 'Error reading import file.', 'danger');
                 fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
             };
             reader.readAsText(file);
         }
         window.handleImportDedupeFile = handleImportDedupeFile;
 
-
-        // --- Session Dedupe Management ---
-        function loadSessionDedupeList() {
-            const fileInput = document.getElementById('csvFile');
-            const pastedCsv = document.getElementById('pastedCsv').value;
-            let localTermsLoaded = 0;
-            currentSessionDedupeTranslations.clear(); 
-
-            const processContent = (content) => {
-                content.split('\n').forEach(line => {
-                    const parts = line.split(',').map(part => part.trim());
-                    if (parts.length >= 2 && parts[1]) {
-                        currentSessionDedupeTranslations.add(parts[1].toLowerCase());
-                        localTermsLoaded++;
-                    }
-                });
-            };
-
-            if (fileInput.files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    processContent(e.target.result);
-                    displayStatus('sessionDedupeStatus', `Loaded ${localTermsLoaded} terms to current session from file.`, 'success');
-                };
-                reader.onerror = () => displayStatus('sessionDedupeStatus', 'Error reading file.', 'danger');
-                reader.readAsText(fileInput.files[0]);
-            } else if (pastedCsv.trim()) {
-                processContent(pastedCsv);
-                displayStatus('sessionDedupeStatus', `Loaded ${localTermsLoaded} terms to current session from pasted text.`, 'success');
-            } else {
-                displayStatus('sessionDedupeStatus', 'No session dedupe data provided.', 'info');
-            }
+        function clearDedupeListTextarea() {
+            pastedDedupeListTextarea.value = '';
+            hideStatus('dedupeListStatus');
         }
-        window.loadSessionDedupeList = loadSessionDedupeList;
-        
-        function clearSessionDedupeVisuals() {
-            const csvFileInput = document.getElementById('csvFile');
-            csvFileInput.value = ''; 
-            updateFileDisplay(csvFileInput, 'fileDisplayText_csv');
-            document.getElementById('pastedCsv').value = '';
-            currentSessionDedupeTranslations.clear(); 
-            hideStatus('sessionDedupeStatus');
-        }
-        window.clearSessionDedupeVisuals = clearSessionDedupeVisuals;
+        window.clearDedupeListTextarea = clearDedupeListTextarea;
+
 
         // --- Main Extraction Logic ---
         async function processAllData() {
@@ -776,10 +754,10 @@
             extractBtn.disabled = true;
             clearProcessingLog();
             hideStatus('jsonStatus'); hideStatus('outputSummary');
-            document.getElementById('saveToStorageBtnContainer').innerHTML = ''; 
+            // document.getElementById('saveToStorageBtnContainer').innerHTML = ''; // Removed this container
             addProcessingLogStep('Extraction process initiated...', 'info');
             
-            lastExtractedPureTerms = [];
+            lastExtractedPureTerms = []; // This will store new `raw,translation,gender` lines
             const chapterTextareas = document.querySelectorAll('#chapterInputsContainer textarea');
             if (chapterTextareas.length === 0 || Array.from(chapterTextareas).every(ta => !ta.value.trim())) {
                 displayStatus('jsonStatus', "No chapter JSON provided.", 'warning');
@@ -787,48 +765,40 @@
                 finalizeExtractionUI(extractBtn); return;
             }
             
-            const combinedDedupeForRun = new Set([...persistentDedupeTranslations, ...currentSessionDedupeTranslations]);
-            addProcessingLogStep(`Using ${combinedDedupeForRun.size} terms for deduplication (from storage & session).`, 'info');
+            // Build deduplication set for THIS RUN from the pastedDedupeListTextarea
+            const currentDedupeListContent = pastedDedupeListTextarea.value;
+            const dedupeLinesForRun = currentDedupeListContent.split('\n').map(line => line.trim()).filter(line => line);
+            const translationsToDeduplicateThisRun = new Set();
+            dedupeLinesForRun.forEach(line => {
+                const parts = line.split(',').map(part => part.trim());
+                // Use translation part (parts[1]) if available, otherwise the whole line if it's a single term
+                const translationKey = (parts.length >= 2 && parts[1]) ? parts[1].toLowerCase() : ((parts.length === 1 && parts[0]) ? parts[0].toLowerCase() : null);
+                if (translationKey) {
+                    translationsToDeduplicateThisRun.add(translationKey);
+                }
+            });
+            addProcessingLogStep(`Using ${translationsToDeduplicateThisRun.size} unique translations from the Deduplication List for current extraction.`, 'info');
 
             let allChunks = [];
             let chaptersParsedCount = 0;
             for (let i = 0; i < chapterTextareas.length; i++) {
                 const chapterJsonStr = chapterTextareas[i].value;
                 const chapterGroup = chapterTextareas[i].closest('.chapter-input-group');
-                const boxNumber = chapterGroup ? chapterGroup.id.split('_')[1] : i + 1; // Get logical box number
+                const boxNumber = chapterGroup ? chapterGroup.id.split('_')[1] : i + 1; 
                 
                 if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${boxNumber} empty. Skipping.`, 'info'); continue; }
                 addProcessingLogStep(`Parsing Chapter from Box ${boxNumber}...`, 'info');
                 await new Promise(r => setTimeout(r, 10)); 
                 try {
                     const parsedChapter = JSON.parse(chapterJsonStr);
-                    let isValidStructure = true;
-                    let structureErrorMsg = "";
-
-                    if (!Array.isArray(parsedChapter)) {
-                        isValidStructure = false;
-                        structureErrorMsg = "Input is not a JSON array.";
-                    } else if (parsedChapter.length > 0) {
-                        const firstElement = parsedChapter[0];
-                        if (typeof firstElement !== 'object' || firstElement === null) {
-                            isValidStructure = false;
-                            structureErrorMsg = "First element in array is not an object.";
-                        } else if (!('terms' in firstElement)) {
-                            isValidStructure = false;
-                            structureErrorMsg = "First object in array is missing 'terms' key.";
-                        } else if (!Array.isArray(firstElement.terms)) {
-                            isValidStructure = false;
-                            structureErrorMsg = "'terms' key is not an array.";
-                        }
-                    }
-                    
-                    if (!isValidStructure) {
-                         addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON structure. ${structureErrorMsg} Skipped.`, 'warning'); continue;
+                    // Basic structure validation (can be expanded)
+                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !('terms' in parsedChapter[0]) || !Array.isArray(parsedChapter[0].terms)))) {
+                         addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON structure. Expected array of objects with a 'terms' array. Skipped.`, 'warning'); continue;
                     }
 
                     allChunks.push(...parsedChapter);
                     chaptersParsedCount++;
-                    addProcessingLogStep(`Chapter Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, 'success');
+                    addProcessingLogStep(`Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, 'success');
                 } catch (e) { 
                     addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON. Error: "${e.message}". Skipped.`, 'danger'); 
                 }
@@ -841,28 +811,28 @@
             }
             addProcessingLogStep(`${chaptersParsedCount} chapters parsed. Extracting terms...`, 'info');
 
-            const seenThisRunTranslations = new Set();
+            const seenThisRunTranslations = new Set(); // To avoid duplicates within the same extraction run output
             allChunks.forEach(chunk => {
                 if (chunk && Array.isArray(chunk.terms)) {
                     chunk.terms.forEach(term => {
                         const raw = term.raw, translation = term.translation;
                         if (raw && translation) {
                             const translationKey = String(translation).toLowerCase(); 
-                            if (!combinedDedupeForRun.has(translationKey) && !seenThisRunTranslations.has(translationKey)) {
+                            if (!translationsToDeduplicateThisRun.has(translationKey) && !seenThisRunTranslations.has(translationKey)) {
                                 seenThisRunTranslations.add(translationKey);
                                 let gender = "Neuter"; 
                                 if (term.tags && Array.isArray(term.tags)) {
                                     if (term.tags.includes("#male")) gender = "Male";
                                     else if (term.tags.includes("#female")) gender = "Female";
                                 }
-                                lastExtractedPureTerms.push(`${raw}, ${translation}, ${gender}`);
+                                lastExtractedPureTerms.push(`${raw},${translation},${gender}`); // Store full line
                             }
                         }
                     });
                 }
             });
 
-            addProcessingLogStep(`Found ${lastExtractedPureTerms.length} new unique terms.`, 'success');
+            addProcessingLogStep(`Found ${lastExtractedPureTerms.length} new unique terms for this session.`, 'success');
             
             let finalOutputText = "";
             const includeHeader = document.getElementById('includeCustomHeaderCheckbox').checked;
@@ -874,92 +844,44 @@
             outputTextarea.value = finalOutputText;
 
             if (lastExtractedPureTerms.length > 0) {
-                 displayStatus('outputSummary', `Extraction complete: ${lastExtractedPureTerms.length} new unique terms found.`, 'success');
-                 createSaveToStorageButton();
+                 displayStatus('outputSummary', `Extraction complete: ${lastExtractedPureTerms.length} new unique terms found. Use 'Move Extracted' to add them to the Dedupe List.`, 'success');
             } else {
-                 displayStatus('outputSummary', 'Extraction complete. No new unique terms found based on current deduplication lists.', 'info');
+                 displayStatus('outputSummary', 'Extraction complete. No new unique terms found based on current Deduplication List.', 'info');
             }
             finalizeExtractionUI(extractBtn);
         }
         window.processAllData = processAllData;
-
-        function createSaveToStorageButton() {
-            const novelName = novelNameInput.value.trim();
-            const container = document.getElementById('saveToStorageBtnContainer');
-            container.innerHTML = ''; 
-            if (lastExtractedPureTerms.length > 0 && novelName && novelName !== "Project") {
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary';
-                btn.innerHTML = `<i class="fas fa-save"></i> Save ${lastExtractedPureTerms.length} New Terms to '${novelName}' Storage`;
-                btn.onclick = saveNewTermsToPersistentStorage;
-                container.appendChild(btn);
-            } else if (!novelName || novelName === "Project" && lastExtractedPureTerms.length > 0) {
-                 const p = document.createElement('p');
-                 p.className = 'status-message status-warning';
-                 p.innerHTML = `<i class="fas fa-exclamation-circle"></i> Enter a valid Novel Name to enable saving new terms to persistent storage.`;
-                 container.appendChild(p);
-            }
-        }
-        
-        function saveNewTermsToPersistentStorage() {
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                displayStatus('outputSummary', 'A valid Novel Name is required to save.', 'danger');
-                return;
-            }
-            if (lastExtractedPureTerms.length === 0) {
-                displayStatus('outputSummary', 'No new terms to save.', 'info');
-                return;
-            }
-
-            const currentPersistentSet = getPersistentDedupeSet(novelName);
-            let addedCount = 0;
-            lastExtractedPureTerms.forEach(termLine => {
-                const translationKey = termLine.split(',')[1]?.trim().toLowerCase();
-                if (translationKey && !currentPersistentSet.has(translationKey)) {
-                    currentPersistentSet.add(translationKey);
-                    addedCount++;
-                }
-            });
-
-            if (savePersistentDedupeSet(novelName, currentPersistentSet)) {
-                if (novelName === novelNameInput.value.trim()) { // Check if this is the currently active project
-                     persistentDedupeTranslations = new Set([...currentPersistentSet]);
-                }
-                displayStatus('outputSummary', `Successfully saved ${addedCount} new term translations to '${novelName}' storage. Total stored: ${currentPersistentSet.size}.`, 'success');
-                document.getElementById('saveToStorageBtnContainer').innerHTML = '<p class="status-message status-success" style="justify-content:flex-end;"><i class="fas fa-check-circle"></i> New terms saved to storage!</p>';
-            } else {
-                displayStatus('outputSummary', `Failed to save new terms to '${novelName}' storage.`, 'danger');
-            }
-        }
 
         function finalizeExtractionUI(button) {
             button.classList.remove('loading');
             button.disabled = false;
         }
 
-        // --- Copy to Clipboard ---
-        function copyOutput(mode) {
-            let textToCopy = "";
-            let tooltipId = "";
-            let baseText = lastExtractedPureTerms.join('\n');
-
-            if (mode === 'termsOnly') {
-                textToCopy = baseText;
-                tooltipId = 'copyTermsTooltip';
-            } else if (mode === 'withHeader') {
-                textToCopy = baseText; 
-                if (document.getElementById('includeCustomHeaderCheckbox').checked) {
-                    const header = editablePresetTextarea.value.trim();
-                    if (header) {
-                        textToCopy = header + (textToCopy ? "\n\n" + textToCopy : ""); 
-                    }
-                }
-                 tooltipId = 'copyHeaderTooltip';
+        // --- Output Handling ---
+        function moveExtractedToDedupeList() {
+            if (lastExtractedPureTerms.length === 0) {
+                showTooltipMessage('moveExtractedTooltip', "No terms to move!");
+                return;
             }
+            const currentDedupeText = pastedDedupeListTextarea.value.trim();
+            const newTermsText = lastExtractedPureTerms.join('\n');
+            
+            pastedDedupeListTextarea.value = (currentDedupeText ? currentDedupeText + '\n' : '') + newTermsText;
+            
+            displayStatus('dedupeListStatus', `${lastExtractedPureTerms.length} extracted terms added to the Deduplication List textbox. Remember to SAVE to project storage if desired.`, 'info');
+            showTooltipMessage('moveExtractedTooltip', "Moved!");
+            lastExtractedPureTerms = []; // Clear after moving
+            outputTextarea.value = document.getElementById('includeCustomHeaderCheckbox').checked ? editablePresetTextarea.value.trim() + "\n\n" : ""; // Clear output or reset to header
+            hideStatus('outputSummary');
+        }
+        window.moveExtractedToDedupeList = moveExtractedToDedupeList;
+
+        function copyOutput(mode) { // Only 'withHeader' mode effectively remains for direct copy
+            let textToCopy = outputTextarea.value; // This now includes header if checked, and only new terms
+            let tooltipId = 'copyHeaderTooltip';
             
             if (!textToCopy.trim()) { 
-                 showTooltipMessage(tooltipId, (mode === 'termsOnly' ? "No terms to copy!" : "Nothing to copy!")); return;
+                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
             }
             performCopy(textToCopy, tooltipId);
         }
@@ -982,6 +904,7 @@
                 showTooltipMessage(tooltipId, "Copy Failed!");
             });
         }
+
         function showTooltipMessage(tooltipId, message) {
             const tooltip = document.getElementById(tooltipId);
             if (!tooltip) return;
@@ -1002,12 +925,12 @@
         // --- Modal Logic ---
         function showGenericModal(title, message, onConfirm, onCancel = null) {
             modalTitleEl.textContent = title;
-            modalMessageEl.innerHTML = message; // Use innerHTML for potential formatting
+            modalMessageEl.innerHTML = message; 
             
-            modalActionsContainer.innerHTML = ''; // Clear previous buttons
+            modalActionsContainer.innerHTML = ''; 
 
             const confirmBtn = document.createElement('button');
-            confirmBtn.className = 'btn btn-danger';
+            confirmBtn.className = 'btn btn-danger'; // Default to danger for generic confirm
             confirmBtn.textContent = 'Confirm';
             confirmBtn.onclick = () => { if(onConfirm) onConfirm(); hideGenericModal(); };
             
@@ -1024,56 +947,50 @@
 
         function hideGenericModal() {
             modalOverlay.classList.remove('active');
-            generalConfirmCallback = null;
+            generalConfirmCallback = null; // Clear them
             generalCancelCallback = null;
         }
 
-        function showImportOptionsModal(novelName, currentSet, importedSet, onCancelOrClose) {
-            modalTitleEl.textContent = `Import Terms for '${novelName}'`;
-            const currentCount = currentSet.size;
-            const importCount = importedSet.size;
-            const mergedSet = new Set([...currentSet, ...importedSet]);
-            const mergedCount = mergedSet.size;
-            const newTermsInMerge = mergedCount - currentCount;
+        function showImportOptionsModalToTextarea(importedLines, currentLineCountInTextarea, callbackOnAction) {
+            modalTitleEl.textContent = `Import Lines to Dedupe List Textbox`;
+            const importCount = importedLines.length;
+            
+            const combinedLines = (pastedDedupeListTextarea.value.trim() ? pastedDedupeListTextarea.value.trim().split('\n') : []).concat(importedLines);
+            const uniqueCombinedLines = Array.from(new Set(combinedLines)); // Simple uniqueness for display
+            const mergedCount = uniqueCombinedLines.length;
+            const newLinesInMerge = mergedCount - currentLineCountInTextarea;
+
 
             modalMessageEl.innerHTML = `
-                You are importing <strong>${importCount} unique terms</strong>.
-                Your project '${novelName}' currently has <strong>${currentCount} stored terms</strong>.
-                <br><br>Please choose an import action:
+                You are importing <strong>${importCount} lines</strong>.
+                The textbox currently has <strong>${currentLineCountInTextarea} lines</strong>.
+                <br><br>Choose an action for the textbox content:
             `;
             
-            modalActionsContainer.innerHTML = ''; // Clear previous buttons
+            modalActionsContainer.innerHTML = ''; 
 
             const replaceBtn = document.createElement('button');
-            replaceBtn.className = 'btn btn-danger';
-            replaceBtn.innerHTML = `<i class="fas fa-exchange-alt"></i> Replace (${importCount} total)`;
+            replaceBtn.className = 'btn btn-warning'; // Use warning for replace
+            replaceBtn.innerHTML = `<i class="fas fa-exchange-alt"></i> Replace Textbox (${importCount} total)`;
             replaceBtn.onclick = () => {
-                savePersistentDedupeSet(novelName, importedSet);
-                if (novelName === novelNameInput.value.trim()) persistentDedupeTranslations = new Set(importedSet);
-                displayStatus('storedTermsInfo', `Successfully replaced storage. ${importedSet.size} terms now stored for '${novelName}'.`, 'success');
-                updateStoredTermsInfo();
+                if(callbackOnAction) callbackOnAction('replace');
                 hideGenericModal();
-                if(onCancelOrClose) onCancelOrClose();
             };
 
             const mergeBtn = document.createElement('button');
             mergeBtn.className = 'btn btn-primary';
-            mergeBtn.innerHTML = `<i class="fas fa- Mearge"></i> Merge (+${newTermsInMerge} new, ${mergedCount} total)`;
+            mergeBtn.innerHTML = `<i class="fas fa- Mearge"></i> Append to Textbox (+${importCount} lines)`;
             mergeBtn.onclick = () => {
-                savePersistentDedupeSet(novelName, mergedSet);
-                 if (novelName === novelNameInput.value.trim()) persistentDedupeTranslations = new Set(mergedSet);
-                displayStatus('storedTermsInfo', `Successfully merged terms. ${mergedCount} terms now stored for '${novelName}'. Added ${newTermsInMerge} new.`, 'success');
-                updateStoredTermsInfo();
+                 if(callbackOnAction) callbackOnAction('merge');
                 hideGenericModal();
-                if(onCancelOrClose) onCancelOrClose();
             };
             
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'btn btn-outline';
             cancelBtn.textContent = 'Cancel Import';
             cancelBtn.onclick = () => { 
+                if(callbackOnAction) callbackOnAction('cancel'); // Allow callback to know it was cancelled
                 hideGenericModal(); 
-                if(onCancelOrClose) onCancelOrClose();
             };
             
             modalActionsContainer.appendChild(cancelBtn);
