@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenith Term Processor v5.0</title>
+    <title>Zenith Term Processor v5.2</title> <!-- Version Bump -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -16,6 +16,7 @@
             --secondary-600: #7c3aed; /* Violet 600 */
             --success-500: #10b981; /* Emerald 500 */
             --danger-500: #ef4444;  /* Red 500 */
+            --danger-600: #dc2626;  /* Red 600 for hover */
             --warning-500: #f59e0b; /* Amber 500 */
             --neutral-700: #374151; /* Gray 700 for text */
             --neutral-500: #6b7280; /* Gray 500 for secondary text */
@@ -44,17 +45,18 @@
         .app-title-bar p { font-size: 0.875rem; opacity: 0.9; margin-top: 0.25rem; }
 
         .grid-layout { display: grid; gap: 1.5rem; }
-        @media (min-width: 1024px) {
+        @media (min-width: 1024px) { /* Large screens */
             .grid-layout { grid-template-columns: repeat(3, 1fr); }
             .grid-layout .col-span-1 { grid-column: span 1 / span 1; }
             .grid-layout .col-span-2 { grid-column: span 2 / span 2; }
             .grid-layout .col-span-3 { grid-column: span 3 / span 3; }
         }
-         @media (min-width: 768px) and (max-width: 1023px) {
+         @media (min-width: 768px) and (max-width: 1023px) { /* Medium screens */
             .grid-layout { grid-template-columns: repeat(2, 1fr); }
-            .grid-layout .col-span-1-md { grid-column: span 1 / span 1; }
-            .grid-layout .col-span-2-md { grid-column: span 2 / span 2; }
+            .grid-layout .md-col-span-1 { grid-column: span 1 / span 1; }
+            .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
         }
+        /* Default (small screens) is single column for all panels */
 
 
         .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.5rem; }
@@ -71,7 +73,7 @@
         }
         input[type="text"]:focus, textarea:focus {
             outline: 2px solid transparent; outline-offset: 2px;
-            border-color: var(--primary-500); box-shadow: 0 0 0 2px var(--primary-500_alpha, rgba(59,130,246,0.3));
+            border-color: var(--primary-500); box-shadow: 0 0 0 2px rgba(59,130,246,0.3); /* Primary-500 with alpha */
         }
         textarea { resize: vertical; min-height: 80px; }
 
@@ -89,7 +91,7 @@
             box-shadow: var(--shadow-sm); border: 1px solid transparent;
         }
         .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px var(--primary-500_alpha, rgba(59,130,246,0.4)); }
+        .btn:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(59,130,246,0.4); } /* Primary-500 with alpha */
         .btn i { font-size:0.9em; }
 
         .btn-primary { background-color: var(--primary-500); color: white; }
@@ -97,9 +99,12 @@
         .btn-secondary { background-color: var(--secondary-500); color: white; }
         .btn-secondary:hover { background-color: var(--secondary-600); }
         .btn-danger { background-color: var(--danger-500); color: white; }
-        .btn-danger:hover { background-color: #d03030; } /* Slightly darker red */
+        .btn-danger:hover { background-color: var(--danger-600); }
         .btn-outline { background-color: transparent; border-color: var(--neutral-300); color: var(--neutral-500); }
         .btn-outline:hover { background-color: var(--neutral-100); border-color: var(--neutral-500); color:var(--neutral-700); }
+        .btn-outline.btn-danger { color: var(--danger-500); border-color: var(--danger-500); }
+        .btn-outline.btn-danger:hover { background-color: var(--danger-500); color:white; }
+
 
         .btn-icon { padding: 0.5rem; }
         .btn-main-action { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; }
@@ -108,7 +113,7 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: var(--neutral-100_alpha, rgba(243,244,246,0.5));}
+        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: rgba(243,244,246,0.5); } /* neutral-100 with alpha */
         .chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
         .chapter-label { font-weight: 500; font-size:0.9rem; color: var(--secondary-500);}
 
@@ -117,10 +122,10 @@
             display: flex; align-items: center; gap: 0.5rem; border: 1px solid;
         }
         .status-message i { font-size: 1.1em; }
-        .status-success { background-color: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-        .status-warning { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; }
-        .status-danger  { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-        .status-info    { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .status-success { background-color: #d1fae5; color: #065f46; border-color: #6ee7b7; } /* Emerald 100, 800, 300 */
+        .status-warning { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; } /* Amber 100, 800, 300 */
+        .status-danger  { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; } /* Red 100, 800, 300 */
+        .status-info    { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; } /* Blue 100, 800, 300 */
 
         #processingLog ul { list-style: none; padding: 0; max-height: 120px; overflow-y: auto; font-size: 0.8rem; color:var(--neutral-500);}
         #processingLog li { padding: 0.25rem 0; border-bottom: 1px dotted var(--neutral-100);}
@@ -145,18 +150,30 @@
         }
         .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
 
+        /* Style for the internal grid in Session Configuration Panel */
+        .session-config-grid-internal {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr; /* Default: single column */
+        }
+        @media (min-width: 600px) { /* Breakpoint for two columns */
+            .session-config-grid-internal {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="app-title-bar">
-            <h1><i class="fas fa-meteor"></i> Zenith Term Processor v5.0</h1>
+            <h1><i class="fas fa-meteor"></i> Zenith Term Processor v5.2</h1>
             <p>Intelligent Term Extraction with Persistent Project Deduplication</p>
         </header>
 
         <div class="grid-layout">
             <!-- Project Setup Panel -->
-            <div class="panel col-span-1 col-span-1-md">
+            <div class="panel col-span-1 md-col-span-1">
                 <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Setup & Storage</h2>
                 <div class="form-group">
                     <label for="novelNameInput" class="form-label">Novel/Project Name:</label>
@@ -171,17 +188,24 @@
                     <button id="clearStoredBtn" onclick="confirmClearStorage()" class="btn btn-outline btn-danger" style="width:100%;">
                         <i class="fas fa-trash-alt"></i>Clear Storage for Project
                     </button>
+                    <button id="exportStoredBtn" onclick="exportPersistentDedupe()" class="btn btn-outline" style="width:100%; margin-top:0.25rem;">
+                        <i class="fas fa-file-export"></i>Export Storage for Project
+                    </button>
+                    <div class="file-input-wrapper" style="margin-top:0.25rem;">
+                        <input type="file" id="importDedupeFile" accept=".json" onchange="handleImportDedupeFile(this)">
+                        <div class="file-display-text" id="fileDisplayText_importDedupe"><i class="fas fa-file-import"></i>Import to Project Storage (.json)...</div>
+                    </div>
                 </div>
             </div>
 
             <!-- Chapter Input Panel -->
-            <div class="panel col-span-2 col-span-1-md">
+            <div class="panel col-span-1 md-col-span-1">
                 <h2 class="panel-title"><i class="fas fa-book-reader"></i>Chapter JSON Input</h2>
                 <div id="chapterInputsContainer" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
                     <!-- Chapter input boxes dynamically added here -->
                 </div>
                 <div class="btn-group" style="margin-top:1rem;">
-                    <button onclick="addChapterInput()" class="btn btn-primary">
+                    <button onclick="addChapterInputUI()" class="btn btn-primary">
                         <i class="fas fa-plus"></i>Add Chapter Box
                     </button>
                 </div>
@@ -189,10 +213,10 @@
             </div>
 
             <!-- Current Session Dedupe & Header Panel -->
-            <div class="panel col-span-3 col-span-2-md">
+            <div class="panel col-span-1 md-col-span-2">
                 <h2 class="panel-title"><i class="fas fa-filter"></i>Session Configuration</h2>
-                <div class="grid-layout" style="gap: 1rem;"> <!-- Nested grid for side-by-side -->
-                    <div class="col-span-1">
+                <div class="session-config-grid-internal"> <!-- MODIFIED: class applied, inline style removed -->
+                    <div> <!-- Dedupe Column -->
                         <div class="form-group">
                             <label class="form-label">Current Session Deduplication List:</label>
                              <div class="file-input-wrapper">
@@ -215,7 +239,7 @@
                             <div id="sessionDedupeStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
                         </div>
                     </div>
-                    <div class="col-span-1">
+                    <div> <!-- Header Column -->
                         <div class="form-group">
                             <div style="display:flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                                 <input type="checkbox" id="includeCustomHeaderCheckbox" onchange="toggleCustomHeaderInputUI(this.checked)" style="width:auto; height:auto; accent-color: var(--primary-500);">
@@ -230,7 +254,7 @@
             </div>
 
             <!-- Extraction Actions & Results Panel -->
-            <div class="panel col-span-3">
+            <div class="panel col-span-3 md-col-span-2">
                 <h2 class="panel-title"><i class="fas fa-magic-wand-sparkles"></i>Extraction Actions & Results</h2>
                 <div style="text-align:center; margin-bottom: 1.5rem;">
                     <button id="mainExtractBtn" onclick="processAllData()" class="btn btn-primary btn-main-action">
@@ -288,11 +312,12 @@
     </footer>
 
     <script>
+    (function() { // IIFE Start
         // --- Global State & Constants ---
-        let currentSessionDedupeTranslations = new Set(); // For terms from file/paste in this session
-        let persistentDedupeTranslations = new Set(); // For terms loaded from localStorage
+        let currentSessionDedupeTranslations = new Set(); 
+        let persistentDedupeTranslations = new Set(); 
         let chapterInputCounter = 0;
-        let lastExtractedPureTerms = []; // Only "raw, translation, gender"
+        let lastExtractedPureTerms = []; 
         const LS_NOVEL_NAME_KEY = 'zenithTermExtractor_lastNovelName';
         const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_';
 
@@ -302,10 +327,16 @@
         const novelNameInput = document.getElementById('novelNameInput');
         const editablePresetTextarea = document.getElementById('editablePresetTextarea');
         const outputTextarea = document.getElementById('outputTextarea');
+        // Modal elements
+        const modalOverlay = document.getElementById('confirmationModal');
+        const modalTitleEl = document.getElementById('modalTitle');
+        const modalMessageEl = document.getElementById('modalMessageText');
+        let confirmCallback = null;
+        let cancelCallback = null; // For modal cancellation
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            addChapterInputUI(); // Add initial chapter box
+            addChapterInputUI(); 
             editablePresetTextarea.value = DEFAULT_HEADER_TEXT;
             const lastNovel = localStorage.getItem(LS_NOVEL_NAME_KEY);
             if (lastNovel) {
@@ -313,6 +344,20 @@
             }
             updateDynamicButtonLabels();
             updateStoredTermsInfo();
+
+            // Modal event listeners
+            document.getElementById('modalCancelBtn').addEventListener('click', () => {
+                if(typeof cancelCallback === 'function') cancelCallback();
+                modalOverlay.classList.remove('active');
+                confirmCallback = null; // Clear callbacks
+                cancelCallback = null;
+            });
+            document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+                if(typeof confirmCallback === 'function') confirmCallback();
+                modalOverlay.classList.remove('active');
+                confirmCallback = null; // Clear callbacks
+                cancelCallback = null;
+            });
         });
 
         // --- UI Update Functions ---
@@ -330,11 +375,16 @@
             label.textContent = `Chapter ${chapterInputCounter} JSON`;
             headerDiv.appendChild(label);
 
-            if (chapterInputCounter > 1) {
+            if (chapterInputCounter > 1) { 
                 const removeBtn = document.createElement('button');
                 removeBtn.innerHTML = '<i class="fas fa-minus-circle"></i>';
                 removeBtn.className = 'btn btn-icon btn-outline btn-danger';
-                removeBtn.onclick = () => itemDiv.remove();
+                removeBtn.style.padding = '0.3rem 0.5rem'; 
+                removeBtn.title = 'Remove this chapter box';
+                removeBtn.onclick = () => {
+                    itemDiv.remove();
+                    // Note: Chapter numbers are not re-indexed on removal for simplicity.
+                };
                 headerDiv.appendChild(removeBtn);
             }
             itemDiv.appendChild(headerDiv);
@@ -342,24 +392,46 @@
             const textarea = document.createElement('textarea');
             textarea.rows = 4;
             textarea.placeholder = `Paste JSON for Chapter ${chapterInputCounter}...`;
-            textarea.id = `chapterJson_${chapterInputCounter}`;
+            textarea.id = `chapterJson_${chapterInputCounter}`; 
             itemDiv.appendChild(textarea);
             container.appendChild(itemDiv);
+            container.scrollTop = container.scrollHeight; // Scroll to new chapter box
         }
+        window.addChapterInputUI = addChapterInputUI; // Expose to global for HTML onclick
 
         function toggleCustomHeaderInputUI(isChecked) {
             document.getElementById('customHeaderInputArea').style.display = isChecked ? 'block' : 'none';
         }
+        window.toggleCustomHeaderInputUI = toggleCustomHeaderInputUI;
+
 
         function updateDynamicButtonLabels() {
             const novelName = novelNameInput.value.trim() || "Project";
             document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load Stored for '${novelName}'`;
             document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear Storage for '${novelName}'`;
-            if (novelName !== "Project") {
-                localStorage.setItem(LS_NOVEL_NAME_KEY, novelName);
+            document.getElementById('exportStoredBtn').innerHTML = `<i class="fas fa-file-export"></i>Export Storage for '${novelName}'`;
+            
+            const importFileInput = document.getElementById('importDedupeFile');
+            const importFileDisplayText = document.getElementById('fileDisplayText_importDedupe');
+            if (novelName === "Project") { // Novel name not set
+                importFileInput.disabled = true;
+                importFileDisplayText.innerHTML = `<i class="fas fa-file-import"></i>Enter Project Name to Import`;
+                importFileDisplayText.style.cursor = "not-allowed";
+            } else {
+                importFileInput.disabled = false;
+                if (!importFileInput.files || importFileInput.files.length === 0) {
+                    importFileDisplayText.innerHTML = `<i class="fas fa-file-import"></i>Import to '${novelName}' Storage (.json)...`;
+                } // else updateFileDisplay handles it
+                importFileDisplayText.style.cursor = "pointer";
+            }
+
+            if (novelNameInput.value.trim() && novelName !== "Project") {
+                localStorage.setItem(LS_NOVEL_NAME_KEY, novelNameInput.value.trim());
             }
             updateStoredTermsInfo();
         }
+        novelNameInput.addEventListener('keyup', updateDynamicButtonLabels); // Make sure it's available
+
         
         function updateStoredTermsInfo() {
             const novelName = novelNameInput.value.trim();
@@ -371,47 +443,66 @@
             const key = LS_DEDUPE_PREFIX + novelName;
             const storedData = JSON.parse(localStorage.getItem(key) || '[]');
             storedInfoDiv.innerHTML = `<i class="fas fa-database"></i> ${storedData.length} terms stored for '${novelName}'.`;
-            storedInfoDiv.style.display = storedData.length > 0 ? 'flex' : 'none';
+            storedInfoDiv.style.display = storedData.length > 0 || novelName ? 'flex' : 'none'; // Show even if 0 for a named project
         }
 
 
         function displayStatus(elementId, message, type = 'info', icon = null) {
             const el = document.getElementById(elementId);
+            if (!el) return;
             let iconHtml = '';
             if (icon) iconHtml = `<i class="fas ${icon}"></i>`;
-            else { // Default icons based on type
+            else { 
                 if(type === 'success') iconHtml = '<i class="fas fa-check-circle"></i>';
                 else if(type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
                 else if(type === 'danger') iconHtml = '<i class="fas fa-times-circle"></i>';
                 else iconHtml = '<i class="fas fa-info-circle"></i>';
             }
             el.innerHTML = `${iconHtml} ${message}`;
-            el.className = `status-message status-${type}`; // Reset class list and add new
+            el.className = `status-message status-${type}`; 
             el.style.display = 'flex';
         }
-        function hideStatus(elementId) { document.getElementById(elementId).style.display = 'none'; }
+        function hideStatus(elementId) { 
+            const el = document.getElementById(elementId);
+            if (el) el.style.display = 'none'; 
+        }
 
         function updateFileDisplay(input, displayId) {
             const display = document.getElementById(displayId);
-            if (input.files.length > 0) {
-                display.innerHTML = `<i class="fas fa-file-csv"></i> ${input.files[0].name}`;
+            if (!display) return;
+            const novelName = novelNameInput.value.trim() || "Project";
+
+            if (input.files && input.files.length > 0) {
+                display.innerHTML = `<i class="fas ${displayId === 'fileDisplayText_csv' ? 'fa-file-csv' : 'fa-file-import'}"></i> ${input.files[0].name}`;
                 display.classList.add('has-file');
             } else {
-                display.innerHTML = `<i class="fas fa-file-csv"></i> Upload .csv file...`;
+                if (displayId === 'fileDisplayText_csv') {
+                    display.innerHTML = `<i class="fas fa-file-csv"></i> Upload .csv file...`;
+                } else if (displayId === 'fileDisplayText_importDedupe') {
+                    if (novelName === "Project" || !novelNameInput.value.trim()) {
+                         display.innerHTML = `<i class="fas fa-file-import"></i>Enter Project Name to Import`;
+                    } else {
+                        display.innerHTML = `<i class="fas fa-file-import"></i>Import to '${novelName}' Storage (.json)...`;
+                    }
+                }
                 display.classList.remove('has-file');
             }
         }
+        window.updateFileDisplay = updateFileDisplay; // Expose for HTML onchange
         
         function addProcessingLogStep(message, type = 'info') {
             const logUl = document.querySelector('#processingLog ul');
             if(!logUl) return;
             document.getElementById('processingLog').style.display = 'block';
             const li = document.createElement('li');
-            let iconClass = 'fa-info-circle';
-            if (type === 'success') iconClass = 'fa-check-circle text-green-500';
-            else if (type === 'danger') iconClass = 'fa-times-circle text-red-500';
-            else if (type === 'warning') iconClass = 'fa-exclamation-triangle text-yellow-500';
-            li.innerHTML = `<i class="fas ${iconClass}" style="margin-right:0.5rem;"></i> ${message}`;
+            let iconClass = 'fa-info-circle'; 
+            let iconColor = 'var(--neutral-500)';
+
+            if (type === 'success') { iconClass = 'fa-check-circle'; iconColor = 'var(--success-500)';}
+            else if (type === 'danger') { iconClass = 'fa-times-circle'; iconColor = 'var(--danger-500)';}
+            else if (type === 'warning') { iconClass = 'fa-exclamation-triangle'; iconColor = 'var(--warning-500)';}
+            
+            li.innerHTML = `<i class="fas ${iconClass}" style="margin-right:0.5rem; color:${iconColor};"></i> ${message}`;
             logUl.appendChild(li);
             logUl.scrollTop = logUl.scrollHeight;
         }
@@ -422,11 +513,13 @@
         }
 
         // --- LocalStorage Interaction ---
+        // Note: localStorage has size limits (typically 5-10MB).
+        // Very large projects might hit this limit over time.
         function getPersistentDedupeSet(novelName) {
             if (!novelName) return new Set();
             const key = LS_DEDUPE_PREFIX + novelName;
             const storedArray = JSON.parse(localStorage.getItem(key) || '[]');
-            return new Set(storedArray.map(term => term.toLowerCase()));
+            return new Set(storedArray.map(term => String(term).toLowerCase())); 
         }
 
         function savePersistentDedupeSet(novelName, translationsSet) {
@@ -443,17 +536,18 @@
         function loadPersistentDedupe() {
             const novelName = novelNameInput.value.trim();
             if (!novelName) {
-                displayStatus('sessionDedupeStatus', "Please enter a Novel/Project Name first.", 'warning');
+                displayStatus('storedTermsInfo', "Please enter a Novel/Project Name first.", 'warning', 'fa-exclamation-triangle');
                 return;
             }
             persistentDedupeTranslations = getPersistentDedupeSet(novelName);
-            displayStatus('sessionDedupeStatus', `${persistentDedupeTranslations.size} terms loaded from '${novelName}' storage. Will be used for next extraction.`, 'success');
+            displayStatus('storedTermsInfo', `${persistentDedupeTranslations.size} terms loaded from '${novelName}' storage. Will be used for next extraction.`, 'success', 'fa-cloud-download-alt');
         }
+        window.loadPersistentDedupe = loadPersistentDedupe;
         
         function confirmClearStorage() {
             const novelName = novelNameInput.value.trim();
             if (!novelName) {
-                 displayStatus('outputSummary', "Please enter a Novel/Project Name to clear its storage.", 'warning'); // Or general status
+                 displayStatus('storedTermsInfo', "Please enter a Novel/Project Name to clear its storage.", 'warning', 'fa-exclamation-triangle'); 
                 return;
             }
             showModal(
@@ -461,19 +555,112 @@
                 `This will permanently delete all ${getPersistentDedupeSet(novelName).size} stored deduplication terms for this project. This action cannot be undone.`,
                 () => {
                     localStorage.removeItem(LS_DEDUPE_PREFIX + novelName);
-                    persistentDedupeTranslations.clear(); // Clear in-memory copy too
-                    displayStatus('outputSummary', `Storage for '${novelName}' cleared successfully.`, 'success');
+                    persistentDedupeTranslations.clear(); 
+                    displayStatus('storedTermsInfo', `Storage for '${novelName}' cleared successfully.`, 'success', 'fa-check-circle');
                     updateStoredTermsInfo();
                 }
             );
         }
+        window.confirmClearStorage = confirmClearStorage;
+
+        function exportPersistentDedupe() {
+            const novelName = novelNameInput.value.trim();
+            if (!novelName) {
+                displayStatus('storedTermsInfo', "Novel name is required to export storage.", 'warning', 'fa-exclamation-triangle');
+                return;
+            }
+            const dedupeSet = getPersistentDedupeSet(novelName);
+            if (dedupeSet.size === 0) {
+                displayStatus('storedTermsInfo', `No terms stored for '${novelName}' to export.`, 'info', 'fa-info-circle');
+                return;
+            }
+
+            const dataStr = JSON.stringify(Array.from(dedupeSet), null, 2); // Pretty print JSON
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_')}_dedupe_export.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', url);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            document.body.appendChild(linkElement); // Required for Firefox
+            linkElement.click();
+            document.body.removeChild(linkElement);
+            URL.revokeObjectURL(url);
+            displayStatus('storedTermsInfo', `Exported ${dedupeSet.size} terms for '${novelName}'.`, 'success', 'fa-check-circle');
+        }
+        window.exportPersistentDedupe = exportPersistentDedupe;
+
+        function handleImportDedupeFile(fileInput) {
+            const novelName = novelNameInput.value.trim();
+            const importDisplayId = 'fileDisplayText_importDedupe';
+
+            if (!novelName) {
+                displayStatus('storedTermsInfo', "Novel name is required to import storage.", 'warning', 'fa-exclamation-triangle');
+                fileInput.value = ''; 
+                updateFileDisplay(fileInput, importDisplayId); 
+                return;
+            }
+
+            if (fileInput.files.length === 0) {
+                updateFileDisplay(fileInput, importDisplayId);
+                return;
+            }
+            const file = fileInput.files[0];
+            updateFileDisplay(fileInput, importDisplayId); // Show filename while processing
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const importedArray = JSON.parse(event.target.result);
+                    if (!Array.isArray(importedArray) || !importedArray.every(item => typeof item === 'string')) {
+                        displayStatus('storedTermsInfo', 'Invalid file content. Expected a JSON array of strings.', 'danger', 'fa-times-circle');
+                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                        return;
+                    }
+
+                    const currentCount = getPersistentDedupeSet(novelName).size;
+                    const importCount = new Set(importedArray.map(t => String(t).toLowerCase())).size;
+
+                    showModal(
+                        `Import Terms for '${novelName}'?`,
+                        `This will replace the current ${currentCount} stored terms with ${importCount} terms from the file. This action cannot be undone.`,
+                        () => { // onConfirm
+                            const newDedupeSet = new Set(importedArray.map(term => String(term).toLowerCase()));
+                            savePersistentDedupeSet(novelName, newDedupeSet);
+                            if (persistentDedupeTranslations.size > 0 || novelName === novelNameInput.value.trim()) {
+                                // If current project's dedupe was loaded, update it too
+                                persistentDedupeTranslations = newDedupeSet;
+                            }
+                            displayStatus('storedTermsInfo', `Successfully imported ${newDedupeSet.size} terms to '${novelName}' storage.`, 'success', 'fa-check-circle');
+                            updateStoredTermsInfo();
+                            fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                        },
+                        () => { // onCancel
+                            fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                        }
+                    );
+                } catch (e) {
+                    displayStatus('storedTermsInfo', `Error parsing import file: ${e.message}`, 'danger', 'fa-times-circle');
+                    fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                }
+            };
+            reader.onerror = function() {
+                displayStatus('storedTermsInfo', 'Error reading import file.', 'danger', 'fa-times-circle');
+                fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+            };
+            reader.readAsText(file);
+        }
+        window.handleImportDedupeFile = handleImportDedupeFile;
+
 
         // --- Session Dedupe Management ---
         function loadSessionDedupeList() {
             const fileInput = document.getElementById('csvFile');
             const pastedCsv = document.getElementById('pastedCsv').value;
             let localTermsLoaded = 0;
-            currentSessionDedupeTranslations.clear(); // Reset for this specific load operation
+            currentSessionDedupeTranslations.clear(); 
 
             const processContent = (content) => {
                 content.split('\n').forEach(line => {
@@ -500,23 +687,28 @@
                 displayStatus('sessionDedupeStatus', 'No session dedupe data provided.', 'info');
             }
         }
+        window.loadSessionDedupeList = loadSessionDedupeList;
         
         function clearSessionDedupeVisuals() {
-            document.getElementById('csvFile').value = '';
-            updateFileDisplay(document.getElementById('csvFile'), 'fileDisplayText_csv');
+            const csvFileInput = document.getElementById('csvFile');
+            csvFileInput.value = ''; // Clear file input
+            updateFileDisplay(csvFileInput, 'fileDisplayText_csv');
             document.getElementById('pastedCsv').value = '';
-            currentSessionDedupeTranslations.clear(); // Clear the set
+            currentSessionDedupeTranslations.clear(); 
             hideStatus('sessionDedupeStatus');
         }
+        window.clearSessionDedupeVisuals = clearSessionDedupeVisuals;
 
         // --- Main Extraction Logic ---
         async function processAllData() {
+            // Note: For extremely large JSON inputs or deduplication lists,
+            // browser performance might be impacted as this is all client-side.
             const extractBtn = document.getElementById('mainExtractBtn');
             extractBtn.classList.add('loading');
             extractBtn.disabled = true;
             clearProcessingLog();
             hideStatus('jsonStatus'); hideStatus('outputSummary');
-            document.getElementById('saveToStorageBtnContainer').innerHTML = ''; // Clear previous save button
+            document.getElementById('saveToStorageBtnContainer').innerHTML = ''; 
             addProcessingLogStep('Extraction process initiated...', 'info');
             
             lastExtractedPureTerms = [];
@@ -526,8 +718,7 @@
                 addProcessingLogStep('No chapter JSON data. Aborted.', 'danger');
                 finalizeExtractionUI(extractBtn); return;
             }
-
-            // Combine persistent and session dedupe lists for THIS extraction run
+            
             const combinedDedupeForRun = new Set([...persistentDedupeTranslations, ...currentSessionDedupeTranslations]);
             addProcessingLogStep(`Using ${combinedDedupeForRun.size} terms for deduplication (from storage & session).`, 'info');
 
@@ -535,18 +726,40 @@
             let chaptersParsedCount = 0;
             for (let i = 0; i < chapterTextareas.length; i++) {
                 const chapterJsonStr = chapterTextareas[i].value;
-                if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${i + 1} empty. Skipping.`, 'info'); continue; }
-                addProcessingLogStep(`Parsing Chapter from Box ${i + 1}...`, 'info');
-                await new Promise(r => setTimeout(r, 10)); // UI update tick
+                const boxNumber = i + 1; // Use chapter box number for logging
+                if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${boxNumber} empty. Skipping.`, 'info'); continue; }
+                addProcessingLogStep(`Parsing Chapter from Box ${boxNumber}...`, 'info');
+                await new Promise(r => setTimeout(r, 10)); 
                 try {
                     const parsedChapter = JSON.parse(chapterJsonStr);
-                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !parsedChapter[0].terms))) {
-                         addProcessingLogStep(`Box ${i+1}: Invalid JSON structure or missing terms. Skipped.`, 'warning'); continue;
+                    let isValidStructure = true;
+                    let structureErrorMsg = "";
+
+                    if (!Array.isArray(parsedChapter)) {
+                        isValidStructure = false;
+                        structureErrorMsg = "Input is not a JSON array.";
+                    } else if (parsedChapter.length > 0) {
+                        const firstElement = parsedChapter[0];
+                        if (typeof firstElement !== 'object' || firstElement === null) {
+                            isValidStructure = false;
+                            structureErrorMsg = "First element in array is not an object.";
+                        } else if (!('terms' in firstElement)) {
+                            isValidStructure = false;
+                            structureErrorMsg = "First object in array is missing 'terms' key.";
+                        } else if (!Array.isArray(firstElement.terms)) {
+                            isValidStructure = false;
+                            structureErrorMsg = "'terms' key is not an array.";
+                        }
                     }
+                    
+                    if (!isValidStructure) {
+                         addProcessingLogStep(`Box ${boxNumber}: Invalid JSON. ${structureErrorMsg} Skipped.`, 'warning'); continue;
+                    }
+
                     allChunks.push(...parsedChapter);
                     chaptersParsedCount++;
-                    addProcessingLogStep(`Box ${i + 1}: Parsed ${parsedChapter.length} chunks.`, 'success');
-                } catch (e) { addProcessingLogStep(`Box ${i + 1}: JSON Parse Error - ${e.message}. Skipped.`, 'danger'); }
+                    addProcessingLogStep(`Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, 'success');
+                } catch (e) { addProcessingLogStep(`Box ${boxNumber}: JSON Parse Error - ${e.message}. Skipped.`, 'danger'); }
             }
 
             if (chaptersParsedCount === 0) {
@@ -562,12 +775,14 @@
                     chunk.terms.forEach(term => {
                         const raw = term.raw, translation = term.translation;
                         if (raw && translation) {
-                            const translationKey = translation.toLowerCase();
+                            const translationKey = String(translation).toLowerCase(); // Ensure string and lowercase
                             if (!combinedDedupeForRun.has(translationKey) && !seenThisRunTranslations.has(translationKey)) {
                                 seenThisRunTranslations.add(translationKey);
-                                let gender = "Neuter";
-                                if (term.tags && term.tags.includes("#male")) gender = "Male";
-                                else if (term.tags && term.tags.includes("#female")) gender = "Female";
+                                let gender = "Neuter"; // Default gender
+                                if (term.tags && Array.isArray(term.tags)) {
+                                    if (term.tags.includes("#male")) gender = "Male";
+                                    else if (term.tags.includes("#female")) gender = "Female";
+                                }
                                 lastExtractedPureTerms.push(`${raw}, ${translation}, ${gender}`);
                             }
                         }
@@ -594,11 +809,12 @@
             }
             finalizeExtractionUI(extractBtn);
         }
+        window.processAllData = processAllData;
 
         function createSaveToStorageButton() {
             const novelName = novelNameInput.value.trim();
             const container = document.getElementById('saveToStorageBtnContainer');
-            container.innerHTML = ''; // Clear previous
+            container.innerHTML = ''; 
             if (lastExtractedPureTerms.length > 0 && novelName) {
                 const btn = document.createElement('button');
                 btn.className = 'btn btn-secondary';
@@ -635,10 +851,12 @@
             });
 
             if (savePersistentDedupeSet(novelName, currentPersistentSet)) {
+                // Update the main persistentDedupeTranslations if it was loaded for the current project
+                if (novelName === novelNameInput.value.trim()) {
+                     persistentDedupeTranslations = new Set([...currentPersistentSet]);
+                }
                 displayStatus('outputSummary', `Successfully saved ${addedCount} new term translations to '${novelName}' storage. Total stored: ${currentPersistentSet.size}.`, 'success');
-                // Optionally, clear lastExtractedPureTerms or disable button after saving
-                 document.getElementById('saveToStorageBtnContainer').innerHTML = '<p class="status-message status-success"><i class="fas fa-check-circle"></i> New terms saved to storage!</p>';
-
+                document.getElementById('saveToStorageBtnContainer').innerHTML = '<p class="status-message status-success" style="justify-content:flex-end;"><i class="fas fa-check-circle"></i> New terms saved to storage!</p>';
             } else {
                 displayStatus('outputSummary', `Failed to save new terms to '${novelName}' storage.`, 'danger');
             }
@@ -653,37 +871,37 @@
         function copyOutput(mode) {
             let textToCopy = "";
             let tooltipId = "";
+            let baseText = lastExtractedPureTerms.join('\n');
 
             if (mode === 'termsOnly') {
-                textToCopy = lastExtractedPureTerms.join('\n');
+                textToCopy = baseText;
                 tooltipId = 'copyTermsTooltip';
             } else if (mode === 'withHeader') {
-                textToCopy = lastExtractedPureTerms.join('\n');
+                textToCopy = baseText; // Start with terms
                 if (document.getElementById('includeCustomHeaderCheckbox').checked) {
                     const header = editablePresetTextarea.value.trim();
-                    if (header) textToCopy = header + "\n\n" + textToCopy;
+                    if (header) {
+                        textToCopy = header + (textToCopy ? "\n\n" + textToCopy : ""); // Add header, ensure newline if terms exist
+                    }
                 }
                  tooltipId = 'copyHeaderTooltip';
             }
             
-            if (!textToCopy && mode === 'termsOnly') {
-                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
+            if (!textToCopy.trim()) { // Check if the final textToCopy is empty or just whitespace
+                 showTooltipMessage(tooltipId, (mode === 'termsOnly' ? "No terms to copy!" : "Nothing to copy!")); return;
             }
-            if (!textToCopy && mode === 'withHeader' && 
-                !(document.getElementById('includeCustomHeaderCheckbox').checked && editablePresetTextarea.value.trim())) {
-                 showTooltipMessage(tooltipId, "No terms or header selected!"); return;
-            }
-
             performCopy(textToCopy, tooltipId);
         }
+        window.copyOutput = copyOutput;
         
-        function copyToClipboard(elementId, tooltipId) { // General purpose
+        function copyToClipboard(elementId, tooltipId) { 
             const el = document.getElementById(elementId);
             if (!el.value || !el.value.trim()) {
                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
             }
             performCopy(el.value, tooltipId);
         }
+        window.copyToClipboard = copyToClipboard;
 
         function performCopy(text, tooltipId) {
             navigator.clipboard.writeText(text).then(() => {
@@ -696,30 +914,31 @@
         function showTooltipMessage(tooltipId, message) {
             const tooltip = document.getElementById(tooltipId);
             if (!tooltip) return;
-            const originalText = tooltip.textContent;
+            const originalText = tooltip.dataset.originalText || tooltip.textContent; // Store original if not already
+            if (!tooltip.dataset.originalText) tooltip.dataset.originalText = originalText;
+
             tooltip.textContent = message;
-            setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+            tooltip.style.visibility = 'visible'; // Make sure it's visible
+            tooltip.style.opacity = '1';
+
+            setTimeout(() => { 
+                tooltip.textContent = tooltip.dataset.originalText;
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+            }, 1500);
         }
 
         // --- Modal Logic ---
-        let confirmCallback = null;
-        const modalOverlay = document.getElementById('confirmationModal');
-        const modalTitleEl = document.getElementById('modalTitle');
-        const modalMessageEl = document.getElementById('modalMessageText');
-        
-        document.getElementById('modalCancelBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
-        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-            if(typeof confirmCallback === 'function') confirmCallback();
-            modalOverlay.classList.remove('active');
-        });
-
-        function showModal(title, message, onConfirm) {
+        function showModal(title, message, onConfirm, onCancel = null) {
             modalTitleEl.textContent = title;
             modalMessageEl.textContent = message;
             confirmCallback = onConfirm;
+            cancelCallback = onCancel;
             modalOverlay.classList.add('active');
         }
-
+        // Event listeners for modal buttons are in DOMContentLoaded
+        
+    })(); // IIFE End
     </script>
 </body>
 </html>
