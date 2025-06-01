@@ -3,29 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Novel Term Extractor v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Elite Novel Term Extractor v3.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3498db; /* A friendly, modern blue */
-            --primary-hover-color: #2980b9;
-            --secondary-color: #2ecc71; /* Green for success/positive actions */
-            --secondary-hover-color: #27ae60;
-            --tertiary-color: #9b59b6; /* Purple for ancillary actions */
-            --tertiary-hover-color: #8e44ad;
-            --accent-color: #e67e22; /* Orange for warnings/attention */
-            --background-color: #ecf0f1;
-            --card-background-color: #ffffff;
-            --text-color: #34495e;
-            --text-light-color: #7f8c8d;
-            --border-color: #bdc3c7;
+            --bg-color: #f4f7f9;
+            --card-bg-color: #ffffff;
+            --primary-color: #4A90E2; /* Professional Blue */
+            --primary-hover-color: #357ABD;
+            --secondary-color: #50E3C2; /* Teal accent for success */
+            --secondary-hover-color: #38C1A5;
+            --tertiary-color: #9013FE; /* Purple for specific actions */
+            --tertiary-hover-color: #7B0FD0;
+            --text-primary: #2c3e50; /* Dark Grey Blue */
+            --text-secondary: #7f8c8d; /* Lighter Grey */
+            --border-color: #dfe6e9;
+            --shadow-color: rgba(44, 62, 80, 0.1);
             --success-color: var(--secondary-color);
             --error-color: #e74c3c;
-            --font-family: 'Roboto', sans-serif;
-            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --border-radius: 10px;
-            --transition-speed: 0.3s;
+            --warning-color: #f39c12;
+            --info-color: var(--primary-color);
+            --font-family: 'Inter', sans-serif;
+            --base-font-size: 16px;
+            --border-radius: 8px;
+            --transition-speed: 0.25s;
         }
 
         * {
@@ -34,317 +36,382 @@
             padding: 0;
         }
 
+        html {
+            font-size: var(--base-font-size);
+        }
+
         body {
             font-family: var(--font-family);
-            background-color: var(--background-color);
-            color: var(--text-color);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             line-height: 1.6;
-            padding-top: 20px;
+            padding: 20px;
         }
 
-        .page-title-container {
+        .app-header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
+            margin-bottom: 40px;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
             color: white;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            margin-left: 20px;
-            margin-right: 20px;
+            box-shadow: 0 6px 12px var(--shadow-color);
         }
-
-        .page-title-container h1 {
-            font-size: 2.5em;
+        .app-header h1 {
+            font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
-        .page-title-container .subtitle {
-            font-size: 1.1em;
-            font-weight: 300;
+        .app-header p {
+            font-size: 1rem;
             opacity: 0.9;
+            margin-top: 5px;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto 40px auto;
-            padding: 0 20px;
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .card {
-            background-color: var(--card-background-color);
-            padding: 30px;
+        @media (min-width: 992px) {
+            .main-layout {
+                grid-template-columns: 1fr 1fr; /* Two columns for inputs */
+            }
+            .full-width-panel {
+                grid-column: 1 / -1; /* Span across both columns */
+            }
+        }
+        
+        .panel {
+            background-color: var(--card-bg-color);
+            padding: 25px;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            margin-bottom: 30px;
+            box-shadow: 0 4px 8px var(--shadow-color);
             transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
         }
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        .panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow-color);
         }
-
-        .card-header {
+        .panel-header {
             display: flex;
             align-items: center;
-            font-size: 1.6em;
-            font-weight: 500;
+            font-size: 1.3rem;
+            font-weight: 600;
             margin-bottom: 20px;
             color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
         }
-        .card-header i {
-            margin-right: 12px;
-            font-size: 1.2em;
-        }
-        
-        label {
+        .panel-header i { margin-right: 10px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
             font-weight: 500;
-            color: var(--text-color);
+            margin-bottom: 8px;
+            color: var(--text-secondary);
         }
 
-        textarea, input[type="file"] {
+        textarea, .file-input-display {
             width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 18px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
+            font-size: 0.95rem;
             font-family: var(--font-family);
-            background-color: #f9fafb;
+            background-color: #fdfdfe;
             transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+            resize: vertical;
+        }
+        textarea:focus, .file-input-display:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            outline: none;
         }
         
-        input[type="file"] {
-            padding: 10px;
-        }
-        
-        .file-input-wrapper {
+        .file-input-container {
             position: relative;
-            overflow: hidden;
-            display: inline-block;
-            margin-bottom: 15px;
-            width: 100%;
         }
-        .file-input-wrapper input[type=file] {
+        .file-input-container input[type="file"] {
             position: absolute;
             left: 0;
             top: 0;
             opacity: 0;
-            cursor: pointer;
+            width: 100%;
             height: 100%;
-            width: 100%;
-        }
-        .file-input-button {
-            border: 1px solid var(--border-color);
-            display: inline-block;
-            padding: 10px 15px;
             cursor: pointer;
-            border-radius: 6px;
-            background-color: #fff;
-            width: 100%;
-            text-align: left;
-            color: var(--text-light-color);
         }
-        .file-input-button i {
-            margin-right: 8px;
-            color: var(--primary-color);
-        }
-        #fileNameDisplay {
-            font-style: italic;
-            color: var(--primary-color);
-        }
-
-
-        textarea:focus, input[type="file"]:focus-within .file-input-button {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, .25); /* primary-color with alpha */
-            outline: none;
-        }
-        
-        .button-group {
+        .file-input-display {
             display: flex;
-            gap: 12px;
-            margin-top: 10px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+        .file-input-display .placeholder { color: var(--text-secondary); }
+        .file-input-display i { color: var(--primary-color); }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
             flex-wrap: wrap;
         }
 
-        button {
-            padding: 12px 25px;
+        .btn {
+            padding: 8px 15px; /* Smaller padding for normal buttons */
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.9rem;
             font-weight: 500;
-            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 2px 4px var(--shadow-color);
         }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        button:active {
-            transform: translateY(0px);
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 6px var(--shadow-color); }
+        .btn:active { transform: translateY(0); box-shadow: 0 1px 2px var(--shadow-color); }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover-color); }
+
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-secondary:hover { background-color: var(--secondary-hover-color); }
+        
+        .btn-tertiary { background-color: var(--tertiary-color); color: white; }
+        .btn-tertiary:hover { background-color: var(--tertiary-hover-color); }
+        
+        .btn-danger { background-color: var(--error-color); color: white; }
+        .btn-danger:hover { background-color: #c0392b; }
+
+        .btn-icon { padding: 8px 10px; } /* Even smaller for icon only */
+        .btn-icon .btn-text { display: none; }
+        @media (min-width: 768px) {
+            .btn-icon.responsive-text .btn-text { display: inline; margin-left: 5px; }
         }
 
-        .button-primary { background-color: var(--primary-color); color: white; }
-        .button-primary:hover { background-color: var(--primary-hover-color); }
 
-        .button-secondary { background-color: var(--secondary-color); color: white; }
-        .button-secondary:hover { background-color: var(--secondary-hover-color); }
-        
-        .button-tertiary { background-color: var(--tertiary-color); color: white; }
-        .button-tertiary:hover { background-color: var(--tertiary-hover-color); }
-        
+        .main-action-panel { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
         .main-action-button {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.25em;
-            font-weight: 700;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
         .main-action-button .spinner {
-            display: none; /* Hidden by default */
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            display: none; width: 18px; height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
         }
-        .main-action-button.loading .spinner { display: block; }
-        .main-action-button.loading .button-text { display: none; } /* Hide text when loading */
+        .main-action-button.loading .spinner { display: inline-block; }
+        .main-action-button.loading .btn-text { margin-left: 8px; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .status-message {
-            margin-top: 15px;
-            padding: 12px 18px;
-            border-radius: 6px;
-            font-size: 0.95em;
+        .toggle-switch-container {
             display: flex;
             align-items: center;
             gap: 10px;
-            border: 1px solid transparent;
         }
-        .status-message i { font-size: 1.2em; }
-        .status-message.success { background-color: #e6f9f0; color: #1e8552; border-color: var(--success-color);}
-        .status-message.warning { background-color: #fff9e6; color: #bf880a; border-color: var(--accent-color);}
-        .status-message.error   { background-color: #feebee; color: #c03329; border-color: var(--error-color); }
-        .status-message.info    { background-color: #e7f3fe; color: #2a78b6; border-color: var(--primary-color);}
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px; /* Smaller switch */
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+
+        .status-message {
+            margin-top: 10px; padding: 10px 15px; border-radius: 6px;
+            font-size: 0.9rem; display: flex; align-items: center;
+            gap: 8px; border: 1px solid transparent;
+        }
+        .status-message i { font-size: 1.1em; }
+        .status-message.success { background-color: #e6fff8; color: #008d6e; border-color: var(--success-color); }
+        .status-message.warning { background-color: #fff8e1; color: #c47d00; border-color: var(--warning-color); }
+        .status-message.error   { background-color: #fdecea; color: #c03329; border-color: var(--error-color); }
+        .status-message.info    { background-color: #e7f3fe; color: #357ABD; border-color: var(--info-color); }
 
         .instructions {
-            font-size: 0.9em;
-            color: var(--text-light-color);
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--secondary-color);
-            border-radius: 4px;
+            font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;
+            padding: 10px; background-color: #f8f9fa;
+            border-left: 3px solid var(--secondary-color); border-radius: 4px;
+        }
+        
+        #processingStatusLog ul { list-style-type: none; padding-left: 0; max-height: 150px; overflow-y: auto;}
+        #processingStatusLog li { padding: 4px 0; font-size: 0.85rem; border-bottom: 1px dotted #eee;}
+        #processingStatusLog li:last-child { border-bottom: none; }
+
+        .output-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
         }
 
-        .page-footer {
-            text-align: center;
-            padding: 30px 20px;
-            font-size: 0.95em;
-            color: var(--text-light-color);
-            border-top: 1px solid var(--border-color);
-            margin-top: 50px;
+        .tooltip {
+            position: relative;
+            display: inline-block;
         }
-         .page-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 100px;
+            background-color: #555; color: #fff; text-align: center;
+            border-radius: 6px; padding: 5px 0;
+            position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            margin-left: -50px; opacity: 0; transition: opacity 0.3s;
         }
-        .page-footer a:hover {
-            text-decoration: underline;
+        .tooltip .tooltiptext::after {
+            content: ""; position: absolute; top: 100%; left: 50%;
+            margin-left: -5px; border-width: 5px; border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1;}
+
+        .app-footer {
+            text-align: center; padding: 20px; font-size: 0.9rem;
+            color: var(--text-secondary); border-top: 1px solid var(--border-color); margin-top: 40px;
         }
 
     </style>
 </head>
 <body>
-    <div class="page-title-container">
-        <h1><i class="fas fa-magic-wand-sparkles"></i> Novel Term Extractor v2.0</h1>
-        <p class="subtitle">Parse chapters, deduplicate, and extract terms like a pro!</p>
-    </div>
+    <header class="app-header">
+        <h1><i class="fas fa-rocket"></i> Elite Novel Term Extractor v3.0</h1>
+        <p>Advanced Chapter Parsing, Deduplication, and Custom Output Formatting</p>
+    </header>
 
-    <div class="container">
-        <!-- JSON Input Section -->
-        <div class="card">
-            <div class="card-header"><i class="fas fa-file-code"></i>Chapter Data Input</div>
+    <div class="main-layout">
+        <!-- JSON Input Panel -->
+        <div class="panel json-input-panel">
+            <div class="panel-header"><i class="fas fa-file-alt"></i>Chapter Data Input</div>
             <div class="instructions">
-                Paste JSON data for your chapters below.
-                <strong>Important:</strong> Separate the JSON array of each chapter from the next by leaving <strong>at least one blank line</strong>.
-                Each block will be treated as a separate chapter. IDs within each chapter JSON should start from 0.
+                Paste JSON arrays for chapters below. <strong>Separate each chapter's JSON block with at least one blank line.</strong>
             </div>
-            <label for="jsonInput">Paste Chapters' JSON data here:</label>
-            <textarea id="jsonInput" rows="12" placeholder="[{"id":0, "terms":[...]}, ...] 
+            <div class="form-group">
+                <label for="jsonInput">Chapters' JSON Data:</label>
+                <textarea id="jsonInput" rows="15" placeholder="[{"id":0, "terms":[...]}, ...] 
 
- (Leave a blank line) 
+(Blank line) 
 
- [{"id":0, "terms":[...]}, ...]"></textarea>
+[{"id":0, "terms":[...]}, ...]"></textarea>
+            </div>
             <div id="jsonStatus" class="status-message" style="display:none;"></div>
         </div>
 
-        <!-- Deduplication List Section -->
-        <div class="card">
-            <div class="card-header"><i class="fas fa-filter-circle-xmark"></i>Deduplication List (Optional)</div>
+        <!-- Deduplication List Panel -->
+        <div class="panel deduplication-panel">
+            <div class="panel-header"><i class="fas fa-tasks"></i>Deduplication List (Optional)</div>
             <div class="instructions">
-                Provide an existing list of terms to exclude. Format: <code>raw, translation, gender</code> or <code>raw, translation</code>. Deduplication is based on case-insensitive English translation.
+                Provide an existing list to exclude terms. Format: <code>raw, translation[, gender]</code>. Match is on English translation (case-insensitive).
             </div>
-            
-            <label for="csvFile">Upload CSV file:</label>
-            <div class="file-input-wrapper">
-                <input type="file" id="csvFile" accept=".csv" onchange="updateFileName()">
-                <div class="file-input-button"><i class="fas fa-upload"></i><span id="fileNameDisplay">Choose a .csv file...</span></div>
+            <div class="form-group">
+                <label for="csvFile">Upload CSV file:</label>
+                <div class="file-input-container">
+                    <input type="file" id="csvFile" accept=".csv" onchange="updateFileNameDisplay(this)">
+                    <div class="file-input-display">
+                        <span id="fileNamePlaceholder">Choose a .csv file...</span>
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                </div>
             </div>
-
-            <label for="pastedCsv">Or paste CSV content here:</label>
-            <textarea id="pastedCsv" rows="5" placeholder="大明, Great Ming, Neuter
+            <div class="form-group">
+                <label for="pastedCsv">Or paste CSV content (and copy from here):</label>
+                <textarea id="pastedCsv" rows="7" placeholder="大明, Great Ming, Neuter
 道人, Daoist, Male"></textarea>
-            
-            <div class="button-group">
-                <button onclick="loadExternalList()" class="button-secondary"><i class="fas fa-list-check"></i>Load Deduplication List</button>
-                <button onclick="clearExternalList()" class="button-tertiary"><i class="fas fa-eraser"></i>Clear List</button>
+            </div>
+            <div class="button-row">
+                <button onclick="loadExternalList()" class="btn btn-secondary"><i class="fas fa-list-check"></i>Load List</button>
+                <button onclick="clearExternalList()" class="btn btn-danger"><i class="fas fa-eraser"></i>Clear</button>
+                <div class="tooltip">
+                    <button onclick="copyToClipboard('pastedCsv', 'dedupeTooltip')" class="btn btn-tertiary btn-icon responsive-text">
+                        <i class="fas fa-copy"></i><span class="btn-text">Copy List</span>
+                    </button>
+                    <span class="tooltiptext" id="dedupeTooltip">Copy to clipboard</span>
+                </div>
             </div>
             <div id="externalListStatus" class="status-message" style="margin-top:15px; display:none;"></div>
         </div>
 
-        <!-- Action Button & Processing Status -->
-        <div class="card">
-             <button onclick="processAllData()" class="main-action-button button-primary">
-                <span class="button-text"><i class="fas fa-cogs"></i>Extract Terms</span>
-                <span class="spinner"></span>
-            </button>
-            <div id="processingStatusLog" class="status-message info" style="display:none; margin-top: 20px; flex-direction: column; align-items: flex-start;">
-                <strong>Processing Log:</strong>
-                <ul id="processingSteps" style="list-style-type: none; padding-left: 0; width: 100%;"></ul>
+        <!-- Action and Output Panel -->
+        <div class="panel full-width-panel">
+            <div class="panel-header"><i class="fas fa-cogs"></i>Actions & Results</div>
+            
+            <div class="main-action-panel">
+                <div class="button-row" style="justify-content: space-between; margin-bottom: 20px;">
+                     <button onclick="processAllData()" class="btn btn-primary main-action-button">
+                        <span class="btn-text"><i class="fas fa-bolt"></i>Extract Terms</span>
+                        <span class="spinner"></span>
+                    </button>
+                    <div class="toggle-switch-container">
+                        <label for="addPresetToggle" style="font-size:0.9rem; margin-bottom: 0;">Add Header Preset:</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="addPresetToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
-        </div>
-        
+            <div id="processingStatusLog" class="status-message info" style="display:none; margin-top: 0;">
+                <strong>Processing Log:</strong>
+                <ul id="processingSteps"></ul>
+            </div>
 
-        <!-- Output Section -->
-        <div class="card">
-            <div class="card-header"><i class="fas fa-clipboard-list"></i>Extracted Terms</div>
+            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 25px 0;">
+            
+            <div class="output-actions">
+                <div class="tooltip">
+                    <button onclick="copyToClipboard('outputText', 'outputTooltip')" class="btn btn-tertiary btn-icon responsive-text">
+                        <i class="fas fa-copy"></i><span class="btn-text">Copy Output</span>
+                    </button>
+                    <span class="tooltiptext" id="outputTooltip">Copy to clipboard</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="outputText">Extracted Terms:</label>
+                <textarea id="outputText" rows="15" readonly placeholder="Results will appear here..."></textarea>
+            </div>
             <div id="outputSummary" class="status-message" style="display:none;"></div>
-            <textarea id="outputText" rows="15" readonly placeholder="Extracted terms will appear here..."></textarea>
         </div>
     </div>
 
-    <footer class="page-footer">
-        <p>© 2024 Advanced Term Extractor. Built with <i class="fas fa-heart" style="color: #e74c3c;"></i>. </p>
+    <footer class="app-footer">
+        <p>© 2024 Elite Term Extractor. Precision Engineered.</p>
     </footer>
 
     <script>
         let externalListTranslations = new Set();
+        const PRESET_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."
+ Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`;
+
 
         function displayStatus(elementId, message, type, iconClass = '') {
             const el = document.getElementById(elementId);
-            const iconHtml = iconClass ? `<i class="fas ${iconClass}"></i>` : '';
+            const iconHtml = iconClass ? `<i class="fas ${iconClass}" style="margin-right:5px;"></i>` : '';
             el.innerHTML = `${iconHtml} ${message}`;
             el.className = 'status-message ' + type;
             el.style.display = 'flex';
@@ -355,39 +422,37 @@
             el.style.display = 'none';
         }
 
-        function updateFileName() {
-            const fileInput = document.getElementById('csvFile');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
+        function updateFileNameDisplay(fileInput) {
+            const placeholder = document.getElementById('fileNamePlaceholder');
             if (fileInput.files.length > 0) {
-                fileNameDisplay.textContent = fileInput.files[0].name;
+                placeholder.textContent = fileInput.files[0].name;
+                placeholder.style.color = 'var(--text-primary)';
             } else {
-                fileNameDisplay.innerHTML = '<i class="fas fa-upload"></i>Choose a .csv file...';
+                placeholder.textContent = 'Choose a .csv file...';
+                placeholder.style.color = 'var(--text-secondary)';
             }
         }
         
         function addProcessingStep(message, type = 'info') {
             const logContainer = document.getElementById('processingStatusLog');
-            logContainer.style.display = 'block';
+            logContainer.style.display = 'block'; // Ensure it's visible
             const stepsList = document.getElementById('processingSteps');
             const listItem = document.createElement('li');
             
-            let icon = 'fa-info-circle'; // default
-            if (type === 'success') icon = 'fa-check-circle';
-            else if (type === 'error') icon = 'fa-times-circle';
-            else if (type === 'warning') icon = 'fa-exclamation-triangle';
+            let icon = 'fa-info-circle'; 
+            let color = 'var(--info-color)';
+            if (type === 'success') { icon = 'fa-check-circle'; color = 'var(--success-color)'; }
+            else if (type === 'error') { icon = 'fa-times-circle'; color = 'var(--error-color)'; }
+            else if (type === 'warning') { icon = 'fa-exclamation-triangle'; color = 'var(--warning-color)'; }
 
-            listItem.innerHTML = `<i class="fas ${icon}" style="margin-right: 8px; color: var(--${type}-color, var(--primary-color));"></i> ${message}`;
-            listItem.style.padding = '5px 0';
-            listItem.style.borderBottom = '1px dashed #eee';
-            listItem.style.color = (type === 'error' || type === 'warning') ? `var(--${type}-color)`: 'inherit';
+            listItem.innerHTML = `<i class="fas ${icon}" style="margin-right: 8px; color: ${color};"></i> ${message}`;
             stepsList.appendChild(listItem);
+            stepsList.scrollTop = stepsList.scrollHeight; // Auto-scroll
         }
 
         function clearProcessingLog() {
-            const logContainer = document.getElementById('processingStatusLog');
-            const stepsList = document.getElementById('processingSteps');
-            stepsList.innerHTML = '';
-            logContainer.style.display = 'none';
+            document.getElementById('processingSteps').innerHTML = '';
+            hideStatus('processingStatusLog');
         }
 
 
@@ -413,46 +478,43 @@
                 });
 
                 if (count > 0) {
-                    displayStatus('externalListStatus', `${count} terms loaded for deduplication. ${invalidLines > 0 ? invalidLines + ' invalid lines skipped.' : ''}`, 'success', 'fa-check-circle');
+                    displayStatus('externalListStatus', `${count} terms loaded. ${invalidLines > 0 ? invalidLines + ' invalid lines.' : ''}`, 'success', 'fa-check-circle');
                 } else if (csvContent.trim() !== '' && invalidLines > 0) {
-                     displayStatus('externalListStatus', 'No valid terms found. All lines were invalid (expected format: raw,translation[,gender]).', 'warning', 'fa-exclamation-triangle');
+                     displayStatus('externalListStatus', 'No valid terms. Format: raw,translation[,gender].', 'warning', 'fa-exclamation-triangle');
                 } else if (csvContent.trim() !== '') {
-                     displayStatus('externalListStatus', 'Deduplication list provided but no valid terms found or all lines were empty.', 'warning', 'fa-exclamation-triangle');
+                     displayStatus('externalListStatus', 'Dedupe list empty or invalid.', 'warning', 'fa-exclamation-triangle');
                 }
                 else {
-                    displayStatus('externalListStatus', 'Deduplication list is empty or no content provided.', 'info', 'fa-info-circle');
+                    displayStatus('externalListStatus', 'Dedupe list empty.', 'info', 'fa-info-circle');
                 }
             };
 
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                if (file.type !== "text/csv" && !file.name.endsWith(".csv") && file.type !== "application/vnd.ms-excel") { // Some systems might report excel for CSV
-                     displayStatus('externalListStatus', 'Invalid file type. Please upload a .csv file.', 'error', 'fa-times-circle');
+                if (file.type !== "text/csv" && !file.name.endsWith(".csv") && file.type !== "application/vnd.ms-excel") {
+                     displayStatus('externalListStatus', 'Invalid file type. Use .csv.', 'error', 'fa-times-circle');
                      fileInput.value = ''; 
-                     updateFileName();
+                     updateFileNameDisplay(fileInput);
                      return;
                 }
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    processCsvContent(event.target.result);
-                };
-                reader.onerror = function() {
-                    displayStatus('externalListStatus', 'Error reading file.', 'error', 'fa-times-circle');
-                }
+                reader.onload = (event) => processCsvContent(event.target.result);
+                reader.onerror = () => displayStatus('externalListStatus', 'Error reading file.', 'error', 'fa-times-circle');
                 reader.readAsText(file);
             } else if (pastedCsv.trim() !== '') {
                 processCsvContent(pastedCsv);
             } else {
-                displayStatus('externalListStatus', 'No deduplication list provided (select a file or paste content).', 'info', 'fa-info-circle');
+                displayStatus('externalListStatus', 'No dedupe list provided.', 'info', 'fa-info-circle');
             }
         }
 
         function clearExternalList() {
             externalListTranslations.clear();
-            document.getElementById('csvFile').value = ''; 
+            const fileInput = document.getElementById('csvFile');
+            fileInput.value = ''; 
+            updateFileNameDisplay(fileInput);
             document.getElementById('pastedCsv').value = ''; 
-            updateFileName();
-            displayStatus('externalListStatus', 'Deduplication list cleared.', 'info', 'fa-eraser');
+            displayStatus('externalListStatus', 'Dedupe list cleared.', 'info', 'fa-eraser');
         }
 
         async function processAllData() {
@@ -460,8 +522,8 @@
             extractButton.classList.add('loading');
             extractButton.disabled = true;
 
-            clearProcessingLog(); // Clear previous log
-            addProcessingStep("Starting term extraction process...");
+            clearProcessingLog();
+            addProcessingStep("Initializing extraction...");
 
             const jsonInputString = document.getElementById('jsonInput').value;
             const outputTextarea = document.getElementById('outputText');
@@ -471,73 +533,55 @@
             hideStatus('outputSummary');
 
             if (!jsonInputString.trim()) {
-                displayStatus('jsonStatus', "Input JSON is empty.", 'warning', 'fa-exclamation-triangle');
-                addProcessingStep("JSON input is empty. Aborting.", 'error');
-                extractButton.classList.remove('loading');
-                extractButton.disabled = false;
-                return;
+                displayStatus('jsonStatus', "JSON input is empty.", 'warning', 'fa-exclamation-triangle');
+                addProcessingStep("JSON input empty. Aborted.", 'error');
+                finalizeExtraction(extractButton); return;
             }
 
-            // Split chapters by one or more blank lines
             const chapterJsonStrings = jsonInputString.split(/\n\s*\n/).filter(s => s.trim() !== "");
-            addProcessingStep(`Detected ${chapterJsonStrings.length} potential chapter(s).`);
+            addProcessingStep(`Detected ${chapterJsonStrings.length} chapter block(s).`);
 
             if (chapterJsonStrings.length === 0) {
-                displayStatus('jsonStatus', "No chapter JSON blocks found. Ensure chapters are separated by blank lines.", 'warning', 'fa-exclamation-triangle');
-                addProcessingStep("No chapter JSON blocks found after splitting. Aborting.", 'error');
-                extractButton.classList.remove('loading');
-                extractButton.disabled = false;
-                return;
+                displayStatus('jsonStatus', "No chapter blocks found (separate by blank lines).", 'warning', 'fa-exclamation-triangle');
+                addProcessingStep("No chapter blocks. Aborted.", 'error');
+                finalizeExtraction(extractButton); return;
             }
 
             let allChunks = [];
-            let chaptersProcessed = 0;
-            let totalChunksProcessed = 0;
+            let chaptersSuccessfullyParsed = 0;
 
             for (let i = 0; i < chapterJsonStrings.length; i++) {
                 const chapterStr = chapterJsonStrings[i];
                 addProcessingStep(`Parsing Chapter ${i + 1}...`);
-                await new Promise(resolve => setTimeout(resolve, 50)); // Simulate work / allow UI update
+                await new Promise(resolve => setTimeout(resolve, 20)); 
 
                 try {
                     const parsedChapter = JSON.parse(chapterStr);
                     if (!Array.isArray(parsedChapter)) {
-                        addProcessingStep(`Chapter ${i + 1} data is not a valid JSON array. Skipping.`, 'error');
-                        continue;
+                        addProcessingStep(`Chapter ${i + 1} not a JSON array. Skipped.`, 'error'); continue;
                     }
-                    
-                    // Validate chunk structure a bit (optional, but good)
-                    const firstChunk = parsedChapter[0];
+                     const firstChunk = parsedChapter[0];
                     if (parsedChapter.length > 0 && (typeof firstChunk !== 'object' || firstChunk === null || !('id' in firstChunk) || !Array.isArray(firstChunk.terms))) {
-                        addProcessingStep(`Chapter ${i+1} has an unexpected chunk structure. Skipping.`, 'warning');
-                        continue;
+                        addProcessingStep(`Chapter ${i+1} chunk structure error. Skipped.`, 'warning'); continue;
                     }
-
                     allChunks.push(...parsedChapter);
-                    chaptersProcessed++;
-                    totalChunksProcessed += parsedChapter.length;
-                    addProcessingStep(`Chapter ${i + 1} parsed successfully (${parsedChapter.length} chunks).`, 'success');
-
+                    chaptersSuccessfullyParsed++;
+                    addProcessingStep(`Chapter ${i + 1} parsed (${parsedChapter.length} chunks).`, 'success');
                 } catch (error) {
-                    addProcessingStep(`Error parsing Chapter ${i + 1} JSON: ${error.message}. Skipping.`, 'error');
+                    addProcessingStep(`Error in Chapter ${i + 1} JSON: ${error.message}. Skipped.`, 'error');
                 }
             }
             
-            if (chaptersProcessed === 0 && chapterJsonStrings.length > 0) {
-                 displayStatus('jsonStatus', `Could not parse any of the ${chapterJsonStrings.length} chapter blocks successfully. Check JSON format.`, 'error', 'fa-times-circle');
-                 addProcessingStep("Failed to parse any chapter data. Aborting.", 'error');
-                 extractButton.classList.remove('loading');
-                 extractButton.disabled = false;
-                 return;
+            if (chaptersSuccessfullyParsed === 0 && chapterJsonStrings.length > 0) {
+                 displayStatus('jsonStatus', `Failed to parse any chapter blocks.`, 'error', 'fa-times-circle');
+                 addProcessingStep("All chapter parsing failed. Aborted.", 'error');
+                 finalizeExtraction(extractButton); return;
             }
-            addProcessingStep(`Successfully processed ${chaptersProcessed} chapter(s) with a total of ${totalChunksProcessed} chunks.`, 'success');
+            addProcessingStep(`${chaptersSuccessfullyParsed} chapter(s) processed. Extracting terms...`);
+            await new Promise(resolve => setTimeout(resolve, 20)); 
 
-
-            const extractedTerms = [];
+            const extractedTermsList = [];
             const seenTranslationsInJson = new Set(); 
-            addProcessingStep("Deduplicating and extracting terms...");
-            await new Promise(resolve => setTimeout(resolve, 50)); 
-
 
             allChunks.forEach(chunk => {
                 if (chunk && Array.isArray(chunk.terms)) {
@@ -547,43 +591,92 @@
                             const translation = term.translation;
                             const translationKey = translation.toLowerCase();
 
-                            if (externalListTranslations.has(translationKey)) {
-                                return; 
-                            }
-                            if (seenTranslationsInJson.has(translationKey)) {
-                                return; 
-                            }
-                            seenTranslationsInJson.add(translationKey);
+                            if (externalListTranslations.has(translationKey) || seenTranslationsInJson.has(translationKey)) return; 
                             
+                            seenTranslationsInJson.add(translationKey);
                             let gender = "Neuter";
                             if (Array.isArray(term.tags)) {
-                                if (term.tags.includes("#male")) {
-                                    gender = "Male";
-                                } else if (term.tags.includes("#female")) {
-                                    gender = "Female";
-                                }
+                                if (term.tags.includes("#male")) gender = "Male";
+                                else if (term.tags.includes("#female")) gender = "Female";
                             }
-                            extractedTerms.push(`${raw}, ${translation}, ${gender}`);
+                            extractedTermsList.push(`${raw}, ${translation}, ${gender}`);
                         }
                     });
                 }
             });
-
-            if (extractedTerms.length > 0) {
-                outputTextarea.value = extractedTerms.join('\n');
-                displayStatus('outputSummary', `Extraction complete! ${chaptersProcessed} chapter(s) processed. ${extractedTerms.length} unique terms extracted.`, 'success', 'fa-magic-wand-sparkles');
-                addProcessingStep(`Extraction complete: ${extractedTerms.length} unique terms found.`, 'success');
-
-            } else {
-                outputTextarea.value = ""; 
-                displayStatus('outputSummary', `Extraction complete. ${chaptersProcessed} chapter(s) processed. No new unique terms found based on current criteria.`, 'info', 'fa-info-circle');
-                addProcessingStep("No new unique terms found.", 'info');
-            }
             
-            extractButton.classList.remove('loading');
-            extractButton.disabled = false;
+            let finalOutputString = "";
+            if (document.getElementById('addPresetToggle').checked) {
+                finalOutputString += PRESET_TEXT + "\n\n";
+                 addProcessingStep("Preset header added.", 'info');
+            }
+
+            if (extractedTermsList.length > 0) {
+                finalOutputString += extractedTermsList.join('\n');
+                outputTextarea.value = finalOutputString;
+                displayStatus('outputSummary', `Extraction Complete! ${extractedTermsList.length} unique terms.`, 'success', 'fa-check-double');
+                addProcessingStep(`Extracted ${extractedTermsList.length} unique terms.`, 'success');
+            } else {
+                if (document.getElementById('addPresetToggle').checked) { // If only preset is there
+                     outputTextarea.value = finalOutputString;
+                }
+                displayStatus('outputSummary', `Processed ${chaptersSuccessfullyParsed} chapter(s). No new unique terms found.`, 'info', 'fa-info-circle');
+                addProcessingStep("No new unique terms.", 'info');
+            }
+            finalizeExtraction(extractButton);
         }
 
+        function finalizeExtraction(button) {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+
+        function copyToClipboard(elementId, tooltipId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    const tooltip = document.getElementById(tooltipId);
+                    const originalText = tooltip.textContent;
+                    tooltip.textContent = "Copied!";
+                    setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                }).catch(err => {
+                    console.error('Fallback: Oops, unable to copy via navigator.clipboard', err);
+                     // Fallback for older browsers (less reliable)
+                    try {
+                        document.execCommand('copy');
+                        const tooltip = document.getElementById(tooltipId);
+                        const originalText = tooltip.textContent;
+                        tooltip.textContent = "Copied!";
+                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                    } catch (execErr) {
+                        console.error('Fallback execCommand: Oops, unable to copy', execErr);
+                        const tooltip = document.getElementById(tooltipId);
+                        const originalText = tooltip.textContent;
+                        tooltip.textContent = "Copy Failed!";
+                        setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                    }
+                });
+            } catch (e) {
+                console.error('Error with navigator.clipboard: ', e);
+                 // Fallback for older browsers or environments without navigator.clipboard
+                 try {
+                    document.execCommand('copy');
+                    const tooltip = document.getElementById(tooltipId);
+                    const originalText = tooltip.textContent;
+                    tooltip.textContent = "Copied!";
+                    setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                } catch (execErr) {
+                    console.error('Fallback execCommand: Oops, unable to copy', execErr);
+                    const tooltip = document.getElementById(tooltipId);
+                    const originalText = tooltip.textContent;
+                    tooltip.textContent = "Copy Failed!";
+                    setTimeout(() => { tooltip.textContent = originalText; }, 1500);
+                }
+            }
+        }
     </script>
 </body>
 </html>
