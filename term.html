@@ -3,97 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Term Extractor</title>
+    <title>Advanced Novel Term Extractor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #007bff; /* A vibrant blue */
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d; /* A calm grey */
+            --background-color: #f0f2f5; /* Light greyish blue */
+            --card-background-color: #ffffff;
+            --text-color: #333;
+            --text-light-color: #555;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+            --font-family: 'Poppins', sans-serif;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 8px;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        textarea {
-            width: 98%;
-            min-height: 200px;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), #005cb2);
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            padding: 25px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 600;
         }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background-color: var(--card-background-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light-color);
         }
-        .output-container {
+
+        textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            background-color: #fdfdfd;
+        }
+        
+        input[type="file"] {
+            padding: 10px; /* Slightly different padding for file input */
+        }
+
+        textarea:focus, input[type="file"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            outline: none;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-1px);
+        }
+        
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+        button.secondary:hover {
+            background-color: #545b62;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px; /* Spacing between buttons */
+            margin-top: 10px;
+        }
+
+        .main-action-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
             margin-top: 20px;
         }
-        .error {
-            color: red;
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9em;
         }
+        .status-message.success { background-color: #e9f7ef; color: var(--success-color); border: 1px solid var(--success-color);}
+        .status-message.warning { background-color: #fff8e1; color: #c47d00; border: 1px solid var(--warning-color); }
+        .status-message.error { background-color: #fdecea; color: var(--error-color); border: 1px solid var(--error-color); }
+        .status-message.info { background-color: #e7f3fe; color: var(--primary-color); border: 1px solid var(--primary-color); }
+
+
+        .instructions {
+            font-size: 0.9em;
+            color: var(--text-light-color);
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: var(--text-light-color);
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
     </style>
 </head>
 <body>
 
+    <header class="page-header">
+        <h1>Advanced Novel Term Extractor</h1>
+    </header>
+
     <div class="container">
-        <h1>Novel Term Extractor</h1>
+        <!-- JSON Input Section -->
+        <div class="card">
+            <div class="card-header">1. JSON Data Input</div>
+            <div class="instructions">
+                Paste your JSON data containing chapter chunks. The JSON should be an array of chunk objects.
+                If you have multiple chapters, you can either concatenate their chunk arrays into one large array,
+                or provide an array of these chapter arrays (e.g., <code>[ [ch1_chunks], [ch2_chunks] ]</code>).
+            </div>
+            <label for="jsonInput">Paste JSON here:</label>
+            <textarea id="jsonInput" rows="10" placeholder="[{"id":0, "terms":[...]}, ...]"></textarea>
+            <div id="jsonError" class="status-message" style="display:none;"></div>
+        </div>
 
-        <label for="jsonInput">Paste your JSON data here:</label>
-        <p style="font-size:0.9em; color: #555;">
-            The JSON should be an array of chunk objects. If you have multiple chapters,
-            you can either concatenate their chunk arrays into one large array, or provide an array of these chapter arrays
-            (e.g., <code>[ [chapter1_chunk1, chapter1_chunk2,...], [chapter2_chunk1, chapter2_chunk2,...] ]</code>).
-        </p>
-        <textarea id="jsonInput" placeholder="Paste your JSON array of chunks here..."></textarea>
+        <!-- Deduplication List Section -->
+        <div class="card">
+            <div class="card-header">2. Deduplication List (Optional)</div>
+            <div class="instructions">
+                Provide an existing list of terms to exclude from the extraction.
+                Format: <code>raw, translation, gender</code> or <code>raw, translation</code> (gender defaults to Neuter).
+                Deduplication is based on case-insensitive matching of the English translation.
+            </div>
+            <label for="csvFile">Upload CSV file:</label>
+            <input type="file" id="csvFile" accept=".csv">
 
-        <button onclick="processJson()">Extract Terms</button>
+            <label for="pastedCsv">Or paste CSV content here:</label>
+            <textarea id="pastedCsv" rows="5" placeholder="大明, Great Ming, Neuter
+道人, Daoist, Male"></textarea>
+            
+            <div class="button-group">
+                <button onclick="loadExternalList()">Load Deduplication List</button>
+                <button class="secondary" onclick="clearExternalList()">Clear List</button>
+            </div>
+            <div id="externalListStatus" class="status-message" style="margin-top:15px; display:none;"></div>
+        </div>
 
-        <div class="output-container">
-            <label for="outputText">Extracted Terms:</label>
-            <div id="errorMessage" class="error"></div>
-            <textarea id="outputText" readonly placeholder="Extracted terms will appear here..."></textarea>
+        <!-- Action Button -->
+        <div class="card">
+             <button onclick="processJson()" class="main-action-button">Extract Terms</button>
+        </div>
+
+        <!-- Output Section -->
+        <div class="card">
+            <div class="card-header">3. Extracted Terms</div>
+            <label for="outputText">Results:</label>
+            <div id="outputStatus" class="status-message" style="display:none;"></div>
+            <textarea id="outputText" rows="15" readonly placeholder="Extracted terms will appear here..."></textarea>
         </div>
     </div>
 
+    <footer class="page-footer">
+        <p>© 2024 Term Extractor Tool. Use wisely!</p>
+    </footer>
+
     <script>
+        let externalListTranslations = new Set();
+
+        function displayMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'status-message ' + type; // Reset classes and add new type
+            el.style.display = 'block';
+        }
+        
+        function hideMessage(elementId) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'none';
+        }
+
+        function loadExternalList() {
+            const fileInput = document.getElementById('csvFile');
+            const pastedCsv = document.getElementById('pastedCsv').value;
+            const statusEl = document.getElementById('externalListStatus');
+            
+            externalListTranslations.clear(); // Clear previous list
+
+            const processCsvContent = (csvContent) => {
+                const lines = csvContent.split('\n');
+                let count = 0;
+                let invalidLines = 0;
+                lines.forEach(line => {
+                    if (line.trim() === '') return; // Skip empty lines
+                    const parts = line.split(',').map(part => part.trim());
+                    if (parts.length >= 2 && parts[1]) { // Ensure there's a translation
+                        externalListTranslations.add(parts[1].toLowerCase());
+                        count++;
+                    } else {
+                        invalidLines++;
+                    }
+                });
+
+                if (count > 0) {
+                    displayMessage('externalListStatus', `${count} terms loaded for deduplication. ${invalidLines > 0 ? invalidLines + ' invalid lines skipped.' : ''}`, 'success');
+                } else if (csvContent.trim() !== '' && invalidLines > 0) {
+                     displayMessage('externalListStatus', 'No valid terms found. All lines were invalid (expected format: raw,translation[,gender]).', 'warning');
+                } else if (csvContent.trim() !== '') {
+                     displayMessage('externalListStatus', 'Deduplication list provided but no valid terms found or all lines were empty.', 'warning');
+                }
+                else {
+                    displayMessage('externalListStatus', 'Deduplication list is empty.', 'info');
+                }
+            };
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
+                     displayMessage('externalListStatus', 'Invalid file type. Please upload a .csv file.', 'error');
+                     fileInput.value = ''; // Reset file input
+                     return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    processCsvContent(event.target.result);
+                };
+                reader.onerror = function() {
+                    displayMessage('externalListStatus', 'Error reading file.', 'error');
+                }
+                reader.readAsText(file);
+            } else if (pastedCsv.trim() !== '') {
+                processCsvContent(pastedCsv);
+            } else {
+                displayMessage('externalListStatus', 'No deduplication list provided (select a file or paste content).', 'info');
+            }
+        }
+
+        function clearExternalList() {
+            externalListTranslations.clear();
+            document.getElementById('csvFile').value = ''; // Clear file input
+            document.getElementById('pastedCsv').value = ''; // Clear textarea
+            displayMessage('externalListStatus', 'Deduplication list cleared.', 'info');
+        }
+
         function processJson() {
             const jsonString = document.getElementById('jsonInput').value;
             const outputTextarea = document.getElementById('outputText');
-            const errorMessageDiv = document.getElementById('errorMessage');
             
             outputTextarea.value = ''; // Clear previous output
-            errorMessageDiv.textContent = ''; // Clear previous error
+            hideMessage('jsonError');
+            hideMessage('outputStatus');
 
             if (!jsonString.trim()) {
-                errorMessageDiv.textContent = "Input JSON is empty.";
+                displayMessage('jsonError', "Input JSON is empty.", 'warning');
                 return;
             }
 
@@ -101,32 +326,28 @@
             try {
                 const parsedJson = JSON.parse(jsonString);
                 if (!Array.isArray(parsedJson)) {
-                    errorMessageDiv.textContent = "The root of the JSON must be an array.";
+                    displayMessage('jsonError', "The root of the JSON must be an array.", 'error');
                     return;
                 }
 
-                // Handle both flat array of chunks and array of chapter-chunk-arrays
-                if (parsedJson.length > 0 && Array.isArray(parsedJson[0]) && parsedJson[0].length > 0 && typeof parsedJson[0][0].id !== 'undefined') {
-                    // Input is likely an array of chapter arrays: [[chapter1_chunks], [chapter2_chunks]]
+                if (parsedJson.length > 0 && Array.isArray(parsedJson[0]) && parsedJson[0].length > 0 && typeof parsedJson[0][0] === 'object' && parsedJson[0][0] !== null && 'id' in parsedJson[0][0]) {
                     allChunks = parsedJson.flat();
-                } else if (parsedJson.length > 0 && typeof parsedJson[0].id !== 'undefined' && Array.isArray(parsedJson[0].terms)) {
-                    // Input is likely a flat array of all chunks
+                } else if (parsedJson.length > 0 && typeof parsedJson[0] === 'object' && parsedJson[0] !== null && 'id' in parsedJson[0] && Array.isArray(parsedJson[0].terms)) {
                     allChunks = parsedJson;
                 } else if (parsedJson.length === 0) {
-                     allChunks = []; // Empty array is valid
-                }
-                else {
-                     errorMessageDiv.textContent = "JSON structure not recognized. Expected an array of chunks or an array of chapter-chunk-arrays.";
-                     return;
+                    allChunks = [];
+                } else {
+                    displayMessage('jsonError', "JSON structure not recognized. Expected an array of chunks or an array of chapter-chunk-arrays.", 'error');
+                    return;
                 }
 
             } catch (error) {
-                errorMessageDiv.textContent = "Invalid JSON: " + error.message;
+                displayMessage('jsonError', "Invalid JSON: " + error.message, 'error');
                 return;
             }
 
             const extractedTerms = [];
-            const seenTranslations = new Set(); // To store lowercase English translations for deduplication
+            const seenTranslationsInJson = new Set(); // For deduplication within the JSON itself
 
             allChunks.forEach(chunk => {
                 if (chunk && Array.isArray(chunk.terms)) {
@@ -134,8 +355,22 @@
                         if (term && typeof term.raw === 'string' && typeof term.translation === 'string') {
                             const raw = term.raw;
                             const translation = term.translation;
-                            let gender = "Neuter"; // Default
+                            const translationKey = translation.toLowerCase();
 
+                            // 1. Check against external list first
+                            if (externalListTranslations.has(translationKey)) {
+                                return; // Skip this term, it's in the external deduplication list
+                            }
+
+                            // 2. Check for duplicates from JSON processing (if not in external list)
+                            if (seenTranslationsInJson.has(translationKey)) {
+                                return; // Skip this term, it's a duplicate from within the JSON itself
+                            }
+
+                            // If not in external list and not yet seen from JSON, process it
+                            seenTranslationsInJson.add(translationKey);
+                            
+                            let gender = "Neuter";
                             if (Array.isArray(term.tags)) {
                                 if (term.tags.includes("#male")) {
                                     gender = "Male";
@@ -143,13 +378,7 @@
                                     gender = "Female";
                                 }
                             }
-
-                            // Deduplication: check against lowercase translation
-                            const translationKey = translation.toLowerCase();
-                            if (!seenTranslations.has(translationKey)) {
-                                seenTranslations.add(translationKey);
-                                extractedTerms.push(`${raw}, ${translation}, ${gender}`);
-                            }
+                            extractedTerms.push(`${raw}, ${translation}, ${gender}`);
                         }
                     });
                 }
@@ -157,8 +386,10 @@
 
             if (extractedTerms.length > 0) {
                 outputTextarea.value = extractedTerms.join('\n');
+                displayMessage('outputStatus', `Successfully extracted ${extractedTerms.length} unique terms.`, 'success');
             } else {
-                outputTextarea.value = "No valid terms found to extract.";
+                outputTextarea.value = ""; // Clear if no terms
+                displayMessage('outputStatus', "No new unique terms found to extract based on current criteria.", 'info');
             }
         }
     </script>
