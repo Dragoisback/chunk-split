@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Term Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        textarea {
+            width: 98%;
+            min-height: 200px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .output-container {
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Novel Term Extractor</h1>
+
+        <label for="jsonInput">Paste your JSON data here:</label>
+        <p style="font-size:0.9em; color: #555;">
+            The JSON should be an array of chunk objects. If you have multiple chapters,
+            you can either concatenate their chunk arrays into one large array, or provide an array of these chapter arrays
+            (e.g., <code>[ [chapter1_chunk1, chapter1_chunk2,...], [chapter2_chunk1, chapter2_chunk2,...] ]</code>).
+        </p>
+        <textarea id="jsonInput" placeholder="Paste your JSON array of chunks here..."></textarea>
+
+        <button onclick="processJson()">Extract Terms</button>
+
+        <div class="output-container">
+            <label for="outputText">Extracted Terms:</label>
+            <div id="errorMessage" class="error"></div>
+            <textarea id="outputText" readonly placeholder="Extracted terms will appear here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        function processJson() {
+            const jsonString = document.getElementById('jsonInput').value;
+            const outputTextarea = document.getElementById('outputText');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            
+            outputTextarea.value = ''; // Clear previous output
+            errorMessageDiv.textContent = ''; // Clear previous error
+
+            if (!jsonString.trim()) {
+                errorMessageDiv.textContent = "Input JSON is empty.";
+                return;
+            }
+
+            let allChunks = [];
+            try {
+                const parsedJson = JSON.parse(jsonString);
+                if (!Array.isArray(parsedJson)) {
+                    errorMessageDiv.textContent = "The root of the JSON must be an array.";
+                    return;
+                }
+
+                // Handle both flat array of chunks and array of chapter-chunk-arrays
+                if (parsedJson.length > 0 && Array.isArray(parsedJson[0]) && parsedJson[0].length > 0 && typeof parsedJson[0][0].id !== 'undefined') {
+                    // Input is likely an array of chapter arrays: [[chapter1_chunks], [chapter2_chunks]]
+                    allChunks = parsedJson.flat();
+                } else if (parsedJson.length > 0 && typeof parsedJson[0].id !== 'undefined' && Array.isArray(parsedJson[0].terms)) {
+                    // Input is likely a flat array of all chunks
+                    allChunks = parsedJson;
+                } else if (parsedJson.length === 0) {
+                     allChunks = []; // Empty array is valid
+                }
+                else {
+                     errorMessageDiv.textContent = "JSON structure not recognized. Expected an array of chunks or an array of chapter-chunk-arrays.";
+                     return;
+                }
+
+            } catch (error) {
+                errorMessageDiv.textContent = "Invalid JSON: " + error.message;
+                return;
+            }
+
+            const extractedTerms = [];
+            const seenTranslations = new Set(); // To store lowercase English translations for deduplication
+
+            allChunks.forEach(chunk => {
+                if (chunk && Array.isArray(chunk.terms)) {
+                    chunk.terms.forEach(term => {
+                        if (term && typeof term.raw === 'string' && typeof term.translation === 'string') {
+                            const raw = term.raw;
+                            const translation = term.translation;
+                            let gender = "Neuter"; // Default
+
+                            if (Array.isArray(term.tags)) {
+                                if (term.tags.includes("#male")) {
+                                    gender = "Male";
+                                } else if (term.tags.includes("#female")) {
+                                    gender = "Female";
+                                }
+                            }
+
+                            // Deduplication: check against lowercase translation
+                            const translationKey = translation.toLowerCase();
+                            if (!seenTranslations.has(translationKey)) {
+                                seenTranslations.add(translationKey);
+                                extractedTerms.push(`${raw}, ${translation}, ${gender}`);
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (extractedTerms.length > 0) {
+                outputTextarea.value = extractedTerms.join('\n');
+            } else {
+                outputTextarea.value = "No valid terms found to extract.";
+            }
+        }
+    </script>
+
+</body>
+</html>
