@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Weaver Studio</title>
+    <title>Story Weaver Studio (Debug Mode)</title>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
     <style>
         :root {
@@ -172,7 +172,6 @@
             transform: translateY(1px);
         }
 
-        /* Control button specifics */
         .item-controls button.move-up, .item-controls button.move-down {
             background-color: #e0e0e0;
             color: var(--text-color);
@@ -210,9 +209,9 @@
         
         .generate-clear-actions {
             display: flex;
-            justify-content: space-between; /* Or center, or end */
-            gap: 15px; /* Adjust as needed */
-            margin-top: 10px; /* Spacing from "Add" buttons if they are separate */
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 10px;
         }
 
 
@@ -249,7 +248,7 @@
 
     <div class="app-container">
         <header class="app-header">
-            <h1>Story Weaver Studio</h1>
+            <h1>Story Weaver Studio (Debug Mode)</h1>
             <p>Craft chapters or combine documents into a single masterpiece.</p>
         </header>
 
@@ -296,7 +295,12 @@
     </div>
 
     <script>
+        // DEBUGGING ALERTS: Remove these once the issue is resolved.
+        alert("Script loaded. DOMContentLoaded listener will be set up.");
+
         document.addEventListener('DOMContentLoaded', () => {
+            alert("DOMContentLoaded event fired. Initializing app...");
+
             // DOM Elements
             const mode1Btn = document.getElementById('mode1-btn');
             const mode2Btn = document.getElementById('mode2-btn');
@@ -311,34 +315,49 @@
             const generateDocBtn = document.getElementById('generate-doc-btn');
             const clearAllBtn = document.getElementById('clear-all-btn');
 
+            // --- Check if crucial elements exist ---
+            if (!addChapterBtn) alert("DEBUG: addChapterBtn is NULL!");
+            if (!chaptersList) alert("DEBUG: chaptersList is NULL!");
+            if (!addDocumentBtn) alert("DEBUG: addDocumentBtn is NULL!");
+            if (!documentsList) alert("DEBUG: documentsList is NULL!");
+
+
             let currentMode = 'mode1';
 
             // --- Mode Switching ---
             function switchMode(newMode) {
+                alert(`Switching to mode: ${newMode}`);
                 currentMode = newMode;
                 mode1Btn.classList.toggle('active', newMode === 'mode1');
                 mode2Btn.classList.toggle('active', newMode === 'mode2');
                 mode1Content.classList.toggle('active', newMode === 'mode1');
                 mode2Content.classList.toggle('active', newMode === 'mode2');
 
-                // Add an initial box if the respective list is empty
                 if (newMode === 'mode1' && chaptersList.children.length === 0) {
+                    alert("Mode 1 active and chaptersList is empty. Creating initial chapter box.");
                     createItemBox('chapter', chaptersList);
                 } else if (newMode === 'mode2' && documentsList.children.length === 0) {
+                     alert("Mode 2 active and documentsList is empty. Creating initial document box.");
                     createItemBox('document', documentsList);
                 }
             }
 
-            mode1Btn.addEventListener('click', () => switchMode('mode1'));
-            mode2Btn.addEventListener('click', () => switchMode('mode2'));
+            if (mode1Btn) mode1Btn.addEventListener('click', () => switchMode('mode1')); else alert("DEBUG: mode1Btn not found for listener.");
+            if (mode2Btn) mode2Btn.addEventListener('click', () => switchMode('mode2')); else alert("DEBUG: mode2Btn not found for listener.");
 
             // --- Item Box Creation & Management ---
             function createItemBox(type, container) {
+                alert(`createItemBox called. Type: ${type}. Container exists: ${!!container}`);
+                if (!container) {
+                    alert("CRITICAL ERROR in createItemBox: Container is null or undefined. Cannot add item box.");
+                    return; 
+                }
+
                 const itemId = `${type}-${Date.now()}`;
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('item-container');
                 itemDiv.id = itemId;
-                itemDiv.setAttribute('draggable', 'true'); // For potential future drag-and-drop
+                itemDiv.setAttribute('draggable', 'true');
 
                 const textarea = document.createElement('textarea');
                 textarea.placeholder = (type === 'chapter')
@@ -349,19 +368,19 @@
                 controlsDiv.classList.add('item-controls');
 
                 const moveUpBtn = document.createElement('button');
-                moveUpBtn.innerHTML = '<span>▲</span> Up'; // Unicode Up Arrow
+                moveUpBtn.innerHTML = '<span>▲</span> Up';
                 moveUpBtn.classList.add('move-up');
                 moveUpBtn.title = "Move Up";
                 moveUpBtn.onclick = () => moveItem(itemDiv, 'up');
 
                 const moveDownBtn = document.createElement('button');
-                moveDownBtn.innerHTML = '<span>▼</span> Down'; // Unicode Down Arrow
+                moveDownBtn.innerHTML = '<span>▼</span> Down';
                 moveDownBtn.classList.add('move-down');
                 moveDownBtn.title = "Move Down";
                 moveDownBtn.onclick = () => moveItem(itemDiv, 'down');
 
                 const removeBtn = document.createElement('button');
-                removeBtn.innerHTML = '<span></span> Remove'; // Unicode Trash Can
+                removeBtn.innerHTML = '<span></span> Remove';
                 removeBtn.classList.add('remove');
                 removeBtn.title = "Remove this box";
                 removeBtn.onclick = () => {
@@ -378,13 +397,13 @@
                 itemDiv.appendChild(textarea);
                 itemDiv.appendChild(controlsDiv);
                 
-                // Prepend to make new items appear at the top, or append for bottom
-                // container.prepend(itemDiv); // New items at top
-                container.appendChild(itemDiv); // New items at bottom
+                container.appendChild(itemDiv);
                 textarea.focus();
+                alert(`Item box (${type}) created and appended. Textarea focused.`);
             }
 
             function moveItem(itemDiv, direction) {
+                // Not adding alerts here for brevity, focus on creation first
                 const parent = itemDiv.parentNode;
                 if (direction === 'up' && itemDiv.previousElementSibling) {
                     parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
@@ -393,135 +412,156 @@
                 }
             }
 
-            addChapterBtn.addEventListener('click', () => createItemBox('chapter', chaptersList));
-            addDocumentBtn.addEventListener('click', () => createItemBox('document', documentsList));
+            if (addChapterBtn) {
+                addChapterBtn.addEventListener('click', () => {
+                    alert("Add Chapter Box button clicked!");
+                    try {
+                        createItemBox('chapter', chaptersList);
+                    } catch (e) {
+                        alert(`ERROR in Add Chapter click: ${e.message}\n${e.stack}`);
+                    }
+                });
+            } else {
+                alert("DEBUG: addChapterBtn NOT found for click listener attachment!");
+            }
+
+            if (addDocumentBtn) {
+                addDocumentBtn.addEventListener('click', () => {
+                    alert("Add Document Box button clicked!");
+                     try {
+                        createItemBox('document', documentsList);
+                    } catch (e) {
+                        alert(`ERROR in Add Document click: ${e.message}\n${e.stack}`);
+                    }
+                });
+            } else {
+                alert("DEBUG: addDocumentBtn NOT found for click listener attachment!");
+            }
+
 
             // --- Document Generation ---
-            generateDocBtn.addEventListener('click', () => {
-                let htmlContent = `
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <style>
-                            body { font-family: Arial, sans-serif; font-size: 12pt; margin: 1in; }
-                            h1 { font-size: 22pt; font-weight: bold; color: #2F5496; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
-                            p { margin-bottom: 12pt; line-height: 1.5; text-align: justify; }
-                            .page-break { page-break-after: always; }
-                        </style>
-                    </head>
-                    <body>`;
-                
-                let itemsToProcess = [];
-                if (currentMode === 'mode1') {
-                    itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
-                    itemsToProcess.forEach((textarea, index) => {
-                        const content = textarea.value.trim();
-                        if (content) {
-                            const lines = content.split('\n');
-                            let titleLine = 'Untitled Chapter';
-                            let bodyContent = content;
+            if (generateDocBtn) {
+                generateDocBtn.addEventListener('click', () => {
+                    alert("Generate DOCX button clicked. Processing content...");
+                    // ... (rest of the generation logic from previous script) ...
+                    // For brevity, I'm not including the full generation logic with alerts,
+                    // as the primary issue is item creation.
 
-                            if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
-                                titleLine = lines.shift();
-                                bodyContent = lines.join('\n').trim();
-                            } else {
-                                // If not starting with "Chapter", use the first line as title if it's short,
-                                // or make a generic title and use all content as body.
-                                if(lines[0] && lines[0].length < 80 && lines.length > 1) { // Arbitrary length check
-                                     titleLine = lines.shift();
-                                     bodyContent = lines.join('\n').trim();
-                                } else {
-                                    titleLine = `Section ${index + 1}`; // Or some other default
-                                }
-                            }
-                           
-                            htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
-                            if (bodyContent) {
-                                bodyContent.split(/\n\s*\n/).forEach(paragraphText => {
-                                    if (paragraphText.trim()) {
-                                        htmlContent += `<p>${escapeHtml(paragraphText.replace(/\n/g, '<br>'))}</p>`;
+                    let htmlContent = `
+                        <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
+                        body { font-family: Arial, sans-serif; font-size: 12pt; margin: 1in; }
+                        h1 { font-size: 22pt; font-weight: bold; color: #2F5496; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
+                        p { margin-bottom: 12pt; line-height: 1.5; text-align: justify; }
+                        .page-break { page-break-after: always; }
+                        </style></head><body>`;
+                    
+                    let itemsToProcess = [];
+                    let processingError = false;
+
+                    try {
+                        if (currentMode === 'mode1') {
+                            itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
+                            itemsToProcess.forEach((textarea, index) => {
+                                // ... (mode 1 content processing as before) ...
+                                const content = textarea.value.trim();
+                                if (content) {
+                                    const lines = content.split('\n');
+                                    let titleLine = 'Untitled Chapter';
+                                    let bodyContent = content;
+                                    if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
+                                        titleLine = lines.shift();
+                                        bodyContent = lines.join('\n').trim();
+                                    } else if(lines[0] && lines[0].length < 80 && lines.length > 1) {
+                                        titleLine = lines.shift();
+                                        bodyContent = lines.join('\n').trim();
+                                    } else { titleLine = `Section ${index + 1}`; }
+                                    htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
+                                    if (bodyContent) {
+                                        bodyContent.split(/\n\s*\n/).forEach(p => { if(p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`; });
                                     }
-                                });
-                            }
-                            if (index < itemsToProcess.length - 1) {
-                                htmlContent += '<div class="page-break"></div>';
-                            }
-                        }
-                    });
-                } else { // mode2
-                    itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
-                    itemsToProcess.forEach((textarea, index) => {
-                        const content = textarea.value.trim();
-                        if (content) {
-                             content.split(/\n\s*\n/).forEach(paragraphText => {
-                                if (paragraphText.trim()) {
-                                    htmlContent += `<p>${escapeHtml(paragraphText.replace(/\n/g, '<br>'))}</p>`;
+                                    if (index < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
                                 }
                             });
-                            if (index < itemsToProcess.length - 1) {
-                                htmlContent += '<div class="page-break"></div>';
-                            }
+                        } else { // mode2
+                            itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
+                            itemsToProcess.forEach((textarea, index) => {
+                                // ... (mode 2 content processing as before) ...
+                                const content = textarea.value.trim();
+                                if (content) {
+                                    content.split(/\n\s*\n/).forEach(p => { if(p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`; });
+                                    if (index < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
+                                }
+                            });
                         }
-                    });
-                }
-
-                htmlContent += `</body></html>`;
-
-                if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
-                    try {
-                        const converted = htmlDocx.asBlob(htmlContent, {
-                            orientation: 'portrait',
-                            margins: { top: 720, right: 720, bottom: 720, left: 720 } // 1 inch = 720 TWIPs (1440/2.54 * cm)
-                        }); // html-docx-js uses TWIPs for margins (1 inch = 1440 TWIPs)
-                                                // However, the library often uses points or implies pixels if not correctly interpreted. Let's use a standard.
-                                                // A common default is 1 inch, so 720 for some libraries if they interpret as points/pixels for typical screen DPI or 1440 for strict TWIPs.
-                                                // The html-docx-js documentation uses points: 1 inch = 72 points.
-                                                // If `margins` takes `points`: { top: 72, right: 72, bottom: 72, left: 72 }
-                                                // The library states its values for margins are in TWIPs. 1 inch = 1440 TWIPs.
-                                                // So, margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } is safer for 1 inch margins.
-
-                        const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
-                        
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(converted);
-                        link.download = filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(link.href);
-
-                        if (confirm("Document generated and download started! ✨\n\nDo you want to clear all input fields?")) {
-                            clearAllInputs(false); // false to not ask for confirmation again
-                        }
+                        htmlContent += `</body></html>`;
                     } catch (e) {
-                        console.error("Error generating DOCX:", e);
-                        alert("An error occurred while generating the document. Please check the console (F12) for details.");
+                        alert(`Error during content processing for DOCX: ${e.message}`);
+                        processingError = true;
                     }
-                } else {
-                    alert("Looks like there's no content yet. Add some chapters or documents first!");
-                }
-            });
+
+                    if (processingError) return;
+
+
+                    if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
+                        try {
+                            alert("Content processed. Attempting to generate DOCX blob...");
+                            const converted = htmlDocx.asBlob(htmlContent, {
+                                orientation: 'portrait',
+                                margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+                            });
+                            alert("DOCX blob created. Triggering download...");
+                            const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
+                            
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(converted);
+                            link.download = filename;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(link.href);
+                            alert("Download triggered.");
+
+                            if (confirm("Document generated and download started! ✨\n\nDo you want to clear all input fields?")) {
+                                clearAllInputs(false);
+                            }
+                        } catch (e) {
+                            console.error("Error generating DOCX:", e);
+                            alert(`An error occurred while generating the document: ${e.message}\nStack: ${e.stack}`);
+                        }
+                    } else {
+                        alert("Looks like there's no content yet. Add some chapters or documents first!");
+                    }
+                });
+            } else {
+                alert("DEBUG: generateDocBtn not found for listener.");
+            }
             
             // --- Clear All ---
-            clearAllBtn.addEventListener('click', () => clearAllInputs(true));
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => clearAllInputs(true));
+            } else {
+                alert("DEBUG: clearAllBtn not found for listener.");
+            }
+
 
             function clearAllInputs(confirmFirst = true) {
+                alert(`clearAllInputs called. Confirm first: ${confirmFirst}`);
                 const doClear = confirmFirst 
                     ? confirm("Are you sure you want to clear all input fields? This action cannot be undone.")
                     : true;
 
                 if (doClear) {
-                    chaptersList.innerHTML = '';
-                    documentsList.innerHTML = '';
+                    if (chaptersList) chaptersList.innerHTML = ''; else alert("DEBUG: chaptersList is null in clearAllInputs");
+                    if (documentsList) documentsList.innerHTML = ''; else alert("DEBUG: documentsList is null in clearAllInputs");
                     
-                    // Add one empty box back for convenience
+                    alert("Inputs cleared. Adding initial box for current mode.");
                     if (currentMode === 'mode1') {
                         createItemBox('chapter', chaptersList);
                     } else {
                         createItemBox('document', documentsList);
                     }
-                    // console.log("All inputs cleared.");
+                } else {
+                    alert("Clear inputs cancelled by user.");
                 }
             }
 
@@ -537,7 +577,9 @@
             }
 
             // --- Initialize App ---
+            alert("Attempting to initialize to Mode 1.");
             switchMode('mode1'); // Start in mode 1 by default
+            alert("App initialization complete.");
         });
     </script>
 
