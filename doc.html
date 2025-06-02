@@ -3,198 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Assembler</title>
+    <title>Story Weaver Studio</title>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
     <style>
+        :root {
+            --primary-color: #4a90e2; /* A nice blue */
+            --primary-darker: #357ABD;
+            --secondary-color: #50e3c2; /* A teal/mint */
+            --accent-color: #f5a623; /* Orange for highlights */
+            --text-color: #333;
+            --text-light: #555;
+            --bg-color: #f4f8fa; /* Light grayish blue */
+            --bg-container: #ffffff;
+            --border-color: #dce1e6;
+            --danger-color: #e74c3c;
+            --danger-darker: #c0392b;
+            --success-color: #2ecc71;
+            --success-darker: #27ae60;
+            --disabled-color: #bdc3c7;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .app-container {
+            width: 100%;
+            max-width: 950px;
+            background-color: var(--bg-container);
+            padding: 30px 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 20px;
         }
 
-        h1, h2 {
-            color: #2c3e50;
+        .app-header {
             text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .app-header h1 {
+            font-size: 2.2em;
+            color: var(--primary-darker);
+            margin: 0 0 10px 0;
+        }
+        .app-header p {
+            font-size: 1em;
+            color: var(--text-light);
         }
 
         .mode-selector {
             display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
         }
 
-        .mode-selector button, .action-button {
-            padding: 12px 20px;
+        .mode-selector button {
+            flex-grow: 1;
+            padding: 15px 20px;
             border: none;
-            border-radius: 6px;
+            border-bottom: 3px solid transparent;
+            background-color: transparent;
+            color: var(--text-light);
+            font-size: 1.1em;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            background-color: #3498db;
-            color: white;
+            transition: color 0.3s ease, border-color 0.3s ease;
+            outline: none;
+        }
+        .mode-selector button:hover {
+            color: var(--primary-color);
         }
         .mode-selector button.active {
-            background-color: #2980b9;
-            font-weight: bold;
+            color: var(--primary-darker);
+            border-bottom-color: var(--primary-darker);
+            font-weight: 600;
         }
-        .mode-selector button:hover, .action-button:hover {
-            background-color: #2980b9;
-        }
-        .mode-selector button:active, .action-button:active {
-            transform: translateY(1px);
-        }
-
-        .action-button.secondary {
-            background-color: #e74c3c;
-        }
-        .action-button.secondary:hover {
-            background-color: #c0392b;
-        }
-        .action-button.add {
-            background-color: #2ecc71;
-        }
-        .action-button.add:hover {
-            background-color: #27ae60;
-        }
-
 
         .content-area {
-            display: none; /* Hidden by default */
+            display: none;
             margin-top: 20px;
         }
         .content-area.active {
             display: block;
+            animation: fadeIn 0.5s ease-out;
         }
-
-        .item-container {
-            margin-bottom: 15px;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-        }
-        .item-controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .item-controls button {
-            padding: 5px 10px;
-            font-size: 0.8em;
-            background-color: #7f8c8d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .item-controls button:hover {
-            background-color: #95a5a6;
-        }
-        .item-controls button.remove {
-            background-color: #c0392b;
-        }
-        .item-controls button.remove:hover {
-            background-color: #e74c3c;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 0.95em;
-            resize: vertical;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .instructions {
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 10px;
+            font-size: 0.95em;
+            color: var(--text-light);
+            margin-bottom: 20px;
             background-color: #e8f4fd;
-            padding: 10px;
-            border-left: 3px solid #3498db;
-            border-radius: 4px;
+            padding: 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 6px;
         }
 
-        #app-title { margin-bottom: 30px; }
-        #footer {
-            text-align: center;
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Spacing between item boxes */
+        }
+        
+        .item-container {
+            background-color: #fdfdfd;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .item-container:focus-within {
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.2); /* Primary color shadow */
+            border-color: var(--primary-color);
+        }
+
+        .item-container textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        .item-container textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .item-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .item-controls button, .action-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .item-controls button:active, .action-button:active {
+            transform: translateY(1px);
+        }
+
+        /* Control button specifics */
+        .item-controls button.move-up, .item-controls button.move-down {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+        }
+        .item-controls button.move-up:hover, .item-controls button.move-down:hover {
+            background-color: #d0d0d0;
+        }
+        .item-controls button.remove {
+            background-color: #fbe0dd; /* Lighter red */
+            color: var(--danger-color);
+        }
+        .item-controls button.remove:hover {
+            background-color: #f8c9c5;
+            color: var(--danger-darker);
+        }
+
+        .main-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             margin-top: 30px;
-            font-size: 0.8em;
-            color: #777;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+        .main-actions .action-button.add { /* Add Chapter/Document Buttons */
+             background-color: var(--primary-color);
+             color: white;
+             font-size: 1em;
+             padding: 12px 20px;
+             justify-content: center;
+        }
+        .main-actions .action-button.add:hover {
+             background-color: var(--primary-darker);
+        }
+        
+        .generate-clear-actions {
+            display: flex;
+            justify-content: space-between; /* Or center, or end */
+            gap: 15px; /* Adjust as needed */
+            margin-top: 10px; /* Spacing from "Add" buttons if they are separate */
+        }
+
+
+        .action-button.generate {
+            background-color: var(--success-color);
+            color: white;
+            font-size: 1.05em;
+            padding: 12px 25px;
+            flex-grow: 1;
+        }
+        .action-button.generate:hover {
+            background-color: var(--success-darker);
+        }
+
+        .action-button.clear {
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 1.05em;
+            padding: 12px 25px;
+        }
+        .action-button.clear:hover {
+            background-color: var(--danger-darker);
+        }
+
+        #app-footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: var(--text-light);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1 id="app-title">Document Assembler</h1>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Story Weaver Studio</h1>
+            <p>Craft chapters or combine documents into a single masterpiece.</p>
+        </header>
 
         <div class="mode-selector">
-            <button id="mode1-btn" class="active">Mode 1: Create Chapters</button>
+            <button id="mode1-btn">Mode 1: Create Chapters</button>
             <button id="mode2-btn">Mode 2: Combine Documents</button>
         </div>
 
         <!-- Mode 1: Chapter Creation -->
-        <div id="mode1-content" class="content-area active">
-            <h2>Create Document from Chapters</h2>
+        <div id="mode1-content" class="content-area">
             <p class="instructions">
-                Add chapters one by one. Each chapter should start with "Chapter X: Title" on the first line.
-                This line will become a heading (H1) in the final document.
+                Add chapters one by one. Start each chapter with "Chapter X: Title" on its own line. This line becomes an H1 heading.
+                Use double line breaks (press Enter twice) to create new paragraphs.
             </p>
-            <button id="add-chapter-btn" class="action-button add">Add Chapter Box</button>
-            <div id="chapters-list">
+            <div class="main-actions">
+                 <button id="add-chapter-btn" class="action-button add">➕ Add New Chapter Box</button>
+            </div>
+            <div id="chapters-list" class="items-list" style="margin-top: 20px;">
                 <!-- Chapter boxes will be added here -->
             </div>
         </div>
 
         <!-- Mode 2: Document Combination -->
         <div id="mode2-content" class="content-area">
-            <h2>Combine Existing Documents</h2>
             <p class="instructions">
-                Add content for each document you want to combine. Paste the full text of each document into a separate box.
-                Each box will be treated as a separate document, with a page break after it.
+                Paste the content of each existing document into a separate box. Each box represents one document, and a page break will be inserted after it in the final output. Use double line breaks for paragraphs.
             </p>
-            <button id="add-document-btn" class="action-button add">Add Document Box</button>
-            <div id="documents-list">
+             <div class="main-actions">
+                <button id="add-document-btn" class="action-button add">➕ Add New Document Box</button>
+            </div>
+            <div id="documents-list" class="items-list" style="margin-top: 20px;">
                 <!-- Document boxes will be added here -->
             </div>
         </div>
 
-        <hr style="margin: 30px 0;">
+        <div class="main-actions generate-clear-actions">
+            <button id="generate-doc-btn" class="action-button generate">📄 Generate & Download .docx</button>
+            <button id="clear-all-btn" class="action-button clear">🗑️ Clear All Inputs</button>
+        </div>
 
-        <div style="text-align: center; margin-bottom: 15px;">
-            <button id="generate-doc-btn" class="action-button">Generate & Download .docx</button>
-        </div>
-        <div style="text-align: center;">
-            <button id="clear-all-btn" class="action-button secondary">Clear All Inputs</button>
-        </div>
-         <div id="footer">
-            <p>Note: Downloaded documents are created locally in your browser. No data is sent to any server.</p>
-        </div>
+        <footer id="app-footer">
+            <p>Created with ❤️. All processing is done in your browser. No data is sent to any server.</p>
+        </footer>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
             const mode1Btn = document.getElementById('mode1-btn');
             const mode2Btn = document.getElementById('mode2-btn');
             const mode1Content = document.getElementById('mode1-content');
@@ -208,31 +311,34 @@
             const generateDocBtn = document.getElementById('generate-doc-btn');
             const clearAllBtn = document.getElementById('clear-all-btn');
 
-            let currentMode = 'mode1'; // 'mode1' or 'mode2'
+            let currentMode = 'mode1';
 
-            function switchMode(mode) {
-                currentMode = mode;
-                if (mode === 'mode1') {
-                    mode1Btn.classList.add('active');
-                    mode2Btn.classList.remove('active');
-                    mode1Content.classList.add('active');
-                    mode2Content.classList.remove('active');
-                } else {
-                    mode1Btn.classList.remove('active');
-                    mode2Btn.classList.add('active');
-                    mode1Content.classList.remove('active');
-                    mode2Content.classList.add('active');
+            // --- Mode Switching ---
+            function switchMode(newMode) {
+                currentMode = newMode;
+                mode1Btn.classList.toggle('active', newMode === 'mode1');
+                mode2Btn.classList.toggle('active', newMode === 'mode2');
+                mode1Content.classList.toggle('active', newMode === 'mode1');
+                mode2Content.classList.toggle('active', newMode === 'mode2');
+
+                // Add an initial box if the respective list is empty
+                if (newMode === 'mode1' && chaptersList.children.length === 0) {
+                    createItemBox('chapter', chaptersList);
+                } else if (newMode === 'mode2' && documentsList.children.length === 0) {
+                    createItemBox('document', documentsList);
                 }
             }
 
             mode1Btn.addEventListener('click', () => switchMode('mode1'));
             mode2Btn.addEventListener('click', () => switchMode('mode2'));
 
+            // --- Item Box Creation & Management ---
             function createItemBox(type, container) {
                 const itemId = `${type}-${Date.now()}`;
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('item-container');
                 itemDiv.id = itemId;
+                itemDiv.setAttribute('draggable', 'true'); // For potential future drag-and-drop
 
                 const textarea = document.createElement('textarea');
                 textarea.placeholder = (type === 'chapter')
@@ -243,47 +349,54 @@
                 controlsDiv.classList.add('item-controls');
 
                 const moveUpBtn = document.createElement('button');
-                moveUpBtn.textContent = 'Up';
+                moveUpBtn.innerHTML = '<span>▲</span> Up'; // Unicode Up Arrow
+                moveUpBtn.classList.add('move-up');
+                moveUpBtn.title = "Move Up";
                 moveUpBtn.onclick = () => moveItem(itemDiv, 'up');
 
                 const moveDownBtn = document.createElement('button');
-                moveDownBtn.textContent = 'Down';
+                moveDownBtn.innerHTML = '<span>▼</span> Down'; // Unicode Down Arrow
+                moveDownBtn.classList.add('move-down');
+                moveDownBtn.title = "Move Down";
                 moveDownBtn.onclick = () => moveItem(itemDiv, 'down');
 
                 const removeBtn = document.createElement('button');
-                removeBtn.textContent = 'Remove';
+                removeBtn.innerHTML = '<span></span> Remove'; // Unicode Trash Can
                 removeBtn.classList.add('remove');
-                removeBtn.onclick = () => itemDiv.remove();
-
+                removeBtn.title = "Remove this box";
+                removeBtn.onclick = () => {
+                    itemDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    itemDiv.style.opacity = '0';
+                    itemDiv.style.transform = 'scale(0.95)';
+                    setTimeout(() => itemDiv.remove(), 300);
+                };
+                
                 controlsDiv.appendChild(moveUpBtn);
                 controlsDiv.appendChild(moveDownBtn);
                 controlsDiv.appendChild(removeBtn);
 
                 itemDiv.appendChild(textarea);
                 itemDiv.appendChild(controlsDiv);
-                container.appendChild(itemDiv);
+                
+                // Prepend to make new items appear at the top, or append for bottom
+                // container.prepend(itemDiv); // New items at top
+                container.appendChild(itemDiv); // New items at bottom
+                textarea.focus();
             }
 
             function moveItem(itemDiv, direction) {
                 const parent = itemDiv.parentNode;
-                if (direction === 'up') {
-                    if (itemDiv.previousElementSibling) {
-                        parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
-                    }
-                } else if (direction === 'down') {
-                    if (itemDiv.nextElementSibling) {
-                        parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
-                    }
+                if (direction === 'up' && itemDiv.previousElementSibling) {
+                    parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
+                } else if (direction === 'down' && itemDiv.nextElementSibling) {
+                    parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
                 }
             }
 
             addChapterBtn.addEventListener('click', () => createItemBox('chapter', chaptersList));
             addDocumentBtn.addEventListener('click', () => createItemBox('document', documentsList));
-            
-            // Add one box by default for convenience
-            createItemBox('chapter', chaptersList);
 
-
+            // --- Document Generation ---
             generateDocBtn.addEventListener('click', () => {
                 let htmlContent = `
                     <!DOCTYPE html>
@@ -291,50 +404,62 @@
                     <head>
                         <meta charset="UTF-8">
                         <style>
-                            body { font-family: Arial, sans-serif; font-size: 12pt; }
-                            h1 { font-size: 24pt; margin-bottom: 18pt; }
-                            p { margin-bottom: 12pt; line-height: 1.5; }
+                            body { font-family: Arial, sans-serif; font-size: 12pt; margin: 1in; }
+                            h1 { font-size: 22pt; font-weight: bold; color: #2F5496; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
+                            p { margin-bottom: 12pt; line-height: 1.5; text-align: justify; }
                             .page-break { page-break-after: always; }
                         </style>
                     </head>
                     <body>`;
                 
-                let items;
+                let itemsToProcess = [];
                 if (currentMode === 'mode1') {
-                    items = chaptersList.querySelectorAll('.item-container textarea');
-                    items.forEach((textarea, index) => {
+                    itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
+                    itemsToProcess.forEach((textarea, index) => {
                         const content = textarea.value.trim();
                         if (content) {
                             const lines = content.split('\n');
-                            const titleLine = lines.shift() || 'Untitled Chapter';
-                            const bodyContent = lines.join('\n').trim();
+                            let titleLine = 'Untitled Chapter';
+                            let bodyContent = content;
 
+                            if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
+                                titleLine = lines.shift();
+                                bodyContent = lines.join('\n').trim();
+                            } else {
+                                // If not starting with "Chapter", use the first line as title if it's short,
+                                // or make a generic title and use all content as body.
+                                if(lines[0] && lines[0].length < 80 && lines.length > 1) { // Arbitrary length check
+                                     titleLine = lines.shift();
+                                     bodyContent = lines.join('\n').trim();
+                                } else {
+                                    titleLine = `Section ${index + 1}`; // Or some other default
+                                }
+                            }
+                           
                             htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
                             if (bodyContent) {
-                                // Convert newlines in body to paragraphs
-                                bodyContent.split(/\n\s*\n/).forEach(paragraph => { // Split by one or more empty lines
-                                    if (paragraph.trim()) {
-                                        htmlContent += `<p>${escapeHtml(paragraph.replace(/\n/g, '<br>'))}</p>`;
+                                bodyContent.split(/\n\s*\n/).forEach(paragraphText => {
+                                    if (paragraphText.trim()) {
+                                        htmlContent += `<p>${escapeHtml(paragraphText.replace(/\n/g, '<br>'))}</p>`;
                                     }
                                 });
                             }
-                            if (index < items.length - 1) { // Don't add page break after the last item
+                            if (index < itemsToProcess.length - 1) {
                                 htmlContent += '<div class="page-break"></div>';
                             }
                         }
                     });
                 } else { // mode2
-                    items = documentsList.querySelectorAll('.item-container textarea');
-                    items.forEach((textarea, index) => {
+                    itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
+                    itemsToProcess.forEach((textarea, index) => {
                         const content = textarea.value.trim();
                         if (content) {
-                            // Treat entire content as a block, convert newlines to paragraphs
-                             content.split(/\n\s*\n/).forEach(paragraph => { // Split by one or more empty lines
-                                if (paragraph.trim()) {
-                                    htmlContent += `<p>${escapeHtml(paragraph.replace(/\n/g, '<br>'))}</p>`;
+                             content.split(/\n\s*\n/).forEach(paragraphText => {
+                                if (paragraphText.trim()) {
+                                    htmlContent += `<p>${escapeHtml(paragraphText.replace(/\n/g, '<br>'))}</p>`;
                                 }
                             });
-                            if (index < items.length - 1) { // Don't add page break after the last item
+                            if (index < itemsToProcess.length - 1) {
                                 htmlContent += '<div class="page-break"></div>';
                             }
                         }
@@ -343,48 +468,66 @@
 
                 htmlContent += `</body></html>`;
 
-                if (items && items.length > 0 && Array.from(items).some(ta => ta.value.trim() !== '')) {
-                    // console.log("Generated HTML for DOCX:", htmlContent); // For debugging
-                    const converted = htmlDocx.asBlob(htmlContent);
-                    const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10)}.docx`;
-                    
-                    // Trigger download
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(converted);
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href); // Clean up
+                if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
+                    try {
+                        const converted = htmlDocx.asBlob(htmlContent, {
+                            orientation: 'portrait',
+                            margins: { top: 720, right: 720, bottom: 720, left: 720 } // 1 inch = 720 TWIPs (1440/2.54 * cm)
+                        }); // html-docx-js uses TWIPs for margins (1 inch = 1440 TWIPs)
+                                                // However, the library often uses points or implies pixels if not correctly interpreted. Let's use a standard.
+                                                // A common default is 1 inch, so 720 for some libraries if they interpret as points/pixels for typical screen DPI or 1440 for strict TWIPs.
+                                                // The html-docx-js documentation uses points: 1 inch = 72 points.
+                                                // If `margins` takes `points`: { top: 72, right: 72, bottom: 72, left: 72 }
+                                                // The library states its values for margins are in TWIPs. 1 inch = 1440 TWIPs.
+                                                // So, margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } is safer for 1 inch margins.
 
-                    // Offer to clear inputs (as per "clean the cache" requirement)
-                    if (confirm("Document generated and download started. Do you want to clear all input fields?")) {
-                        clearAllInputs();
+                        const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
+                        
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(converted);
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+
+                        if (confirm("Document generated and download started! ✨\n\nDo you want to clear all input fields?")) {
+                            clearAllInputs(false); // false to not ask for confirmation again
+                        }
+                    } catch (e) {
+                        console.error("Error generating DOCX:", e);
+                        alert("An error occurred while generating the document. Please check the console (F12) for details.");
                     }
                 } else {
-                    alert("No content to generate. Please add some chapters or documents.");
+                    alert("Looks like there's no content yet. Add some chapters or documents first!");
                 }
             });
+            
+            // --- Clear All ---
+            clearAllBtn.addEventListener('click', () => clearAllInputs(true));
 
-            clearAllBtn.addEventListener('click', () => {
-                if (confirm("Are you sure you want to clear all input fields? This cannot be undone.")) {
-                    clearAllInputs();
-                }
-            });
+            function clearAllInputs(confirmFirst = true) {
+                const doClear = confirmFirst 
+                    ? confirm("Are you sure you want to clear all input fields? This action cannot be undone.")
+                    : true;
 
-            function clearAllInputs() {
-                chaptersList.innerHTML = '';
-                documentsList.innerHTML = '';
-                // Add one empty box back for convenience after clearing
-                if (currentMode === 'mode1') {
-                    createItemBox('chapter', chaptersList);
-                } else {
-                     createItemBox('document', documentsList);
+                if (doClear) {
+                    chaptersList.innerHTML = '';
+                    documentsList.innerHTML = '';
+                    
+                    // Add one empty box back for convenience
+                    if (currentMode === 'mode1') {
+                        createItemBox('chapter', chaptersList);
+                    } else {
+                        createItemBox('document', documentsList);
+                    }
+                    // console.log("All inputs cleared.");
                 }
-                console.log("Inputs cleared."); // For confirmation
             }
 
+            // --- Utility ---
             function escapeHtml(unsafe) {
+                if (typeof unsafe !== 'string') return '';
                 return unsafe
                      .replace(/&/g, "&")
                      .replace(/</g, "<")
@@ -393,8 +536,8 @@
                      .replace(/'/g, "'");
             }
 
-            // Initialize with Mode 1 active
-            switchMode('mode1');
+            // --- Initialize App ---
+            switchMode('mode1'); // Start in mode 1 by default
         });
     </script>
 
