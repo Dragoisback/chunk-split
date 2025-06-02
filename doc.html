@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Assembler</title>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
             margin: 0;
             padding: 20px;
-            background-color: #f4f7f9;
+            background-color: #f4f7f6;
             color: #333;
+            line-height: 1.6;
         }
 
         .container {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 20px auto;
             background-color: #fff;
             padding: 25px;
             border-radius: 8px;
@@ -25,410 +26,377 @@
 
         h1, h2 {
             color: #2c3e50;
-            margin-top: 0;
+            text-align: center;
         }
-        h1 { text-align: center; margin-bottom: 20px; }
-        h2 { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
 
-        .mode-switcher {
+        .mode-selector {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             gap: 10px;
         }
 
-        .mode-button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: 1px solid #3498db;
-            background-color: #fff;
-            color: #3498db;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .mode-button.active {
-            background-color: #3498db;
-            color: #fff;
-        }
-        .mode-button:hover:not(.active) {
-            background-color: #eaf5ff;
-        }
-
-        .mode-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .mode-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        textarea {
-            width: calc(100% - 22px); /* Account for padding and border */
-            min-height: 150px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-bottom: 10px;
-            resize: vertical;
-        }
-
-        button {
-            padding: 10px 15px;
-            font-size: 15px;
-            cursor: pointer;
-            border-radius: 5px;
+        .mode-selector button, .action-button {
+            padding: 12px 20px;
             border: none;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .btn-primary {
-            background-color: #2ecc71;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            background-color: #3498db;
             color: white;
         }
-        .btn-primary:hover {
+        .mode-selector button.active {
+            background-color: #2980b9;
+            font-weight: bold;
+        }
+        .mode-selector button:hover, .action-button:hover {
+            background-color: #2980b9;
+        }
+        .mode-selector button:active, .action-button:active {
+            transform: translateY(1px);
+        }
+
+        .action-button.secondary {
+            background-color: #e74c3c;
+        }
+        .action-button.secondary:hover {
+            background-color: #c0392b;
+        }
+        .action-button.add {
+            background-color: #2ecc71;
+        }
+        .action-button.add:hover {
             background-color: #27ae60;
         }
 
-        .btn-secondary {
-            background-color: #e74c3c;
-            color: white;
+
+        .content-area {
+            display: none; /* Hidden by default */
+            margin-top: 20px;
         }
-        .btn-secondary:hover {
-            background-color: #c0392b;
-        }
-        
-        .btn-tertiary {
-            background-color: #3498db;
-            color: white;
-        }
-        .btn-tertiary:hover {
-            background-color: #2980b9;
+        .content-area.active {
+            display: block;
         }
 
-        .chapter-item, .file-item {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 4px;
+        .item-container {
             margin-bottom: 15px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
         }
-        .file-item {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .file-item-name {
-            flex-grow: 1;
-            margin-right: 10px;
-            word-break: break-all;
-        }
-
-        .actions {
-            margin-top: 20px;
+        .item-controls {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
         }
-        .item-actions button {
-            font-size: 12px;
-            padding: 5px 8px;
-            margin-left: 5px;
+        .item-controls button {
+            padding: 5px 10px;
+            font-size: 0.8em;
+            background-color: #7f8c8d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .item-controls button:hover {
+            background-color: #95a5a6;
+        }
+        .item-controls button.remove {
+            background-color: #c0392b;
+        }
+        .item-controls button.remove:hover {
+            background-color: #e74c3c;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
         }
 
-        #fileListContainer li { margin-bottom: 10px; }
-
-        .info-text {
+        .instructions {
             font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+            background-color: #e8f4fd;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            border-radius: 4px;
+        }
+
+        #app-title { margin-bottom: 30px; }
+        #footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8em;
             color: #777;
-            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Document Assembler</h1>
+        <h1 id="app-title">Document Assembler</h1>
 
-        <div class="mode-switcher">
-            <button id="mode1Button" class="mode-button active" onclick="switchMode('mode1')">Chapter Aggregator</button>
-            <button id="mode2Button" class="mode-button" onclick="switchMode('mode2')">Document Combiner</button>
+        <div class="mode-selector">
+            <button id="mode1-btn" class="active">Mode 1: Create Chapters</button>
+            <button id="mode2-btn">Mode 2: Combine Documents</button>
         </div>
 
-        <!-- Mode 1: Chapter Aggregator -->
-        <div id="mode1" class="mode-content active">
-            <h2>Mode 1: Chapter Aggregator</h2>
-            <p class="info-text">Add chapters one by one. The first line of each chapter (e.g., "Chapter 1: Title") will become a heading.</p>
-            <div id="chaptersContainer">
-                <!-- Chapter items will be added here -->
-            </div>
-            <div class="actions">
-                <button class="btn-tertiary" onclick="addChapter()">Add New Chapter</button>
-                <button class="btn-primary" onclick="generateMode1Document()">Generate Document (from Chapters)</button>
+        <!-- Mode 1: Chapter Creation -->
+        <div id="mode1-content" class="content-area active">
+            <h2>Create Document from Chapters</h2>
+            <p class="instructions">
+                Add chapters one by one. Each chapter should start with "Chapter X: Title" on the first line.
+                This line will become a heading (H1) in the final document.
+            </p>
+            <button id="add-chapter-btn" class="action-button add">Add Chapter Box</button>
+            <div id="chapters-list">
+                <!-- Chapter boxes will be added here -->
             </div>
         </div>
 
-        <!-- Mode 2: Document Combiner -->
-        <div id="mode2" class="mode-content">
-            <h2>Mode 2: Document Combiner</h2>
-            <p class="info-text">Upload text (.txt) or simple HTML files. Reorder them as needed before combining.</p>
-            <input type="file" id="fileUpload" multiple accept=".txt,.html,.htm">
-            <ul id="fileListContainer">
-                <!-- Uploaded files will be listed here -->
-            </ul>
-            <div class="actions">
-                 <button class="btn-primary" onclick="generateMode2Document()">Combine & Download Documents</button>
-                 <button class="btn-secondary" onclick="clearMode2Inputs()">Clear Uploaded Files</button>
+        <!-- Mode 2: Document Combination -->
+        <div id="mode2-content" class="content-area">
+            <h2>Combine Existing Documents</h2>
+            <p class="instructions">
+                Add content for each document you want to combine. Paste the full text of each document into a separate box.
+                Each box will be treated as a separate document, with a page break after it.
+            </p>
+            <button id="add-document-btn" class="action-button add">Add Document Box</button>
+            <div id="documents-list">
+                <!-- Document boxes will be added here -->
             </div>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <button id="generate-doc-btn" class="action-button">Generate & Download .docx</button>
+        </div>
+        <div style="text-align: center;">
+            <button id="clear-all-btn" class="action-button secondary">Clear All Inputs</button>
+        </div>
+         <div id="footer">
+            <p>Note: Downloaded documents are created locally in your browser. No data is sent to any server.</p>
         </div>
     </div>
 
     <script>
-        let currentMode = 'mode1';
-        let chapterCount = 0;
-        let uploadedFiles = []; // For Mode 2
-
-        // --- Utility Functions ---
-        function switchMode(mode) {
-            currentMode = mode;
-            document.getElementById('mode1').classList.toggle('active', mode === 'mode1');
-            document.getElementById('mode1Button').classList.toggle('active', mode === 'mode1');
-            document.getElementById('mode2').classList.toggle('active', mode === 'mode2');
-            document.getElementById('mode2Button').classList.toggle('active', mode === 'mode2');
-        }
-
-        function createDownloadLink(filename, content) {
-            const mimeType = 'application/msword'; // To suggest opening with Word
-            const blob = new Blob([content], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function escapeHtml(unsafe) {
-            if (unsafe === null || unsafe === undefined) return '';
-            return unsafe
-                 .replace(/&/g, "&")
-                 .replace(/</g, "<")
-                 .replace(/>/g, ">")
-                 .replace(/"/g, """)
-                 .replace(/'/g, "'");
-        }
-
-        // --- Mode 1: Chapter Aggregator ---
-        function addChapter() {
-            chapterCount++;
-            const chapterId = `chapter-${chapterCount}`;
-            const chapterDiv = document.createElement('div');
-            chapterDiv.className = 'chapter-item';
-            chapterDiv.id = chapterId;
-            chapterDiv.innerHTML = `
-                <label for="textarea-${chapterId}" style="font-weight: bold; margin-bottom: 5px;">Chapter ${chapterCount}</label>
-                <textarea id="textarea-${chapterId}" placeholder="Chapter X: Title\nYour chapter content here..."></textarea>
-                <button class="btn-secondary item-actions" style="align-self: flex-end;" onclick="removeChapter('${chapterId}')">Remove Chapter</button>
-            `;
-            document.getElementById('chaptersContainer').appendChild(chapterDiv);
-        }
-
-        function removeChapter(chapterId) {
-            const chapterElement = document.getElementById(chapterId);
-            if (chapterElement) {
-                chapterElement.remove();
-                // No need to decrement chapterCount or re-label, simple removal is fine for this UI
-            }
-        }
-
-        function generateMode1Document() {
-            const chaptersContainer = document.getElementById('chaptersContainer');
-            const chapterItems = chaptersContainer.getElementsByClassName('chapter-item');
-            if (chapterItems.length === 0) {
-                alert("Please add at least one chapter.");
-                return;
-            }
-
-            let htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Generated Document</title>
-                    <style>
-                        body { font-family: sans-serif; line-height: 1.4; }
-                        h1 { font-size: 22pt; margin-top: 20px; margin-bottom: 15px; page-break-before: always; }
-                        h1:first-of-type { page-break-before: auto; } /* No page break before the very first H1 */
-                        p { margin-bottom: 10px; font-size: 12pt; }
-                        .page-break { page-break-after: always; }
-                    </style>
-                </head>
-                <body>
-            `;
-
-            for (let i = 0; i < chapterItems.length; i++) {
-                const textarea = chapterItems[i].querySelector('textarea');
-                const content = textarea.value.trim();
-                if (!content) continue;
-
-                const lines = content.split('\n');
-                const title = escapeHtml(lines.shift() || `Chapter ${i+1}`); // Default title if first line is empty
-                const body = lines.map(line => `<p>${escapeHtml(line)}</p>`).join('\n');
-
-                htmlContent += `<h1>${title}</h1>\n${body}\n`;
-                if (i < chapterItems.length - 1) { // Add page break if not the last chapter
-                    // The h1 style already handles page-break-before, so an explicit div might not be needed
-                    // unless we want a more forceful break or different styling.
-                    // For simplicity, relying on h1 style for now.
-                    // htmlContent += `<div class="page-break"></div>\n`;
-                }
-            }
-
-            htmlContent += `</body></html>`;
-            createDownloadLink('document_from_chapters.doc', htmlContent);
-            clearMode1Inputs();
-        }
-        
-        function clearMode1Inputs() {
-            const chaptersContainer = document.getElementById('chaptersContainer');
-            chaptersContainer.innerHTML = ''; // Clears all chapter items
-            chapterCount = 0; // Reset counter
-            addChapter(); // Add one empty chapter box to start
-        }
-
-
-        // --- Mode 2: Document Combiner ---
-        document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
-
-        function handleFileUpload(event) {
-            const files = event.target.files;
-            if (!files) return;
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    uploadedFiles.push({
-                        id: `file-${Date.now()}-${Math.random().toString(16).slice(2)}`, // Unique ID
-                        name: file.name,
-                        content: e.target.result
-                    });
-                    renderFileList();
-                };
-                // Read as text. If it's HTML, it will be text. If binary, this might show garbage.
-                reader.readAsText(file);
-            }
-            event.target.value = null; // Reset file input for re-uploading same file
-        }
-
-        function renderFileList() {
-            const fileListContainer = document.getElementById('fileListContainer');
-            fileListContainer.innerHTML = ''; // Clear current list
-
-            uploadedFiles.forEach((file, index) => {
-                const li = document.createElement('li');
-                li.className = 'file-item';
-                li.dataset.id = file.id;
-                li.innerHTML = `
-                    <span class="file-item-name">${escapeHtml(file.name)}</span>
-                    <div class="item-actions">
-                        <button onclick="moveFile('${file.id}', 'up')" ${index === 0 ? 'disabled' : ''}>Up</button>
-                        <button onclick="moveFile('${file.id}', 'down')" ${index === uploadedFiles.length - 1 ? 'disabled' : ''}>Down</button>
-                        <button class="btn-secondary" onclick="removeFile('${file.id}')">Remove</button>
-                    </div>
-                `;
-                fileListContainer.appendChild(li);
-            });
-        }
-
-        function moveFile(fileId, direction) {
-            const index = uploadedFiles.findIndex(f => f.id === fileId);
-            if (index === -1) return;
-
-            if (direction === 'up' && index > 0) {
-                [uploadedFiles[index - 1], uploadedFiles[index]] = [uploadedFiles[index], uploadedFiles[index - 1]];
-            } else if (direction === 'down' && index < uploadedFiles.length - 1) {
-                [uploadedFiles[index], uploadedFiles[index + 1]] = [uploadedFiles[index + 1], uploadedFiles[index]];
-            }
-            renderFileList();
-        }
-        
-        function removeFile(fileId) {
-            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
-            renderFileList();
-        }
-
-        function generateMode2Document() {
-            if (uploadedFiles.length === 0) {
-                alert("Please upload at least one file.");
-                return;
-            }
-
-            let combinedContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Combined Document</title>
-                    <style>
-                        body { font-family: sans-serif; line-height: 1.4; }
-                        /* Style for content separation, e.g., page breaks between documents */
-                        .document-separator { page-break-before: always; border-top: 2px dashed #ccc; margin-top: 20px; padding-top:20px; }
-                        .document-separator:first-child { border-top: none; margin-top:0; padding-top:0; page-break-before: auto; }
-                    </style>
-                </head>
-                <body>
-            `;
-
-            uploadedFiles.forEach((file, index) => {
-                // Assuming content is HTML or plain text. If HTML, it might have its own structure.
-                // For simplicity, we'll just append it.
-                // Could add a separator or filename heading here.
-                if (index > 0) {
-                    combinedContent += `<div class="document-separator"></div>\n`;
-                } else {
-                    // For the first document, ensure it doesn't get an unwanted separator style from :first-child if it's wrapped.
-                    // It's simpler to just not add the separator for the first one.
-                }
-                combinedContent += `<!-- Start of ${escapeHtml(file.name)} -->\n`;
-                combinedContent += file.content; // Assuming content is safe or HTML
-                combinedContent += `\n<!-- End of ${escapeHtml(file.name)} -->\n`;
-            });
-
-            combinedContent += `</body></html>`;
-            createDownloadLink('combined_document.doc', combinedContent);
-            // clearMode2Inputs(); // User might want to re-download or re-order
-        }
-        
-        function clearMode2Inputs() {
-            uploadedFiles = [];
-            document.getElementById('fileUpload').value = null; // Clear file input
-            renderFileList();
-        }
-
-        // --- Initial Setup ---
         document.addEventListener('DOMContentLoaded', () => {
-            switchMode('mode1'); // Set initial mode
-            addChapter(); // Add one chapter box to Mode 1 by default
-        });
+            const mode1Btn = document.getElementById('mode1-btn');
+            const mode2Btn = document.getElementById('mode2-btn');
+            const mode1Content = document.getElementById('mode1-content');
+            const mode2Content = document.getElementById('mode2-content');
 
+            const addChapterBtn = document.getElementById('add-chapter-btn');
+            const chaptersList = document.getElementById('chapters-list');
+            const addDocumentBtn = document.getElementById('add-document-btn');
+            const documentsList = document.getElementById('documents-list');
+
+            const generateDocBtn = document.getElementById('generate-doc-btn');
+            const clearAllBtn = document.getElementById('clear-all-btn');
+
+            let currentMode = 'mode1'; // 'mode1' or 'mode2'
+
+            function switchMode(mode) {
+                currentMode = mode;
+                if (mode === 'mode1') {
+                    mode1Btn.classList.add('active');
+                    mode2Btn.classList.remove('active');
+                    mode1Content.classList.add('active');
+                    mode2Content.classList.remove('active');
+                } else {
+                    mode1Btn.classList.remove('active');
+                    mode2Btn.classList.add('active');
+                    mode1Content.classList.remove('active');
+                    mode2Content.classList.add('active');
+                }
+            }
+
+            mode1Btn.addEventListener('click', () => switchMode('mode1'));
+            mode2Btn.addEventListener('click', () => switchMode('mode2'));
+
+            function createItemBox(type, container) {
+                const itemId = `${type}-${Date.now()}`;
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('item-container');
+                itemDiv.id = itemId;
+
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = (type === 'chapter')
+                    ? "Chapter 1: My Awesome Title\n\nThis is the beginning of the chapter..."
+                    : "Paste the content of your document here...";
+
+                const controlsDiv = document.createElement('div');
+                controlsDiv.classList.add('item-controls');
+
+                const moveUpBtn = document.createElement('button');
+                moveUpBtn.textContent = 'Up';
+                moveUpBtn.onclick = () => moveItem(itemDiv, 'up');
+
+                const moveDownBtn = document.createElement('button');
+                moveDownBtn.textContent = 'Down';
+                moveDownBtn.onclick = () => moveItem(itemDiv, 'down');
+
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = 'Remove';
+                removeBtn.classList.add('remove');
+                removeBtn.onclick = () => itemDiv.remove();
+
+                controlsDiv.appendChild(moveUpBtn);
+                controlsDiv.appendChild(moveDownBtn);
+                controlsDiv.appendChild(removeBtn);
+
+                itemDiv.appendChild(textarea);
+                itemDiv.appendChild(controlsDiv);
+                container.appendChild(itemDiv);
+            }
+
+            function moveItem(itemDiv, direction) {
+                const parent = itemDiv.parentNode;
+                if (direction === 'up') {
+                    if (itemDiv.previousElementSibling) {
+                        parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
+                    }
+                } else if (direction === 'down') {
+                    if (itemDiv.nextElementSibling) {
+                        parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
+                    }
+                }
+            }
+
+            addChapterBtn.addEventListener('click', () => createItemBox('chapter', chaptersList));
+            addDocumentBtn.addEventListener('click', () => createItemBox('document', documentsList));
+            
+            // Add one box by default for convenience
+            createItemBox('chapter', chaptersList);
+
+
+            generateDocBtn.addEventListener('click', () => {
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { font-family: Arial, sans-serif; font-size: 12pt; }
+                            h1 { font-size: 24pt; margin-bottom: 18pt; }
+                            p { margin-bottom: 12pt; line-height: 1.5; }
+                            .page-break { page-break-after: always; }
+                        </style>
+                    </head>
+                    <body>`;
+                
+                let items;
+                if (currentMode === 'mode1') {
+                    items = chaptersList.querySelectorAll('.item-container textarea');
+                    items.forEach((textarea, index) => {
+                        const content = textarea.value.trim();
+                        if (content) {
+                            const lines = content.split('\n');
+                            const titleLine = lines.shift() || 'Untitled Chapter';
+                            const bodyContent = lines.join('\n').trim();
+
+                            htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
+                            if (bodyContent) {
+                                // Convert newlines in body to paragraphs
+                                bodyContent.split(/\n\s*\n/).forEach(paragraph => { // Split by one or more empty lines
+                                    if (paragraph.trim()) {
+                                        htmlContent += `<p>${escapeHtml(paragraph.replace(/\n/g, '<br>'))}</p>`;
+                                    }
+                                });
+                            }
+                            if (index < items.length - 1) { // Don't add page break after the last item
+                                htmlContent += '<div class="page-break"></div>';
+                            }
+                        }
+                    });
+                } else { // mode2
+                    items = documentsList.querySelectorAll('.item-container textarea');
+                    items.forEach((textarea, index) => {
+                        const content = textarea.value.trim();
+                        if (content) {
+                            // Treat entire content as a block, convert newlines to paragraphs
+                             content.split(/\n\s*\n/).forEach(paragraph => { // Split by one or more empty lines
+                                if (paragraph.trim()) {
+                                    htmlContent += `<p>${escapeHtml(paragraph.replace(/\n/g, '<br>'))}</p>`;
+                                }
+                            });
+                            if (index < items.length - 1) { // Don't add page break after the last item
+                                htmlContent += '<div class="page-break"></div>';
+                            }
+                        }
+                    });
+                }
+
+                htmlContent += `</body></html>`;
+
+                if (items && items.length > 0 && Array.from(items).some(ta => ta.value.trim() !== '')) {
+                    // console.log("Generated HTML for DOCX:", htmlContent); // For debugging
+                    const converted = htmlDocx.asBlob(htmlContent);
+                    const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10)}.docx`;
+                    
+                    // Trigger download
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(converted);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href); // Clean up
+
+                    // Offer to clear inputs (as per "clean the cache" requirement)
+                    if (confirm("Document generated and download started. Do you want to clear all input fields?")) {
+                        clearAllInputs();
+                    }
+                } else {
+                    alert("No content to generate. Please add some chapters or documents.");
+                }
+            });
+
+            clearAllBtn.addEventListener('click', () => {
+                if (confirm("Are you sure you want to clear all input fields? This cannot be undone.")) {
+                    clearAllInputs();
+                }
+            });
+
+            function clearAllInputs() {
+                chaptersList.innerHTML = '';
+                documentsList.innerHTML = '';
+                // Add one empty box back for convenience after clearing
+                if (currentMode === 'mode1') {
+                    createItemBox('chapter', chaptersList);
+                } else {
+                     createItemBox('document', documentsList);
+                }
+                console.log("Inputs cleared."); // For confirmation
+            }
+
+            function escapeHtml(unsafe) {
+                return unsafe
+                     .replace(/&/g, "&")
+                     .replace(/</g, "<")
+                     .replace(/>/g, ">")
+                     .replace(/"/g, """)
+                     .replace(/'/g, "'");
+            }
+
+            // Initialize with Mode 1 active
+            switchMode('mode1');
+        });
     </script>
+
 </body>
 </html>
