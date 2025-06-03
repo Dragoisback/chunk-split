@@ -3,585 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Weaver Studio (Debug Mode)</title>
+    <title>Story Weaver Studio</title>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4a90e2; /* A nice blue */
-            --primary-darker: #357ABD;
-            --secondary-color: #50e3c2; /* A teal/mint */
-            --accent-color: #f5a623; /* Orange for highlights */
-            --text-color: #333;
-            --text-light: #555;
-            --bg-color: #f4f8fa; /* Light grayish blue */
-            --bg-container: #ffffff;
-            --border-color: #dce1e6;
-            --danger-color: #e74c3c;
-            --danger-darker: #c0392b;
-            --success-color: #2ecc71;
-            --success-darker: #27ae60;
-            --disabled-color: #bdc3c7;
+            --main-bg: #f7fafd;
+            --surface-bg: #fff;
+            --primary: #6c47ff;
+            --primary-dark: #4d2fd9;
+            --secondary: #22c1c3;
+            --secondary-dark: #1a9e9f;
+            --danger: #ef476f;
+            --danger-dark: #d7264b;
+            --success: #3ecf8e;
+            --success-dark: #28b86b;
+            --text-main: #23272f;
+            --text-subtle: #6c7890;
+            --border: #e6e8ef;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --shadow-lg: 0 8px 32px 0 rgba(120, 113, 220, 0.12);
+            --shadow-sm: 0 2px 8px 0 rgba(120, 113, 220, 0.05);
+            --transition: 0.17s cubic-bezier(.4,0,.2,1);
+            --font-title: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            --font-main: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: var(--main-bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            font-size: 17px;
+            letter-spacing: 0.01em;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
             display: flex;
-            justify-content: center;
             align-items: flex-start;
+            justify-content: center;
             min-height: 100vh;
         }
 
         .app-container {
+            background: var(--surface-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 810px;
             width: 100%;
-            max-width: 950px;
-            background-color: var(--bg-container);
-            padding: 30px 35px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin: 20px;
+            margin: 48px 0 32px 0;
+            padding: 40px 36px 32px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+            min-height: 80vh;
         }
 
         .app-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 23px;
         }
-
         .app-header h1 {
-            font-size: 2.2em;
-            color: var(--primary-darker);
+            font-family: var(--font-title);
+            font-size: 2.35em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--primary-dark);
             margin: 0 0 10px 0;
+            background: linear-gradient(90deg, var(--primary) 20%, var(--secondary) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
         }
         .app-header p {
-            font-size: 1em;
-            color: var(--text-light);
+            color: var(--text-subtle);
+            font-size: 1.07em;
+            letter-spacing: 0.01em;
+            margin: 0 0 12px 0;
         }
 
         .mode-selector {
             display: flex;
+            gap: 20px;
+            justify-content: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid var(--border-color);
+            background: #f3f4fd;
+            border-radius: var(--radius-sm);
+            padding: 8px 0;
         }
-
         .mode-selector button {
-            flex-grow: 1;
-            padding: 15px 20px;
             border: none;
-            border-bottom: 3px solid transparent;
-            background-color: transparent;
-            color: var(--text-light);
-            font-size: 1.1em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: color 0.3s ease, border-color 0.3s ease;
-            outline: none;
-        }
-        .mode-selector button:hover {
-            color: var(--primary-color);
-        }
-        .mode-selector button.active {
-            color: var(--primary-darker);
-            border-bottom-color: var(--primary-darker);
+            background: none;
+            font-family: var(--font-title);
+            font-size: 1.09em;
             font-weight: 600;
+            color: var(--text-subtle);
+            cursor: pointer;
+            padding: 13px 32px;
+            border-radius: var(--radius-sm);
+            transition: background var(--transition), color var(--transition);
+        }
+        .mode-selector button.active, .mode-selector button:focus-visible {
+            background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
+            color: #fff;
+            box-shadow: 0 3px 16px 0 rgba(120,113,220,0.08);
+            outline: none;
         }
 
         .content-area {
             display: none;
-            margin-top: 20px;
         }
         .content-area.active {
             display: block;
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn 0.45s cubic-bezier(0.57,0.21,0.69,1.25);
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(15px);}
+            to { opacity: 1; transform: translateY(0);}
         }
 
         .instructions {
-            font-size: 0.95em;
-            color: var(--text-light);
-            margin-bottom: 20px;
-            background-color: #e8f4fd;
-            padding: 15px;
-            border-left: 4px solid var(--primary-color);
-            border-radius: 6px;
+            font-size: 0.98em;
+            color: var(--primary-dark);
+            background: linear-gradient(90deg, #f3f4fd 75%, #e8fcfa 100%);
+            padding: 15px 22px;
+            border-left: 5px solid var(--primary);
+            margin-bottom: 22px;
+            border-radius: var(--radius-sm);
         }
 
         .items-list {
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Spacing between item boxes */
+            gap: 22px;
         }
-        
+
         .item-container {
-            background-color: #fdfdfd;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: box-shadow 0.3s ease;
+            background: #fbfbff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            padding: 18px 18px 12px 18px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
         }
         .item-container:focus-within {
-            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.2); /* Primary color shadow */
-            border-color: var(--primary-color);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px #8073ff1f;
         }
-
         .item-container textarea {
             width: 100%;
-            min-height: 180px;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-family: inherit;
+            min-height: 135px;
+            max-height: 410px;
+            font-family: var(--font-mono);
             font-size: 1em;
+            padding: 11px 13px 10px 13px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: #f7fafd;
             resize: vertical;
-            transition: border-color 0.3s ease;
-        }
-        .item-container textarea:focus {
-            border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            color: var(--text-main);
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px 0 rgba(120,113,220,0.03);
+            transition: box-shadow var(--transition);
         }
-
         .item-controls {
             display: flex;
-            justify-content: flex-end;
             gap: 10px;
-            margin-top: 15px;
+            justify-content: flex-end;
+            margin-top: 0;
         }
-
-        .item-controls button, .action-button {
-            padding: 8px 15px;
+        .item-controls button {
             border: none;
-            border-radius: 6px;
+            background: #e3e4fd;
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            font-size: 0.97em;
+            font-family: var(--font-title);
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 500;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: inline-flex;
+            padding: 7px 14px;
+            transition: background var(--transition), color var(--transition);
+            outline: none;
+            display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
-        .item-controls button:active, .action-button:active {
-            transform: translateY(1px);
-        }
-
-        .item-controls button.move-up, .item-controls button.move-down {
-            background-color: #e0e0e0;
-            color: var(--text-color);
-        }
-        .item-controls button.move-up:hover, .item-controls button.move-down:hover {
-            background-color: #d0d0d0;
+        .item-controls button:hover, .item-controls button:focus-visible {
+            background: var(--primary);
+            color: #fff;
         }
         .item-controls button.remove {
-            background-color: #fbe0dd; /* Lighter red */
-            color: var(--danger-color);
+            background: #ffe3e9;
+            color: var(--danger-dark);
         }
-        .item-controls button.remove:hover {
-            background-color: #f8c9c5;
-            color: var(--danger-darker);
+        .item-controls button.remove:hover, .item-controls button.remove:focus-visible {
+            background: var(--danger-dark);
+            color: #fff;
         }
 
         .main-actions {
             display: flex;
-            flex-direction: column;
             gap: 15px;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border-color);
+            margin: 32px 0 0 0;
         }
-        .main-actions .action-button.add { /* Add Chapter/Document Buttons */
-             background-color: var(--primary-color);
-             color: white;
-             font-size: 1em;
-             padding: 12px 20px;
-             justify-content: center;
+        .main-actions .action-button {
+            border: none;
+            font-family: var(--font-title);
+            font-weight: 600;
+            font-size: 1.07em;
+            padding: 13px 22px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            background: var(--primary);
+            color: #fff;
+            transition: background var(--transition), box-shadow var(--transition);
+            box-shadow: 0 3px 16px 0 rgba(120,113,220,0.09);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .main-actions .action-button.add {
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
         }
         .main-actions .action-button.add:hover {
-             background-color: var(--primary-darker);
+            background: linear-gradient(90deg, var(--primary-dark) 60%, var(--secondary-dark) 100%);
         }
-        
+        .main-actions .action-button:active {
+            filter: brightness(95%);
+        }
         .generate-clear-actions {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
-            margin-top: 10px;
+            gap: 16px;
+            margin: 32px 0 0 0;
         }
-
-
         .action-button.generate {
-            background-color: var(--success-color);
-            color: white;
-            font-size: 1.05em;
-            padding: 12px 25px;
-            flex-grow: 1;
+            flex: 1;
+            background: linear-gradient(90deg, var(--success) 70%, var(--primary) 100%);
         }
         .action-button.generate:hover {
-            background-color: var(--success-darker);
+            background: linear-gradient(90deg, var(--success-dark) 60%, var(--primary-dark) 100%);
         }
-
         .action-button.clear {
-            background-color: var(--danger-color);
-            color: white;
-            font-size: 1.05em;
-            padding: 12px 25px;
+            background: linear-gradient(90deg, var(--danger) 70%, var(--secondary) 100%);
         }
         .action-button.clear:hover {
-            background-color: var(--danger-darker);
+            background: linear-gradient(90deg, var(--danger-dark) 70%, var(--secondary-dark) 100%);
         }
 
         #app-footer {
             text-align: center;
-            margin-top: 40px;
-            font-size: 0.85em;
-            color: var(--text-light);
+            margin-top: 38px;
+            font-size: 0.91em;
+            color: var(--text-subtle);
+            letter-spacing: 0.01em;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .app-container {
+                max-width: 98vw;
+                padding: 24px 8vw 20px 8vw;
+            }
+        }
+        @media (max-width: 600px) {
+            .app-container {
+                max-width: 100vw;
+                padding: 12px 2vw 10px 2vw;
+                border-radius: 0;
+            }
+            .main-actions, .generate-clear-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            background: #fff;
+            color: var(--primary-dark);
+            border-radius: 99px;
+            box-shadow: 0 4px 18px 0 rgba(120,113,220,0.14);
+            padding: 14px 34px;
+            font-family: var(--font-title);
+            font-weight: 700;
+            font-size: 1.05em;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            transition: opacity 0.35s, bottom 0.35s;
+        }
+        .toast.show {
+            opacity: 1;
+            bottom: 56px;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
-
     <div class="app-container">
         <header class="app-header">
-            <h1>Story Weaver Studio (Debug Mode)</h1>
-            <p>Craft chapters or combine documents into a single masterpiece.</p>
+            <h1>Story Weaver Studio</h1>
+            <p>Craft beautiful chapters or combine documents into a single .docx masterpiece. Fast, elegant, and all in your browser.</p>
         </header>
 
         <div class="mode-selector">
-            <button id="mode1-btn">Mode 1: Create Chapters</button>
-            <button id="mode2-btn">Mode 2: Combine Documents</button>
+            <button id="mode1-btn" class="active">📝 Create Chapters</button>
+            <button id="mode2-btn">📑 Combine Documents</button>
         </div>
 
         <!-- Mode 1: Chapter Creation -->
-        <div id="mode1-content" class="content-area">
-            <p class="instructions">
-                Add chapters one by one. Start each chapter with "Chapter X: Title" on its own line. This line becomes an H1 heading.
-                Use double line breaks (press Enter twice) to create new paragraphs.
-            </p>
+        <div id="mode1-content" class="content-area active">
+            <div class="instructions">
+                <b>Mode 1 — Create Chapters:</b><br>
+                Add chapters one by one. Start each chapter with <code>Chapter X: Title</code> (or similar) on its own line. This line becomes a big heading.<br>
+                Use double line breaks for new paragraphs.
+            </div>
             <div class="main-actions">
-                 <button id="add-chapter-btn" class="action-button add">➕ Add New Chapter Box</button>
+                <button id="add-chapter-btn" class="action-button add">➕ Add Chapter Box</button>
             </div>
-            <div id="chapters-list" class="items-list" style="margin-top: 20px;">
-                <!-- Chapter boxes will be added here -->
-            </div>
+            <div id="chapters-list" class="items-list" style="margin-top: 20px;"></div>
         </div>
 
         <!-- Mode 2: Document Combination -->
         <div id="mode2-content" class="content-area">
-            <p class="instructions">
-                Paste the content of each existing document into a separate box. Each box represents one document, and a page break will be inserted after it in the final output. Use double line breaks for paragraphs.
-            </p>
-             <div class="main-actions">
-                <button id="add-document-btn" class="action-button add">➕ Add New Document Box</button>
+            <div class="instructions">
+                <b>Mode 2 — Combine Documents:</b><br>
+                Paste the content of each document into its own box. Each box becomes a new page in the result.
             </div>
-            <div id="documents-list" class="items-list" style="margin-top: 20px;">
-                <!-- Document boxes will be added here -->
+            <div class="main-actions">
+                <button id="add-document-btn" class="action-button add">➕ Add Document Box</button>
             </div>
+            <div id="documents-list" class="items-list" style="margin-top: 20px;"></div>
         </div>
 
         <div class="main-actions generate-clear-actions">
             <button id="generate-doc-btn" class="action-button generate">📄 Generate & Download .docx</button>
-            <button id="clear-all-btn" class="action-button clear">🗑️ Clear All Inputs</button>
+            <button id="clear-all-btn" class="action-button clear">🗑️ Clear All</button>
         </div>
 
         <footer id="app-footer">
-            <p>Created with ❤️. All processing is done in your browser. No data is sent to any server.</p>
+            <p>Made with <span style="color:var(--primary)">&#10084;&#65039;</span> — 100% browser, no data leaves your device.</p>
         </footer>
     </div>
-
+    <div class="toast" id="toast"></div>
     <script>
-        // DEBUGGING ALERTS: Remove these once the issue is resolved.
-        alert("Script loaded. DOMContentLoaded listener will be set up.");
+        // --- UI State ---
+        const mode1Btn = document.getElementById('mode1-btn');
+        const mode2Btn = document.getElementById('mode2-btn');
+        const mode1Content = document.getElementById('mode1-content');
+        const mode2Content = document.getElementById('mode2-content');
+        const addChapterBtn = document.getElementById('add-chapter-btn');
+        const chaptersList = document.getElementById('chapters-list');
+        const addDocumentBtn = document.getElementById('add-document-btn');
+        const documentsList = document.getElementById('documents-list');
+        const generateDocBtn = document.getElementById('generate-doc-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const toast = document.getElementById('toast');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            alert("DOMContentLoaded event fired. Initializing app...");
+        let currentMode = 'mode1';
 
-            // DOM Elements
-            const mode1Btn = document.getElementById('mode1-btn');
-            const mode2Btn = document.getElementById('mode2-btn');
-            const mode1Content = document.getElementById('mode1-content');
-            const mode2Content = document.getElementById('mode2-content');
+        // --- Toast helper ---
+        function showToast(msg, ms = 2000) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), ms);
+        }
 
-            const addChapterBtn = document.getElementById('add-chapter-btn');
-            const chaptersList = document.getElementById('chapters-list');
-            const addDocumentBtn = document.getElementById('add-document-btn');
-            const documentsList = document.getElementById('documents-list');
+        // --- Mode switching ---
+        function switchMode(newMode) {
+            currentMode = newMode;
+            mode1Btn.classList.toggle('active', newMode === 'mode1');
+            mode2Btn.classList.toggle('active', newMode === 'mode2');
+            mode1Content.classList.toggle('active', newMode === 'mode1');
+            mode2Content.classList.toggle('active', newMode === 'mode2');
+            // Add one box if none exist
+            if (newMode === 'mode1' && chaptersList.children.length === 0) {
+                createItemBox('chapter', chaptersList);
+            } else if (newMode === 'mode2' && documentsList.children.length === 0) {
+                createItemBox('document', documentsList);
+            }
+        }
+        mode1Btn.addEventListener('click', () => switchMode('mode1'));
+        mode2Btn.addEventListener('click', () => switchMode('mode2'));
 
-            const generateDocBtn = document.getElementById('generate-doc-btn');
-            const clearAllBtn = document.getElementById('clear-all-btn');
+        // --- Item box creation ---
+        function createItemBox(type, container) {
+            const itemId = `${type}-${Date.now()}-${Math.floor(Math.random()*9999)}`;
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item-container');
+            itemDiv.id = itemId;
 
-            // --- Check if crucial elements exist ---
-            if (!addChapterBtn) alert("DEBUG: addChapterBtn is NULL!");
-            if (!chaptersList) alert("DEBUG: chaptersList is NULL!");
-            if (!addDocumentBtn) alert("DEBUG: addDocumentBtn is NULL!");
-            if (!documentsList) alert("DEBUG: documentsList is NULL!");
+            const textarea = document.createElement('textarea');
+            textarea.placeholder = (type === 'chapter')
+                ? "Chapter 1: My Awesome Title\n\nThis is the beginning of the chapter..."
+                : "Paste the content of your document here...";
 
+            // Controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.classList.add('item-controls');
 
-            let currentMode = 'mode1';
+            const moveUpBtn = document.createElement('button');
+            moveUpBtn.innerHTML = '<span style="font-size:1.1em;">&#9650;</span> Up';
+            moveUpBtn.title = "Move up";
+            moveUpBtn.addEventListener('click', () => moveItem(itemDiv, 'up'));
 
-            // --- Mode Switching ---
-            function switchMode(newMode) {
-                alert(`Switching to mode: ${newMode}`);
-                currentMode = newMode;
-                mode1Btn.classList.toggle('active', newMode === 'mode1');
-                mode2Btn.classList.toggle('active', newMode === 'mode2');
-                mode1Content.classList.toggle('active', newMode === 'mode1');
-                mode2Content.classList.toggle('active', newMode === 'mode2');
+            const moveDownBtn = document.createElement('button');
+            moveDownBtn.innerHTML = '<span style="font-size:1.1em;">&#9660;</span> Down';
+            moveDownBtn.title = "Move down";
+            moveDownBtn.addEventListener('click', () => moveItem(itemDiv, 'down'));
 
-                if (newMode === 'mode1' && chaptersList.children.length === 0) {
-                    alert("Mode 1 active and chaptersList is empty. Creating initial chapter box.");
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '<span style="font-size:1.1em;">&#10006;</span> Remove';
+            removeBtn.classList.add('remove');
+            removeBtn.title = "Remove this box";
+            removeBtn.addEventListener('click', () => {
+                itemDiv.style.transition = 'opacity 0.28s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.4,0,.2,1)';
+                itemDiv.style.opacity = '0';
+                itemDiv.style.transform = 'scale(0.95)';
+                setTimeout(() => itemDiv.remove(), 270);
+            });
+
+            controlsDiv.append(moveUpBtn, moveDownBtn, removeBtn);
+
+            itemDiv.appendChild(textarea);
+            itemDiv.appendChild(controlsDiv);
+
+            container.appendChild(itemDiv);
+            textarea.focus();
+        }
+
+        function moveItem(itemDiv, dir) {
+            const parent = itemDiv.parentNode;
+            if (dir === 'up' && itemDiv.previousElementSibling) {
+                parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
+            } else if (dir === 'down' && itemDiv.nextElementSibling) {
+                parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
+            }
+        }
+
+        addChapterBtn.addEventListener('click', () => {
+            createItemBox('chapter', chaptersList);
+        });
+        addDocumentBtn.addEventListener('click', () => {
+            createItemBox('document', documentsList);
+        });
+
+        // --- .docx generation ---
+        generateDocBtn.addEventListener('click', () => {
+            let htmlContent = `
+                <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
+                body { font-family: Arial, sans-serif; font-size: 13.5pt; margin: 1in; color: #222;}
+                h1 { font-size: 23pt; font-weight: bold; color: #6c47ff; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
+                p { margin-bottom: 13pt; line-height: 1.5; text-align: justify; }
+                .page-break { page-break-after: always; }
+                </style></head><body>
+            `;
+
+            let itemsToProcess = [];
+            let errors = false;
+
+            try {
+                if (currentMode === 'mode1') {
+                    itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
+                    itemsToProcess.forEach((textarea, i) => {
+                        const content = textarea.value.trim();
+                        if (content) {
+                            const lines = content.split('\n');
+                            let titleLine = 'Untitled Chapter';
+                            let bodyContent = content;
+                            if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
+                                titleLine = lines.shift();
+                                bodyContent = lines.join('\n').trim();
+                            } else if (lines[0] && lines[0].length < 80 && lines.length > 1) {
+                                titleLine = lines.shift();
+                                bodyContent = lines.join('\n').trim();
+                            } else { titleLine = `Section ${i + 1}`; }
+                            htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
+                            if (bodyContent) {
+                                bodyContent.split(/\n\s*\n/).forEach(p => {
+                                    if (p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`;
+                                });
+                            }
+                            if (i < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
+                        }
+                    });
+                } else {
+                    itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
+                    itemsToProcess.forEach((textarea, i) => {
+                        const content = textarea.value.trim();
+                        if (content) {
+                            content.split(/\n\s*\n/).forEach(p => {
+                                if (p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`;
+                            });
+                            if (i < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
+                        }
+                    });
+                }
+                htmlContent += `</body></html>`;
+            } catch (e) {
+                showToast("Error processing content: " + e.message, 2900);
+                errors = true;
+            }
+            if (errors) return;
+
+            if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
+                try {
+                    const converted = htmlDocx.asBlob(htmlContent,
+                        { orientation: 'portrait', margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } }
+                    );
+                    const filename = `StoryWeaver-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(converted);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                    showToast("Document generated & download started!", 2100);
+                } catch (e) {
+                    showToast("Error generating .docx: " + e.message, 3100);
+                }
+            } else {
+                showToast("Nothing to generate — add some chapters or documents!", 2200);
+            }
+        });
+
+        // --- Clear all ---
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm("Clear all input fields? This cannot be undone.")) {
+                chaptersList.innerHTML = '';
+                documentsList.innerHTML = '';
+                showToast("All cleared.");
+                if (currentMode === 'mode1') {
                     createItemBox('chapter', chaptersList);
-                } else if (newMode === 'mode2' && documentsList.children.length === 0) {
-                     alert("Mode 2 active and documentsList is empty. Creating initial document box.");
+                } else {
                     createItemBox('document', documentsList);
                 }
             }
-
-            if (mode1Btn) mode1Btn.addEventListener('click', () => switchMode('mode1')); else alert("DEBUG: mode1Btn not found for listener.");
-            if (mode2Btn) mode2Btn.addEventListener('click', () => switchMode('mode2')); else alert("DEBUG: mode2Btn not found for listener.");
-
-            // --- Item Box Creation & Management ---
-            function createItemBox(type, container) {
-                alert(`createItemBox called. Type: ${type}. Container exists: ${!!container}`);
-                if (!container) {
-                    alert("CRITICAL ERROR in createItemBox: Container is null or undefined. Cannot add item box.");
-                    return; 
-                }
-
-                const itemId = `${type}-${Date.now()}`;
-                const itemDiv = document.createElement('div');
-                itemDiv.classList.add('item-container');
-                itemDiv.id = itemId;
-                itemDiv.setAttribute('draggable', 'true');
-
-                const textarea = document.createElement('textarea');
-                textarea.placeholder = (type === 'chapter')
-                    ? "Chapter 1: My Awesome Title\n\nThis is the beginning of the chapter..."
-                    : "Paste the content of your document here...";
-
-                const controlsDiv = document.createElement('div');
-                controlsDiv.classList.add('item-controls');
-
-                const moveUpBtn = document.createElement('button');
-                moveUpBtn.innerHTML = '<span>▲</span> Up';
-                moveUpBtn.classList.add('move-up');
-                moveUpBtn.title = "Move Up";
-                moveUpBtn.onclick = () => moveItem(itemDiv, 'up');
-
-                const moveDownBtn = document.createElement('button');
-                moveDownBtn.innerHTML = '<span>▼</span> Down';
-                moveDownBtn.classList.add('move-down');
-                moveDownBtn.title = "Move Down";
-                moveDownBtn.onclick = () => moveItem(itemDiv, 'down');
-
-                const removeBtn = document.createElement('button');
-                removeBtn.innerHTML = '<span></span> Remove';
-                removeBtn.classList.add('remove');
-                removeBtn.title = "Remove this box";
-                removeBtn.onclick = () => {
-                    itemDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    itemDiv.style.opacity = '0';
-                    itemDiv.style.transform = 'scale(0.95)';
-                    setTimeout(() => itemDiv.remove(), 300);
-                };
-                
-                controlsDiv.appendChild(moveUpBtn);
-                controlsDiv.appendChild(moveDownBtn);
-                controlsDiv.appendChild(removeBtn);
-
-                itemDiv.appendChild(textarea);
-                itemDiv.appendChild(controlsDiv);
-                
-                container.appendChild(itemDiv);
-                textarea.focus();
-                alert(`Item box (${type}) created and appended. Textarea focused.`);
-            }
-
-            function moveItem(itemDiv, direction) {
-                // Not adding alerts here for brevity, focus on creation first
-                const parent = itemDiv.parentNode;
-                if (direction === 'up' && itemDiv.previousElementSibling) {
-                    parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
-                } else if (direction === 'down' && itemDiv.nextElementSibling) {
-                    parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
-                }
-            }
-
-            if (addChapterBtn) {
-                addChapterBtn.addEventListener('click', () => {
-                    alert("Add Chapter Box button clicked!");
-                    try {
-                        createItemBox('chapter', chaptersList);
-                    } catch (e) {
-                        alert(`ERROR in Add Chapter click: ${e.message}\n${e.stack}`);
-                    }
-                });
-            } else {
-                alert("DEBUG: addChapterBtn NOT found for click listener attachment!");
-            }
-
-            if (addDocumentBtn) {
-                addDocumentBtn.addEventListener('click', () => {
-                    alert("Add Document Box button clicked!");
-                     try {
-                        createItemBox('document', documentsList);
-                    } catch (e) {
-                        alert(`ERROR in Add Document click: ${e.message}\n${e.stack}`);
-                    }
-                });
-            } else {
-                alert("DEBUG: addDocumentBtn NOT found for click listener attachment!");
-            }
-
-
-            // --- Document Generation ---
-            if (generateDocBtn) {
-                generateDocBtn.addEventListener('click', () => {
-                    alert("Generate DOCX button clicked. Processing content...");
-                    // ... (rest of the generation logic from previous script) ...
-                    // For brevity, I'm not including the full generation logic with alerts,
-                    // as the primary issue is item creation.
-
-                    let htmlContent = `
-                        <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
-                        body { font-family: Arial, sans-serif; font-size: 12pt; margin: 1in; }
-                        h1 { font-size: 22pt; font-weight: bold; color: #2F5496; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
-                        p { margin-bottom: 12pt; line-height: 1.5; text-align: justify; }
-                        .page-break { page-break-after: always; }
-                        </style></head><body>`;
-                    
-                    let itemsToProcess = [];
-                    let processingError = false;
-
-                    try {
-                        if (currentMode === 'mode1') {
-                            itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
-                            itemsToProcess.forEach((textarea, index) => {
-                                // ... (mode 1 content processing as before) ...
-                                const content = textarea.value.trim();
-                                if (content) {
-                                    const lines = content.split('\n');
-                                    let titleLine = 'Untitled Chapter';
-                                    let bodyContent = content;
-                                    if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
-                                        titleLine = lines.shift();
-                                        bodyContent = lines.join('\n').trim();
-                                    } else if(lines[0] && lines[0].length < 80 && lines.length > 1) {
-                                        titleLine = lines.shift();
-                                        bodyContent = lines.join('\n').trim();
-                                    } else { titleLine = `Section ${index + 1}`; }
-                                    htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
-                                    if (bodyContent) {
-                                        bodyContent.split(/\n\s*\n/).forEach(p => { if(p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`; });
-                                    }
-                                    if (index < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
-                                }
-                            });
-                        } else { // mode2
-                            itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
-                            itemsToProcess.forEach((textarea, index) => {
-                                // ... (mode 2 content processing as before) ...
-                                const content = textarea.value.trim();
-                                if (content) {
-                                    content.split(/\n\s*\n/).forEach(p => { if(p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`; });
-                                    if (index < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
-                                }
-                            });
-                        }
-                        htmlContent += `</body></html>`;
-                    } catch (e) {
-                        alert(`Error during content processing for DOCX: ${e.message}`);
-                        processingError = true;
-                    }
-
-                    if (processingError) return;
-
-
-                    if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
-                        try {
-                            alert("Content processed. Attempting to generate DOCX blob...");
-                            const converted = htmlDocx.asBlob(htmlContent, {
-                                orientation: 'portrait',
-                                margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
-                            });
-                            alert("DOCX blob created. Triggering download...");
-                            const filename = `GeneratedDocument-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
-                            
-                            const link = document.createElement('a');
-                            link.href = URL.createObjectURL(converted);
-                            link.download = filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            URL.revokeObjectURL(link.href);
-                            alert("Download triggered.");
-
-                            if (confirm("Document generated and download started! ✨\n\nDo you want to clear all input fields?")) {
-                                clearAllInputs(false);
-                            }
-                        } catch (e) {
-                            console.error("Error generating DOCX:", e);
-                            alert(`An error occurred while generating the document: ${e.message}\nStack: ${e.stack}`);
-                        }
-                    } else {
-                        alert("Looks like there's no content yet. Add some chapters or documents first!");
-                    }
-                });
-            } else {
-                alert("DEBUG: generateDocBtn not found for listener.");
-            }
-            
-            // --- Clear All ---
-            if (clearAllBtn) {
-                clearAllBtn.addEventListener('click', () => clearAllInputs(true));
-            } else {
-                alert("DEBUG: clearAllBtn not found for listener.");
-            }
-
-
-            function clearAllInputs(confirmFirst = true) {
-                alert(`clearAllInputs called. Confirm first: ${confirmFirst}`);
-                const doClear = confirmFirst 
-                    ? confirm("Are you sure you want to clear all input fields? This action cannot be undone.")
-                    : true;
-
-                if (doClear) {
-                    if (chaptersList) chaptersList.innerHTML = ''; else alert("DEBUG: chaptersList is null in clearAllInputs");
-                    if (documentsList) documentsList.innerHTML = ''; else alert("DEBUG: documentsList is null in clearAllInputs");
-                    
-                    alert("Inputs cleared. Adding initial box for current mode.");
-                    if (currentMode === 'mode1') {
-                        createItemBox('chapter', chaptersList);
-                    } else {
-                        createItemBox('document', documentsList);
-                    }
-                } else {
-                    alert("Clear inputs cancelled by user.");
-                }
-            }
-
-            // --- Utility ---
-            function escapeHtml(unsafe) {
-                if (typeof unsafe !== 'string') return '';
-                return unsafe
-                     .replace(/&/g, "&")
-                     .replace(/</g, "<")
-                     .replace(/>/g, ">")
-                     .replace(/"/g, """)
-                     .replace(/'/g, "'");
-            }
-
-            // --- Initialize App ---
-            alert("Attempting to initialize to Mode 1.");
-            switchMode('mode1'); // Start in mode 1 by default
-            alert("App initialization complete.");
         });
-    </script>
 
+        // --- Utility: HTML escape ---
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // --- Init: Start in mode 1 with one box ---
+        switchMode('mode1');
+    </script>
 </body>
 </html>
