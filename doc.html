@@ -3,574 +3,914 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Weaver Studio</title>
+    <title>Story Weaver Studio - Revamped</title>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto+Mono:wght@400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --main-bg: #f7fafd;
-            --surface-bg: #fff;
-            --primary: #6c47ff;
-            --primary-dark: #4d2fd9;
-            --secondary: #22c1c3;
-            --secondary-dark: #1a9e9f;
-            --danger: #ef476f;
-            --danger-dark: #d7264b;
-            --success: #3ecf8e;
-            --success-dark: #28b86b;
-            --text-main: #23272f;
-            --text-subtle: #6c7890;
-            --border: #e6e8ef;
-            --radius: 16px;
-            --radius-sm: 8px;
-            --shadow-lg: 0 8px 32px 0 rgba(120, 113, 220, 0.12);
-            --shadow-sm: 0 2px 8px 0 rgba(120, 113, 220, 0.05);
-            --transition: 0.17s cubic-bezier(.4,0,.2,1);
-            --font-title: 'Montserrat', 'Segoe UI', Arial, sans-serif;
-            --font-main: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            --font-primary: 'Inter', 'Segoe UI', Arial, sans-serif;
+            --font-headings: 'Montserrat', 'Segoe UI', Arial, sans-serif;
             --font-mono: 'Roboto Mono', monospace;
+
+            --primary: #4A90E2; /* Blue */
+            --primary-dark: #357ABD;
+            --primary-light: #EAF2FA;
+            --secondary: #50E3C2; /* Mint */
+            --secondary-dark: #38BFA0;
+            --accent: #F5A623; /* Orange */
+            --accent-dark: #D8931F;
+
+            --bg-main: #F4F7F9;
+            --bg-surface: #FFFFFF;
+            --bg-surface-alt: #E9EFF3; /* For cards */
+            
+            --text-main: #2D3748; /* Dark Gray */
+            --text-subtle: #718096; /* Medium Gray */
+            --text-on-primary: #FFFFFF;
+            --text-on-accent: #FFFFFF;
+
+            --border-color: #D8DEE3;
+            --border-color-light: #E2E8F0;
+            --danger: #D0021B;
+            --danger-dark: #B00016;
+            --success: #4CAF50;
+            --success-dark: #3E8E41;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 8px 0 rgba(60,64,67,0.1), 0 1px 3px 0 rgba(60,64,67,0.15);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.07);
+            
+            --transition-fast: 0.15s ease-out;
+            --transition-std: 0.25s ease-out;
+
+            --max-width-content: 900px;
+        }
+
+        /* --- Dark Mode Variables (example - more comprehensive would be needed) --- */
+        /*
+        html[data-theme="dark"] {
+            --bg-main: #1A202C;
+            --bg-surface: #2D3748;
+            --bg-surface-alt: #262F3D;
+            --text-main: #E2E8F0;
+            --text-subtle: #A0AEC0;
+            --border-color: #4A5568;
+            --border-color-light: #3A4354;
+        }
+        */
+
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
         html, body {
             margin: 0;
             padding: 0;
-            background: var(--main-bg);
+            background: var(--bg-main);
             color: var(--text-main);
-            font-family: var(--font-main);
-            min-height: 100vh;
-            font-size: 17px;
-            letter-spacing: 0.01em;
-        }
-
-        body {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+            font-family: var(--font-primary);
+            font-size: 16px; /* Base font size */
+            line-height: 1.6;
             min-height: 100vh;
         }
 
-        .app-container {
-            background: var(--surface-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            max-width: 810px;
-            width: 100%;
-            margin: 48px 0 32px 0;
-            padding: 40px 36px 32px 36px;
+        .app-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 0;
-            position: relative;
-            min-height: 80vh;
+            min-height: 100vh;
         }
 
         .app-header {
-            text-align: center;
-            margin-bottom: 23px;
+            background: var(--bg-surface);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .app-header h1 {
-            font-family: var(--font-title);
-            font-size: 2.35em;
+            font-family: var(--font-headings);
+            font-size: 1.5em;
             font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--primary-dark);
-            margin: 0 0 10px 0;
-            background: linear-gradient(90deg, var(--primary) 20%, var(--secondary) 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
+            margin: 0;
         }
-        .app-header p {
-            color: var(--text-subtle);
-            font-size: 1.07em;
-            letter-spacing: 0.01em;
-            margin: 0 0 12px 0;
-        }
-
-        .mode-selector {
+        
+        .segmented-control {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-            background: #f3f4fd;
+            background-color: var(--bg-surface-alt);
             border-radius: var(--radius-sm);
-            padding: 8px 0;
+            padding: 4px;
         }
-        .mode-selector button {
+        .segmented-control button {
             border: none;
-            background: none;
-            font-family: var(--font-title);
-            font-size: 1.09em;
+            background: transparent;
+            font-family: var(--font-primary);
             font-weight: 600;
+            font-size: 0.9em;
             color: var(--text-subtle);
             cursor: pointer;
-            padding: 13px 32px;
+            padding: 8px 16px;
             border-radius: var(--radius-sm);
-            transition: background var(--transition), color var(--transition);
+            transition: background var(--transition-std), color var(--transition-std);
         }
-        .mode-selector button.active, .mode-selector button:focus-visible {
-            background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
-            color: #fff;
-            box-shadow: 0 3px 16px 0 rgba(120,113,220,0.08);
-            outline: none;
-        }
-
-        .content-area {
-            display: none;
-        }
-        .content-area.active {
-            display: block;
-            animation: fadeIn 0.45s cubic-bezier(0.57,0.21,0.69,1.25);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px);}
-            to { opacity: 1; transform: translateY(0);}
+        .segmented-control button.active {
+            background: var(--primary);
+            color: var(--text-on-primary);
+            box-shadow: var(--shadow-xs);
         }
 
-        .instructions {
-            font-size: 0.98em;
-            color: var(--primary-dark);
-            background: linear-gradient(90deg, #f3f4fd 75%, #e8fcfa 100%);
-            padding: 15px 22px;
-            border-left: 5px solid var(--primary);
-            margin-bottom: 22px;
-            border-radius: var(--radius-sm);
-        }
-
-        .items-list {
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-
-        .item-container {
-            background: #fbfbff;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-sm);
-            padding: 18px 18px 12px 18px;
-            transition: border-color var(--transition), box-shadow var(--transition);
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            position: relative;
-        }
-        .item-container:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px #8073ff1f;
-        }
-        .item-container textarea {
+        .main-content {
+            flex-grow: 1;
+            padding: 24px 20px;
+            max-width: var(--max-width-content);
             width: 100%;
-            min-height: 135px;
-            max-height: 410px;
-            font-family: var(--font-mono);
+            margin: 0 auto;
+        }
+        
+        .page-title-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .page-title-section h2 {
+            font-family: var(--font-headings);
+            font-size: 2.2em;
+            color: var(--text-main);
+            margin: 0 0 8px 0;
+        }
+        .page-title-section p {
+            color: var(--text-subtle);
             font-size: 1em;
-            padding: 11px 13px 10px 13px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .instructions-toggle {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            background: var(--primary-light);
+            padding: 10px 15px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--primary);
+        }
+        .instructions-toggle svg { width: 20px; height: 20px; margin-right: 8px; transition: transform var(--transition-std); }
+        .instructions-toggle.open svg { transform: rotate(90deg); }
+        .instructions-content {
+            font-size: 0.95em;
+            color: var(--text-main);
+            background: var(--bg-surface);
+            padding: 15px 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 22px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            display: none; /* Hidden by default */
+        }
+        .instructions-content.visible { display: block; }
+        .instructions-content b { color: var(--primary-dark); }
+        .instructions-content ul { padding-left: 20px; margin-top: 8px; }
+        .instructions-content code { background: var(--bg-surface-alt); padding: 2px 5px; border-radius: var(--radius-sm); font-family: var(--font-mono); }
+
+        .content-area { display: none; }
+        .content-area.active { display: block; animation: fadeIn 0.3s var(--transition-std); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+
+        .items-list { display: flex; flex-direction: column; gap: 20px; }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-subtle);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-top: 20px;
+        }
+        .empty-state p { margin: 0 0 10px 0; font-size: 1.1em; }
+
+        .item-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: box-shadow var(--transition-std), border-color var(--transition-std);
+        }
+        .item-card.dragging { opacity: 0.6; border-color: var(--primary); box-shadow: var(--shadow-lg); }
+        
+        .item-card-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color-light);
+            background: var(--bg-surface-alt); /* Lighter header */
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+        }
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-subtle);
+            padding: 8px; /* Increase tap area */
+            margin-right: 8px;
+        }
+        .drag-handle svg { display: block; width:18px; height:18px; }
+        .item-title-preview {
+            font-weight: 600;
+            font-size: 0.95em;
+            color: var(--text-main);
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .item-menu-btn {
+            background: transparent; border: none; color: var(--text-subtle); cursor: pointer; padding: 8px; margin-left: auto;
+        }
+        .item-menu-btn svg { display:block; width:18px; height:18px;}
+        .item-menu-btn:hover { color: var(--primary); }
+
+        .item-card textarea {
+            width: 100%;
+            min-height: 180px; /* Increased min-height */
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            padding: 15px;
             border: none;
-            border-radius: var(--radius-sm);
-            background: #f7fafd;
+            background: transparent; /* Use card background */
             resize: vertical;
             outline: none;
             color: var(--text-main);
-            margin-bottom: 10px;
-            box-shadow: 0 1px 3px 0 rgba(120,113,220,0.03);
-            transition: box-shadow var(--transition);
         }
-        .item-controls {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 0;
-        }
-        .item-controls button {
-            border: none;
-            background: #e3e4fd;
-            color: var(--primary);
-            border-radius: var(--radius-sm);
-            font-size: 0.97em;
-            font-family: var(--font-title);
-            font-weight: 600;
-            cursor: pointer;
-            padding: 7px 14px;
-            transition: background var(--transition), color var(--transition);
-            outline: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .item-controls button:hover, .item-controls button:focus-visible {
-            background: var(--primary);
-            color: #fff;
-        }
-        .item-controls button.remove {
-            background: #ffe3e9;
-            color: var(--danger-dark);
-        }
-        .item-controls button.remove:hover, .item-controls button.remove:focus-visible {
-            background: var(--danger-dark);
-            color: #fff;
-        }
-
-        .main-actions {
-            display: flex;
-            gap: 15px;
-            margin: 32px 0 0 0;
-        }
-        .main-actions .action-button {
-            border: none;
-            font-family: var(--font-title);
-            font-weight: 600;
-            font-size: 1.07em;
-            padding: 13px 22px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            background: var(--primary);
-            color: #fff;
-            transition: background var(--transition), box-shadow var(--transition);
-            box-shadow: 0 3px 16px 0 rgba(120,113,220,0.09);
-            display: flex;
-            align-items: center;
-            gap: 9px;
-        }
-        .main-actions .action-button.add {
-            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
-        }
-        .main-actions .action-button.add:hover {
-            background: linear-gradient(90deg, var(--primary-dark) 60%, var(--secondary-dark) 100%);
-        }
-        .main-actions .action-button:active {
-            filter: brightness(95%);
-        }
-        .generate-clear-actions {
+        .item-card-footer {
             display: flex;
             justify-content: space-between;
-            gap: 16px;
-            margin: 32px 0 0 0;
+            align-items: center;
+            padding: 6px 12px;
+            font-size: 0.8em;
+            color: var(--text-subtle);
+            border-top: 1px solid var(--border-color-light);
+        }
+        .word-count { font-weight: 600; }
+
+        .fab-add-item {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: var(--text-on-accent);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 2em;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-std), transform var(--transition-std);
+            z-index: 90;
+        }
+        .fab-add-item:hover { background: var(--accent-dark); transform: scale(1.05); }
+
+        .bottom-action-bar {
+            background: var(--bg-surface);
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+            z-index: 95;
+        }
+        .filename-input-group {
+            flex-grow: 1; display: flex; flex-direction: column;
+        }
+        .filename-input-group label {
+            font-size: 0.8em; color: var(--text-subtle); margin-bottom: 2px;
+        }
+        .filename-input-group input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-primary);
+            font-size: 0.95em;
+            background-color: var(--bg-main); /* Slightly different bg for input */
+        }
+        .filename-input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .action-button {
+            border: none;
+            font-family: var(--font-headings);
+            font-weight: 600;
+            font-size: 0.95em;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background var(--transition-std), color var(--transition-std);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
         .action-button.generate {
-            flex: 1;
-            background: linear-gradient(90deg, var(--success) 70%, var(--primary) 100%);
+            background: var(--success); color: var(--text-on-primary);
         }
-        .action-button.generate:hover {
-            background: linear-gradient(90deg, var(--success-dark) 60%, var(--primary-dark) 100%);
-        }
+        .action-button.generate:hover { background: var(--success-dark); }
         .action-button.clear {
-            background: linear-gradient(90deg, var(--danger) 70%, var(--secondary) 100%);
+            background: var(--danger); color: var(--text-on-primary);
         }
-        .action-button.clear:hover {
-            background: linear-gradient(90deg, var(--danger-dark) 70%, var(--secondary-dark) 100%);
-        }
-
-        #app-footer {
-            text-align: center;
-            margin-top: 38px;
-            font-size: 0.91em;
-            color: var(--text-subtle);
-            letter-spacing: 0.01em;
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .app-container {
-                max-width: 98vw;
-                padding: 24px 8vw 20px 8vw;
-            }
-        }
-        @media (max-width: 600px) {
-            .app-container {
-                max-width: 100vw;
-                padding: 12px 2vw 10px 2vw;
-                border-radius: 0;
-            }
-            .main-actions, .generate-clear-actions {
-                flex-direction: column;
-            }
-        }
+        .action-button.clear:hover { background: var(--danger-dark); }
 
         /* Toast Notification */
         .toast {
             position: fixed;
             left: 50%;
-            bottom: 30px;
+            bottom: 30px; /* Initial position above FAB */
             transform: translateX(-50%);
-            background: #fff;
-            color: var(--primary-dark);
-            border-radius: 99px;
-            box-shadow: 0 4px 18px 0 rgba(120,113,220,0.14);
-            padding: 14px 34px;
-            font-family: var(--font-title);
-            font-weight: 700;
-            font-size: 1.05em;
+            background: var(--text-main); /* Darker toast for contrast */
+            color: var(--bg-main);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 12px 24px;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 0.95em;
             opacity: 0;
             pointer-events: none;
-            z-index: 100;
-            transition: opacity 0.35s, bottom 0.35s;
+            z-index: 1000;
+            transition: opacity 0.3s, bottom 0.3s;
         }
         .toast.show {
             opacity: 1;
-            bottom: 56px;
+            bottom: 95px; /* Position above bottom bar & FAB */
             pointer-events: auto;
+        }
+        .toast.success { background: var(--success); color: var(--text-on-primary); }
+        .toast.error { background: var(--danger); color: var(--text-on-primary); }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .app-header h1 { font-size: 1.2em; }
+            .segmented-control button { padding: 6px 10px; font-size: 0.85em;}
+            .page-title-section h2 { font-size: 1.8em; }
+            .main-content { padding: 20px 15px; }
+            
+            .bottom-action-bar {
+                flex-direction: column;
+                gap: 10px;
+                padding-bottom: calc(60px + 15px + 15px); /* Space for FAB */
+            }
+            .filename-input-group { width: 100%; }
+            .action-button { width: 100%; justify-content: center; }
+            .fab-add-item { bottom: 20px; right: 20px; width: 56px; height: 56px;}
+            .toast.show { bottom: calc(60px + 20px + 15px); } /* adjust toast position for mobile */
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-wrapper">
         <header class="app-header">
-            <h1>Story Weaver Studio</h1>
-            <p>Craft beautiful chapters or combine documents into a single .docx masterpiece. Fast, elegant, and all in your browser.</p>
+            <h1>Story Weaver</h1>
+            <div class="segmented-control">
+                <button id="mode1-btn" class="active">📝 Chapters</button>
+                <button id="mode2-btn">📑 Documents</button>
+            </div>
+            <!-- Optional: Theme Toggle <button id="theme-toggle">🌓</button> -->
         </header>
 
-        <div class="mode-selector">
-            <button id="mode1-btn" class="active">📝 Create Chapters</button>
-            <button id="mode2-btn">📑 Combine Documents</button>
-        </div>
-
-        <!-- Mode 1: Chapter Creation -->
-        <div id="mode1-content" class="content-area active">
-            <div class="instructions">
-                <b>Mode 1 — Create Chapters:</b><br>
-                Add chapters one by one. Start each chapter with <code>Chapter X: Title</code> (or similar) on its own line. This line becomes a big heading.<br>
-                Use double line breaks for new paragraphs.
+        <main class="main-content">
+            <div class="page-title-section">
+                <h2 id="page-main-title">Create Beautiful Chapters</h2>
+                <p id="page-main-subtitle">Craft your story chapter by chapter, or combine existing documents into a polished .docx file.</p>
             </div>
-            <div class="main-actions">
-                <button id="add-chapter-btn" class="action-button add">➕ Add Chapter Box</button>
+            
+            <!-- Mode 1: Chapter Creation -->
+            <div id="mode1-content" class="content-area active">
+                <div class="instructions-toggle" id="mode1-instructions-toggle">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 17l5-5-5-5v10z"></path></svg>
+                    <span>How to Create Chapters</span>
+                </div>
+                <div class="instructions-content" id="mode1-instructions-content">
+                    <b>Mode 1 — Create Chapters:</b>
+                    <ul>
+                        <li>Add chapters one by one. The first line of your text (if short) will be used as the chapter title (e.g., <code>Chapter 1: The Beginning</code>). It becomes a large heading.</li>
+                        <li>Use double line breaks for new paragraphs.</li>
+                        <li>Basic Markdown: <code>*italic*</code> or <code>_italic_</code>, <code>**bold**</code> or <code>__bold__</code>.</li>
+                        <li>Drag cards to reorder chapters.</li>
+                    </ul>
+                </div>
+                <div id="chapters-list" class="items-list"></div>
+                <div id="chapters-empty-state" class="empty-state" style="display:none;">
+                    <p>No chapters yet!</p>
+                    <span>Click the '+' button to add your first chapter.</span>
+                </div>
             </div>
-            <div id="chapters-list" class="items-list" style="margin-top: 20px;"></div>
-        </div>
 
-        <!-- Mode 2: Document Combination -->
-        <div id="mode2-content" class="content-area">
-            <div class="instructions">
-                <b>Mode 2 — Combine Documents:</b><br>
-                Paste the content of each document into its own box. Each box becomes a new page in the result.
+            <!-- Mode 2: Document Combination -->
+            <div id="mode2-content" class="content-area">
+                <div class="instructions-toggle" id="mode2-instructions-toggle">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 17l5-5-5-5v10z"></path></svg>
+                    <span>How to Combine Documents</span>
+                </div>
+                <div class="instructions-content" id="mode2-instructions-content">
+                    <b>Mode 2 — Combine Documents:</b>
+                    <ul>
+                        <li>Paste the content of each document into its own box.</li>
+                        <li>Each box's content will typically start on a new page in the generated .docx.</li>
+                        <li>Drag cards to reorder documents before combining.</li>
+                    </ul>
+                </div>
+                <div id="documents-list" class="items-list"></div>
+                <div id="documents-empty-state" class="empty-state" style="display:none;">
+                    <p>No documents yet!</p>
+                    <span>Click the '+' button to add your first document.</span>
+                </div>
             </div>
-            <div class="main-actions">
-                <button id="add-document-btn" class="action-button add">➕ Add Document Box</button>
+        </main>
+
+        <button id="fab-add" class="fab-add-item" title="Add Item">➕</button>
+        
+        <footer class="bottom-action-bar">
+            <div class="filename-input-group">
+                <label for="filename-input">Filename (no .docx):</label>
+                <input type="text" id="filename-input" placeholder="MyStory_Export">
             </div>
-            <div id="documents-list" class="items-list" style="margin-top: 20px;"></div>
-        </div>
-
-        <div class="main-actions generate-clear-actions">
-            <button id="generate-doc-btn" class="action-button generate">📄 Generate & Download .docx</button>
-            <button id="clear-all-btn" class="action-button clear">🗑️ Clear All</button>
-        </div>
-
-        <footer id="app-footer">
-            <p>Made with <span style="color:var(--primary)">&#10084;&#65039;</span> — 100% browser, no data leaves your device.</p>
+            <button id="generate-doc-btn" class="action-button generate">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
+                Generate .docx
+            </button>
+            <button id="clear-all-btn" class="action-button clear">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                Clear All
+            </button>
         </footer>
     </div>
     <div class="toast" id="toast"></div>
+
     <script>
-        // --- UI State ---
+        // --- DOM Elements ---
         const mode1Btn = document.getElementById('mode1-btn');
         const mode2Btn = document.getElementById('mode2-btn');
         const mode1Content = document.getElementById('mode1-content');
         const mode2Content = document.getElementById('mode2-content');
-        const addChapterBtn = document.getElementById('add-chapter-btn');
+        const pageMainTitle = document.getElementById('page-main-title');
+        const pageMainSubtitle = document.getElementById('page-main-subtitle');
+
         const chaptersList = document.getElementById('chapters-list');
-        const addDocumentBtn = document.getElementById('add-document-btn');
         const documentsList = document.getElementById('documents-list');
+        const chaptersEmptyState = document.getElementById('chapters-empty-state');
+        const documentsEmptyState = document.getElementById('documents-empty-state');
+
+        const fabAddItem = document.getElementById('fab-add');
         const generateDocBtn = document.getElementById('generate-doc-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
+        const filenameInput = document.getElementById('filename-input');
         const toast = document.getElementById('toast');
 
-        let currentMode = 'mode1';
+        // Instructions Toggles
+        const mode1InstToggle = document.getElementById('mode1-instructions-toggle');
+        const mode1InstContent = document.getElementById('mode1-instructions-content');
+        const mode2InstToggle = document.getElementById('mode2-instructions-toggle');
+        const mode2InstContent = document.getElementById('mode2-instructions-content');
 
-        // --- Toast helper ---
-        function showToast(msg, ms = 2000) {
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), ms);
+        [mode1InstToggle, mode2InstToggle].forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.id.includes('mode1') ? mode1InstContent : mode2InstContent;
+                content.classList.toggle('visible');
+                toggle.classList.toggle('open');
+            });
+        });
+
+        let currentMode = 'mode1'; // 'mode1' for chapters, 'mode2' for documents
+        let itemIdCounter = 0; // Simple unique ID for items
+
+        // --- App State & LocalStorage ---
+        const APP_STORAGE_KEY = 'storyWeaverStudioState_v2';
+
+        function saveState() {
+            const chapterData = Array.from(chaptersList.querySelectorAll('.item-card textarea')).map(ta => ta.value);
+            const documentData = Array.from(documentsList.querySelectorAll('.item-card textarea')).map(ta => ta.value);
+            const state = {
+                currentMode,
+                chapters: chapterData,
+                documents: documentData,
+                filename: filenameInput.value
+            };
+            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(state));
+            showToast('Progress auto-saved!', 1500);
         }
 
-        // --- Mode switching ---
-        function switchMode(newMode) {
+        function loadState() {
+            const savedState = localStorage.getItem(APP_STORAGE_KEY);
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    switchMode(state.currentMode || 'mode1', true); // true to skip initial box creation
+                    
+                    state.chapters?.forEach(content => createItemBox('chapter', chaptersList, content));
+                    state.documents?.forEach(content => createItemBox('document', documentsList, content));
+                    
+                    filenameInput.value = state.filename || `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
+                    
+                    updateEmptyStates();
+                    showToast('Welcome back! Your work is restored.', 2000);
+                } catch(e) {
+                    console.error("Error loading state from localStorage:", e);
+                    localStorage.removeItem(APP_STORAGE_KEY); // Clear corrupted state
+                    initializeDefaultState();
+                }
+            } else {
+                initializeDefaultState();
+            }
+        }
+        
+        function initializeDefaultState() {
+            switchMode('mode1'); // This will create one initial box
+            filenameInput.value = `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
+        }
+
+
+        // --- Toast Helper ---
+        let toastTimeout;
+        function showToast(msg, duration = 2500, type = 'info') {
+            clearTimeout(toastTimeout);
+            toast.textContent = msg;
+            toast.className = 'toast'; // Reset classes
+            toast.classList.add('show');
+            if (type === 'success') toast.classList.add('success');
+            if (type === 'error') toast.classList.add('error');
+            
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        // --- Mode Switching ---
+        function switchMode(newMode, isLoading = false) {
             currentMode = newMode;
             mode1Btn.classList.toggle('active', newMode === 'mode1');
             mode2Btn.classList.toggle('active', newMode === 'mode2');
             mode1Content.classList.toggle('active', newMode === 'mode1');
             mode2Content.classList.toggle('active', newMode === 'mode2');
-            // Add one box if none exist
-            if (newMode === 'mode1' && chaptersList.children.length === 0) {
-                createItemBox('chapter', chaptersList);
-            } else if (newMode === 'mode2' && documentsList.children.length === 0) {
-                createItemBox('document', documentsList);
+
+            if (newMode === 'mode1') {
+                pageMainTitle.textContent = 'Create Beautiful Chapters';
+                pageMainSubtitle.textContent = 'Craft your story chapter by chapter...';
+                fabAddItem.title = "Add Chapter Box";
+                if (!isLoading && chaptersList.children.length === 0) createItemBox('chapter', chaptersList);
+            } else {
+                pageMainTitle.textContent = 'Combine Documents';
+                pageMainSubtitle.textContent = 'Merge multiple documents into one single masterpiece...';
+                fabAddItem.title = "Add Document Box";
+                if (!isLoading && documentsList.children.length === 0) createItemBox('document', documentsList);
             }
+            updateEmptyStates();
+            // saveState(); // Autosave on mode switch
         }
         mode1Btn.addEventListener('click', () => switchMode('mode1'));
         mode2Btn.addEventListener('click', () => switchMode('mode2'));
 
-        // --- Item box creation ---
-        function createItemBox(type, container) {
-            const itemId = `${type}-${Date.now()}-${Math.floor(Math.random()*9999)}`;
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('item-container');
-            itemDiv.id = itemId;
+        // --- Item Box Management ---
+        function createItemBox(type, container, content = '') {
+            itemIdCounter++;
+            const itemId = `${type}-${itemIdCounter}`;
+            const card = document.createElement('div');
+            card.classList.add('item-card');
+            card.id = itemId;
+            card.draggable = true; // For drag & drop
 
-            const textarea = document.createElement('textarea');
-            textarea.placeholder = (type === 'chapter')
-                ? "Chapter 1: My Awesome Title\n\nThis is the beginning of the chapter..."
-                : "Paste the content of your document here...";
+            const placeholderText = (type === 'chapter')
+                ? "Chapter X: Title\n\nStart writing your chapter here..."
+                : "Paste document content here...";
+            const initialTitle = (type === 'chapter') ? "New Chapter" : "New Document";
 
-            // Controls
-            const controlsDiv = document.createElement('div');
-            controlsDiv.classList.add('item-controls');
+            card.innerHTML = `
+                <div class="item-card-header">
+                    <span class="drag-handle" title="Drag to reorder">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"></path></svg>
+                    </span>
+                    <span class="item-title-preview">${initialTitle}</span>
+                    <button class="item-menu-btn" title="More options">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                    </button>
+                </div>
+                <textarea placeholder="${placeholderText}"></textarea>
+                <div class="item-card-footer">
+                    <span class="word-count">0 words</span>
+                    <span class="item-id-debug" style="font-size:0.7em; opacity:0.5;">ID: ${itemId}</span>
+                </div>
+            `;
+            
+            const textarea = card.querySelector('textarea');
+            textarea.value = content;
+            const titlePreview = card.querySelector('.item-title-preview');
+            const wordCountEl = card.querySelector('.word-count');
 
-            const moveUpBtn = document.createElement('button');
-            moveUpBtn.innerHTML = '<span style="font-size:1.1em;">&#9650;</span> Up';
-            moveUpBtn.title = "Move up";
-            moveUpBtn.addEventListener('click', () => moveItem(itemDiv, 'up'));
+            function updateItemMeta() {
+                const text = textarea.value;
+                // Update title preview
+                const firstLine = text.split('\n')[0].trim();
+                if (type === 'chapter') {
+                    titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Chapter ${Array.from(container.children).indexOf(card) + 1}`;
+                } else {
+                    titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Document ${Array.from(container.children).indexOf(card) + 1}`;
+                }
+                // Update word count
+                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                wordCountEl.textContent = `${words} word${words === 1 ? '' : 's'}`;
+                saveState(); // Autosave on text change
+            }
 
-            const moveDownBtn = document.createElement('button');
-            moveDownBtn.innerHTML = '<span style="font-size:1.1em;">&#9660;</span> Down';
-            moveDownBtn.title = "Move down";
-            moveDownBtn.addEventListener('click', () => moveItem(itemDiv, 'down'));
+            textarea.addEventListener('input', updateItemMeta);
+            textarea.addEventListener('blur', saveState); // Save on blur too
+            updateItemMeta(); // Initial call
 
-            const removeBtn = document.createElement('button');
-            removeBtn.innerHTML = '<span style="font-size:1.1em;">&#10006;</span> Remove';
-            removeBtn.classList.add('remove');
-            removeBtn.title = "Remove this box";
-            removeBtn.addEventListener('click', () => {
-                itemDiv.style.transition = 'opacity 0.28s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.4,0,.2,1)';
-                itemDiv.style.opacity = '0';
-                itemDiv.style.transform = 'scale(0.95)';
-                setTimeout(() => itemDiv.remove(), 270);
+            card.querySelector('.item-menu-btn').addEventListener('click', () => {
+                // Basic remove action. Could expand to a popover menu.
+                if (confirm('Are you sure you want to remove this item?')) {
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    card.style.maxHeight = '0px';
+                    card.style.padding = '0'; card.style.margin = '0'; card.style.border = '0';
+                    setTimeout(() => {
+                        card.remove();
+                        updateEmptyStates();
+                        saveState();
+                    }, 300);
+                }
             });
+            
+            // Drag and Drop listeners
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('dragleave', handleDragLeave);
+            card.addEventListener('drop', handleDrop);
+            card.addEventListener('dragend', handleDragEnd);
 
-            controlsDiv.append(moveUpBtn, moveDownBtn, removeBtn);
-
-            itemDiv.appendChild(textarea);
-            itemDiv.appendChild(controlsDiv);
-
-            container.appendChild(itemDiv);
+            container.appendChild(card);
             textarea.focus();
+            updateEmptyStates();
+            // saveState(); // Autosave when item is added (already called in updateItemMeta/textarea listener)
+        }
+        
+        fabAddItem.addEventListener('click', () => {
+            const list = currentMode === 'mode1' ? chaptersList : documentsList;
+            const type = currentMode === 'mode1' ? 'chapter' : 'document';
+            createItemBox(type, list);
+        });
+
+        function updateEmptyStates() {
+            chaptersEmptyState.style.display = chaptersList.children.length === 0 ? 'block' : 'none';
+            documentsEmptyState.style.display = documentsList.children.length === 0 ? 'block' : 'none';
         }
 
-        function moveItem(itemDiv, dir) {
-            const parent = itemDiv.parentNode;
-            if (dir === 'up' && itemDiv.previousElementSibling) {
-                parent.insertBefore(itemDiv, itemDiv.previousElementSibling);
-            } else if (dir === 'down' && itemDiv.nextElementSibling) {
-                parent.insertBefore(itemDiv.nextElementSibling, itemDiv);
+        // --- Drag & Drop Functionality ---
+        let draggedItem = null;
+
+        function handleDragStart(e) {
+            draggedItem = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML); // Not strictly needed for internal D&D
+            setTimeout(() => this.classList.add('dragging'), 0); // Timeout to allow browser to render drag image
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); // Necessary to allow dropping
+            e.dataTransfer.dropEffect = 'move';
+            const targetItem = e.target.closest('.item-card');
+            if (targetItem && targetItem !== draggedItem) {
+                const list = targetItem.parentNode;
+                const targetRect = targetItem.getBoundingClientRect();
+                // Get midpoint of targetItem for better positioning
+                const isAfter = e.clientY > targetRect.top + targetRect.height / 2;
+                
+                if (isAfter) {
+                    list.insertBefore(draggedItem, targetItem.nextSibling);
+                } else {
+                    list.insertBefore(draggedItem, targetItem);
+                }
             }
         }
 
-        addChapterBtn.addEventListener('click', () => {
-            createItemBox('chapter', chaptersList);
-        });
-        addDocumentBtn.addEventListener('click', () => {
-            createItemBox('document', documentsList);
-        });
+        function handleDragLeave(e) {
+            // Could add placeholder styling removal here if implemented
+        }
 
-        // --- .docx generation ---
+        function handleDrop(e) {
+            e.stopPropagation(); // Stops the browser from redirecting.
+            // Actual reordering logic happens in dragOver
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedItem = null;
+            // Update title previews based on new order for chapters
+            const list = this.parentNode;
+            if (list) {
+                Array.from(list.children).forEach((card, index) => {
+                    const textarea = card.querySelector('textarea');
+                    const titlePreview = card.querySelector('.item-title-preview');
+                    const type = card.id.startsWith('chapter') ? 'chapter' : 'document';
+                    if (textarea && titlePreview) {
+                         const firstLine = textarea.value.split('\n')[0].trim();
+                         if (type === 'chapter') {
+                            titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Chapter ${index + 1}`;
+                         } else {
+                            titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Document ${index + 1}`;
+                         }
+                    }
+                });
+            }
+            saveState(); // Save order change
+        }
+
+
+        // --- .docx Generation ---
         generateDocBtn.addEventListener('click', () => {
-            let htmlContent = `
-                <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
-                body { font-family: Arial, sans-serif; font-size: 13.5pt; margin: 1in; color: #222;}
-                h1 { font-size: 23pt; font-weight: bold; color: #6c47ff; margin-top: 0; margin-bottom: 24pt; page-break-after: avoid; }
-                p { margin-bottom: 13pt; line-height: 1.5; text-align: justify; }
-                .page-break { page-break-after: always; }
+            let htmlDocContent = `
+                <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+                <style>
+                    body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; margin: 1in; color: #000000;}
+                    h1 { font-size: 20pt; font-weight: bold; color: #2F5496; margin-top: 0; margin-bottom: 18pt; page-break-after: avoid; }
+                    p { margin-bottom: 10pt; line-height: 1.5; text-align: justify; }
+                    em, i { font-style: italic; }
+                    strong, b { font-weight: bold; }
+                    .page-break { page-break-after: always; }
                 </style></head><body>
             `;
 
             let itemsToProcess = [];
-            let errors = false;
+            let hasContent = false;
 
-            try {
-                if (currentMode === 'mode1') {
-                    itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-container textarea'));
-                    itemsToProcess.forEach((textarea, i) => {
-                        const content = textarea.value.trim();
-                        if (content) {
-                            const lines = content.split('\n');
-                            let titleLine = 'Untitled Chapter';
-                            let bodyContent = content;
-                            if (lines[0] && lines[0].toLowerCase().startsWith('chapter')) {
-                                titleLine = lines.shift();
-                                bodyContent = lines.join('\n').trim();
-                            } else if (lines[0] && lines[0].length < 80 && lines.length > 1) {
-                                titleLine = lines.shift();
-                                bodyContent = lines.join('\n').trim();
-                            } else { titleLine = `Section ${i + 1}`; }
-                            htmlContent += `<h1>${escapeHtml(titleLine)}</h1>`;
-                            if (bodyContent) {
-                                bodyContent.split(/\n\s*\n/).forEach(p => {
-                                    if (p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`;
-                                });
-                            }
-                            if (i < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
+            if (currentMode === 'mode1') {
+                itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-card textarea'));
+                itemsToProcess.forEach((textarea, i) => {
+                    let content = textarea.value.trim();
+                    if (content) {
+                        hasContent = true;
+                        let lines = content.split('\n');
+                        let titleLine = '';
+                        let bodyContent = content;
+
+                        if (lines[0] && (lines[0].toLowerCase().startsWith('chapter ') || lines[0].toLowerCase().startsWith('section ') || (lines[0].length < 70 && lines.length > 1))) {
+                            titleLine = escapeHtml(lines.shift());
+                            bodyContent = lines.join('\n').trim();
+                        } else {
+                            titleLine = `Chapter ${i + 1}`;
                         }
-                    });
-                } else {
-                    itemsToProcess = Array.from(documentsList.querySelectorAll('.item-container textarea'));
-                    itemsToProcess.forEach((textarea, i) => {
-                        const content = textarea.value.trim();
-                        if (content) {
-                            content.split(/\n\s*\n/).forEach(p => {
-                                if (p.trim()) htmlContent += `<p>${escapeHtml(p.replace(/\n/g, '<br>'))}</p>`;
+                        htmlDocContent += `<h1>${titleLine}</h1>`;
+                        
+                        if (bodyContent) {
+                            // Basic Markdown-like to HTML conversion
+                            bodyContent = escapeHtml(bodyContent);
+                            bodyContent = bodyContent.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>'); // Bold
+                            bodyContent = bodyContent.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');       // Italic
+                            
+                            bodyContent.split(/\n\s*\n/).forEach(p => { // Double line break for paragraphs
+                                if (p.trim()) htmlDocContent += `<p>${p.replace(/\n/g, '<br>')}</p>`; // Single line breaks to <br>
                             });
-                            if (i < itemsToProcess.length - 1) htmlContent += '<div class="page-break"></div>';
                         }
-                    });
-                }
-                htmlContent += `</body></html>`;
-            } catch (e) {
-                showToast("Error processing content: " + e.message, 2900);
-                errors = true;
-            }
-            if (errors) return;
+                        // Add page break if not the last item
+                        if (i < itemsToProcess.filter(ta => ta.value.trim()).length - 1) {
+                           htmlDocContent += '<div class="page-break"></div>';
+                        }
+                    }
+                });
+            } else { // mode2
+                itemsToProcess = Array.from(documentsList.querySelectorAll('.item-card textarea'));
+                itemsToProcess.forEach((textarea, i) => {
+                    let content = textarea.value.trim();
+                    if (content) {
+                        hasContent = true;
+                        // No special title handling for combined docs, treat all as paragraphs.
+                        // User can put H1, H2 in their pasted content, assuming html-docx-js handles basic H tags.
+                        // For simplicity, here we just wrap in paragraphs
+                        
+                        content = escapeHtml(content); // Escape basic HTML
+                        // Could add markdown here too if desired for mode 2
+                        // content = content.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>'); // Bold
+                        // content = content.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');       // Italic
 
-            if (itemsToProcess.length > 0 && itemsToProcess.some(ta => ta.value.trim() !== '')) {
-                try {
-                    const converted = htmlDocx.asBlob(htmlContent,
-                        { orientation: 'portrait', margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } }
-                    );
-                    const filename = `StoryWeaver-${new Date().toISOString().slice(0,10).replace(/-/g, '')}.docx`;
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(converted);
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href);
-                    showToast("Document generated & download started!", 2100);
-                } catch (e) {
-                    showToast("Error generating .docx: " + e.message, 3100);
+                        content.split(/\n\s*\n/).forEach(p => {
+                            if (p.trim()) htmlDocContent += `<p>${p.replace(/\n/g, '<br>')}</p>`;
+                        });
+                        
+                        // Add page break if not the last item
+                        if (i < itemsToProcess.filter(ta => ta.value.trim()).length - 1) {
+                           htmlDocContent += '<div class="page-break"></div>';
+                        }
+                    }
+                });
+            }
+            htmlDocContent += `</body></html>`;
+
+            if (hasContent) {
+                generateDocBtn.disabled = true;
+                generateDocBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" class="spinner" fill="currentColor" style="animation: spin 1s linear infinite;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"></path></svg>
+                    Generating...
+                `;
+                // Add spinner CSS
+                if(!document.getElementById('spinner-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'spinner-style';
+                    style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}`;
+                    document.head.appendChild(style);
                 }
+
+                setTimeout(() => { // Simulate processing time and allow UI to update
+                    try {
+                        const converted = htmlDocx.asBlob(htmlDocContent, {
+                            orientation: 'portrait',
+                            margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } // 1 inch margins
+                        });
+                        
+                        let userFilename = filenameInput.value.trim();
+                        if (!userFilename) {
+                            userFilename = `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
+                        }
+                        userFilename = userFilename.replace(/[^a-z0-9_-\s]/gi, '').replace(/\s+/g, '_'); // Sanitize
+                        
+                        const finalFilename = `${userFilename}.docx`;
+                        
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(converted);
+                        link.download = finalFilename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                        showToast("Document generated & download started!", 2500, 'success');
+                    } catch (e) {
+                        console.error("Error generating .docx:", e);
+                        showToast("Error generating .docx: " + e.message, 3500, 'error');
+                    } finally {
+                        generateDocBtn.disabled = false;
+                        generateDocBtn.innerHTML = `
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
+                            Generate .docx
+                        `;
+                    }
+                }, 200); // Small delay for spinner
             } else {
-                showToast("Nothing to generate — add some chapters or documents!", 2200);
+                showToast("Nothing to generate. Add some content first!", 2500, 'error');
             }
         });
 
-        // --- Clear all ---
+        // --- Clear All ---
         clearAllBtn.addEventListener('click', () => {
-            if (confirm("Clear all input fields? This cannot be undone.")) {
+            if (confirm("Are you sure you want to clear all content? This cannot be undone.")) {
                 chaptersList.innerHTML = '';
                 documentsList.innerHTML = '';
-                showToast("All cleared.");
-                if (currentMode === 'mode1') {
-                    createItemBox('chapter', chaptersList);
-                } else {
-                    createItemBox('document', documentsList);
-                }
+                showToast("All content cleared.", 2000);
+                if (currentMode === 'mode1') createItemBox('chapter', chaptersList);
+                else createItemBox('document', documentsList);
+                updateEmptyStates();
+                saveState(); // Save the cleared state
             }
         });
 
-        // --- Utility: HTML escape ---
+        // --- HTML Escape Utility ---
         function escapeHtml(unsafe) {
             if (typeof unsafe !== 'string') return '';
             return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+                .replace(/&/g, "&")
+                .replace(/</g, "<")
+                .replace(/>/g, ">")
+                .replace(/"/g, """)
+                .replace(/'/g, "'");
         }
+        
+        filenameInput.addEventListener('blur', saveState);
 
-        // --- Init: Start in mode 1 with one box ---
-        switchMode('mode1');
+        // --- Initial Load ---
+        loadState(); // Load saved state or initialize
+        
+        // For development: quickly populate
+        // if (chaptersList.children.length === 0) {
+        //     createItemBox('chapter', chaptersList, "Chapter 1: The Adventure Begins\n\nOnce upon a time...");
+        //     createItemBox('chapter', chaptersList, "*Chapter 2: A New Friend*\n\n**Suddenly**, a wild Pikachu appeared!");
+        // }
     </script>
 </body>
 </html>
