@@ -13,20 +13,20 @@
             --font-headings: 'Montserrat', 'Segoe UI', Arial, sans-serif;
             --font-mono: 'Roboto Mono', monospace;
 
-            --primary: #4A90E2; /* Blue */
+            --primary: #4A90E2;
             --primary-dark: #357ABD;
             --primary-light: #EAF2FA;
-            --secondary: #50E3C2; /* Mint */
+            --secondary: #50E3C2;
             --secondary-dark: #38BFA0;
-            --accent: #F5A623; /* Orange */
+            --accent: #F5A623;
             --accent-dark: #D8931F;
 
             --bg-main: #F4F7F9;
             --bg-surface: #FFFFFF;
-            --bg-surface-alt: #E9EFF3; /* For cards */
+            --bg-surface-alt: #E9EFF3;
             
-            --text-main: #2D3748; /* Dark Gray */
-            --text-subtle: #718096; /* Medium Gray */
+            --text-main: #2D3748;
+            --text-subtle: #718096;
             --text-on-primary: #FFFFFF;
             --text-on-accent: #FFFFFF;
 
@@ -51,40 +51,38 @@
             --max-width-content: 900px;
         }
 
-        /* --- Dark Mode Variables (example - more comprehensive would be needed) --- */
-        /*
         html[data-theme="dark"] {
             --bg-main: #1A202C;
-            --bg-surface: #2D3748;
-            --bg-surface-alt: #262F3D;
+            --bg-surface: #232b39;
+            --bg-surface-alt: #242f3d;
             --text-main: #E2E8F0;
             --text-subtle: #A0AEC0;
             --border-color: #4A5568;
             --border-color-light: #3A4354;
+            --text-on-primary: #FFFFFF;
+            --text-on-accent: #232b39;
+            --fab-shadow: 0 10px 24px rgba(0,0,0,0.25);
         }
-        */
 
         *, *::before, *::after {
             box-sizing: border-box;
         }
-
         html, body {
             margin: 0;
             padding: 0;
             background: var(--bg-main);
             color: var(--text-main);
             font-family: var(--font-primary);
-            font-size: 16px; /* Base font size */
+            font-size: 16px;
             line-height: 1.6;
             min-height: 100vh;
+            transition: background .3s, color .3s;
         }
-
         .app-wrapper {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
         .app-header {
             background: var(--bg-surface);
             padding: 12px 20px;
@@ -103,13 +101,14 @@
             font-weight: 700;
             color: var(--primary);
             margin: 0;
+            letter-spacing: 1px;
         }
-        
         .segmented-control {
             display: flex;
             background-color: var(--bg-surface-alt);
             border-radius: var(--radius-sm);
             padding: 4px;
+            box-shadow: var(--shadow-xs);
         }
         .segmented-control button {
             border: none;
@@ -128,7 +127,16 @@
             color: var(--text-on-primary);
             box-shadow: var(--shadow-xs);
         }
-
+        .theme-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-subtle);
+            margin-left: 16px;
+            font-size: 1.18em;
+            cursor: pointer;
+            transition: color .2s;
+        }
+        .theme-toggle-btn:hover { color: var(--primary); }
         .main-content {
             flex-grow: 1;
             padding: 24px 20px;
@@ -136,16 +144,16 @@
             width: 100%;
             margin: 0 auto;
         }
-        
         .page-title-section {
             text-align: center;
             margin-bottom: 32px;
         }
         .page-title-section h2 {
             font-family: var(--font-headings);
-            font-size: 2.2em;
+            font-size: 2.3em;
             color: var(--text-main);
             margin: 0 0 8px 0;
+            letter-spacing: 0.5px;
         }
         .page-title-section p {
             color: var(--text-subtle);
@@ -165,8 +173,10 @@
             padding: 10px 15px;
             border-radius: var(--radius-md);
             border: 1px solid var(--primary);
+            transition: background .2s, color .2s;
+            user-select: none;
         }
-        .instructions-toggle svg { width: 20px; height: 20px; margin-right: 8px; transition: transform var(--transition-std); }
+        .instructions-toggle svg { width: 20px; height: 20px; margin-right: 8px; transition: transform var(--transition-std);}
         .instructions-toggle.open svg { transform: rotate(90deg); }
         .instructions-content {
             font-size: 0.95em;
@@ -177,7 +187,7 @@
             margin-bottom: 22px;
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-sm);
-            display: none; /* Hidden by default */
+            display: none;
         }
         .instructions-content.visible { display: block; }
         .instructions-content b { color: var(--primary-dark); }
@@ -185,9 +195,8 @@
         .instructions-content code { background: var(--bg-surface-alt); padding: 2px 5px; border-radius: var(--radius-sm); font-family: var(--font-mono); }
 
         .content-area { display: none; }
-        .content-area.active { display: block; animation: fadeIn 0.3s var(--transition-std); }
+        .content-area.active { display: block; animation: fadeIn 0.3s var(--transition-std);}
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
-
         .items-list { display: flex; flex-direction: column; gap: 20px; }
         .empty-state {
             text-align: center;
@@ -196,9 +205,11 @@
             border: 2px dashed var(--border-color);
             border-radius: var(--radius-lg);
             margin-top: 20px;
+            background: var(--bg-surface-alt);
+            transition: background .2s;
         }
-        .empty-state p { margin: 0 0 10px 0; font-size: 1.1em; }
-
+        .empty-state svg { display:block; margin:0 auto 10px auto; width:38px; height:38px; opacity:.6; }
+        .empty-state p { margin: 0 0 10px 0; font-size: 1.13em; }
         .item-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
@@ -209,27 +220,26 @@
             position: relative;
             transition: box-shadow var(--transition-std), border-color var(--transition-std);
         }
-        .item-card.dragging { opacity: 0.6; border-color: var(--primary); box-shadow: var(--shadow-lg); }
-        
+        .item-card.dragging { opacity: 0.6; border-color: var(--primary); box-shadow: var(--shadow-lg);}
         .item-card-header {
             display: flex;
             align-items: center;
             padding: 8px 12px;
             border-bottom: 1px solid var(--border-color-light);
-            background: var(--bg-surface-alt); /* Lighter header */
+            background: var(--bg-surface-alt);
             border-top-left-radius: var(--radius-md);
             border-top-right-radius: var(--radius-md);
         }
         .drag-handle {
             cursor: grab;
             color: var(--text-subtle);
-            padding: 8px; /* Increase tap area */
+            padding: 8px;
             margin-right: 8px;
         }
-        .drag-handle svg { display: block; width:18px; height:18px; }
+        .drag-handle svg { display: block; width:20px; height:20px;}
         .item-title-preview {
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.98em;
             color: var(--text-main);
             flex-grow: 1;
             white-space: nowrap;
@@ -238,21 +248,24 @@
         }
         .item-menu-btn {
             background: transparent; border: none; color: var(--text-subtle); cursor: pointer; padding: 8px; margin-left: auto;
+            transition: color .2s;
         }
-        .item-menu-btn svg { display:block; width:18px; height:18px;}
-        .item-menu-btn:hover { color: var(--primary); }
+        .item-menu-btn svg { display:block; width:20px; height:20px;}
+        .item-menu-btn:hover { color: var(--danger); }
 
         .item-card textarea {
             width: 100%;
-            min-height: 180px; /* Increased min-height */
+            min-height: 170px;
             font-family: var(--font-mono);
-            font-size: 0.95em;
+            font-size: 0.97em;
             padding: 15px;
             border: none;
-            background: transparent; /* Use card background */
+            background: transparent;
             resize: vertical;
             outline: none;
             color: var(--text-main);
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            transition: background .2s, color .2s;
         }
         .item-card-footer {
             display: flex;
@@ -273,18 +286,27 @@
             color: var(--text-on-accent);
             border: none;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 2em;
-            box-shadow: var(--shadow-lg);
+            width: 62px;
+            height: 62px;
+            font-size: 2.2em;
+            box-shadow: var(--shadow-lg), var(--fab-shadow, none);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background var(--transition-std), transform var(--transition-std);
-            z-index: 90;
+            transition: background var(--transition-std), transform var(--transition-std), box-shadow 0.2s;
+            z-index: 95;
+            outline: none;
+            animation: bounceIn .8s;
         }
-        .fab-add-item:hover { background: var(--accent-dark); transform: scale(1.05); }
+        .fab-add-item:active { transform: scale(0.93);}
+        .fab-add-item:hover { background: var(--accent-dark); transform: scale(1.09);}
+        @keyframes bounceIn {
+            0% { transform: scale(.7);}
+            60% { transform: scale(1.18);}
+            80% { transform: scale(.96);}
+            100% { transform: scale(1);}
+        }
 
         .bottom-action-bar {
             background: var(--bg-surface);
@@ -296,7 +318,7 @@
             align-items: center;
             position: sticky;
             bottom: 0;
-            z-index: 95;
+            z-index: 90;
         }
         .filename-input-group {
             flex-grow: 1; display: flex; flex-direction: column;
@@ -310,80 +332,102 @@
             border-radius: var(--radius-sm);
             font-family: var(--font-primary);
             font-size: 0.95em;
-            background-color: var(--bg-main); /* Slightly different bg for input */
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background .2s, color .2s;
         }
         .filename-input-group input:focus {
             border-color: var(--primary);
             outline: none;
             box-shadow: 0 0 0 2px var(--primary-light);
         }
-
         .action-button {
             border: none;
             font-family: var(--font-headings);
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.97em;
             padding: 10px 18px;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: background var(--transition-std), color var(--transition-std);
+            transition: background var(--transition-std), color var(--transition-std), box-shadow .15s;
             display: flex;
             align-items: center;
             gap: 8px;
             white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.09);
         }
         .action-button.generate {
             background: var(--success); color: var(--text-on-primary);
         }
-        .action-button.generate:hover { background: var(--success-dark); }
+        .action-button.generate:hover { background: var(--success-dark);}
         .action-button.clear {
             background: var(--danger); color: var(--text-on-primary);
         }
-        .action-button.clear:hover { background: var(--danger-dark); }
-
+        .action-button.clear:hover { background: var(--danger-dark);}
+        .action-button:active { transform: scale(.98);}
         /* Toast Notification */
         .toast {
             position: fixed;
             left: 50%;
-            bottom: 30px; /* Initial position above FAB */
-            transform: translateX(-50%);
-            background: var(--text-main); /* Darker toast for contrast */
+            bottom: 30px;
+            transform: translateX(-50%) scale(.97);
+            background: var(--text-main);
             color: var(--bg-main);
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-lg);
-            padding: 12px 24px;
+            padding: 13px 27px;
             font-family: var(--font-primary);
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 1.05em;
             opacity: 0;
             pointer-events: none;
             z-index: 1000;
-            transition: opacity 0.3s, bottom 0.3s;
+            transition: opacity 0.3s, bottom 0.3s, background .2s;
         }
         .toast.show {
             opacity: 1;
-            bottom: 95px; /* Position above bottom bar & FAB */
+            bottom: 95px;
             pointer-events: auto;
+            animation: toastPop .2s;
         }
-        .toast.success { background: var(--success); color: var(--text-on-primary); }
-        .toast.error { background: var(--danger); color: var(--text-on-primary); }
-
+        @keyframes toastPop { 0%{transform:translateX(-50%) scale(.7);} 100%{transform:translateX(-50%) scale(1);} }
+        .toast.success { background: var(--success); color: var(--text-on-primary);}
+        .toast.error { background: var(--danger); color: var(--text-on-primary);}
+        /* Loading overlay for docx generation */
+        .loading-overlay {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(40,60,90,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            animation: fadeIn .3s;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);}}
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .app-header h1 { font-size: 1.2em; }
+            .app-header h1 { font-size: 1.15em;}
             .segmented-control button { padding: 6px 10px; font-size: 0.85em;}
-            .page-title-section h2 { font-size: 1.8em; }
-            .main-content { padding: 20px 15px; }
-            
+            .page-title-section h2 { font-size: 1.45em;}
+            .main-content { padding: 17px 5px;}
             .bottom-action-bar {
                 flex-direction: column;
                 gap: 10px;
-                padding-bottom: calc(60px + 15px + 15px); /* Space for FAB */
+                padding-bottom: calc(60px + 15px + 15px);
             }
-            .filename-input-group { width: 100%; }
-            .action-button { width: 100%; justify-content: center; }
-            .fab-add-item { bottom: 20px; right: 20px; width: 56px; height: 56px;}
-            .toast.show { bottom: calc(60px + 20px + 15px); } /* adjust toast position for mobile */
+            .filename-input-group { width: 100%;}
+            .action-button { width: 100%; justify-content: center;}
+            .fab-add-item { bottom: 20px; right: 20px; width: 54px; height: 54px;}
+            .toast.show { bottom: calc(60px + 20px + 15px);}
         }
     </style>
 </head>
@@ -391,19 +435,19 @@
     <div class="app-wrapper">
         <header class="app-header">
             <h1>Story Weaver</h1>
-            <div class="segmented-control">
-                <button id="mode1-btn" class="active">📝 Chapters</button>
-                <button id="mode2-btn">📑 Documents</button>
+            <div class="segmented-control" role="tablist">
+                <button id="mode1-btn" class="active" role="tab" aria-selected="true" tabindex="0">📝 Chapters</button>
+                <button id="mode2-btn" role="tab" aria-selected="false" tabindex="0">📑 Documents</button>
             </div>
-            <!-- Optional: Theme Toggle <button id="theme-toggle">🌓</button> -->
+            <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark Mode">
+                <span id="theme-toggle-icon">🌙</span>
+            </button>
         </header>
-
         <main class="main-content">
             <div class="page-title-section">
                 <h2 id="page-main-title">Create Beautiful Chapters</h2>
                 <p id="page-main-subtitle">Craft your story chapter by chapter, or combine existing documents into a polished .docx file.</p>
             </div>
-            
             <!-- Mode 1: Chapter Creation -->
             <div id="mode1-content" class="content-area active">
                 <div class="instructions-toggle" id="mode1-instructions-toggle">
@@ -421,11 +465,11 @@
                 </div>
                 <div id="chapters-list" class="items-list"></div>
                 <div id="chapters-empty-state" class="empty-state" style="display:none;">
+                    <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="4"><rect x="8" y="8" width="32" height="32" rx="3"/><path d="M24 16v16m8-8H16"/></g></svg>
                     <p>No chapters yet!</p>
                     <span>Click the '+' button to add your first chapter.</span>
                 </div>
             </div>
-
             <!-- Mode 2: Document Combination -->
             <div id="mode2-content" class="content-area">
                 <div class="instructions-toggle" id="mode2-instructions-toggle">
@@ -442,31 +486,32 @@
                 </div>
                 <div id="documents-list" class="items-list"></div>
                 <div id="documents-empty-state" class="empty-state" style="display:none;">
+                    <svg viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="4"><rect x="8" y="8" width="32" height="32" rx="3"/><path d="M24 16v16m8-8H16"/></g></svg>
                     <p>No documents yet!</p>
                     <span>Click the '+' button to add your first document.</span>
                 </div>
             </div>
         </main>
-
-        <button id="fab-add" class="fab-add-item" title="Add Item">➕</button>
-        
+        <button id="fab-add" class="fab-add-item" title="Add Item" aria-label="Add Item">+</button>
         <footer class="bottom-action-bar">
             <div class="filename-input-group">
                 <label for="filename-input">Filename (no .docx):</label>
-                <input type="text" id="filename-input" placeholder="MyStory_Export">
+                <input type="text" id="filename-input" placeholder="MyStory_Export" autocomplete="off">
             </div>
-            <button id="generate-doc-btn" class="action-button generate">
+            <button id="generate-doc-btn" class="action-button generate" aria-label="Generate DOCX">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
                 Generate .docx
             </button>
-            <button id="clear-all-btn" class="action-button clear">
+            <button id="clear-all-btn" class="action-button clear" aria-label="Clear All">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
                 Clear All
             </button>
         </footer>
     </div>
-    <div class="toast" id="toast"></div>
-
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="loading-overlay" id="loading-overlay" style="display:none;">
+        <div class="loading-spinner" aria-label="Generating document..."></div>
+    </div>
     <script>
         // --- DOM Elements ---
         const mode1Btn = document.getElementById('mode1-btn');
@@ -475,24 +520,47 @@
         const mode2Content = document.getElementById('mode2-content');
         const pageMainTitle = document.getElementById('page-main-title');
         const pageMainSubtitle = document.getElementById('page-main-subtitle');
-
         const chaptersList = document.getElementById('chapters-list');
         const documentsList = document.getElementById('documents-list');
         const chaptersEmptyState = document.getElementById('chapters-empty-state');
         const documentsEmptyState = document.getElementById('documents-empty-state');
-
         const fabAddItem = document.getElementById('fab-add');
         const generateDocBtn = document.getElementById('generate-doc-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
         const filenameInput = document.getElementById('filename-input');
         const toast = document.getElementById('toast');
-
+        const loadingOverlay = document.getElementById('loading-overlay');
         // Instructions Toggles
         const mode1InstToggle = document.getElementById('mode1-instructions-toggle');
         const mode1InstContent = document.getElementById('mode1-instructions-content');
         const mode2InstToggle = document.getElementById('mode2-instructions-toggle');
         const mode2InstContent = document.getElementById('mode2-instructions-content');
-
+        // Theme toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        // --- THEME ---
+        function setTheme(mode) {
+            if (mode === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggleIcon.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeToggleIcon.textContent = '🌙';
+            }
+            localStorage.setItem('storyWeaverTheme', mode);
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(isDark ? 'light' : 'dark');
+        }
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        // Load theme preference
+        (() => {
+            const savedTheme = localStorage.getItem('storyWeaverTheme');
+            if (savedTheme) setTheme(savedTheme);
+            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+        })();
+        // --- Instructions Toggles ---
         [mode1InstToggle, mode2InstToggle].forEach(toggle => {
             toggle.addEventListener('click', () => {
                 const content = toggle.id.includes('mode1') ? mode1InstContent : mode2InstContent;
@@ -500,13 +568,10 @@
                 toggle.classList.toggle('open');
             });
         });
-
-        let currentMode = 'mode1'; // 'mode1' for chapters, 'mode2' for documents
-        let itemIdCounter = 0; // Simple unique ID for items
-
+        let currentMode = 'mode1';
+        let itemIdCounter = 0;
         // --- App State & LocalStorage ---
         const APP_STORAGE_KEY = 'storyWeaverStudioState_v2';
-
         function saveState() {
             const chapterData = Array.from(chaptersList.querySelectorAll('.item-card textarea')).map(ta => ta.value);
             const documentData = Array.from(documentsList.querySelectorAll('.item-card textarea')).map(ta => ta.value);
@@ -517,60 +582,52 @@
                 filename: filenameInput.value
             };
             localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(state));
-            showToast('Progress auto-saved!', 1500);
+            showToast('Progress auto-saved!', 1200);
         }
-
         function loadState() {
             const savedState = localStorage.getItem(APP_STORAGE_KEY);
             if (savedState) {
                 try {
                     const state = JSON.parse(savedState);
-                    switchMode(state.currentMode || 'mode1', true); // true to skip initial box creation
-                    
+                    switchMode(state.currentMode || 'mode1', true);
                     state.chapters?.forEach(content => createItemBox('chapter', chaptersList, content));
                     state.documents?.forEach(content => createItemBox('document', documentsList, content));
-                    
                     filenameInput.value = state.filename || `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
-                    
                     updateEmptyStates();
-                    showToast('Welcome back! Your work is restored.', 2000);
+                    showToast('Welcome back! Your work is restored.', 1500);
                 } catch(e) {
                     console.error("Error loading state from localStorage:", e);
-                    localStorage.removeItem(APP_STORAGE_KEY); // Clear corrupted state
+                    localStorage.removeItem(APP_STORAGE_KEY);
                     initializeDefaultState();
                 }
             } else {
                 initializeDefaultState();
             }
         }
-        
         function initializeDefaultState() {
-            switchMode('mode1'); // This will create one initial box
+            switchMode('mode1');
             filenameInput.value = `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
         }
-
-
         // --- Toast Helper ---
         let toastTimeout;
         function showToast(msg, duration = 2500, type = 'info') {
             clearTimeout(toastTimeout);
             toast.textContent = msg;
-            toast.className = 'toast'; // Reset classes
+            toast.className = 'toast';
             toast.classList.add('show');
             if (type === 'success') toast.classList.add('success');
             if (type === 'error') toast.classList.add('error');
-            
             toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
         }
-
         // --- Mode Switching ---
         function switchMode(newMode, isLoading = false) {
             currentMode = newMode;
             mode1Btn.classList.toggle('active', newMode === 'mode1');
             mode2Btn.classList.toggle('active', newMode === 'mode2');
+            mode1Btn.setAttribute('aria-selected', newMode === 'mode1');
+            mode2Btn.setAttribute('aria-selected', newMode === 'mode2');
             mode1Content.classList.toggle('active', newMode === 'mode1');
             mode2Content.classList.toggle('active', newMode === 'mode2');
-
             if (newMode === 'mode1') {
                 pageMainTitle.textContent = 'Create Beautiful Chapters';
                 pageMainSubtitle.textContent = 'Craft your story chapter by chapter...';
@@ -583,11 +640,9 @@
                 if (!isLoading && documentsList.children.length === 0) createItemBox('document', documentsList);
             }
             updateEmptyStates();
-            // saveState(); // Autosave on mode switch
         }
         mode1Btn.addEventListener('click', () => switchMode('mode1'));
         mode2Btn.addEventListener('click', () => switchMode('mode2'));
-
         // --- Item Box Management ---
         function createItemBox(type, container, content = '') {
             itemIdCounter++;
@@ -595,21 +650,19 @@
             const card = document.createElement('div');
             card.classList.add('item-card');
             card.id = itemId;
-            card.draggable = true; // For drag & drop
-
+            card.draggable = true;
             const placeholderText = (type === 'chapter')
                 ? "Chapter X: Title\n\nStart writing your chapter here..."
                 : "Paste document content here...";
             const initialTitle = (type === 'chapter') ? "New Chapter" : "New Document";
-
             card.innerHTML = `
                 <div class="item-card-header">
-                    <span class="drag-handle" title="Drag to reorder">
+                    <span class="drag-handle" title="Drag to reorder" tabindex="0">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"></path></svg>
                     </span>
                     <span class="item-title-preview">${initialTitle}</span>
-                    <button class="item-menu-btn" title="More options">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                    <button class="item-menu-btn" title="Remove" aria-label="Remove Item">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                 </div>
                 <textarea placeholder="${placeholderText}"></textarea>
@@ -618,33 +671,26 @@
                     <span class="item-id-debug" style="font-size:0.7em; opacity:0.5;">ID: ${itemId}</span>
                 </div>
             `;
-            
             const textarea = card.querySelector('textarea');
             textarea.value = content;
             const titlePreview = card.querySelector('.item-title-preview');
             const wordCountEl = card.querySelector('.word-count');
-
             function updateItemMeta() {
                 const text = textarea.value;
-                // Update title preview
                 const firstLine = text.split('\n')[0].trim();
                 if (type === 'chapter') {
                     titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Chapter ${Array.from(container.children).indexOf(card) + 1}`;
                 } else {
                     titlePreview.textContent = firstLine.length > 0 && firstLine.length < 60 ? firstLine : `Document ${Array.from(container.children).indexOf(card) + 1}`;
                 }
-                // Update word count
                 const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
                 wordCountEl.textContent = `${words} word${words === 1 ? '' : 's'}`;
-                saveState(); // Autosave on text change
+                saveState();
             }
-
             textarea.addEventListener('input', updateItemMeta);
-            textarea.addEventListener('blur', saveState); // Save on blur too
-            updateItemMeta(); // Initial call
-
+            textarea.addEventListener('blur', saveState);
+            updateItemMeta();
             card.querySelector('.item-menu-btn').addEventListener('click', () => {
-                // Basic remove action. Could expand to a popover menu.
                 if (confirm('Are you sure you want to remove this item?')) {
                     card.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease';
                     card.style.opacity = '0';
@@ -655,54 +701,50 @@
                         card.remove();
                         updateEmptyStates();
                         saveState();
-                    }, 300);
+                    }, 280);
                 }
             });
-            
             // Drag and Drop listeners
             card.addEventListener('dragstart', handleDragStart);
             card.addEventListener('dragover', handleDragOver);
             card.addEventListener('dragleave', handleDragLeave);
             card.addEventListener('drop', handleDrop);
             card.addEventListener('dragend', handleDragEnd);
-
             container.appendChild(card);
             textarea.focus();
             updateEmptyStates();
-            // saveState(); // Autosave when item is added (already called in updateItemMeta/textarea listener)
         }
-        
         fabAddItem.addEventListener('click', () => {
             const list = currentMode === 'mode1' ? chaptersList : documentsList;
             const type = currentMode === 'mode1' ? 'chapter' : 'document';
             createItemBox(type, list);
         });
-
+        // Keyboard shortcut: Ctrl+Enter to add
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                fabAddItem.click();
+            }
+        });
         function updateEmptyStates() {
             chaptersEmptyState.style.display = chaptersList.children.length === 0 ? 'block' : 'none';
             documentsEmptyState.style.display = documentsList.children.length === 0 ? 'block' : 'none';
         }
-
         // --- Drag & Drop Functionality ---
         let draggedItem = null;
-
         function handleDragStart(e) {
             draggedItem = this;
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML); // Not strictly needed for internal D&D
-            setTimeout(() => this.classList.add('dragging'), 0); // Timeout to allow browser to render drag image
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            setTimeout(() => this.classList.add('dragging'), 0);
         }
-
         function handleDragOver(e) {
-            e.preventDefault(); // Necessary to allow dropping
+            e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             const targetItem = e.target.closest('.item-card');
             if (targetItem && targetItem !== draggedItem) {
                 const list = targetItem.parentNode;
                 const targetRect = targetItem.getBoundingClientRect();
-                // Get midpoint of targetItem for better positioning
                 const isAfter = e.clientY > targetRect.top + targetRect.height / 2;
-                
                 if (isAfter) {
                     list.insertBefore(draggedItem, targetItem.nextSibling);
                 } else {
@@ -710,21 +752,14 @@
                 }
             }
         }
-
-        function handleDragLeave(e) {
-            // Could add placeholder styling removal here if implemented
-        }
-
+        function handleDragLeave(e) {}
         function handleDrop(e) {
-            e.stopPropagation(); // Stops the browser from redirecting.
-            // Actual reordering logic happens in dragOver
+            e.stopPropagation();
             return false;
         }
-
         function handleDragEnd(e) {
             this.classList.remove('dragging');
             draggedItem = null;
-            // Update title previews based on new order for chapters
             const list = this.parentNode;
             if (list) {
                 Array.from(list.children).forEach((card, index) => {
@@ -741,10 +776,8 @@
                     }
                 });
             }
-            saveState(); // Save order change
+            saveState();
         }
-
-
         // --- .docx Generation ---
         generateDocBtn.addEventListener('click', () => {
             let htmlDocContent = `
@@ -758,10 +791,8 @@
                     .page-break { page-break-after: always; }
                 </style></head><body>
             `;
-
             let itemsToProcess = [];
             let hasContent = false;
-
             if (currentMode === 'mode1') {
                 itemsToProcess = Array.from(chaptersList.querySelectorAll('.item-card textarea'));
                 itemsToProcess.forEach((textarea, i) => {
@@ -771,7 +802,6 @@
                         let lines = content.split('\n');
                         let titleLine = '';
                         let bodyContent = content;
-
                         if (lines[0] && (lines[0].toLowerCase().startsWith('chapter ') || lines[0].toLowerCase().startsWith('section ') || (lines[0].length < 70 && lines.length > 1))) {
                             titleLine = escapeHtml(lines.shift());
                             bodyContent = lines.join('\n').trim();
@@ -779,43 +809,29 @@
                             titleLine = `Chapter ${i + 1}`;
                         }
                         htmlDocContent += `<h1>${titleLine}</h1>`;
-                        
                         if (bodyContent) {
-                            // Basic Markdown-like to HTML conversion
                             bodyContent = escapeHtml(bodyContent);
-                            bodyContent = bodyContent.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>'); // Bold
-                            bodyContent = bodyContent.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');       // Italic
-                            
-                            bodyContent.split(/\n\s*\n/).forEach(p => { // Double line break for paragraphs
-                                if (p.trim()) htmlDocContent += `<p>${p.replace(/\n/g, '<br>')}</p>`; // Single line breaks to <br>
+                            bodyContent = bodyContent.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>');
+                            bodyContent = bodyContent.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');
+                            bodyContent.split(/\n\s*\n/).forEach(p => {
+                                if (p.trim()) htmlDocContent += `<p>${p.replace(/\n/g, '<br>')}</p>`;
                             });
                         }
-                        // Add page break if not the last item
                         if (i < itemsToProcess.filter(ta => ta.value.trim()).length - 1) {
                            htmlDocContent += '<div class="page-break"></div>';
                         }
                     }
                 });
-            } else { // mode2
+            } else {
                 itemsToProcess = Array.from(documentsList.querySelectorAll('.item-card textarea'));
                 itemsToProcess.forEach((textarea, i) => {
                     let content = textarea.value.trim();
                     if (content) {
                         hasContent = true;
-                        // No special title handling for combined docs, treat all as paragraphs.
-                        // User can put H1, H2 in their pasted content, assuming html-docx-js handles basic H tags.
-                        // For simplicity, here we just wrap in paragraphs
-                        
-                        content = escapeHtml(content); // Escape basic HTML
-                        // Could add markdown here too if desired for mode 2
-                        // content = content.replace(/\*\*(.*?)\*\*|__(.*?)__/g, '<strong>$1$2</strong>'); // Bold
-                        // content = content.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>');       // Italic
-
+                        content = escapeHtml(content);
                         content.split(/\n\s*\n/).forEach(p => {
                             if (p.trim()) htmlDocContent += `<p>${p.replace(/\n/g, '<br>')}</p>`;
                         });
-                        
-                        // Add page break if not the last item
                         if (i < itemsToProcess.filter(ta => ta.value.trim()).length - 1) {
                            htmlDocContent += '<div class="page-break"></div>';
                         }
@@ -823,36 +839,21 @@
                 });
             }
             htmlDocContent += `</body></html>`;
-
             if (hasContent) {
                 generateDocBtn.disabled = true;
-                generateDocBtn.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" class="spinner" fill="currentColor" style="animation: spin 1s linear infinite;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"></path></svg>
-                    Generating...
-                `;
-                // Add spinner CSS
-                if(!document.getElementById('spinner-style')) {
-                    const style = document.createElement('style');
-                    style.id = 'spinner-style';
-                    style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}`;
-                    document.head.appendChild(style);
-                }
-
-                setTimeout(() => { // Simulate processing time and allow UI to update
+                loadingOverlay.style.display = "flex";
+                setTimeout(() => {
                     try {
                         const converted = htmlDocx.asBlob(htmlDocContent, {
                             orientation: 'portrait',
-                            margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 } // 1 inch margins
+                            margins: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
                         });
-                        
                         let userFilename = filenameInput.value.trim();
                         if (!userFilename) {
                             userFilename = `StoryWeaver_${new Date().toISOString().slice(0,10).replace(/-/g, '')}`;
                         }
-                        userFilename = userFilename.replace(/[^a-z0-9_-\s]/gi, '').replace(/\s+/g, '_'); // Sanitize
-                        
+                        userFilename = userFilename.replace(/[^a-z0-9_-\s]/gi, '').replace(/\s+/g, '_');
                         const finalFilename = `${userFilename}.docx`;
-                        
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(converted);
                         link.download = finalFilename;
@@ -860,57 +861,44 @@
                         link.click();
                         document.body.removeChild(link);
                         URL.revokeObjectURL(link.href);
-                        showToast("Document generated & download started!", 2500, 'success');
+                        showToast("Document generated & download started!", 2100, 'success');
                     } catch (e) {
                         console.error("Error generating .docx:", e);
                         showToast("Error generating .docx: " + e.message, 3500, 'error');
                     } finally {
                         generateDocBtn.disabled = false;
-                        generateDocBtn.innerHTML = `
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
-                            Generate .docx
-                        `;
+                        loadingOverlay.style.display = "none";
                     }
-                }, 200); // Small delay for spinner
+                }, 350);
             } else {
-                showToast("Nothing to generate. Add some content first!", 2500, 'error');
+                showToast("Nothing to generate. Add some content first!", 1700, 'error');
             }
         });
-
         // --- Clear All ---
         clearAllBtn.addEventListener('click', () => {
             if (confirm("Are you sure you want to clear all content? This cannot be undone.")) {
                 chaptersList.innerHTML = '';
                 documentsList.innerHTML = '';
-                showToast("All content cleared.", 2000);
+                showToast("All content cleared.", 1200);
                 if (currentMode === 'mode1') createItemBox('chapter', chaptersList);
                 else createItemBox('document', documentsList);
                 updateEmptyStates();
-                saveState(); // Save the cleared state
+                saveState();
             }
         });
-
-        // --- HTML Escape Utility ---
+        // --- HTML Escape Utility (fixed!) ---
         function escapeHtml(unsafe) {
             if (typeof unsafe !== 'string') return '';
             return unsafe
-                .replace(/&/g, "&")
-                .replace(/</g, "<")
-                .replace(/>/g, ">")
-                .replace(/"/g, """)
-                .replace(/'/g, "'");
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-        
         filenameInput.addEventListener('blur', saveState);
-
         // --- Initial Load ---
-        loadState(); // Load saved state or initialize
-        
-        // For development: quickly populate
-        // if (chaptersList.children.length === 0) {
-        //     createItemBox('chapter', chaptersList, "Chapter 1: The Adventure Begins\n\nOnce upon a time...");
-        //     createItemBox('chapter', chaptersList, "*Chapter 2: A New Friend*\n\n**Suddenly**, a wild Pikachu appeared!");
-        // }
+        loadState();
     </script>
 </body>
 </html>
