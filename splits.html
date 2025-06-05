@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text/JSON Chunker with Dynamic Glossary Replace</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f7f6;
+      color: #333;
+    }
+    h1, h3, h4 { color: #2c3e50; }
+    textarea {
+      width: calc(100% - 22px);
+      height: 200px;
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      background-color: #fff;
+    }
+    .input-group {
+        border: 1px solid #e0e0e0;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .input-group h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .input-container { margin-bottom: 15px; }
+    .input-container label {
+        display: block; margin-bottom: 5px; font-weight: bold; color: #555;
+    }
+    .input-container input[type="number"],
+    .input-container input[type="text"],
+    .input-container select,
+    .input-container textarea {
+        width: 100%; box-sizing: border-box; padding: 8px;
+        border: 1px solid #ccc; border-radius: 4px;
+    }
+    .input-container textarea { height: 80px; }
+    /* Find/replace, chunk, and extra styles omitted for brevity; use your existing CSS */
+    .json-chapter-box {
+      border: 1px solid #b4d3fc;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      padding: 7px 7px 7px 10px;
+      background: #f4fafd;
+      position: relative;
+    }
+    .json-chapter-label {
+      font-weight: bold;
+      color: #3465a4;
+      margin-bottom: 3px;
+      display: inline-block;
+    }
+    .remove-chapter-btn {
+      background: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-size: 13px;
+      cursor: pointer;
+      float: right;
+      margin-left: 7px;
+      margin-top: 1px;
+    }
+    .remove-chapter-btn:hover { background: #b71c1c; }
+    #addChapterBtn {
+      padding: 6px 14px;
+      background: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    #addChapterBtn:hover { background: #0056b3; }
+    .info-counter {
+        font-size: 0.9em;
+        padding: 4px 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        color: #333;
+        border: 1px solid #ced4da;
+        display: inline-block;
+    }
+    /* Rest of your CSS... */
+    .chunk-container {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .chunk-title {
+      font-weight: bold;
+      margin-right: 10px;
+      min-width: 100px;
+      padding-top: 8px;
+      color: #007BFF;
+      flex-shrink: 0;
+    }
+    .chunk-textarea-wrapper { flex-grow: 1; margin-right: 10px; }
+    .chunk-textarea-wrapper textarea {
+        height: 150px; width: 100%; background-color: #e9ecef;
+    }
+    /* ... */
+  </style>
+</head>
+
+<body>
+  <h1>Text/JSON Chunker</h1>
+
+  <div class="input-container">
+    <label for="splitModeSelect">Splitting Mode:</label>
+    <select id="splitModeSelect">
+      <option value="json">JSON Objects (Chunk by group or individually)</option>
+      <option value="text">Plain Text (Split by max characters)</option>
+    </select>
+  </div>
+
+  <!-- MULTI-CHAPTER JSON INPUT SECTION -->
+  <div id="jsonInputSection" class="input-group">
+    <h3>JSON Input Mode (Multi-Chapter)</h3>
+    <p>Paste your array of JSON objects per chapter below. You can add/remove chapters. Objects will be counted and split across all chapters as one long sequence.</p>
+    <button id="addChapterBtn" type="button">+ Add Chapter/JSON Box</button>
+    <div id="jsonChapterBoxes"></div>
+    <div style="text-align: right; margin-bottom: 5px;">
+        <span id="jsonObjectsCount" class="info-counter">Objects: 0</span>
+    </div>
+    <div class="input-container" style="margin-top: 10px; margin-bottom: 20px;">
+        <label for="jsonObjectsPerChunk">Combine original JSON objects per output chunk:</label>
+        <select id="jsonObjectsPerChunk">
+            <option value="1">1 (Original behavior: one object per chunk)</option>
+            <option value="2">2 objects</option>
+            <option value="3">3 objects</option>
+            <option value="4">4 objects</option>
+            <option value="5">5 objects</option>
+            <option value="6">6 objects</option>
+            <option value="7">7 objects</option>
+            <option value="10">10 objects</option>
+            <option value="20">20 objects</option>
+        </select>
+    </div>
+    <!-- Glossary/Find & Replace section unchanged... -->
+    <div id="glossaryFindReplaceSection" style="margin-top: 20px; padding-top:15px; border-top: 1px dashed #ccc;">
+      <h4>Paired Find & Replace in Glossary Translations:</h4>
+      <p style="font-size:0.9em; color:#555;">
+        Define find and replace pairs below. Rules are applied sequentially for each term's translation within the JSON objects.
+      </p>
+      <div id="findReplacePairsContainer"></div>
+      <button type="button" id="addFindReplacePairButton" onclick="addFindReplacePair()">+ Add Replacement Rule</button>
+      <button type="button" id="applyPairedReplacementsButton" onclick="performPairedGlossaryReplace()" style="margin-left:10px;">Apply All Replacement Rules</button>
+      <span id="glossaryReplaceStatus" style="margin-left: 10px; font-size: 0.9em; display: block; margin-top: 5px;"></span>
+    </div>
+  </div>
+
+  <!-- Plain text input section unchanged ... -->
+
+  <div class="input-group">
+    <h3>Chunk Output Settings</h3>
+    <div class="input-container">
+      <label for="addToTop">Add to top of each chunk:</label>
+      <textarea id="addToTop"
+        placeholder="Text to add to the top of each chunk (use $X for part number, $Y for total parts)..."></textarea>
+    </div>
+    <div class="input-container">
+      <label for="addToBottom">Add to bottom of each chunk:</label>
+      <textarea id="addToBottom"
+        placeholder="Text to add to the bottom of each chunk (use $X for part number, $Y for total parts)..."></textarea>
+    </div>
+  </div>
+
+  <button id="mainSplitButton" onclick="processAndChunk()">Split Text</button>
+
+  <div id="chunkedTextContainer"></div>
+  <div id="loadingIndicator">Loading...</div>
+
+  <script>
+    // -- MULTI-CHAPTER JSON SUPPORT --
+    let chapterBoxCount = 0;
+
+    function addJsonChapterBox(defaultValue = '', doNotFocus = false) {
+      chapterBoxCount++;
+      const chapterBoxes = document.getElementById('jsonChapterBoxes');
+      const boxDiv = document.createElement('div');
+      boxDiv.className = "json-chapter-box";
+      boxDiv.dataset.chapterBoxId = chapterBoxCount;
+
+      const label = document.createElement('span');
+      label.className = "json-chapter-label";
+      label.textContent = `Chapter ${chapterBoxCount}`;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = "remove-chapter-btn";
+      removeBtn.type = "button";
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = function() {
+        chapterBoxes.removeChild(boxDiv);
+        updateJsonObjectCount();
+        relabelChapterBoxes();
+      };
+
+      const textarea = document.createElement('textarea');
+      textarea.placeholder = '[ { ... }, { ... } ]';
+      textarea.value = defaultValue;
+      textarea.addEventListener('input', updateJsonObjectCount);
+
+      boxDiv.appendChild(label);
+      boxDiv.appendChild(removeBtn);
+      boxDiv.appendChild(document.createElement('br'));
+      boxDiv.appendChild(textarea);
+
+      chapterBoxes.appendChild(boxDiv);
+
+      if (!doNotFocus) textarea.focus();
+      updateJsonObjectCount();
+    }
+
+    function relabelChapterBoxes() {
+      const boxes = document.querySelectorAll('.json-chapter-box');
+      let idx = 1;
+      boxes.forEach(box => {
+        const label = box.querySelector('.json-chapter-label');
+        if (label) label.textContent = `Chapter ${idx++}`;
+      });
+    }
+
+    function getAllJsonChapterArrays() {
+      const boxes = document.querySelectorAll('.json-chapter-box textarea');
+      const allArrays = [];
+      for (let t of boxes) {
+        const val = t.value.trim();
+        if (!val) continue;
+        try {
+          const arr = JSON.parse(val);
+          if (Array.isArray(arr)) allArrays.push(arr);
+        } catch (e) {}
+      }
+      return allArrays;
+    }
+
+    function updateJsonObjectCount() {
+      const countElement = document.getElementById('jsonObjectsCount');
+      const allArrays = getAllJsonChapterArrays();
+      const total = allArrays.reduce((sum, arr) => sum + arr.length, 0);
+      countElement.style.color = '#333';
+      countElement.textContent = `Objects: ${total}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('addChapterBtn').onclick = function() {
+        addJsonChapterBox();
+      };
+      // Add at least one box by default, or restore from storage if desired
+      if (document.querySelectorAll('.json-chapter-box').length === 0) {
+        addJsonChapterBox();
+      }
+      // ...rest of your DOMContentLoaded logic...
+      // (unchanged: init other settings, add event listeners, etc)
+      // Make sure to update other references to #jsonInputArea as needed!
+      // For glossary/replace, see below.
+    });
+
+    // --- CHUNKING LOGIC: use all chapter boxes
+    function chunkJsonInput(addToTop, addToBottom, container) {
+      // Instead of single textarea, use all chapter boxes:
+      const allArrays = getAllJsonChapterArrays();
+      const flat = [];
+      // Keep original chapter/box and index for each object
+      allArrays.forEach((arr, chapIdx) => {
+        arr.forEach((obj, objIdx) => {
+          flat.push({ ...obj, _chapter: chapIdx+1, _idx: objIdx });
+        });
+      });
+      if (flat.length === 0) {
+        alert("No valid JSON objects found in any chapter.");
+        hideLoading();
+        return;
+      }
+      const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
+      const totalNewChunks = Math.ceil(flat.length / objectsToGroup);
+      const newChunkDigits = String(totalNewChunks).length > 0 ? String(totalNewChunks).length : 1;
+      for (let i = 0; i < flat.length; i += objectsToGroup) {
+        const thisGroup = flat.slice(i, i + objectsToGroup);
+        let chunkContent;
+        if (objectsToGroup === 1 && thisGroup.length === 1) {
+          chunkContent = JSON.stringify(stripMeta(thisGroup[0]), null, 2);
+        } else {
+          chunkContent = JSON.stringify(thisGroup.map(stripMeta), null, 2);
+        }
+        let chunkNumStr = String(Math.floor(i / objectsToGroup) + 1).padStart(newChunkDigits, '0');
+        let chunkDisplayTitle = `Segment ${chunkNumStr}`;
+        // Show range of chapter:index or id
+        const first = thisGroup[0], last = thisGroup[thisGroup.length-1];
+        if (first && last) {
+          chunkDisplayTitle += ` (Chapter ${first._chapter}#${first.id ?? first._idx}`;
+          if (first._chapter !== last._chapter || first.id !== last.id) {
+            chunkDisplayTitle += ` - Chapter ${last._chapter}#${last.id ?? last._idx}`;
+          }
+          chunkDisplayTitle += ')';
+        }
+        let topText = addToTop.replace(/\$X/g, chunkNumStr).replace(/\$Y/g, totalNewChunks);
+        let bottomText = addToBottom.replace(/\$X/g, chunkNumStr).replace(/\$Y/g, totalNewChunks);
+        let finalChunk = "";
+        if (topText) finalChunk += topText + '\n\n';
+        finalChunk += chunkContent;
+        if (bottomText) finalChunk += '\n\n' + bottomText;
+        displayChunk(finalChunk.trim(), chunkDisplayTitle, container);
+      }
+    }
+    function stripMeta(obj) {
+      const cpy = { ...obj };
+      delete cpy._chapter; delete cpy._idx;
+      return cpy;
+    }
+
+    // --- GLOSSARY REPLACE LOGIC: all boxes
+    function performPairedGlossaryReplace() {
+      // For each box, parse, replace, re-stringify.
+      const boxes = document.querySelectorAll('.json-chapter-box textarea');
+      const pairsContainer = document.getElementById('findReplacePairsContainer');
+      const statusElement = document.getElementById('glossaryReplaceStatus');
+      // Collect rules as before
+      const rules = [];
+      const pairElements = pairsContainer.querySelectorAll('.find-replace-pair');
+      for (let i = 0; i < pairElements.length; i++) {
+          const findInput = pairElements[i].querySelector('.find-text');
+          const replaceInput = pairElements[i].querySelector('.replace-text');
+          if (!findInput || !replaceInput) continue;
+          const findText = findInput.value;
+          const replaceText = replaceInput.value;
+          if (findText) {
+              rules.push({
+                  find: findText,
+                  replace: replaceText,
+                  findRegExp: new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+              });
+          }
+      }
+      if (rules.length === 0) {
+        statusElement.textContent = 'No replacement rules to apply.'; statusElement.style.color = 'grey';
+        setTimeout(() => statusElement.textContent = '', 5000); return;
+      }
+      let totalInstances = 0;
+      boxes.forEach(box => {
+        let arr;
+        try { arr = JSON.parse(box.value); } catch { return; }
+        if (!Array.isArray(arr)) return;
+        arr.forEach(obj => {
+          if (obj && Array.isArray(obj.terms)) {
+            obj.terms.forEach(term => {
+              if (term && typeof term.translation === 'string') {
+                let t = term.translation;
+                rules.forEach(rule => {
+                  let cnt = (t.match(rule.findRegExp) || []).length;
+                  if (cnt > 0) {
+                    t = t.replace(rule.findRegExp, rule.replace);
+                    totalInstances += cnt;
+                  }
+                });
+                term.translation = t;
+              }
+            });
+          }
+        });
+        box.value = JSON.stringify(arr, null, 2);
+      });
+      updateJsonObjectCount();
+      statusElement.textContent = `Replacements applied. Total instances replaced: ${totalInstances}.`;
+      statusElement.style.color = totalInstances > 0 ? 'green' : 'orange';
+      setTimeout(() => statusElement.textContent = '', 8000);
+    }
+
+    // --- Use your existing logic for addFindReplacePair, displayChunk, copyToClipboard, etc. ---
+    // --- ... (all unchanged code for plain text, output, chunk copying) ... ---
+
+    // Patch: When mode switches to JSON, always update object count
+    function toggleInputSections() {
+      const splitMode = document.getElementById('splitModeSelect').value;
+      const jsonSection = document.getElementById('jsonInputSection');
+      const plainTextSection = document.getElementById('plainTextInputSection');
+      if (jsonSection) jsonSection.style.display = (splitMode === 'json' ? 'block' : 'none');
+      if (plainTextSection) plainTextSection.style.display = (splitMode === 'text' ? 'block' : 'none');
+      if (splitMode === 'json') updateJsonObjectCount();
+    }
+    // ...rest of your JS...
+  </script>
+</body>
+</html>
