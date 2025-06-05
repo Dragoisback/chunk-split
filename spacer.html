@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragraph Formatter Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        :root {
+            --bg-light: #f4f7f9;
+            --surface-light: #ffffff;
+            --text-light: #1a202c;
+            --subtle-text-light: #718096;
+            --border-light: #e2e8f0;
+            --primary-light: #4a5568;
+            --primary-hover-light: #2d3748;
+
+            --bg-dark: #1a202c;
+            --surface-dark: #2d3748;
+            --text-dark: #e2e8f0;
+            --subtle-text-dark: #a0aec0;
+            --border-dark: #4a5568;
+            --primary-dark: #cbd5e0;
+            --primary-hover-dark: #ffffff;
+
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-dark: rgba(0, 0, 0, 0.4);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* --- Layout & Containers --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 1.5rem;
+        }
+        
+        body.dark-mode header {
+            border-bottom-color: var(--border-dark);
+        }
+
+        .main-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* --- Controls Bar --- */
+        .controls-bar {
+            grid-column: 1 / -1;
+            background-color: var(--surface-light);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-light);
+        }
+        
+        body.dark-mode .controls-bar {
+            background-color: var(--surface-dark);
+            box-shadow: 0 4px 12px var(--shadow-color-dark);
+            border-color: var(--border-dark);
+        }
+
+        .separator-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .separator-control label {
+            font-weight: 500;
+        }
+
+        #separatorInput {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            width: 120px;
+        }
+
+        body.dark-mode #separatorInput {
+            border-color: var(--border-dark);
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        #separatorInput:focus {
+            outline: 2px solid var(--primary-light);
+            outline-offset: 2px;
+        }
+        
+        body.dark-mode #separatorInput:focus {
+            outline-color: var(--primary-dark);
+        }
+
+        /* --- Text Area Columns --- */
+        .text-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .column-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .stats {
+            font-size: 0.875rem;
+            color: var(--subtle-text-light);
+        }
+        
+        body.dark-mode .stats {
+            color: var(--subtle-text-dark);
+        }
+
+        textarea {
+            width: 100%;
+            height: 50vh;
+            min-height: 300px;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            background-color: var(--surface-light);
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+        
+        body.dark-mode textarea {
+            background-color: var(--surface-dark);
+            border-color: var(--border-dark);
+            color: var(--text-dark);
+            box-shadow: 0 2px 6px var(--shadow-color-dark);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.2);
+        }
+
+        body.dark-mode textarea:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(203, 213, 224, 0.2);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
+            background-color: var(--primary-light);
+            color: var(--bg-light);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover-light);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        body.dark-mode .btn {
+            background-color: var(--primary-dark);
+            color: var(--bg-dark);
+        }
+
+        body.dark-mode .btn:hover {
+            background-color: var(--primary-hover-dark);
+        }
+        
+        .btn.btn-secondary {
+            background-color: var(--bg-light);
+            color: var(--primary-light);
+            border: 1px solid var(--border-light);
+        }
+        
+        body.dark-mode .btn.btn-secondary {
+            background-color: var(--surface-dark);
+            color: var(--primary-dark);
+            border-color: var(--border-dark);
+        }
+        
+        .btn.btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        body.dark-mode .btn.btn-secondary:hover {
+            background-color: var(--border-dark);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        /* --- Theme Toggle Switch --- */
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-light);
+        }
+        body.dark-mode input:checked + .slider {
+            background-color: var(--primary-dark);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            .main-title {
+                font-size: 1.5rem;
+            }
+            header, .controls-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+                text-align: center;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="main-title">Paragraph Formatter Pro</h1>
+            <label class="theme-switch" for="themeToggleCheckbox" title="Toggle Dark/Light Mode">
+                <span>☀️</span>
+                <div class="switch">
+                    <input type="checkbox" id="themeToggleCheckbox">
+                    <span class="slider"></span>
+                </div>
+                <span>🌙</span>
+            </label>
+        </header>
+
+        <div class="controls-bar">
+            <div class="separator-control">
+                <label for="separatorInput">Separator:</label>
+                <input type="text" id="separatorInput" value="\n\n" title="Use \n for a new line. Default is two new lines.">
+            </div>
+            <button id="clearBtn" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/></svg>
+                Clear All
+            </button>
+        </div>
+
+        <main class="workspace">
+            <!-- Input Column -->
+            <div class="text-column">
+                <div class="column-header">
+                    <div>
+                        <h2 class="column-title">Input</h2>
+                        <div id="inputStats" class="stats">0 words, 0 characters</div>
+                    </div>
+                    <button id="pasteBtn" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H-.5A.5.5 0 0 1-1 8z"/></svg>
+                        Paste
+                    </button>
+                </div>
+                <textarea id="inputTextArea" placeholder="Paste your novel chapter or any text here... Paragraphs are separated by one or more empty lines."></textarea>
+            </div>
+
+            <!-- Output Column -->
+            <div class="text-column">
+                <div class="column-header">
+                     <div>
+                        <h2 class="column-title">Output</h2>
+                        <div id="outputStats" class="stats">0 words, 0 characters</div>
+                    </div>
+                    <button id="copyBtn" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1z"/></svg>
+                        Copy
+                    </button>
+                </div>
+                <textarea id="outputTextArea" placeholder="Formatted text will appear here..."></textarea>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const inputTextArea = document.getElementById('inputTextArea');
+            const outputTextArea = document.getElementById('outputTextArea');
+            const separatorInput = document.getElementById('separatorInput');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const inputStats = document.getElementById('inputStats');
+            const outputStats = document.getElementById('outputStats');
+            const themeToggle = document.getElementById('themeToggleCheckbox');
+
+            // --- Core Processing Function ---
+            const processText = () => {
+                const inputText = inputTextArea.value;
+                
+                // Convert the user-facing separator (e.g., "\n\n") into a real string with newlines
+                const separator = separatorInput.value.replace(/\\n/g, '\n');
+
+                if (inputText.trim() === '') {
+                    outputTextArea.value = '';
+                    updateStats();
+                    return;
+                }
+
+                // Split by one or more newlines, filter out empty paragraphs, then join with the separator
+                const paragraphs = inputText.split(/\n+/g)
+                                            .filter(p => p.trim() !== '');
+                
+                const outputText = paragraphs.join(separator);
+                outputTextArea.value = outputText;
+                
+                updateStats();
+            };
+
+            // --- Helper Functions ---
+            const updateStats = () => {
+                // Input Stats
+                const inputText = inputTextArea.value;
+                const inputCharCount = inputText.length;
+                const inputWordCount = inputText.trim() === '' ? 0 : inputText.trim().split(/\s+/).length;
+                inputStats.textContent = `${inputWordCount} words, ${inputCharCount} characters`;
+                
+                // Output Stats
+                const outputText = outputTextArea.value;
+                const outputCharCount = outputText.length;
+                const outputWordCount = outputText.trim() === '' ? 0 : outputText.trim().split(/\s+/).length;
+                outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
+            };
+
+            const showCopyFeedback = (button) => {
+                const originalText = button.innerHTML;
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 1500);
+            };
+
+            // --- Theme Management ---
+            const applyTheme = (isDark) => {
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                    themeToggle.checked = true;
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggle.checked = false;
+                }
+            };
+
+            themeToggle.addEventListener('change', () => {
+                const isDark = themeToggle.checked;
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                applyTheme(isDark);
+            });
+
+            // --- Event Listeners ---
+            inputTextArea.addEventListener('input', processText);
+            separatorInput.addEventListener('input', processText);
+
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    inputTextArea.value = text;
+                    processText();
+                } catch (err) {
+                    console.error('Failed to read clipboard contents: ', err);
+                    alert('Could not paste from clipboard. Please ensure you have given the site permission.');
+                }
+            });
+
+            copyBtn.addEventListener('click', () => {
+                if (outputTextArea.value) {
+                    navigator.clipboard.writeText(outputTextArea.value).then(() => {
+                        showCopyFeedback(copyBtn);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        alert('Failed to copy text.');
+                    });
+                }
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                inputTextArea.value = '';
+                outputTextArea.value = '';
+                processText(); // This will also reset the stats
+                inputTextArea.focus();
+            });
+
+            // --- Initialization ---
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                applyTheme(savedTheme === 'dark');
+            } else {
+                applyTheme(prefersDark);
+            }
+
+            processText(); // Initial run in case of cached text in textarea
+        });
+    </script>
+
+</body>
+</html>
