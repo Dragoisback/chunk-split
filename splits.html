@@ -12,11 +12,15 @@
       background-color: #f4f7f6;
       color: #333;
     }
-    h1, h3, h4 { color: #2c3e50; }
+
+    h1, h3, h4 {
+        color: #2c3e50;
+    }
+
     textarea {
       width: calc(100% - 22px);
       height: 200px;
-      margin-bottom: 20px;
+      margin-bottom: 10px; /* Reduced margin-bottom for json-chapter-input-container */
       padding: 10px;
       font-size: 14px;
       line-height: 1.5;
@@ -27,6 +31,7 @@
       box-sizing: border-box;
       background-color: #fff;
     }
+
     .input-group {
         border: 1px solid #e0e0e0;
         padding: 15px;
@@ -41,67 +46,118 @@
         padding-bottom: 10px;
         margin-bottom: 15px;
     }
-    .input-container { margin-bottom: 15px; }
+
+    .input-container {
+      margin-bottom: 15px;
+    }
     .input-container label {
-        display: block; margin-bottom: 5px; font-weight: bold; color: #555;
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
     }
     .input-container input[type="number"],
     .input-container input[type="text"],
     .input-container select,
     .input-container textarea {
-        width: 100%; box-sizing: border-box; padding: 8px;
-        border: 1px solid #ccc; border-radius: 4px;
-    }
-    .input-container textarea { height: 80px; }
-    /* Find/replace, chunk, and extra styles omitted for brevity; use your existing CSS */
-    .json-chapter-box {
-      border: 1px solid #b4d3fc;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      padding: 7px 7px 7px 10px;
-      background: #f4fafd;
-      position: relative;
-    }
-    .json-chapter-label {
-      font-weight: bold;
-      color: #3465a4;
-      margin-bottom: 3px;
-      display: inline-block;
-    }
-    .remove-chapter-btn {
-      background: #f44336;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 3px 9px;
-      font-size: 13px;
-      cursor: pointer;
-      float: right;
-      margin-left: 7px;
-      margin-top: 1px;
-    }
-    .remove-chapter-btn:hover { background: #b71c1c; }
-    #addChapterBtn {
-      padding: 6px 14px;
-      background: #007bff;
-      color: #fff;
-      border-radius: 4px;
-      border: none;
-      font-size: 15px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    #addChapterBtn:hover { background: #0056b3; }
-    .info-counter {
-        font-size: 0.9em;
-        padding: 4px 8px;
-        background-color: #e9ecef;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        border: 1px solid #ccc;
         border-radius: 4px;
-        color: #333;
-        border: 1px solid #ced4da;
-        display: inline-block;
     }
-    /* Rest of your CSS... */
+    .input-container textarea {
+        height: 80px;
+    }
+
+    /* Styles for JSON Chapter Inputs */
+    .json-chapter-input-container {
+        border: 1px dashed #b0bec5;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    .json-chapter-input-container label {
+        font-weight: bold;
+        font-size: 0.95em;
+    }
+    .json-chapter-input-container textarea { /* Target specific textareas */
+        height: 150px;
+    }
+    .json-chapter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .json-chapter-status {
+        font-size: 0.85em;
+        color: #555;
+    }
+    .remove-json-chapter-button, #addJsonChapterButton, #clearAllJsonButton {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background-color: #e9ecef;
+        color: #333;
+    }
+    .remove-json-chapter-button { background-color: #f8d7da; border-color: #f5c6cb; }
+    .remove-json-chapter-button:hover { background-color: #f1b0b7; }
+    #addJsonChapterButton { background-color: #cfe2ff; border-color: #b6d4fe;}
+    #addJsonChapterButton:hover { background-color: #a3c6f8;}
+    #clearAllJsonButton { background-color: #fff3cd; border-color: #ffeeba;}
+    #clearAllJsonButton:hover { background-color: #fce8b2;}
+
+
+    /* Styles for dynamic find/replace pairs */
+    .find-replace-pair {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 4px;
+    }
+    .find-replace-pair input[type="text"] {
+        flex-grow: 1;
+        margin-right: 8px;
+    }
+    .find-replace-pair .arrow {
+        margin-right: 8px;
+        font-weight: bold;
+        color: #555;
+    }
+    .find-replace-pair .remove-pair-button,
+    #addFindReplacePairButton {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background-color: #e9ecef;
+        color: #333;
+        min-width: 30px;
+        text-align: center;
+    }
+    #addFindReplacePairButton {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+     .find-replace-pair .remove-pair-button:hover {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+     }
+     #addFindReplacePairButton:hover {
+        background-color: #218838;
+     }
+
+
     .chunk-container {
       margin-bottom: 20px;
       display: flex;
@@ -112,6 +168,7 @@
       border: 1px solid #e0e0e0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
     .chunk-title {
       font-weight: bold;
       margin-right: 10px;
@@ -120,11 +177,108 @@
       color: #007BFF;
       flex-shrink: 0;
     }
-    .chunk-textarea-wrapper { flex-grow: 1; margin-right: 10px; }
-    .chunk-textarea-wrapper textarea {
-        height: 150px; width: 100%; background-color: #e9ecef;
+
+    .chunk-textarea-wrapper {
+        flex-grow: 1;
+        margin-right: 10px;
     }
-    /* ... */
+    .chunk-textarea-wrapper textarea {
+        height: 150px;
+        width: 100%;
+        background-color: #e9ecef;
+    }
+
+    button, .copy-button {
+      padding: 10px 15px;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button#mainSplitButton {
+        background-color: #28a745;
+    }
+    button#mainSplitButton:hover {
+        background-color: #218838;
+    }
+
+    .button-action-wrapper { /* Wrapper for copy button and its count */
+        display: flex;
+        align-items: center;
+        margin-top: 8px;
+    }
+
+    .copy-button {
+      background-color: #007BFF;
+      font-size: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+    }
+    .copy-button:hover {
+        background-color: #0056b3;
+    }
+    .copy-button.green {
+      background-color: #28a745;
+    }
+    .copy-button.green:hover {
+      background-color: #1e7e34;
+    }
+    .copy-button .tick {
+      display: none;
+      margin-left: 8px;
+      font-size: 16px;
+    }
+    .copy-button.green .tick {
+      display: inline-block;
+    }
+    .copy-count-display {
+        margin-left: 5px;
+        font-size: 0.9em;
+        color: #666;
+        white-space: nowrap;
+    }
+
+    #glossaryFindReplaceSection button#applyPairedReplacementsButton {
+        background-color: #ffc107;
+        color: black;
+        font-size: 14px;
+        padding: 8px 15px;
+        margin-top: 10px;
+    }
+    #glossaryFindReplaceSection button#applyPairedReplacementsButton:hover {
+        background-color: #e0a800;
+    }
+
+    #chunkedTextContainer {
+      margin-top: 30px;
+    }
+
+    #loadingIndicator {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 25px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 8px;
+      z-index: 1000;
+      font-size: 1.1em;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .info-counter {
+        font-size: 0.9em;
+        padding: 4px 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        color: #333;
+        border: 1px solid #ced4da;
+        display: inline-block;
+    }
   </style>
 </head>
 
@@ -139,17 +293,22 @@
     </select>
   </div>
 
-  <!-- MULTI-CHAPTER JSON INPUT SECTION -->
   <div id="jsonInputSection" class="input-group">
-    <h3>JSON Input Mode (Multi-Chapter)</h3>
-    <p>Paste your array of JSON objects per chapter below. You can add/remove chapters. Objects will be counted and split across all chapters as one long sequence.</p>
-    <button id="addChapterBtn" type="button">+ Add Chapter/JSON Box</button>
-    <div id="jsonChapterBoxes"></div>
-    <div style="text-align: right; margin-bottom: 5px;">
-        <span id="jsonObjectsCount" class="info-counter">Objects: 0</span>
+    <h3>JSON Input Mode</h3>
+    <p>Add one or more JSON "chapters". Content from all valid JSON inputs will be combined for chunking. Glossary replacement applies to each input individually. The total object count updates automatically.</p>
+    
+    <div id="jsonInputsContainer">
+      <!-- JSON input boxes will be dynamically added here -->
     </div>
+
+    <div style="margin-top:10px; margin-bottom:15px; display: flex; gap: 10px; align-items: center;">
+        <button type="button" id="addJsonChapterButton" onclick="addJsonChapterInput()">+ Add JSON Input</button>
+        <button type="button" id="clearAllJsonButton" onclick="clearAllJsonInputs()">Clear All JSON Inputs</button>
+        <span id="jsonObjectsCount" class="info-counter" style="margin-left: auto;">Total Objects: 0</span>
+    </div>
+    
     <div class="input-container" style="margin-top: 10px; margin-bottom: 20px;">
-        <label for="jsonObjectsPerChunk">Combine original JSON objects per output chunk:</label>
+        <label for="jsonObjectsPerChunk">Combine original JSON objects per output chunk (from all inputs):</label>
         <select id="jsonObjectsPerChunk">
             <option value="1">1 (Original behavior: one object per chunk)</option>
             <option value="2">2 objects</option>
@@ -162,20 +321,40 @@
             <option value="20">20 objects</option>
         </select>
     </div>
-    <!-- Glossary/Find & Replace section unchanged... -->
+
     <div id="glossaryFindReplaceSection" style="margin-top: 20px; padding-top:15px; border-top: 1px dashed #ccc;">
-      <h4>Paired Find & Replace in Glossary Translations:</h4>
+      <h4>Paired Find & Replace in Glossary Translations (Applied per JSON Input):</h4>
       <p style="font-size:0.9em; color:#555;">
-        Define find and replace pairs below. Rules are applied sequentially for each term's translation within the JSON objects.
+        Define find and replace pairs. Rules are applied sequentially for each term's translation within each JSON input box.
       </p>
-      <div id="findReplacePairsContainer"></div>
+      <div id="findReplacePairsContainer">
+      </div>
       <button type="button" id="addFindReplacePairButton" onclick="addFindReplacePair()">+ Add Replacement Rule</button>
       <button type="button" id="applyPairedReplacementsButton" onclick="performPairedGlossaryReplace()" style="margin-left:10px;">Apply All Replacement Rules</button>
       <span id="glossaryReplaceStatus" style="margin-left: 10px; font-size: 0.9em; display: block; margin-top: 5px;"></span>
     </div>
   </div>
 
-  <!-- Plain text input section unchanged ... -->
+  <div id="plainTextInputSection" class="input-group" style="display:none;">
+    <h3>Plain Text Input Mode</h3>
+    <p>Paste your plain text below. It will be split based on 'Max characters per chunk'. Character count and approximate chunk estimate update automatically.</p>
+    <div style="text-align: right; margin-bottom: 5px;">
+        <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
+    </div>
+    <textarea id="plainTextInputArea" placeholder="Paste plain text here..."></textarea>
+    <div class="input-container">
+      <label for="formatSelect">Format text (for Plain Text Mode):</label>
+      <select id="formatSelect">
+        <option value="as-is">Show text as is</option>
+        <option value="pretty">Pretty (trim lines, join with double newlines)</option>
+      </select>
+    </div>
+    <div class="input-container">
+      <label for="maxChars">Max characters per chunk (for Plain Text Mode):</label>
+      <input type="number" id="maxChars" value="1800">
+    </div>
+  </div>
+
 
   <div class="input-group">
     <h3>Chunk Output Settings</h3>
@@ -197,214 +376,799 @@
   <div id="loadingIndicator">Loading...</div>
 
   <script>
-    // -- MULTI-CHAPTER JSON SUPPORT --
-    let chapterBoxCount = 0;
+    let lastClickedButton = null;
+    let originalPlainTextInput = "";
+    let findReplacePairCount = 0;
+    let jsonChapterInputIdCounter = 0;
 
-    function addJsonChapterBox(defaultValue = '', doNotFocus = false) {
-      chapterBoxCount++;
-      const chapterBoxes = document.getElementById('jsonChapterBoxes');
-      const boxDiv = document.createElement('div');
-      boxDiv.className = "json-chapter-box";
-      boxDiv.dataset.chapterBoxId = chapterBoxCount;
-
-      const label = document.createElement('span');
-      label.className = "json-chapter-label";
-      label.textContent = `Chapter ${chapterBoxCount}`;
-
-      const removeBtn = document.createElement('button');
-      removeBtn.className = "remove-chapter-btn";
-      removeBtn.type = "button";
-      removeBtn.textContent = 'Remove';
-      removeBtn.onclick = function() {
-        chapterBoxes.removeChild(boxDiv);
-        updateJsonObjectCount();
-        relabelChapterBoxes();
-      };
-
-      const textarea = document.createElement('textarea');
-      textarea.placeholder = '[ { ... }, { ... } ]';
-      textarea.value = defaultValue;
-      textarea.addEventListener('input', updateJsonObjectCount);
-
-      boxDiv.appendChild(label);
-      boxDiv.appendChild(removeBtn);
-      boxDiv.appendChild(document.createElement('br'));
-      boxDiv.appendChild(textarea);
-
-      chapterBoxes.appendChild(boxDiv);
-
-      if (!doNotFocus) textarea.focus();
-      updateJsonObjectCount();
+    function showLoading() {
+      document.getElementById('loadingIndicator').style.display = 'block';
     }
 
-    function relabelChapterBoxes() {
-      const boxes = document.querySelectorAll('.json-chapter-box');
-      let idx = 1;
-      boxes.forEach(box => {
-        const label = box.querySelector('.json-chapter-label');
-        if (label) label.textContent = `Chapter ${idx++}`;
-      });
+    function hideLoading() {
+      document.getElementById('loadingIndicator').style.display = 'none';
     }
 
-    function getAllJsonChapterArrays() {
-      const boxes = document.querySelectorAll('.json-chapter-box textarea');
-      const allArrays = [];
-      for (let t of boxes) {
-        const val = t.value.trim();
-        if (!val) continue;
-        try {
-          const arr = JSON.parse(val);
-          if (Array.isArray(arr)) allArrays.push(arr);
-        } catch (e) {}
+    function updateButtonState(button) {
+      if (lastClickedButton && lastClickedButton !== button) {
+        lastClickedButton.classList.remove('green');
+        if (lastClickedButton.querySelector('.tick')) {
+            lastClickedButton.querySelector('.tick').style.display = 'none';
+        }
       }
-      return allArrays;
+      button.classList.add('green');
+      if (button.querySelector('.tick')) {
+          button.querySelector('.tick').style.display = 'inline-block';
+      }
+      lastClickedButton = button;
     }
 
-    function updateJsonObjectCount() {
-      const countElement = document.getElementById('jsonObjectsCount');
-      const allArrays = getAllJsonChapterArrays();
-      const total = allArrays.reduce((sum, arr) => sum + arr.length, 0);
-      countElement.style.color = '#333';
-      countElement.textContent = `Objects: ${total}`;
+    function addFindReplacePair(findVal = "", replaceVal = "") {
+        findReplacePairCount++; // Not critically used, but maintained
+        const container = document.getElementById('findReplacePairsContainer');
+        if (!container) return;
+
+        const pairDiv = document.createElement('div');
+        pairDiv.classList.add('find-replace-pair');
+        pairDiv.innerHTML = `
+            <input type="text" class="find-text" placeholder="Find this text" value="${findVal}">
+            <span class="arrow">➔</span>
+            <input type="text" class="replace-text" placeholder="Replace with this" value="${replaceVal}">
+            <button type="button" class="remove-pair-button" onclick="removeFindReplacePair(this)">－</button>
+        `;
+        container.appendChild(pairDiv);
     }
+
+    function removeFindReplacePair(button) {
+        button.parentElement.remove();
+    }
+
+    // --- JSON Input Management ---
+    function addJsonChapterInput(content = '') {
+        jsonChapterInputIdCounter++;
+        const container = document.getElementById('jsonInputsContainer');
+        if (!container) return;
+
+        const chapterDiv = document.createElement('div');
+        chapterDiv.classList.add('json-chapter-input-container');
+        chapterDiv.dataset.inputId = `json-chapter-${jsonChapterInputIdCounter}`;
+
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('json-chapter-header');
+
+        const label = document.createElement('label');
+        label.textContent = `JSON Input ${jsonChapterInputIdCounter}:`;
+        
+        const statusSpan = document.createElement('span');
+        statusSpan.classList.add('json-chapter-status');
+        statusSpan.textContent = 'Objects: 0';
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('remove-json-chapter-button');
+        removeButton.textContent = 'Remove this Input';
+        removeButton.onclick = function() { removeJsonChapterInput(this); };
+        
+        headerDiv.appendChild(label);
+        headerDiv.appendChild(statusSpan);
+        headerDiv.appendChild(removeButton);
+
+        const textarea = document.createElement('textarea');
+        textarea.classList.add('json-chapter-input'); // For easy selection
+        textarea.placeholder = '[ { ... }, { ... } ]';
+        textarea.value = content;
+        textarea.addEventListener('input', () => {
+            updateIndividualJsonCount(textarea, statusSpan);
+            updateTotalJsonObjectCount();
+            saveAllJsonInputs();
+        });
+
+        chapterDiv.appendChild(headerDiv);
+        chapterDiv.appendChild(textarea);
+        container.appendChild(chapterDiv);
+
+        updateIndividualJsonCount(textarea, statusSpan); // Initial count for new/loaded box
+        updateTotalJsonObjectCount(); // Update global count
+        if (content === '' && jsonChapterInputIdCounter > 1) { // Only save if it's a new, user-added box
+            saveAllJsonInputs();
+        }
+        return chapterDiv;
+    }
+
+    function removeJsonChapterInput(buttonElement) {
+        const chapterDiv = buttonElement.closest('.json-chapter-input-container');
+        if (chapterDiv) {
+            chapterDiv.remove();
+            updateTotalJsonObjectCount();
+            saveAllJsonInputs();
+        }
+         // Ensure at least one input box remains if all are removed
+        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) {
+            addJsonChapterInput();
+        }
+    }
+    
+    function clearAllJsonInputs() {
+        const container = document.getElementById('jsonInputsContainer');
+        if (!container) return;
+        container.innerHTML = ''; // Clear all existing inputs
+        jsonChapterInputIdCounter = 0; // Reset counter
+        addJsonChapterInput(); // Add a single fresh input
+        updateTotalJsonObjectCount();
+        saveAllJsonInputs(); // Save the cleared state (one empty input)
+    }
+
+    function updateIndividualJsonCount(textarea, statusSpan) {
+        const jsonString = textarea.value.trim();
+        statusSpan.style.color = '#555'; // Default color
+
+        if (!jsonString) {
+            statusSpan.textContent = 'Objects: 0';
+            return 0;
+        }
+        try {
+            if (!jsonString.startsWith('[')) {
+                 statusSpan.textContent = 'Error: Not an array';
+                 statusSpan.style.color = 'orange';
+                 return 0;
+            }
+            const jsonData = JSON.parse(jsonString);
+            if (Array.isArray(jsonData)) {
+                statusSpan.textContent = `Objects: ${jsonData.length}`;
+                return jsonData.length;
+            } else {
+                statusSpan.textContent = 'Error: Not an array';
+                statusSpan.style.color = 'orange';
+                return 0;
+            }
+        } catch (e) {
+            statusSpan.textContent = 'Error: Invalid JSON';
+            statusSpan.style.color = 'red';
+            return 0;
+        }
+    }
+
+    function updateTotalJsonObjectCount() {
+        const totalCountElement = document.getElementById('jsonObjectsCount');
+        if (!totalCountElement) return;
+
+        let totalObjects = 0;
+        const chapterInputs = document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container');
+        chapterInputs.forEach(chapterDiv => {
+            const textarea = chapterDiv.querySelector('textarea.json-chapter-input');
+            const statusSpan = chapterDiv.querySelector('.json-chapter-status');
+            if (textarea && statusSpan) {
+                // Rely on updateIndividualJsonCount to have validated and set textContent for statusSpan
+                const jsonString = textarea.value.trim();
+                 try {
+                    if (jsonString.startsWith('[') && jsonString.endsWith(']')) {
+                        const jsonData = JSON.parse(jsonString);
+                        if (Array.isArray(jsonData)) {
+                            totalObjects += jsonData.length;
+                        }
+                    }
+                } catch (e) { /*
+                     Count is 0 if invalid, already handled by individual
+                     This ensures only valid, parsable array lengths are summed.
+                */ }
+            }
+        });
+        totalCountElement.textContent = `Total Objects: ${totalObjects}`;
+    }
+    
+    function getAllCombinedJsonData() {
+        let combinedData = [];
+        let allInputsValid = true;
+        const chapterTextareas = document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input');
+        let allEmpty = true;
+
+        chapterTextareas.forEach((textarea, index) => {
+            const jsonString = textarea.value.trim();
+            if (jsonString) {
+                allEmpty = false;
+                try {
+                    if (!jsonString.startsWith('[') || !jsonString.endsWith(']')) {
+                        throw new Error(`Input ${index + 1} is not a valid JSON array (must start with [ and end with ]).`);
+                    }
+                    const jsonData = JSON.parse(jsonString);
+                    if (Array.isArray(jsonData)) {
+                        combinedData = combinedData.concat(jsonData);
+                    } else {
+                        throw new Error(`Input ${index + 1} is not a valid JSON array.`);
+                    }
+                } catch (e) {
+                    alert(`Error parsing JSON in Input ${index + 1}: ${e.message}\nPlease fix the JSON data before proceeding.`);
+                    allInputsValid = false;
+                    return { data: [], success: false, allEmpty: false }; // Early exit
+                }
+            }
+        });
+        
+        if (!allInputsValid) return { data: [], success: false, allEmpty }; // If any error occurred
+
+        return { data: combinedData, success: true, allEmpty };
+    }
+
+    function saveAllJsonInputs() {
+        const chapterTextareas = document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input');
+        const allJsonContents = [];
+        chapterTextareas.forEach(textarea => {
+            allJsonContents.push(textarea.value);
+        });
+        localStorage.setItem('allJsonInputValues', JSON.stringify(allJsonContents));
+    }
+
+    function loadAllJsonInputs() {
+        const savedJsonContents = localStorage.getItem('allJsonInputValues');
+        const container = document.getElementById('jsonInputsContainer');
+        if (!container) return;
+        container.innerHTML = ''; // Clear any default/existing
+        jsonChapterInputIdCounter = 0;
+
+        if (savedJsonContents) {
+            try {
+                const allJsonContents = JSON.parse(savedJsonContents);
+                if (Array.isArray(allJsonContents) && allJsonContents.length > 0) {
+                    allJsonContents.forEach(content => addJsonChapterInput(content));
+                } else {
+                    addJsonChapterInput(); // Add one empty if localStorage was empty array or invalid
+                }
+            } catch (e) {
+                console.error("Error parsing saved JSON inputs:", e);
+                addJsonChapterInput(); // Add one empty on error
+            }
+        } else {
+            addJsonChapterInput(); // Add one empty if nothing in localStorage
+        }
+        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) {
+           addJsonChapterInput(); // Absolute fallback: ensure at least one input
+        }
+    }
+    // --- End JSON Input Management ---
+
+
+    function updatePlainTextInfo() {
+        const plainTextInputArea = document.getElementById('plainTextInputArea');
+        const infoElement = document.getElementById('plainTextInfo');
+        const maxCharsInput = document.getElementById('maxChars');
+
+        if (!plainTextInputArea || !infoElement || !maxCharsInput) return;
+
+        const text = plainTextInputArea.value;
+        const charCount = text.length;
+        const maxChars = parseInt(maxCharsInput.value, 10);
+        infoElement.style.color = '#333';
+
+        let potentialChunks = 0;
+        if (charCount > 0 && maxChars > 0) {
+            potentialChunks = Math.ceil(charCount / maxChars);
+        } else if (charCount > 0 && (isNaN(maxChars) || maxChars <= 0)) {
+            potentialChunks = 1; 
+        }
+
+        infoElement.textContent = `Chars: ${charCount} / Approx. Chunks: ${potentialChunks}`;
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('addChapterBtn').onclick = function() {
-        addJsonChapterBox();
-      };
-      // Add at least one box by default, or restore from storage if desired
-      if (document.querySelectorAll('.json-chapter-box').length === 0) {
-        addJsonChapterBox();
+      const maxCharsInput = document.getElementById('maxChars');
+      const addToTopInput = document.getElementById('addToTop');
+      const addToBottomInput = document.getElementById('addToBottom');
+      const formatSelect = document.getElementById('formatSelect');
+      const splitModeSelect = document.getElementById('splitModeSelect');
+      const plainTextInputArea = document.getElementById('plainTextInputArea');
+      // const jsonInputArea = document.getElementById('jsonInputArea'); // Removed, handled by new system
+      const jsonObjectsPerChunkSelect = document.getElementById('jsonObjectsPerChunk');
+
+      const newDefaultAddToTopPreset = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis"
+
+1. Analyze raw Passage and Translation: 
+   - FOR EACH line, summarize its meaning and compare it very thoroughly to the translation.
+   - Note if the translation matches the original or deviates, explaining any ambiguities or potential errors.
+   - Check if phrases are adapted naturally (e.g., idiomatic expressions retain flavor without literal awkwardness or being too formal and literal).
+
+2. Identify Errors:
+  - Spot issues related to:
+     - Accuracy: Missing, Overly condensed sentences or lines, added, or incorrect glossary terms
+        * Note : Only ignore glossary if certain it's wrong, if certain its not appropriately conveying the meaning or have grammatical error
+  - Logic: Pronoun mistakes, wrong speaker, or mixed-up character names.
+  - Language: Awkward or unnatural English or Overly condensed sentences.
+  - Analyze every line thoroughly.
+
+3. Verify Errors: 
+   - Double-check all identified errors, ensuring each has clear evidence.
+   - keep all the minor and major valid errors.
+   - Verify if the tone matches the context (majestic for epic scenes, colloquial for dialogue).
+
+4. Fix the Translation :
+  - Correct the verified errors and use English major level proficiency to make the prose flows smoothly with Rich descriptive and faithful rendering of key dialogue
+  - Don't use Only colon and bullet points in your translation and while during their removal make sure the English is natural and idiomatic.
+  - "DO NOT transliterate the honorifics unless the glossary says so. For example, you should use 'Senior Brother X' instead of 'X-shixiong'."
+  - Do not over condense the sentence and dialogue while making sure the English is natural and idiomatic.
+  - Where necessary for comprehension, add brief, unobtrusive context or explanations for cultural terms or implied meanings. Avoid overly complex or literary phrasing if it sacrifices clarity
+
+5. Give only the Fixed human like English translation as output and not the Whole JSON format. and Separately mention when a glossary is wrong or have variations and is fixed in the output.`;
+      
+      addToTopInput.value = localStorage.getItem('addToTop') || newDefaultAddToTopPreset;
+      addToBottomInput.value = localStorage.getItem('addToBottom') || '---\nEnd of Part $X';
+      maxCharsInput.value = localStorage.getItem('maxChars') || '1800';
+      formatSelect.value = localStorage.getItem('formatSelect') || 'pretty';
+      splitModeSelect.value = localStorage.getItem('splitModeSelect') || 'json';
+      
+      if (jsonObjectsPerChunkSelect) {
+          jsonObjectsPerChunkSelect.value = localStorage.getItem('jsonObjectsPerChunk') || '1';
       }
-      // ...rest of your DOMContentLoaded logic...
-      // (unchanged: init other settings, add event listeners, etc)
-      // Make sure to update other references to #jsonInputArea as needed!
-      // For glossary/replace, see below.
+      
+      for (let i = 0; i < 3; i++) { // Add default find/replace pairs
+          addFindReplacePair();
+      }
+
+      loadAllJsonInputs(); // Load multiple JSON inputs
+      toggleInputSections(); 
+
+      if (splitModeSelect.value === 'json') {
+        updateTotalJsonObjectCount(); // Initial count for JSON mode
+      } else {
+        updatePlainTextInfo();
+      }
+
+      // Event listeners for JSON input boxes are added in addJsonChapterInput()
+      if (plainTextInputArea) {
+        plainTextInputArea.addEventListener('input', updatePlainTextInfo);
+      }
+      maxCharsInput.addEventListener('input', updatePlainTextInfo);
+
+
+      maxCharsInput.addEventListener('input', () => localStorage.setItem('maxChars', maxCharsInput.value));
+      addToTopInput.addEventListener('input', () => localStorage.setItem('addToTop', addToTopInput.value));
+      addToBottomInput.addEventListener('input', () => localStorage.setItem('addToBottom', addToBottomInput.value));
+      
+      if (jsonObjectsPerChunkSelect) {
+          jsonObjectsPerChunkSelect.addEventListener('change', () => {
+              localStorage.setItem('jsonObjectsPerChunk', jsonObjectsPerChunkSelect.value);
+          });
+      }
+
+      formatSelect.addEventListener('change', () => {
+        localStorage.setItem('formatSelect', formatSelect.value);
+        formatPlainText();
+      });
+
+      splitModeSelect.addEventListener('change', () => {
+        localStorage.setItem('splitModeSelect', splitModeSelect.value);
+        toggleInputSections();
+        if (splitModeSelect.value === 'json') {
+            updateTotalJsonObjectCount();
+        } else {
+            updatePlainTextInfo();
+        }
+      });
+      
+      if (plainTextInputArea) {
+          plainTextInputArea.addEventListener('input', () => {
+              originalPlainTextInput = plainTextInputArea.value;
+              if (formatSelect.value === 'pretty') { 
+                  formatPlainText(); 
+              }
+              updatePlainTextInfo(); // Also update on direct input
+          });
+          if (plainTextInputArea.value) { // Initialize originalPlainTextInput and format if needed on load
+              originalPlainTextInput = plainTextInputArea.value;
+              formatPlainText();
+          }
+      }
     });
 
-    // --- CHUNKING LOGIC: use all chapter boxes
-    function chunkJsonInput(addToTop, addToBottom, container) {
-      // Instead of single textarea, use all chapter boxes:
-      const allArrays = getAllJsonChapterArrays();
-      const flat = [];
-      // Keep original chapter/box and index for each object
-      allArrays.forEach((arr, chapIdx) => {
-        arr.forEach((obj, objIdx) => {
-          flat.push({ ...obj, _chapter: chapIdx+1, _idx: objIdx });
+    function toggleInputSections() {
+        const splitMode = document.getElementById('splitModeSelect').value;
+        const jsonSection = document.getElementById('jsonInputSection');
+        const plainTextSection = document.getElementById('plainTextInputSection');
+        
+        if (jsonSection) jsonSection.style.display = (splitMode === 'json' ? 'block' : 'none');
+        if (plainTextSection) plainTextSection.style.display = (splitMode === 'text' ? 'block' : 'none');
+    }
+
+    function performPairedGlossaryReplace() {
+        const statusElement = document.getElementById('glossaryReplaceStatus');
+        const pairsContainer = document.getElementById('findReplacePairsContainer');
+
+        if (!statusElement || !pairsContainer) {
+            console.error("Required UI elements for paired replace not found.");
+            if(statusElement) { statusElement.textContent = "UI Error."; statusElement.style.color = "red"; }
+            return;
+        }
+        statusElement.textContent = ''; 
+        statusElement.style.color = 'black'; // Reset color
+
+        const rules = [];
+        const pairElements = pairsContainer.querySelectorAll('.find-replace-pair');
+
+        for (let i = 0; i < pairElements.length; i++) {
+            const findInput = pairElements[i].querySelector('.find-text');
+            const replaceInput = pairElements[i].querySelector('.replace-text');
+            if (!findInput || !replaceInput) continue;
+
+            const findText = findInput.value; 
+            const replaceText = replaceInput.value; 
+
+            if (findText) { 
+                rules.push({
+                    find: findText,
+                    replace: replaceText,
+                    findRegExp: new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+                });
+            } else if (replaceText && !findText) { 
+                 statusElement.innerHTML += `<br>Warning: Rule ${i+1} has replace text but no find text. It will be ignored.`;
+                 statusElement.style.color = 'orange';
+            }
+        }
+        
+        if (rules.length === 0 && pairElements.length > 0) {
+            let allFindFieldsEmpty = true;
+            pairElements.forEach(pairEl => { if(pairEl.querySelector('.find-text').value) allFindFieldsEmpty = false; });
+            if(allFindFieldsEmpty){
+                statusElement.textContent = 'No valid replacement rules entered (all "Find" fields may be empty).';
+                statusElement.style.color = 'orange'; return;
+            }
+        }
+        if(rules.length === 0) {
+            statusElement.textContent = 'No replacement rules to apply.'; statusElement.style.color = 'grey';
+            setTimeout(() => { if (statusElement && statusElement.textContent === 'No replacement rules to apply.') statusElement.textContent = ''; }, 5000);
+            return;
+        }
+
+        const jsonInputTextareas = document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input');
+        let totalInstancesReplacedAcrossAll = 0;
+        let anyReplacementMade = false;
+        let messages = [];
+
+        jsonInputTextareas.forEach((textarea, inputIndex) => {
+            const jsonString = textarea.value.trim();
+            if (!jsonString) return; // Skip empty textareas
+
+            let jsonData;
+            try {
+                jsonData = JSON.parse(jsonString);
+            } catch (e) {
+                messages.push(`Error: Input ${inputIndex + 1} contains invalid JSON. Skipped.`);
+                return;
+            }
+
+            if (!Array.isArray(jsonData)) {
+                messages.push(`Error: JSON in Input ${inputIndex + 1} must be an array. Skipped.`);
+                return;
+            }
+
+            let instancesReplacedInThisInput = 0;
+            let modifiedThisInput = false;
+
+            jsonData.forEach(obj => { // obj could be a single object or an array if objectsToGroup > 1 from previous run
+                const itemsToProcess = Array.isArray(obj) ? obj : [obj]; 
+                itemsToProcess.forEach(actualItem => {
+                    if (actualItem && Array.isArray(actualItem.terms)) {
+                        actualItem.terms.forEach(term => {
+                            if (term && typeof term.translation === 'string') {
+                                let currentTermTranslation = term.translation;
+                                let termChanged = false;
+                                rules.forEach((rule) => {
+                                    const originalLength = currentTermTranslation.length;
+                                    currentTermTranslation = currentTermTranslation.replace(rule.findRegExp, rule.replace);
+                                    if (currentTermTranslation.length !== originalLength || currentTermTranslation !== term.translation.replace(rule.findRegExp, rule.replace)) { // Check if replacement actually happened
+                                        // Need a more reliable way to count matches
+                                        let tempTerm = term.translation;
+                                        let matchesInTerm = 0;
+                                        while(rule.findRegExp.test(tempTerm)){
+                                            matchesInTerm++;
+                                            tempTerm = tempTerm.replace(rule.findRegExp, ""); // To avoid infinite loop with g flag, reset lastIndex
+                                            rule.findRegExp.lastIndex = 0; // Reset for next use
+                                        }
+                                        if (matchesInTerm > 0 && term.translation.match(rule.findRegExp)) { // Double check there was a match
+                                          instancesReplacedInThisInput += (term.translation.match(rule.findRegExp) || []).length; // Count actual matches before replace
+                                          totalInstancesReplacedAcrossAll += (term.translation.match(rule.findRegExp) || []).length;
+                                          termChanged = true;
+                                        }
+                                    }
+                                });
+                                if(termChanged){
+                                   term.translation = currentTermTranslation; // Apply accumulated changes
+                                   modifiedThisInput = true;
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            
+            if (modifiedThisInput) {
+                textarea.value = JSON.stringify(jsonData, null, 2);
+                anyReplacementMade = true;
+                messages.push(`Input ${inputIndex + 1}: ${instancesReplacedInThisInput} replacements applied.`);
+                // Update individual counter after change
+                const statusSpan = textarea.closest('.json-chapter-input-container').querySelector('.json-chapter-status');
+                if (statusSpan) updateIndividualJsonCount(textarea, statusSpan);
+            }
         });
-      });
-      if (flat.length === 0) {
-        alert("No valid JSON objects found in any chapter.");
-        hideLoading();
+        updateTotalJsonObjectCount(); // Reflect changes
+
+        if (messages.length > 0) {
+            statusElement.innerHTML = messages.join('<br>');
+        }
+        if (anyReplacementMade) {
+            statusElement.innerHTML += `<br><b>Total instances replaced across all inputs: ${totalInstancesReplacedAcrossAll}</b>`;
+            statusElement.style.color = 'green';
+        } else if (rules.length > 0 && messages.length === 0) {
+             statusElement.textContent = 'Replacements attempted. No instances found matching any rule in any input.';
+             statusElement.style.color = 'orange';
+        }
+        
+        setTimeout(() => {
+            if (statusElement) statusElement.textContent = '';
+        }, 15000); // Longer timeout for multiple messages
+    }
+
+
+    function formatPlainText() {
+      const formatSelect = document.getElementById('formatSelect');
+      const textArea = document.getElementById('plainTextInputArea');
+      if (!formatSelect || !textArea) return;
+      
+      if (!originalPlainTextInput && textArea.value) {
+          originalPlainTextInput = textArea.value;
+      }
+      const previousValue = textArea.value;
+
+      if (formatSelect.value === 'pretty') {
+        const paragraphs = originalPlainTextInput.split('\n');
+        const formattedText = paragraphs.map(p => p.trim()).filter(p => p).join('\n\n');
+        textArea.value = formattedText;
+      } else {
+        textArea.value = originalPlainTextInput;
+      }
+      if (textArea.value !== previousValue) {
+          textArea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      }
+    }
+
+    function processAndChunk() {
+      showLoading();
+      setTimeout(() => {
+        try {
+          const splitMode = document.getElementById('splitModeSelect').value;
+          const addToTop = document.getElementById('addToTop').value;
+          const addToBottom = document.getElementById('addToBottom').value;
+          const chunkedTextContainer = document.getElementById('chunkedTextContainer');
+          if (!chunkedTextContainer) { hideLoading(); return; }
+          chunkedTextContainer.innerHTML = '';
+          
+          if (splitMode === 'json') {
+            const { data: combinedJsonData, success, allEmpty } = getAllCombinedJsonData();
+            if (allEmpty) {
+                alert("All JSON inputs are empty. Nothing to chunk.");
+            } else if (success && combinedJsonData.length > 0) {
+                chunkJsonInput(combinedJsonData, addToTop, addToBottom, chunkedTextContainer);
+            } else if (!success && !allEmpty) {
+                // Error message already shown by getAllCombinedJsonData
+                alert("Chunking aborted due to errors in JSON input(s).");
+            } else {
+                 alert("No valid JSON objects found to chunk.");
+            }
+          } else {
+            chunkPlainTextInput(addToTop, addToBottom, chunkedTextContainer);
+          }
+        } catch (error) {
+          console.error("Error during chunking:", error);
+          alert("An error occurred during chunking: " + error.message);
+        } finally {
+          hideLoading();
+        }
+      }, 10); 
+    }
+
+    function chunkJsonInput(jsonData, addToTop, addToBottom, container) { // jsonData is now the combined array
+      if (!jsonData || jsonData.length === 0) {
+        // This check is now mostly handled by processAndChunk, but good to keep
+        alert("JSON data is empty or invalid after combining. Nothing to chunk.");
+        hideLoading(); // Ensure loading is hidden
         return;
       }
-      const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
-      const totalNewChunks = Math.ceil(flat.length / objectsToGroup);
+
+      const objectsPerChunkInput = document.getElementById('jsonObjectsPerChunk');
+      const objectsToGroup = parseInt(objectsPerChunkInput ? objectsPerChunkInput.value : "1", 10) || 1;
+
+      const totalNewChunks = Math.ceil(jsonData.length / objectsToGroup);
       const newChunkDigits = String(totalNewChunks).length > 0 ? String(totalNewChunks).length : 1;
-      for (let i = 0; i < flat.length; i += objectsToGroup) {
-        const thisGroup = flat.slice(i, i + objectsToGroup);
-        let chunkContent;
-        if (objectsToGroup === 1 && thisGroup.length === 1) {
-          chunkContent = JSON.stringify(stripMeta(thisGroup[0]), null, 2);
+
+      for (let i = 0; i < jsonData.length; i += objectsToGroup) {
+        const currentGroupOfObjects = jsonData.slice(i, i + objectsToGroup);
+        if (currentGroupOfObjects.length === 0) continue; 
+
+        const newChunkNumber = Math.floor(i / objectsToGroup) + 1;
+        const newChunkPartNumberForPlaceholders = String(newChunkNumber).padStart(newChunkDigits, '0');
+
+        // Chunk title uses global item index and original IDs from objects within the chunk
+        let chunkDisplayTitle = `Segment ${newChunkPartNumberForPlaceholders}`;
+        
+        // For indicating original ID ranges from the combined list
+        const firstOriginalGlobalIndex = i; 
+        const lastOriginalGlobalIndex = i + currentGroupOfObjects.length - 1;
+
+        chunkDisplayTitle += ` (Items ${firstOriginalGlobalIndex + 1}-${lastOriginalGlobalIndex + 1} from combined list)`;
+
+        // You can also add original IDs if they exist and make sense
+        // For simplicity, we rely on the global item indices here primarily.
+        // If you want to show original IDs from objects:
+        /*
+        const firstObjInChunk = currentGroupOfObjects[0];
+        const lastObjInChunk = currentGroupOfObjects[currentGroupOfObjects.length - 1];
+        let idInfo = "";
+        if (firstObjInChunk.id !== undefined) {
+            idInfo = `Orig.ID ${firstObjInChunk.id}`;
+            if (currentGroupOfObjects.length > 1 && lastObjInChunk.id !== undefined && lastObjInChunk.id !== firstObjInChunk.id) {
+                idInfo += ` to ${lastObjInChunk.id}`;
+            }
+        }
+        if(idInfo) chunkDisplayTitle += ` [${idInfo}]`;
+        */
+        
+        let chunkContentString;
+        if (objectsToGroup === 1 && currentGroupOfObjects.length === 1) {
+            // Outputting a single object from the combined list
+            chunkContentString = JSON.stringify(currentGroupOfObjects[0], null, 2);
         } else {
-          chunkContent = JSON.stringify(thisGroup.map(stripMeta), null, 2);
+            // Outputting an array of objects for this chunk
+            chunkContentString = JSON.stringify(currentGroupOfObjects, null, 2);
         }
-        let chunkNumStr = String(Math.floor(i / objectsToGroup) + 1).padStart(newChunkDigits, '0');
-        let chunkDisplayTitle = `Segment ${chunkNumStr}`;
-        // Show range of chapter:index or id
-        const first = thisGroup[0], last = thisGroup[thisGroup.length-1];
-        if (first && last) {
-          chunkDisplayTitle += ` (Chapter ${first._chapter}#${first.id ?? first._idx}`;
-          if (first._chapter !== last._chapter || first.id !== last.id) {
-            chunkDisplayTitle += ` - Chapter ${last._chapter}#${last.id ?? last._idx}`;
-          }
-          chunkDisplayTitle += ')';
-        }
-        let topText = addToTop.replace(/\$X/g, chunkNumStr).replace(/\$Y/g, totalNewChunks);
-        let bottomText = addToBottom.replace(/\$X/g, chunkNumStr).replace(/\$Y/g, totalNewChunks);
+
+        let topText = addToTop.replace(/\$X/g, newChunkPartNumberForPlaceholders).replace(/\$Y/g, totalNewChunks);
+        let bottomText = addToBottom.replace(/\$X/g, newChunkPartNumberForPlaceholders).replace(/\$Y/g, totalNewChunks);
+
         let finalChunk = "";
         if (topText) finalChunk += topText + '\n\n';
-        finalChunk += chunkContent;
+        finalChunk += chunkContentString;
         if (bottomText) finalChunk += '\n\n' + bottomText;
+
         displayChunk(finalChunk.trim(), chunkDisplayTitle, container);
       }
     }
-    function stripMeta(obj) {
-      const cpy = { ...obj };
-      delete cpy._chapter; delete cpy._idx;
-      return cpy;
-    }
 
-    // --- GLOSSARY REPLACE LOGIC: all boxes
-    function performPairedGlossaryReplace() {
-      // For each box, parse, replace, re-stringify.
-      const boxes = document.querySelectorAll('.json-chapter-box textarea');
-      const pairsContainer = document.getElementById('findReplacePairsContainer');
-      const statusElement = document.getElementById('glossaryReplaceStatus');
-      // Collect rules as before
-      const rules = [];
-      const pairElements = pairsContainer.querySelectorAll('.find-replace-pair');
-      for (let i = 0; i < pairElements.length; i++) {
-          const findInput = pairElements[i].querySelector('.find-text');
-          const replaceInput = pairElements[i].querySelector('.replace-text');
-          if (!findInput || !replaceInput) continue;
-          const findText = findInput.value;
-          const replaceText = replaceInput.value;
-          if (findText) {
-              rules.push({
-                  find: findText,
-                  replace: replaceText,
-                  findRegExp: new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
-              });
+    function chunkPlainTextInput(addToTop, addToBottom, container) {
+      const plainTextInputArea = document.getElementById('plainTextInputArea');
+      const maxCharsInput = document.getElementById('maxChars');
+      if (!plainTextInputArea || !maxCharsInput) { alert("Plain text elements not found."); hideLoading(); return; }
+      
+      const text = plainTextInputArea.value; 
+      const maxChars = parseInt(maxCharsInput.value);
+
+      if (!text.trim()) { alert("Plain text input is empty."); hideLoading(); return; }
+      if (isNaN(maxChars) || maxChars <= 0) { alert("Max characters must be positive."); hideLoading(); return; }
+
+      // Current paragraph splitting logic should still work well.
+      const paragraphs = text.split('\n'); 
+      const chunks = [];
+      let currentChunk = "";
+
+      for (const paragraph of paragraphs) {
+        const lengthWithParagraph = currentChunk.length + (currentChunk.length > 0 && paragraph.length > 0 ? 1 : 0) + paragraph.length;
+
+        if (currentChunk.length > 0 && lengthWithParagraph > maxChars && paragraph.length <= maxChars) {
+          chunks.push(currentChunk.trim());
+          currentChunk = paragraph;
+        } else if (lengthWithParagraph <= maxChars) {
+          if (currentChunk.length > 0) {
+            if (paragraph.length > 0) currentChunk += '\n' + paragraph;
+            else currentChunk += '\n'; // Preserve empty lines between paragraphs if intended by double newline
+          } else {
+            currentChunk = paragraph;
           }
+        } else { 
+          if (currentChunk.trim()) chunks.push(currentChunk.trim());
+          // If a single paragraph itself is > maxChars, it becomes its own chunk
+          chunks.push(paragraph); 
+          currentChunk = ""; 
+        }
       }
-      if (rules.length === 0) {
-        statusElement.textContent = 'No replacement rules to apply.'; statusElement.style.color = 'grey';
-        setTimeout(() => statusElement.textContent = '', 5000); return;
+      if (currentChunk.trim() || (currentChunk.length > 0 && chunks.length > 0 && chunks[chunks.length-1] !== currentChunk)) {
+          chunks.push(currentChunk.trim()); // Push the last chunk
       }
-      let totalInstances = 0;
-      boxes.forEach(box => {
-        let arr;
-        try { arr = JSON.parse(box.value); } catch { return; }
-        if (!Array.isArray(arr)) return;
-        arr.forEach(obj => {
-          if (obj && Array.isArray(obj.terms)) {
-            obj.terms.forEach(term => {
-              if (term && typeof term.translation === 'string') {
-                let t = term.translation;
-                rules.forEach(rule => {
-                  let cnt = (t.match(rule.findRegExp) || []).length;
-                  if (cnt > 0) {
-                    t = t.replace(rule.findRegExp, rule.replace);
-                    totalInstances += cnt;
-                  }
-                });
-                term.translation = t;
-              }
-            });
-          }
-        });
-        box.value = JSON.stringify(arr, null, 2);
+
+
+      const totalChunks = chunks.length;
+      const digits = String(totalChunks).length > 0 ? String(totalChunks).length : 1;
+      chunks.forEach((chunk, index) => {
+        const partNumber = String(index + 1).padStart(digits, '0');
+        let topText = addToTop.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks);
+        let bottomText = addToBottom.replace(/\$X/g, partNumber).replace(/\$Y/g, totalChunks);
+        let finalChunk = "";
+        if (topText) finalChunk += topText + '\n\n';
+        finalChunk += chunk;
+        if (bottomText) finalChunk += '\n\n' + bottomText;
+        displayChunk(finalChunk.trim(), `Part ${partNumber}`, container);
       });
-      updateJsonObjectCount();
-      statusElement.textContent = `Replacements applied. Total instances replaced: ${totalInstances}.`;
-      statusElement.style.color = totalInstances > 0 ? 'green' : 'orange';
-      setTimeout(() => statusElement.textContent = '', 8000);
     }
 
-    // --- Use your existing logic for addFindReplacePair, displayChunk, copyToClipboard, etc. ---
-    // --- ... (all unchanged code for plain text, output, chunk copying) ... ---
+    function displayChunk(content, title, container) {
+        const chunkContainerDiv = document.createElement('div');
+        chunkContainerDiv.classList.add('chunk-container');
+        
+        const chunkTitleDiv = document.createElement('div');
+        chunkTitleDiv.classList.add('chunk-title');
+        chunkTitleDiv.textContent = title;
+        
+        const textareaWrapper = document.createElement('div');
+        textareaWrapper.classList.add('chunk-textarea-wrapper');
+        const chunkTextarea = document.createElement('textarea');
+        chunkTextarea.value = content;
+        chunkTextarea.readOnly = true;
+        textareaWrapper.appendChild(chunkTextarea);
+        
+        const buttonActionWrapper = document.createElement('div');
+        buttonActionWrapper.classList.add('button-action-wrapper');
 
-    // Patch: When mode switches to JSON, always update object count
-    function toggleInputSections() {
-      const splitMode = document.getElementById('splitModeSelect').value;
-      const jsonSection = document.getElementById('jsonInputSection');
-      const plainTextSection = document.getElementById('plainTextInputSection');
-      if (jsonSection) jsonSection.style.display = (splitMode === 'json' ? 'block' : 'none');
-      if (plainTextSection) plainTextSection.style.display = (splitMode === 'text' ? 'block' : 'none');
-      if (splitMode === 'json') updateJsonObjectCount();
+        const copyButton = document.createElement('button');
+        copyButton.classList.add('copy-button');
+        copyButton.innerHTML = 'Copy<span class="tick" style="display:none;"> ✔️</span>';
+        copyButton.dataset.copyCount = "0"; 
+
+        const copyCountDisplay = document.createElement('span');
+        copyCountDisplay.classList.add('copy-count-display');
+        copyCountDisplay.textContent = '(0)';
+
+        copyButton.addEventListener('click', function () {
+          copyToClipboard(chunkTextarea.value, this, copyCountDisplay); 
+        });
+
+        buttonActionWrapper.appendChild(copyButton);
+        buttonActionWrapper.appendChild(copyCountDisplay);
+        
+        chunkContainerDiv.appendChild(chunkTitleDiv);
+        chunkContainerDiv.appendChild(textareaWrapper);
+        chunkContainerDiv.appendChild(buttonActionWrapper);
+        container.appendChild(chunkContainerDiv);
     }
-    // ...rest of your JS...
+
+    function copyToClipboard(text, buttonElement, countDisplayElement) {
+      const hiddenInput = document.createElement('textarea');
+      hiddenInput.value = text;
+      document.body.appendChild(hiddenInput);
+      hiddenInput.select();
+      hiddenInput.setSelectionRange(0, 99999);
+      let success = false;
+      try { 
+          success = document.execCommand('copy'); 
+          if (success && buttonElement) {
+              updateButtonState(buttonElement);
+              if (countDisplayElement) {
+                  let currentCount = parseInt(buttonElement.dataset.copyCount, 10);
+                  currentCount++;
+                  buttonElement.dataset.copyCount = currentCount.toString();
+                  countDisplayElement.textContent = `(${currentCount})`;
+              }
+          }
+      } 
+      catch (err) { success = false; }
+      
+      if (!success && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text)
+            .then(() => { 
+                if (buttonElement) {
+                    updateButtonState(buttonElement);
+                    if (countDisplayElement) {
+                        let currentCount = parseInt(buttonElement.dataset.copyCount, 10);
+                        currentCount++;
+                        buttonElement.dataset.copyCount = currentCount.toString();
+                        countDisplayElement.textContent = `(${currentCount})`;
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Async copy failed:', err);
+                alert('Failed to copy text.');
+            });
+      } else if (!success) {
+          alert('Failed to copy text. Please try manual copy.');
+      }
+      document.body.removeChild(hiddenInput);
+    }
   </script>
 </body>
 </html>
