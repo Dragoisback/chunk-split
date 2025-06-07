@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragraph Formatter Pro | Rich Text</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        :root {
+            --bg-light: #f8fafc;
+            --surface-light: #ffffff;
+            --text-light: #0f172a;
+            --subtle-text-light: #64748b;
+            --border-light: #e2e8f0;
+            --primary-light: #0ea5e9; /* Sky Blue */
+            --primary-hover-light: #0284c7;
+            --accent-light: #ffffff;
+            --link-light: #0369a1;
+
+            --bg-dark: #0f172a; /* Slate 900 */
+            --surface-dark: #1e293b; /* Slate 800 */
+            --text-dark: #e2e8f0;
+            --subtle-text-dark: #94a3b8;
+            --border-dark: #334155; /* Slate 700 */
+            --primary-dark: #38bdf8; /* Lighter Sky Blue */
+            --primary-hover-dark: #7dd3fc;
+             --accent-dark: #cbd5e1;
+            --link-dark: #7dd3fc;
+
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --shadow-color-dark: rgba(0, 0, 0, 0.3);
+            --radius: 12px;
+             --radius-sm: 8px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+       
+        /* --- Layout & Containers --- */
+        .container {
+            max-width: 1350px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 3rem);
+            gap: 1rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        body.dark-mode header {
+            background-color: var(--surface-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 2px 8px var(--shadow-color-dark);
+        }
+
+        .main-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-hover-light);
+        }
+        body.dark-mode .main-title {
+            color: var(--primary-hover-dark);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            flex-grow: 1; /* Allow workspace to fill height */
+        }
+        
+        .card {
+            background-color: var(--surface-light);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border: 1px solid var(--border-light);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow: hidden;
+        }
+        body.dark-mode .card {
+            background-color: var(--surface-dark);
+            box-shadow: 0 4px 15px var(--shadow-color-dark);
+            border-color: var(--border-dark);
+        }
+
+        /* --- Controls Bar --- */
+        .controls-bar {
+           /* grid-column: 1 / -1; */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* align top */
+            flex-wrap: wrap;
+            gap: 1rem;
+             padding-bottom: 0.5rem;
+             border-bottom: 1px dashed var(--border-light);
+        }
+         body.dark-mode .controls-bar {
+             border-bottom-color: var(--border-dark);
+         }
+
+        .control-group {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 0.8rem 1.2rem; /* row-gap col-gap */
+             align-items: center;
+        }
+
+       .options-group {
+             display: flex;
+             flex-direction: column;
+             gap: 0.5rem;
+             align-items: flex-start;
+       }
+       .options-row {
+            display: flex;
+             flex-wrap: wrap;
+             gap: 0.8rem 1.2rem; 
+             align-items: center;
+       }
+
+        .input-control { /* Generic control wrapper */
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+             font-weight: 500;
+             font-size: 0.85rem;
+             color: var(--subtle-text-light);
+        }
+         body.dark-mode .input-control {
+             color: var(--subtle-text-dark);
+         }
+         /* Checkbox specific */
+         .input-control input[type="checkbox"] {
+             width: 1rem;
+             height: 1rem;
+             accent-color: var(--primary-light);
+             cursor: pointer;
+         }
+          body.dark-mode .input-control input[type="checkbox"] {
+               accent-color: var(--primary-dark);
+          }
+           .input-control label {
+            cursor: pointer;
+           }
+
+
+        #separatorInput {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', monospace; /* monospace for \n */
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            width: 80px;
+            transition: all 0.3s;
+             font-size: 0.85rem;
+        }
+
+        body.dark-mode #separatorInput {
+            border-color: var(--border-dark);
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        #separatorInput:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        body.dark-mode #separatorInput:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+        }
+
+        /* --- Text Area Columns --- */
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.2rem;
+           /* border-bottom: 1px dashed var(--border-light); */
+            margin-bottom: 0rem;
+        }
+      /*  body.dark-mode .column-header {
+            border-bottom-color: var(--border-dark);
+        } */
+
+        .column-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+
+        .stats {
+            font-size: 0.8rem;
+            color: var(--subtle-text-light);
+            font-weight: 500;
+        }
+        
+        body.dark-mode .stats {
+            color: var(--subtle-text-dark);
+        }
+        
+        /* --- Content Editable Div Styling --- */
+        .text-area {
+            width: 100%;
+            flex-grow: 1; /* Fill available card height */
+            min-height: 200px;
+            padding: 0.5rem 0;
+            background-color: transparent;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            resize: none; /* divs dont resize anyway */
+            transition: border-color 0.3s, box-shadow 0.3s;
+            overflow-y: auto; /* Scroll if content overflows */
+            outline: none; /* Remove default outline */
+            white-space: pre-wrap; /* Respect whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+         
+        /* Placeholder simulation for contenteditable */
+        .text-area:empty::before {
+            content: attr(data-placeholder);
+            color: var(--subtle-text-light);
+            pointer-events: none; /* Allow click-through */
+            display: block; /* Ensure it takes space */
+        }
+        body.dark-mode .text-area:empty::before {
+            color: var(--subtle-text-dark);
+        }
+
+        #outputDiv {
+            /* Prevent editing but allow selection */
+            user-select: text; /* 'all' can be annoying */
+            -webkit-user-modify: read-only;
+            -moz-user-modify: read-only;
+           /* user-modify: read-only; */ /* Not standard */
+            cursor: text;
+        }
+        /* Style actual strong/em/a/p tags */
+        .text-area strong { font-weight: 700; }
+        .text-area em { font-style: italic; }
+        .text-area p { margin-bottom: 1em; }
+        .text-area p:last-child { margin-bottom: 0; }
+        .text-area a { 
+            color: var(--link-light); 
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+         }
+         .text-area a:hover {
+             text-decoration-thickness: 2px;
+         }
+         body.dark-mode .text-area a {
+             color: var(--link-dark);
+         }
+
+        body.dark-mode .text-area {
+            color: var(--text-dark);
+        }
+        
+        /* Custom scrollbar */
+        .text-area::-webkit-scrollbar { width: 8px; }
+        .text-area::-webkit-scrollbar-track { background: var(--border-light); border-radius: 4px; margin: 2px 0;}
+        .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-light);  border-radius: 4px; }
+        .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+        body.dark-mode .text-area::-webkit-scrollbar-track { background: var(--border-dark); }
+        body.dark-mode .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-dark); }
+        body.dark-mode .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-dark); }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.9rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+            background-color: var(--primary-light);
+            color: var(--accent-light);
+            box-shadow: 0 1px 3px var(--shadow-color);
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .btn svg {
+             flex-shrink: 0; /* prevent svg shrinking */
+        }
+
+        .btn:hover:not([disabled]) {
+            background-color: var(--primary-hover-light);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px var(--shadow-color);
+        }
+        
+        .btn:active:not([disabled]) {
+            transform: translateY(0px);
+            box-shadow: 0 1px 2px var(--shadow-color);
+        }
+        /* NEW: Disabled State */
+         .btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+             box-shadow: none;
+         }
+        
+        body.dark-mode .btn {
+            background-color: var(--primary-dark);
+            color: var(--bg-dark); /* Better contrast */
+            box-shadow: 0 1px 3px var(--shadow-color-dark);
+        }
+
+        body.dark-mode .btn:hover:not([disabled]) {
+            background-color: var(--primary-hover-dark);
+            box-shadow: 0 3px 6px var(--shadow-color-dark);
+        }
+         body.dark-mode .btn:active:not([disabled]) {
+            box-shadow: 0 1px 2px var(--shadow-color-dark);
+        }
+        
+        .btn.btn-secondary {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            border-color: var(--border-light);
+        }
+        
+        body.dark-mode .btn.btn-secondary {
+            background-color: var(--surface-dark);
+            color: var(--text-dark);
+            border-color: var(--border-dark);
+        }
+        
+        .btn.btn-secondary:hover:not([disabled]) {
+            background-color: var(--border-light);
+            border-color: var(--subtle-text-light);
+             color: var(--text-light);
+        }
+        
+        body.dark-mode .btn.btn-secondary:hover:not([disabled]) {
+            background-color: var(--border-dark);
+            border-color: var(--subtle-text-dark);
+             color: var(--text-dark);
+        }
+         /* Special case for header clear */
+         #clearBtn:hover {
+             background-color: #fee2e2;
+             border-color: #fca5a5;
+             color: #b91c1c;
+         }
+          body.dark-mode #clearBtn:hover {
+             background-color: #450a0a;
+             border-color: #7f1d1d;
+             color: #fca5a5;
+         }
+
+
+        .btn-group {
+            display: flex;
+             flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        /* --- Theme Toggle Switch --- */
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 1.1rem; /* size icons */
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px; /* slightly smaller */
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-light);
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--surface-light);
+            transition: .3s;
+            border-radius: 50%;
+             box-shadow: 0 1px 3px rgba(0,0,0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-light);
+        }
+        body.dark-mode input:checked + .slider {
+            background-color: var(--primary-dark); 
+        }
+        body.dark-mode input + .slider {
+            background-color: var(--border-dark); 
+        }
+        body.dark-mode input + .slider:before {
+           background-color: var(--surface-dark); 
+            border: 1px solid var(--border-dark);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px); /* match width-height */
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+       
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+             .container {
+                 margin: 1rem auto;
+                 min-height: calc(100vh - 2rem);
+                 padding: 0 1rem;
+             }
+             header {
+                 padding: 0.8rem 1rem;
+             }
+             .workspace {
+                 grid-template-columns: 1fr;
+                 gap: 1rem;
+             }
+              .card {
+                 padding: 1rem;
+             }
+             .text-area {
+                 min-height: 30vh;
+             }
+              .controls-bar {
+                 flex-direction: column-reverse; /* options below buttons on stack */
+                 align-items: stretch;
+             }
+              .control-group {
+                 justify-content: center;
+             }
+             .options-group {
+                 align-items: center;
+             }
+        }
+        
+        @media (max-width: 600px) {
+            .main-title {
+                font-size: 1.2rem;
+            }
+            header {
+                flex-direction: column;
+                gap: 0.8rem;
+                 padding: 1rem;
+            }
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+             .btn {
+                 padding: 0.6rem 0.8rem;
+                 font-size: 0.8rem;
+             }
+             .btn svg { width: 14px; height: 14px;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="main-title">Paragraph Formatter Pro</h1>
+            <div class="header-controls">
+                 <label class="theme-switch" for="themeToggleCheckbox" title="Toggle Dark/Light Mode">
+                    <span>☀️</span>
+                    <div class="switch">
+                        <input type="checkbox" id="themeToggleCheckbox">
+                        <span class="slider"></span>
+                    </div>
+                    <span>🌙</span>
+                </label>
+                 <button id="clearBtn" class="btn btn-secondary" title="Clear All Content and Reset Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                       <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                       <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                     </svg>
+                    Clear All
+                </button>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <!-- Input Column -->
+            <div class="card">
+                 <div class="column-header">
+                    <div>
+                        <h2 class="column-title">Input Text</h2>
+                        <div id="inputStats" class="stats">0 words, 0 characters</div>
+                    </div>
+                </div>
+                <div class="controls-bar">
+                     <!-- Input Options -->
+                    <div class="options-group">
+                       <div class="options-row">
+                          <div class="input-control">
+                                <label for="separatorInput">Separator:</label>
+                                <input type="text" id="separatorInput" value="\\n\\n" title="Separator between paragraphs. Use \\n for a line break (<br>). Ignored if 'Wrap in <p>' is checked. Default is two line breaks.">
+                            </div>
+                             <div class="input-control">
+                                <input type="checkbox" id="wrapPCheckbox" title="Wrap each paragraph in <p> tags">
+                                <label for="wrapPCheckbox">Wrap in &lt;p&gt; tags</label>
+                            </div>
+                       </div>
+                        <div class="options-row">
+                            <div class="input-control">
+                                 <input type="checkbox" id="cleanSpacesCheckbox" title="Collapse multiple spaces, tabs and newlines within a paragraph into a single space.">
+                                 <label for="cleanSpacesCheckbox">Clean extra spaces</label>
+                             </div>
+                        </div>
+                    </div>
+                     <!-- Input Actions -->
+                     <div class="control-group">
+                        <div class="btn-group" title="Change case of INPUT text">
+                             <button id="caseSentenceBtn" class="btn btn-secondary">Sentence</button>
+                             <button id="caseTitleBtn" class="btn btn-secondary">Title</button>
+                             <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
+                             <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
+                        </div>
+                        <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
+                            Paste 
+                        </button>
+                    </div>
+                </div>
+               
+                <div 
+                    id="inputDiv" 
+                    class="text-area" 
+                    contenteditable="true"
+                    spellcheck="false"
+                    role="textbox"
+                    aria-multiline="true"
+                    data-placeholder="Paste or type text here. Use **bold** / __bold__, *italic* / _italic_ and [text](url). Paragraphs are blocks separated by at least one BLANK line...">
+                </div>
+            </div>
+
+            <!-- Output Column -->
+            <div class="card">
+                 <div class="column-header">
+                     <div>
+                        <h2 class="column-title">Formatted Output</h2>
+                        <div id="outputStats" class="stats">0 words, 0 characters</div>
+                    </div>
+                </div>
+                <div class="controls-bar">
+                     <!-- Output Actions -->
+                     <div class="control-group">
+                         <button id="copyBtn" class="btn" title="Copy output to clipboard as Rich Text (HTML) and Plain Text">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
+                             Copy Rich Text
+                        </button>
+                        <button id="downloadHtmlBtn" class="btn btn-secondary" title="Download formatted output as HTML file">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"> <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 0-1 0z"/> <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/></svg>
+                            Download HTML
+                        </button>
+                        <button id="downloadTextBtn" class="btn btn-secondary" title="Download formatted output as plain text file">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"> <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 0-1 0z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/></svg>
+                             Download Text
+                        </button>
+                    </div>
+                   <div><!-- spacer --></div>
+                </div>
+               
+                <div 
+                    id="outputDiv" 
+                    class="text-area" 
+                    contenteditable="false" 
+                    spellcheck="false"
+                    data-placeholder="Formatted rich text output will appear here...">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const inputDiv = document.getElementById('inputDiv');
+            const outputDiv = document.getElementById('outputDiv');
+            const separatorInput = document.getElementById('separatorInput');
+            const wrapPCheckbox = document.getElementById('wrapPCheckbox'); // NEW
+            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); // NEW
+            
+            const pasteBtn = document.getElementById('pasteBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const inputStats = document.getElementById('inputStats');
+            const outputStats = document.getElementById('outputStats');
+            const themeToggle = document.getElementById('themeToggleCheckbox');
+            const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+            const downloadTextBtn = document.getElementById('downloadTextBtn');
+            // NEW: Case buttons
+            const caseSentenceBtn = document.getElementById('caseSentenceBtn');
+            const caseTitleBtn = document.getElementById('caseTitleBtn');
+            const caseLowerBtn = document.getElementById('caseLowerBtn');
+            const caseUpperBtn = document.getElementById('caseUpperBtn');
+
+            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn]; // for disabling
+
+            let copyTimeout;
+            const DEFAULT_SEPARATOR = '\\n\\n';
+
+            // --- Helper: Debounce --- NEW
+             const debounce = (func, delay) => {
+                 let timeout;
+                 return function(...args) {
+                     clearTimeout(timeout);
+                     timeout = setTimeout(() => func.apply(this, args), delay);
+                 };
+             };
+
+            // --- Helper: Escape HTML ---
+            const escapeHTML = (str) => String(str) // ensure string
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+            // --- Helper: Convert Markdown --- ENHANCED
+            const convertMarkdown = (text) => {
+                // 1. Escape HTML first to prevent injection
+                let html = escapeHTML(text);
+                
+                // Order matters for nesting and links!
+                 // 2. Links: [text](url) - BEFORE bold/italic, add target/rel
+                 // Basic URL validation added
+                html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+                 // 3. Bold & Italic ***text*** or ___text___ (non-greedy)
+                html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
+                 // 4. Bold **text** or __text__ (non-greedy)
+                html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+                // 5. Italic *text* or _text_ (non-greedy)
+                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+                 // Re-run to catch basic nesting like **bold *and italic*** or *italic __and bold__*
+                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); 
+                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+                return html;
+            };
+
+            // --- Core Processing Function --- ENHANCED
+            const processText = () => {
+                 // Get plain text
+                const inputText = inputDiv.innerText; 
+                const isWrapP = wrapPCheckbox.checked;
+                const isCleanSpaces = cleanSpacesCheckbox.checked;
+
+                // Save text & settings to localStorage 
+                localStorage.setItem('savedInput', inputText);
+                saveSettings();
+                
+                // SECURITY FIX: Escape separator value before replacing \n
+                const escapedSeparator = escapeHTML(separatorInput.value);
+                const htmlSeparator = escapedSeparator.replace(/\\n/g, '<br>\n');
+                // If wrapping in <p>, the separator is just a newline for source readability, <p> margin handles visual space
+                const finalSeparator = isWrapP ? '\n' : htmlSeparator;
+
+                const outputIsEmpty = !inputText || inputText.trim() === '';
+                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty); // Disable buttons
+
+                if (outputIsEmpty) {
+                    outputDiv.innerHTML = '';
+                    updateStats();
+                    return;
+                }
+
+                // ENHANCED: Split by one or more BLANK lines, allowing single newlines *within* a paragraph
+                 const htmlParagraphs = inputText
+                    .split(/\n\s*\n/g) 
+                    .filter(p => p.trim() !== '')
+                    .map(p => {
+                         let processedP = p.trim();
+                          // NEW: Clean Spaces Option
+                         if(isCleanSpaces) {
+                             processedP = processedP.replace(/\s+/g, ' '); // collapse all whitespace/newlines to single space
+                         }
+                         // Convert Markdown
+                         processedP = convertMarkdown(processedP);
+
+                          // If not cleaning spaces, convert remaining single newlines within the paragraph to <br>
+                          if(!isCleanSpaces) {
+                               processedP = processedP.replace(/\n/g, '<br>\n');
+                          }
+                        
+                         // NEW: Wrap in P tags Option
+                         if (isWrapP) {
+                              return `<p>${processedP}</p>`;
+                         }
+                         return processedP;
+                    });
+                
+                const outputHTML = htmlParagraphs.join(finalSeparator);
+                outputDiv.innerHTML = outputHTML;
+                updateStats();
+            };
+            // Create debounced version for input events
+            const debouncedProcessText = debounce(processText, 250); // NEW
+
+            // --- Helper: Update Stats & Button State ---
+            const updateStats = () => {
+                const inputText = inputDiv.innerText || '';
+                const inputCharCount = inputText.length;
+                // Handle text with only whitespace correctly
+                const inputWordCount = inputText.match(/\S+/g)?.length || 0;
+                inputStats.textContent = `${inputWordCount} words, ${inputCharCount} characters`;
+
+                const outputText = outputDiv.innerText || ''; // innerText ignores <p>, <br> etc
+                const outputCharCount = outputText.length;
+                const outputWordCount = outputText.match(/\S+/g)?.length || 0;
+                outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
+            };
+
+             // --- NEW: Case Conversion Helpers ---
+             const applyCase = (caseFunc) => {
+                  const currentText = inputDiv.innerText;
+                  inputDiv.innerText = caseFunc(currentText);
+                  processText(); // process immediately
+             }
+            const toSentenceCase = (text) => {
+                 // lowercase all, then uppercase first letter of text and first letter after . ! ?
+                const lower = text.toLowerCase();
+                 return lower.replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
+            }
+             const toTitleCase = (text) => {
+                  // Basic title case, does not handle 'a', 'the', 'of' etc.
+                 return text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+             }
+            // --- End Case Conversion ---
+
+
+            // --- Copy Feedback ---
+            const showCopyFeedback = (button) => {
+                if(copyTimeout) clearTimeout(copyTimeout);
+                const originalHTML = button.innerHTML;
+                 // Store original bg if inline style exists, otherwise rely on CSS
+                 const originalStyle = button.getAttribute("style") || "";
+                button.style.transition = 'none';
+                button.style.backgroundColor = '#22c55e'; // Green feedback
+                button.style.color = '#fff';
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.07a.733.733 0 0 1-1.047 0L3.217 8.383a.733.733 0 0 1 .01-1.05.733.733 0 0 1 1.047 0L7 9.893l4.736-5.923z"/>
+                    </svg>
+                    Copied!
+                `;
+                copyTimeout = setTimeout(() => {
+                     button.setAttribute("style", originalStyle); // Restore original styles
+                      // Need a tiny delay for transition to re-enable visually
+                      requestAnimationFrame(() => {
+                           button.style.transition = ''; 
+                      })
+                    button.innerHTML = originalHTML;
+                }, 1500);
+            };
+
+            // --- Theme Management ---
+            const applyTheme = (isDark) => {
+                document.body.classList.toggle('dark-mode', isDark);
+                themeToggle.checked = isDark;
+            };
+             themeToggle.addEventListener('change', () => {
+                const isDark = themeToggle.checked;
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                applyTheme(isDark);
+            });
+
+            // --- NEW: Settings Persistence ---
+             const saveSettings = () => {
+                 const settings = {
+                     separator: separatorInput.value,
+                     wrapP: wrapPCheckbox.checked,
+                     cleanSpaces: cleanSpacesCheckbox.checked,
+                 };
+                 localStorage.setItem('formatterSettings', JSON.stringify(settings));
+             }
+             const loadSettings = () => {
+                 const settingsJSON = localStorage.getItem('formatterSettings');
+                 if(settingsJSON) {
+                    try {
+                         const settings = JSON.parse(settingsJSON);
+                         separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
+                         wrapPCheckbox.checked = settings.wrapP ?? false;
+                         cleanSpacesCheckbox.checked = settings.cleanSpaces ?? false;
+                    } catch(e) {
+                         console.error("Failed loading settings", e);
+                         separatorInput.value = DEFAULT_SEPARATOR; // default
+                    }
+                 } else {
+                      separatorInput.value = DEFAULT_SEPARATOR; // Ensure default on first load
+                 }
+             }
+              const clearSettings = () => {
+                   localStorage.removeItem('formatterSettings');
+                   separatorInput.value = DEFAULT_SEPARATOR;
+                   wrapPCheckbox.checked = false;
+                   cleanSpacesCheckbox.checked = false;
+              }
+
+
+            // --- Event Listeners ---
+            // Use debounced version for typing/options
+            inputDiv.addEventListener('input', debouncedProcessText);
+            separatorInput.addEventListener('input', debouncedProcessText);
+            wrapPCheckbox.addEventListener('change', debouncedProcessText); // NEW
+            cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); // NEW
+
+            // Force paste as plain text - prevent messy HTML
+            inputDiv.addEventListener("paste", function(e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                 // Use insertText for better undo/redo behaviour than insertHTML, but need to handle newlines
+                 document.execCommand("insertText", false, text);
+                 // processText(); // input event should fire, triggering debounce
+            });
+
+            // Buttons - trigger processText() directly for immediate effect
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    inputDiv.innerText = text;
+                    processText(); // immediate
+                    inputDiv.focus();
+                } catch (err) {
+                    console.error('Failed to read clipboard contents: ', err);
+                    alert('Could not paste from clipboard. Please check browser permissions or use Ctrl+V / Cmd+V.');
+                }
+            });
+            
+            // NEW: Case Button Listeners
+            caseSentenceBtn.addEventListener('click', () => applyCase(toSentenceCase));
+            caseTitleBtn.addEventListener('click', () => applyCase(toTitleCase));
+            caseLowerBtn.addEventListener('click', () => applyCase(text => text.toLowerCase()));
+            caseUpperBtn.addEventListener('click', () => applyCase(text => text.toUpperCase()));
+
+
+            copyBtn.addEventListener('click', async () => {
+                 // Check innerText not innerHTML to see if there's actual content
+                if (outputDiv.innerText.trim() && navigator.clipboard && window.ClipboardItem) {
+                    try {
+                        // Provide both plain and html versions
+                        const plainText = outputDiv.innerText;
+                        // Wrap in div so things like <p> tags copy correctly into apps like Word/Docs
+                        const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
+                        const blobHtml = new Blob([htmlText], { type: "text/html" });
+                        const blobPlain = new Blob([plainText], { type: "text/plain" });
+                        const data = new ClipboardItem({
+                            "text/html": blobHtml,
+                            "text/plain": blobPlain,
+                        });
+                        await navigator.clipboard.write([data]);
+                        showCopyFeedback(copyBtn);
+                        // Clear selection that might happen on copy
+                        window.getSelection().removeAllRanges();
+                       // outputDiv.blur();
+                    } catch (err) {
+                        console.error('Failed to copy rich text: ', err);
+                         // Fallback to plain text copy if modern API fails
+                         navigator.clipboard.writeText(outputDiv.innerText).then(() => {
+                             showCopyFeedback(copyBtn);
+                         }).catch(err =>  alert('Failed to copy text even with fallback. Please copy manually.'));
+                    }
+                } 
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                 if (confirm("Clear all text and reset options to default?")) {
+                     inputDiv.innerHTML = '';
+                     outputDiv.innerHTML = '';
+                     localStorage.removeItem('savedInput');
+                     clearSettings(); // NEW
+                     processText(); // immediate
+                     inputDiv.focus();
+                 }
+            });
+
+            // Download helpers
+             const downloadFile = (content, filename, type) => {
+                 const blob = new Blob([content], { type: type });
+                 const url = URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = filename;
+                 document.body.appendChild(a); // Required for Firefox
+                 a.click();
+                 document.body.removeChild(a);
+                 URL.revokeObjectURL(url); // Clean up
+             }
+
+            downloadHtmlBtn.addEventListener('click', () => {
+                 // Simple HTML wrapper for download
+                const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Formatted Output</title><style>body{font-family: sans-serif; line-height: 1.6;} p {margin-bottom: 1em;} a {color: #0369a1;}</style></head><body>${outputDiv.innerHTML}</body></html>`;
+                 downloadFile(content, 'formatted_output.html', 'text/html');
+            });
+
+            downloadTextBtn.addEventListener('click', () => {
+                 // Use innerText which preserves line breaks conceptually but strips HTML
+                 const content = outputDiv.innerText;
+                 downloadFile(content, 'formatted_output.txt', 'text/plain;charset=utf-8');
+            });
+
+            // --- Initialization ---
+            // 1. Theme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(savedTheme ? (savedTheme === 'dark') : prefersDark);
+            
+            // 2. Settings
+            loadSettings(); // NEW
+
+            // 3. Content
+            const savedInput = localStorage.getItem('savedInput');
+            if (savedInput) {
+                inputDiv.innerText = savedInput;
+            }
+            
+            // 4. Initial processing & stats
+            processText(); // Call directly on load, not debounced
+           // updateStats(); // processText calls this
+        });
+    </script>
+
+</body>
+</html>
