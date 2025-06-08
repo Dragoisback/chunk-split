@@ -44,7 +44,7 @@
             --radius: 12px;
              --radius-sm: 8px;
              /* QoL */
-             --text-area-font-size: 0.95rem; 
+             --text-area-font-size: 0.95rem;
         }
 
         *, *::before, *::after {
@@ -65,7 +65,7 @@
             background-color: var(--bg-dark);
             color: var(--text-dark);
         }
-       
+
         /* --- Layout & Containers --- */
         .container {
             max-width: 1350px;
@@ -120,7 +120,7 @@
             gap: 1.5rem;
             flex-grow: 1;
         }
-        
+
         .card {
             background-color: var(--surface-light);
             border-radius: var(--radius);
@@ -184,7 +184,7 @@
        .options-row {
             display: flex;
              flex-wrap: wrap;
-             gap: 0.8rem 1.2rem; 
+             gap: 0.8rem 1.2rem;
              align-items: center;
        }
        /* Find/Replace Panel */
@@ -199,7 +199,7 @@
         .find-replace-row { display: flex; gap: 0.8rem 1.2rem; align-items: center; flex-wrap: wrap; width: 100%;}
         .find-replace-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; width: 100%;}
 
-        .input-control { 
+        .input-control {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -237,7 +237,7 @@
             padding: 0.4rem 0.6rem;
             border: 1px solid var(--border-light);
             border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-light);
             color: var(--text-light);
             transition: all 0.3s;
@@ -263,20 +263,20 @@
         body.dark-mode #separatorInput,
         body.dark-mode #targetWordCount,
         body.dark-mode #projectSelect,
-        body.dark-mode #findInput, 
+        body.dark-mode #findInput,
         body.dark-mode #replaceInput
          {
             border-color: var(--border-dark);
             background-color: var(--bg-dark);
             color: var(--text-dark);
         }
-        
+
         #separatorInput:focus, #targetWordCount:focus, #projectSelect:focus, #findInput:focus, #replaceInput:focus {
             outline: none;
             border-color: var(--primary-light);
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
-        
+
         body.dark-mode #separatorInput:focus, body.dark-mode #targetWordCount:focus, body.dark-mode #projectSelect:focus, body.dark-mode #findInput:focus, body.dark-mode #replaceInput:focus {
             border-color: var(--primary-dark);
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
@@ -313,14 +313,14 @@
          /* NEW: Target Highlighting */
          .stats.target-approaching { color: var(--warning-light); font-weight: 700; }
          body.dark-mode .stats.target-approaching { color: var(--warning-dark); }
-         .stats.target-exceeded { color: var(--danger-light); font-weight: 700; }
+         .stats.target-exceeded { color: var(--danger-light); font-weight: 700; } /* Kept for potential future use */
          body.dark-mode .stats.target-exceeded { color: var(--danger-dark); }
          .stats .target-met { color: var(--success-light); font-weight: 700; }
          body.dark-mode .stats .target-met { color: var(--success-dark); }
         body.dark-mode .stats {
             color: var(--subtle-text-dark);
         }
-        
+
         /* --- Content Editable Div Styling --- */
         .text-area {
             width: 100%;
@@ -335,8 +335,18 @@
             outline: none;
             white-space: pre-wrap;
             word-wrap: break-word;
+            border: 1px solid transparent; /* For focus indication if needed */
         }
-         
+        .text-area:focus-visible { /* Modern focus outline */
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+        body.dark-mode .text-area:focus-visible {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+        }
+
+
         .text-area:empty::before {
             content: attr(data-placeholder);
             color: var(--subtle-text-light);
@@ -368,13 +378,13 @@
             font-weight: 400;
         }
         body.dark-mode #outputDiv.show-markers p::before { color: var(--subtle-text-dark); }
-        
+
         .text-area strong { font-weight: 700; }
         .text-area em { font-style: italic; }
         .text-area p { margin-bottom: 1em; }
         .text-area p:last-child { margin-bottom: 0; }
-        .text-area a { 
-            color: var(--link-light); 
+        .text-area a {
+            color: var(--link-light);
             text-decoration: underline;
         }
          body.dark-mode .text-area a {
@@ -384,7 +394,7 @@
         body.dark-mode .text-area {
             color: var(--text-dark);
         }
-        
+
         /* Custom scrollbar */
        .text-area::-webkit-scrollbar { width: 8px; }
         .text-area::-webkit-scrollbar-track { background: var(--border-light); border-radius: 4px; margin: 2px 0;}
@@ -429,7 +439,7 @@
             transform: translateY(-1px);
             box-shadow: 0 3px 6px var(--shadow-color);
         }
-        
+
         .btn:active:not([disabled]) {
             transform: translateY(0px);
             box-shadow: 0 1px 2px var(--shadow-color);
@@ -439,7 +449,7 @@
             cursor: not-allowed;
              box-shadow: none;
          }
-        
+
         body.dark-mode .btn {
             background-color: var(--primary-dark);
             color: var(--bg-dark);
@@ -453,25 +463,25 @@
          body.dark-mode .btn:active:not([disabled]) {
             box-shadow: 0 1px 2px var(--shadow-color-dark);
         }
-        
+
         .btn.btn-secondary {
             background-color: var(--bg-light);
             color: var(--text-light);
             border-color: var(--border-light);
         }
-        
+
         body.dark-mode .btn.btn-secondary {
             background-color: var(--surface-dark);
             color: var(--text-dark);
             border-color: var(--border-dark);
         }
-        
+
         .btn.btn-secondary:hover:not([disabled]) {
             background-color: var(--border-light);
             border-color: var(--subtle-text-light);
              color: var(--text-light);
         }
-        
+
         body.dark-mode .btn.btn-secondary:hover:not([disabled]) {
             background-color: var(--border-dark);
             border-color: var(--subtle-text-dark);
@@ -479,8 +489,11 @@
         }
           .btn.feedback-success { background-color: var(--success-light) !important; color: white !important; }
           .btn.feedback-danger { background-color: var(--danger-light) !important; color: white !important; }
+          .btn.feedback-warning { background-color: var(--warning-light) !important; color: var(--text-light) !important; } /* For light mode warning */
            body.dark-mode .btn.feedback-success { background-color: var(--success-dark) !important; color: var(--bg-dark) !important;}
            body.dark-mode .btn.feedback-danger { background-color: var(--danger-dark) !important; color: var(--bg-dark) !important;}
+           body.dark-mode .btn.feedback-warning { background-color: var(--warning-dark) !important; color: var(--bg-dark) !important; } /* For dark mode warning */
+
 
          .btn-danger-hover:hover:not([disabled]) {
              background-color: #fee2e2;
@@ -498,7 +511,7 @@
              flex-wrap: wrap;
             gap: 0.75rem;
         }
-        
+
         /* --- Theme Toggle Switch --- */
         .theme-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 1.1rem; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -511,7 +524,7 @@
         body.dark-mode input + .slider:before { background-color: var(--surface-dark); }
         input:checked + .slider:before { transform: translateX(20px); }
         .header-controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-       
+
         /* --- NEW: Help Modal --- */
         .modal-overlay {
             position: fixed;
@@ -591,6 +604,7 @@
              .btn { padding: 0.7rem 1rem; font-size: 0.9rem; } /* Touch-friendly */
              .btn svg { width: 16px; height: 16px;}
              .text-area { min-height: 30vh; }
+             /* Reverted actions-group for better mobile layout */
              .actions-group { flex-direction: row; justify-content: space-between; align-items: center; }
              .options-group { align-items: flex-start; }
              .find-replace-row, .find-replace-controls { flex-direction: column; align-items: stretch; }
@@ -605,7 +619,7 @@
                 Paragraph Formatter Pro
                 <small id="currentProjectTitle">Unsaved Draft</small>
             </h1>
-           
+
             <div class="header-controls">
                  <div class="input-control">
                    <label for="fontSizeSlider" title="Adjust Text Size">Size:</label>
@@ -624,11 +638,10 @@
                     </div>
                     <span>🌙</span>
                 </label>
-                <!-- NEW: Help Button -->
                 <button id="helpBtn" class="btn btn-secondary" title="Show Help">?</button>
             </div>
         </header>
-        
+
          <section class="card project-manager">
              <h2 class="column-title">Projects:</h2>
               <div class="project-group">
@@ -676,7 +689,6 @@
                            </div>
                         </div>
                          <div class="control-group">
-                            <!-- NEW: Undo/Redo Buttons -->
                             <div class="btn-group" title="Undo/Redo last action">
                                 <button id="undoBtn" class="btn btn-secondary" disabled>Undo</button>
                                 <button id="redoBtn" class="btn btn-secondary" disabled>Redo</button>
@@ -690,7 +702,7 @@
                             <div class="btn-group">
                                 <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
-                                    Paste 
+                                    Paste
                                 </button>
                                 <button id="findToggleBtn" class="btn btn-secondary" title="Find and Replace text">Find...</button>
                                 <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
@@ -700,7 +712,6 @@
                             </div>
                         </div>
                     </div>
-                     <!-- NEW: Advanced Find & Replace Panel -->
                     <div id="findReplacePanel" class="find-replace-panel">
                         <div class="find-replace-row">
                             <div class="input-control" style="flex-grow: 1;">
@@ -725,10 +736,10 @@
                         </div>
                     </div>
                 </div>
-               
-                <div 
-                    id="inputDiv" 
-                    class="text-area" 
+
+                <div
+                    id="inputDiv"
+                    class="text-area"
                     contenteditable="true"
                     spellcheck="false"
                     role="textbox"
@@ -742,7 +753,6 @@
                  <div class="column-header">
                      <h2 class="column-title">Formatted Output</h2>
                      <div class="control-group">
-                        <!-- NEW: Paragraph Markers Toggle -->
                         <div class="input-control">
                             <input type="checkbox" id="showMarkersCheckbox" title="Show paragraph numbers and markers">
                             <label for="showMarkersCheckbox">Show Markers</label>
@@ -766,11 +776,11 @@
                         </button>
                     </div>
                 </div>
-               
-                <div 
-                    id="outputDiv" 
-                    class="text-area" 
-                    contenteditable="false" 
+
+                <div
+                    id="outputDiv"
+                    class="text-area"
+                    contenteditable="false"
                     spellcheck="false"
                     data-placeholder="Formatted rich text output will appear here...">
                 </div>
@@ -778,13 +788,12 @@
         </main>
     </div>
 
-    <!-- NEW: Help Modal Structure -->
     <div id="helpModal" class="modal-overlay">
         <div class="modal-content">
             <button id="helpModalClose" class="modal-close-btn">×</button>
             <h2>Welcome to Paragraph Formatter Pro!</h2>
             <p>This tool helps you quickly format your text for web pages, documents, and more. Here's a quick guide:</p>
-            
+
             <h3>Input & Formatting</h3>
             <ul>
                 <li><strong>Live Preview:</strong> Type or paste your text in the left "Input" panel and see the formatted result on the right.</li>
@@ -819,8 +828,8 @@
             const inputDiv = document.getElementById('inputDiv');
             const outputDiv = document.getElementById('outputDiv');
             const separatorInput = document.getElementById('separatorInput');
-            const wrapPCheckbox = document.getElementById('wrapPCheckbox'); 
-            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); 
+            const wrapPCheckbox = document.getElementById('wrapPCheckbox');
+            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox');
             const targetWordCountInput = document.getElementById('targetWordCount');
             const fontSizeSlider = document.getElementById('fontSizeSlider');
             const currentProjectTitleEl = document.getElementById('currentProjectTitle');
@@ -837,7 +846,7 @@
             const caseTitleBtn = document.getElementById('caseTitleBtn');
             const caseLowerBtn = document.getElementById('caseLowerBtn');
             const caseUpperBtn = document.getElementById('caseUpperBtn');
-            
+
             // NEW QoL Elements
             const undoBtn = document.getElementById('undoBtn');
             const redoBtn = document.getElementById('redoBtn');
@@ -883,7 +892,6 @@
 
             let PROJECT_STORE = {};
             let currentProjectName = null;
-            // NEW: State for Undo/Redo and Find/Replace
             let undoStack = [];
             let redoStack = [];
             let currentMatches = [];
@@ -894,30 +902,49 @@
                  let timeout;
                  return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
              };
-            const escapeHTML = (str) => String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
+
+            // CORRECTED escapeHTML function
+            const escapeHTML = (str) => {
+                if (typeof str !== 'string') return '';
+                return str.replace(/&/g, '&')
+                          .replace(/</g, '<')
+                          .replace(/>/g, '>')
+                          .replace(/"/g, '"')
+                          .replace(/'/g, ''');
+            };
+
             const convertMarkdown = (text) => {
-                let html = escapeHTML(text);
-                html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-                html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
-                html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
-                html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+                let html = escapeHTML(text); // Escape the whole text first
+                // Links: [text](url) - $1 is linkText, $2 is url. Both are already escaped.
+                // The href attribute will correctly interpret & etc.
+                // The link text will correctly display escaped characters.
+                html = html.replace(/\[([^\[\]]+?)\]\((https?:\/\/[^\s()]+?)\)/g, (match, linkText, url) => {
+                    // URL for href should ideally not be double-escaped if it contained entities from original input.
+                    // However, since `escapeHTML` was applied to the whole `text`, `url` here is already escaped.
+                    // Browsers are generally good at handling `&` in hrefs.
+                    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+                });
+                // Order: BoldItalic, then Bold, then Italic
+                html = html.replace(/(\*\*\*|___)(.+?)\1/g, '<strong><em>$2</em></strong>'); // Non-greedy match for content
+                html = html.replace(/(\*\*|__)(.+?)\1/g, '<strong>$2</strong>'); // Non-greedy
+                html = html.replace(/(\*|_)(.+?)\1/g, '<em>$2</em>'); // Non-greedy
                 return html;
             };
 
             // --- Core Processing Function ---
             const processText = (shouldSaveState = true) => {
                 if (shouldSaveState) saveState();
-                const inputText = inputDiv.innerText; 
+                const inputText = inputDiv.innerText;
                 sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
                 saveDraftSettings();
-                
+
                 const isWrapP = wrapPCheckbox.checked;
                 const isCleanSpaces = cleanSpacesCheckbox.checked;
                 const finalSeparator = isWrapP ? '\n' : escapeHTML(separatorInput.value).replace(/\\n/g, '<br>\n');
 
                 const outputIsEmpty = !inputText || inputText.trim() === '';
                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
-                saveProjectBtn.disabled = !currentProjectName || inputText.trim() === ''; // FIXED: Corrected logic
+                saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
                 saveAsProjectBtn.disabled = outputIsEmpty;
 
                 if (outputIsEmpty) {
@@ -930,35 +957,38 @@
                  const htmlParagraphs = inputText.split(/\n\s*\n/g).filter(p => p.trim() !== '').map(p => {
                     let processedP = p.trim();
                     if(isCleanSpaces) {
-                        processedP = processedP.replace(/\s+/g, ' '); 
+                        processedP = processedP.replace(/\s+/g, ' ');
                     }
                     processedP = convertMarkdown(processedP);
                     if(!isCleanSpaces) {
+                        // Convert literal newlines within a paragraph (that weren't part of markdown) to <br>
+                        // This should happen after convertMarkdown, which expects plain text lines.
                         processedP = processedP.replace(/\n/g, '<br>\n');
                     }
                     return isWrapP ? `<p>${processedP}</p>` : processedP;
                  });
-                
+
                 outputDiv.innerHTML = htmlParagraphs.join(finalSeparator);
                 updateStats();
                 updateProjectUI();
             };
-            const debouncedProcessText = debounce(processText, 300); 
+            const debouncedProcessText = debounce(processText, 300);
 
              // --- UI & Stats Updaters ---
              const getTargetCount = () => parseInt(targetWordCountInput.value, 10) || 0;
             const updateStats = () => {
                 const inputText = inputDiv.innerText || '';
                 const inputWordCount = inputText.match(/\S+/g)?.length || 0;
-                
+
                 const target = getTargetCount();
                 inputStats.classList.remove('target-approaching', 'target-exceeded', 'target-met');
                 if (target > 0) {
                     if (inputWordCount >= target) inputStats.classList.add('target-met');
                     else if (inputWordCount >= target * 0.9) inputStats.classList.add('target-approaching');
-                    else if (inputWordCount > target * 1.1) inputStats.classList.add('target-exceeded'); // This condition seems off (greater than 110%). Should be for "exceeded" warnings. Changed to > 1.1 for warning, or <= for success state logic. 
+                    // Removed target-exceeded as it might be confusing; meeting or approaching is usually enough.
+                    // else if (inputWordCount > target * 1.1) inputStats.classList.add('target-exceeded');
                 }
-                
+
                 const paragraphCount = inputText.trim() === '' ? 0 : (inputText.split(/\n\s*\n/g).filter(p => p.trim() !== '').length);
                 const readTime = Math.ceil(inputWordCount / WPM);
                 let wordsAndTarget = `${inputWordCount} words`;
@@ -972,7 +1002,7 @@
                 if (inputWordCount > 0) statItems.push(`<span class="stat-item">~${readTime} min read</span>`);
                 inputStats.innerHTML = statItems.join('');
 
-                const outputText = outputDiv.innerText || ''; 
+                const outputText = outputDiv.innerText || '';
                 outputStats.innerHTML = `<span class="stat-item">${outputText.match(/\S+/g)?.length || 0} words</span><span class="stat-item">${outputText.length} characters</span>`;
             };
              const debouncedUpdateStats = debounce(updateStats, 200);
@@ -982,7 +1012,7 @@
             const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
             const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
             const showFeedback = (button, text, type = 'success', duration = 1500) => {
-                 if(button.dataset.feedbackActive) return; 
+                 if(button.dataset.feedbackActive) return;
                  button.dataset.feedbackActive = "true";
                 const originalHTML = button.innerHTML;
                 button.classList.add(`feedback-${type}`);
@@ -1000,15 +1030,15 @@
                 if (currentState !== lastState) {
                     undoStack.push(currentState);
                     if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-                    redoStack = []; // Clear redo stack on new action
+                    redoStack = [];
                     updateUndoRedoButtons();
                 }
             };
             const handleUndo = () => {
-                if (undoStack.length > 1) {
+                if (undoStack.length > 1) { // Always keep the initial state as the last possible undo
                     redoStack.push(undoStack.pop());
                     inputDiv.innerText = undoStack[undoStack.length - 1];
-                    processText(false); // Process without saving state
+                    processText(false);
                 }
                 updateUndoRedoButtons();
             };
@@ -1033,7 +1063,7 @@
             const loadPreferences = () => {
                 const prefs = JSON.parse(localStorage.getItem(STORAGE_KEY_PREFS) || '{}');
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                applyTheme(prefs.theme ? (prefs.theme === 'dark') : prefersDark); 
+                applyTheme(prefs.theme ? (prefs.theme === 'dark') : prefersDark);
                 applyFontSize(prefs.fontSize || '0.95');
                 targetWordCountInput.value = prefs.target || '0';
             };
@@ -1046,12 +1076,16 @@
             const saveDraftSettings = () => sessionStorage.setItem(SESSION_KEY_SETTINGS, JSON.stringify(getCurrentSettings()));
             const loadDraftSettings = () => applySettings(JSON.parse(sessionStorage.getItem(SESSION_KEY_SETTINGS) || '{}'));
             const clearDraft = () => {
-                saveState();
-                ['removeItem', 'removeItem', 'removeItem'].forEach((action, i) => sessionStorage[action]([SESSION_KEY_SETTINGS, SESSION_KEY_DRAFT, SESSION_KEY_CURRENT_PROJECT][i]));
-                currentProjectName = null;
-                inputDiv.innerText = ''; // FIXED: Use innerText for contenteditable
-                applySettings({});
-                processText(false);
+                saveState(); // Save current state before clearing for undo
+                inputDiv.innerHTML = ''; // Use innerHTML to clear potential complex structures
+                applySettings({}); // Reset settings to default
+                sessionStorage.removeItem(SESSION_KEY_DRAFT);
+                sessionStorage.removeItem(SESSION_KEY_SETTINGS);
+                if (currentProjectName) {
+                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                    currentProjectName = null;
+                }
+                processText(false); // Process the empty input, don't save this clearing action to undo stack again
                 inputDiv.focus();
             };
 
@@ -1065,44 +1099,52 @@
                 exportProjectsBtn.disabled = !hasProjects;
                 clearAllProjectsBtn.disabled = !hasProjects;
                 projectSelect.disabled = !hasProjects;
+
                 const defaultOptionText = hasProjects ? "-- Select Project --" : "-- No Projects Saved --";
-                projectSelect.add(new Option(defaultOptionText, "", true, true));
+                const defaultOpt = new Option(defaultOptionText, "");
+                defaultOpt.disabled = true; // Make it unselectable if it's just a placeholder
+                defaultOpt.selected = true;
+                projectSelect.add(defaultOpt);
+
                 sortedNames.forEach(name => projectSelect.add(new Option(name, name, false, name === currentProjectName)));
-                projectActionButtons.forEach(btn => btn.disabled = projectSelect.value === ""); // FIXED: Corrected logic
+                if (currentProjectName) projectSelect.value = currentProjectName; // Ensure current project is selected
+
+                projectActionButtons.forEach(btn => btn.disabled = !projectSelect.value || projectSelect.value === "");
                 currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
-                saveProjectBtn.disabled = !currentProjectName || (inputDiv.innerText.trim() === ''); // This line is also in processText. Duplication is fine.
+                saveProjectBtn.disabled = !currentProjectName || (inputDiv.innerText.trim() === '');
             };
             const handleSaveProject = (isSaveAs = false) => {
                 if (inputDiv.innerText.trim() === '') return;
                 let name = currentProjectName;
                 if (isSaveAs || !name) {
-                    name = prompt("Enter project name:", name || "");
+                    name = prompt("Enter project name:", name || `Project ${Object.keys(PROJECT_STORE).length + 1}`);
                     if (!name || !(name = name.trim())) return;
-                    if (PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) return;
+                    if (PROJECT_STORE[name] && !confirm(`Project "${name}" already exists. Overwrite?`)) return;
                 }
                 PROJECT_STORE[name] = { content: inputDiv.innerText, settings: getCurrentSettings(), timestamp: Date.now() };
                 currentProjectName = name;
                 sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                 saveAllProjectsToStorage();
-                updateProjectUI();
+                updateProjectUI(); // This will re-select the current project name
                 showFeedback(isSaveAs ? saveAsProjectBtn : saveProjectBtn, 'Saved!', 'success');
             };
             const handleLoadProject = () => {
                 const name = projectSelect.value;
                 if (!name || !PROJECT_STORE[name]) return;
-                if (inputDiv.innerText.trim() && !confirm(`Load "${name}"? Current draft will be lost.`)) return;
-                saveState();
+                if (inputDiv.innerText.trim() && !confirm(`Load "${name}"? Current draft changes will be added to undo history but might be lost if not saved.`)) return;
+
+                saveState(); // Save current state before loading for undo
                 const project = PROJECT_STORE[name];
                 currentProjectName = name;
                 sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                 inputDiv.innerText = project.content || '';
                 applySettings(project.settings || {});
-                processText(false);
+                processText(false); // Process loaded text, don't save this loading action to undo stack again
                 showFeedback(loadProjectBtn, 'Loaded!', 'success');
             };
             const handleDeleteProject = () => {
                 const name = projectSelect.value;
-                if (!name || !PROJECT_STORE[name] || !confirm(`Delete project "${name}"?`)) return;
+                if (!name || !PROJECT_STORE[name] || !confirm(`Delete project "${name}"? This cannot be undone.`)) return;
                 delete PROJECT_STORE[name];
                 if (currentProjectName === name) { currentProjectName = null; sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT); }
                 saveAllProjectsToStorage();
@@ -1121,24 +1163,37 @@
                 reader.onload = (e) => {
                     try {
                         const imported = JSON.parse(e.target.result);
-                        if (typeof imported !== 'object' || imported === null || Array.isArray(imported)) throw new Error("Invalid file format.");
-                        
-                        // FIXED: Added check for zero projects before confirming
-                        const count = Object.keys(imported).length;
-                        if (count === 0) {
-                            alert("No projects found in the imported file.");
-                            showFeedback(importProjectsBtn, 'No projects!', 'warning');
+                        if (typeof imported !== 'object' || imported === null || Array.isArray(imported)) throw new Error("Invalid file format: Not an object.");
+                        let projectCount = 0;
+                        for (const key in imported) {
+                            if (Object.prototype.hasOwnProperty.call(imported, key)) {
+                                if (typeof imported[key] === 'object' && imported[key] !== null && 'content' in imported[key] && 'settings' in imported[key]) {
+                                    projectCount++;
+                                } else {
+                                    throw new Error(`Invalid project structure for key "${key}". Each project must be an object with 'content' and 'settings'.`);
+                                }
+                            }
+                        }
+                        if (projectCount === 0 && !confirm("The file contains no valid projects. Proceed anyway? (This might clear existing projects if you confirm merge later)")) {
+                             importFileElement.value = ''; // Reset file input
+                             return;
+                        }
+                        if (!confirm(`Import and merge ${projectCount} project(s)? Existing projects with the same name will be overwritten.`)) {
+                            importFileElement.value = ''; // Reset file input
                             return;
                         }
-                        if (!confirm(`Import and merge ${count} project(s)? Existing projects will be overwritten.`)) return;
-                        
                         PROJECT_STORE = { ...PROJECT_STORE, ...imported };
                         saveAllProjectsToStorage();
+                        loadAllProjectsFromStorage(); // Ensure PROJECT_STORE is fresh
                         updateProjectUI();
                         showFeedback(importProjectsBtn, 'Imported!', 'success');
-                    } catch (err) { alert("Import failed. Ensure file is a valid JSON export."); showFeedback(importProjectsBtn, 'Error!', 'danger'); }
+                    } catch (err) {
+                        alert(`Import failed: ${err.message}`);
+                        showFeedback(importProjectsBtn, 'Error!', 'danger');
+                    }
+                    importFileElement.value = ''; // Reset file input
                 };
-                reader.onerror = () => { alert("Error reading file."); showFeedback(importProjectsBtn, 'Error!', 'danger'); };
+                reader.onerror = () => { alert("Error reading file."); showFeedback(importProjectsBtn, 'Error!', 'danger'); importFileElement.value = '';};
                 reader.readAsText(file);
             };
             const handleClearAllProjects = () => {
@@ -1149,19 +1204,47 @@
                 updateProjectUI();
                 showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger');
             };
-            
+
             // --- NEW: Advanced Find & Replace Logic ---
             const resetFind = () => {
                 currentMatches = [];
                 currentMatchIndex = -1;
                 const sel = window.getSelection();
-                sel.removeAllRanges();
+                if (sel) sel.removeAllRanges(); // Clear any existing selection
+                // If we used temporary spans for highlighting, remove them here.
+                // For now, selection API is used, so removeAllRanges is enough.
             };
+
+            // Helper function to find the text node and offset for a given character index in innerText
+            function findTextNodeAndOffset(parentElement, charIndexInInnerText) {
+                let accumulatedLength = 0;
+                const walker = document.createTreeWalker(parentElement, NodeFilter.SHOW_TEXT, null, false);
+                let currentNode;
+                while (currentNode = walker.nextNode()) {
+                    const nodeLength = currentNode.textContent.length;
+                    if (accumulatedLength + nodeLength >= charIndexInInnerText) {
+                        return { node: currentNode, offset: charIndexInInnerText - accumulatedLength };
+                    }
+                    accumulatedLength += nodeLength;
+                }
+                // If charIndexInInnerText is at the very end (equal to total length),
+                // return the last text node and offset equal to its length.
+                if (charIndexInInnerText === accumulatedLength && parentElement.lastChild && parentElement.lastChild.nodeType === Node.TEXT_NODE) {
+                     return { node: parentElement.lastChild, offset: parentElement.lastChild.textContent.length };
+                }
+                return null; // Index out of bounds or no text nodes
+            }
+
             const findAndHighlight = () => {
                 resetFind();
                 const findTerm = findInput.value;
-                if (!findTerm) return;
-                const text = inputDiv.innerText;
+                if (!findTerm) {
+                    findReplaceButtons.forEach(b => b.disabled = true);
+                    return;
+                }
+                findReplaceButtons.forEach(b => b.disabled = false);
+
+                const text = inputDiv.innerText; // Use innerText for searching
                 const useRegex = useRegexCheckbox.checked;
                 let regex;
                 try {
@@ -1170,57 +1253,102 @@
                     showFeedback(findBtn, "Invalid Regex", "danger");
                     return;
                 }
+
                 let match;
                 while ((match = regex.exec(text)) !== null) {
                     currentMatches.push(match);
+                    if (!useRegex && regex.lastIndex === match.index) { // Avoid infinite loops with empty global matches
+                        regex.lastIndex++;
+                    }
                 }
+
                 if (currentMatches.length > 0) {
                     currentMatchIndex = 0;
                     highlightMatch(currentMatches[0]);
                 } else {
-                    showFeedback(findBtn, "Not found", "danger");
+                    showFeedback(findBtn, "Not found", "warning", 1000);
                 }
             };
-            const highlightMatch = (match) => {
-                const range = document.createRange();
-                const textNode = inputDiv.firstChild; // Potential fragility here if contenteditable contains complex HTML
-                if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return; // Handle empty or complex div
-                range.setStart(textNode, match.index);
-                range.setEnd(textNode, match.index + match[0].length);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                inputDiv.focus();
-                // Scroll into view
-                const rect = range.getBoundingClientRect();
-                if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                    range.startContainer.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const highlightMatch = (matchInstance) => {
+                const startIndex = matchInstance.index;
+                const endIndex = matchInstance.index + matchInstance[0].length;
+
+                const startPos = findTextNodeAndOffset(inputDiv, startIndex);
+                const endPos = findTextNodeAndOffset(inputDiv, endIndex);
+
+                if (startPos && endPos) {
+                    const range = document.createRange();
+                    try {
+                        range.setStart(startPos.node, startPos.offset);
+                        range.setEnd(endPos.node, endPos.offset);
+
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        inputDiv.focus(); // Bring focus to the input area
+
+                        // Scroll into view if not visible
+                        const rect = range.getBoundingClientRect();
+                        const isVisible = (
+                            rect.top >= 0 &&
+                            rect.left >= 0 &&
+                            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                        );
+
+                        if (!isVisible) {
+                            // scrollIntoView can be called on an element.
+                            // For a text node, scroll its parent element.
+                            const parentElement = startPos.node.nodeType === Node.TEXT_NODE ? startPos.node.parentElement : startPos.node;
+                            if (parentElement && typeof parentElement.scrollIntoView === 'function') {
+                                parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error highlighting match:", e, "Match:", matchInstance, "Start:", startPos, "End:", endPos);
+                    }
+                } else {
+                    console.warn("Could not find text node for highlighting match:", matchInstance, "StartPos:", startPos, "EndPos:", endPos);
                 }
             };
+
             const handleFindNext = () => {
                 if (currentMatches.length === 0) {
-                    findAndHighlight();
+                    findAndHighlight(); // Perform initial search if no matches yet
                 } else {
                     currentMatchIndex = (currentMatchIndex + 1) % currentMatches.length;
                     highlightMatch(currentMatches[currentMatchIndex]);
                 }
             };
+
             const handleReplace = () => {
                 const sel = window.getSelection();
-                if (!sel.rangeCount || sel.isCollapsed) {
-                    handleFindNext(); // If nothing is selected, find the first match
+                if (!sel || !sel.rangeCount || sel.isCollapsed) {
+                    handleFindNext(); // If nothing is selected, find the next match
                     return;
                 }
-                saveState();
+                saveState(); // Save state before modification
+
+                // execCommand is simpler for this case and works on the selection
                 document.execCommand('insertText', false, replaceInput.value);
-                // After replacing, find the next occurrence from the new cursor position
+                // inputDiv's content has changed, so innerText is different.
+                // This will trigger the 'input' event on inputDiv, which calls debouncedProcessText.
+                // However, to be sure and immediate:
+                processText(false); // Update output panel immediately.
+
+                // After replacing, find the next occurrence from the new cursor position or start.
+                // Re-running findAndHighlight will rebuild currentMatches based on new inputDiv.innerText
                 findAndHighlight();
             };
+
             const handleReplaceAll = () => {
                 saveState();
                 const findTerm = findInput.value;
                 if (!findTerm) return;
-                const text = inputDiv.innerText;
+
+                const originalText = inputDiv.innerText;
+                const replaceWithValue = replaceInput.value;
                 const useRegex = useRegexCheckbox.checked;
                 let regex;
                 try {
@@ -1229,23 +1357,29 @@
                     showFeedback(replaceAllBtn, "Invalid Regex", "danger");
                     return;
                 }
-                const matches = text.match(regex);
-                if (matches) {
-                    inputDiv.innerText = text.replace(regex, replaceInput.value);
-                    processText(false);
-                    showFeedback(replaceAllBtn, `Replaced ${matches.length}`, 'success');
+
+                const newText = originalText.replace(regex, replaceWithValue);
+                const matchesCount = (originalText.match(regex) || []).length;
+
+                if (matchesCount > 0) {
+                    inputDiv.innerText = newText; // This assignment will trigger 'input' event
+                    // processText(false); // Explicit call to ensure output updates, though 'input' event should handle it
+                    showFeedback(replaceAllBtn, `Replaced ${matchesCount}`, 'success');
                 } else {
                     showFeedback(replaceAllBtn, 'Not found', 'danger');
                 }
-                resetFind();
+                resetFind(); // Clear selection and match state
             };
+
 
             // --- Download Helpers ---
             const downloadFile = (content, filename, type) => {
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(new Blob([content], { type }));
                 a.download = filename;
+                document.body.appendChild(a); // Required for Firefox
                 a.click();
+                document.body.removeChild(a); // Clean up
                 URL.revokeObjectURL(a.href);
             };
 
@@ -1257,20 +1391,73 @@
             };
 
             // --- Event Listeners Setup ---
-            inputDiv.addEventListener('input', debouncedProcessText);
-            [separatorInput, wrapPCheckbox, cleanSpacesCheckbox].forEach(el => el.addEventListener('input', () => processText()));
-            projectSelect.addEventListener('change', updateProjectUI);
-            inputDiv.addEventListener("paste", e => { e.preventDefault(); saveState(); document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData('text/plain')); });
-            pasteBtn.addEventListener('click', async () => { try { saveState(); inputDiv.innerText = await navigator.clipboard.readText(); processText(false); inputDiv.focus(); } catch (err) { showFeedback(pasteBtn, 'Error!', 'danger'); } });
+            inputDiv.addEventListener('input', () => {
+                debouncedProcessText(); // This will call saveState()
+                resetFind(); // If user types, clear find state
+            });
+            [separatorInput, wrapPCheckbox, cleanSpacesCheckbox].forEach(el => el.addEventListener('input', () => processText())); // processText calls saveState
+            projectSelect.addEventListener('change', () => {
+                projectActionButtons.forEach(btn => btn.disabled = !projectSelect.value || projectSelect.value === "");
+            });
+
+            inputDiv.addEventListener("paste", e => {
+                e.preventDefault();
+                saveState(); // Save state *before* pasting new content
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                document.execCommand("insertText", false, text);
+                // The 'input' event on inputDiv will fire after execCommand, calling processText
+            });
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    saveState(); // Save state before pasting
+                    inputDiv.innerText = text; // Replace entire content
+                    processText(false); // Process new content, don't save state again here
+                    inputDiv.focus();
+                } catch (err) {
+                    console.error('Failed to read clipboard contents: ', err);
+                    showFeedback(pasteBtn, 'Paste Error!', 'danger');
+                }
+            });
             caseSentenceBtn.addEventListener('click', () => applyCase(toSentenceCase));
             caseTitleBtn.addEventListener('click', () => applyCase(toTitleCase));
             caseLowerBtn.addEventListener('click', () => applyCase(text => text.toLowerCase()));
             caseUpperBtn.addEventListener('click', () => applyCase(text => text.toUpperCase()));
-            copyBtn.addEventListener('click', async () => { try { const plain = outputDiv.innerText; await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([`<div>${outputDiv.innerHTML}</div>`], { type: "text/html" }), "text/plain": new Blob([plain], { type: "text/plain" }) })]); showFeedback(copyBtn, 'Copied!'); } catch (err) { navigator.clipboard.writeText(outputDiv.innerText).then(() => showFeedback(copyBtn, 'Copied Plain')).catch(() => showFeedback(copyBtn, 'Error!', 'danger')); } });
-            clearBtn.addEventListener('click', () => { if (confirm("Clear current draft?")) { clearDraft(); showFeedback(clearBtn, 'Cleared!', 'success'); }});
+            copyBtn.addEventListener('click', async () => {
+                if (outputDiv.innerText.trim() === '') {
+                    showFeedback(copyBtn, 'Empty!', 'warning', 1000);
+                    return;
+                }
+                try {
+                    const plain = outputDiv.innerText;
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            "text/html": new Blob([`<div>${outputDiv.innerHTML}</div>`], { type: "text/html" }),
+                            "text/plain": new Blob([plain], { type: "text/plain" })
+                        })
+                    ]);
+                    showFeedback(copyBtn, 'Copied Rich!');
+                } catch (err) {
+                    console.warn("Rich text copy failed, falling back to plain text:", err);
+                    try {
+                        await navigator.clipboard.writeText(outputDiv.innerText);
+                        showFeedback(copyBtn, 'Copied Plain');
+                    } catch (fallbackErr) {
+                        console.error('Failed to copy plain text: ', fallbackErr);
+                        showFeedback(copyBtn, 'Copy Error!', 'danger');
+                    }
+                }
+            });
+            clearBtn.addEventListener('click', () => {
+                if (confirm("Clear current draft? This will be added to undo history.")) {
+                    clearDraft(); // clearDraft itself calls saveState for the content *before* clearing
+                    showFeedback(clearBtn, 'Cleared!', 'success');
+                }
+            });
             [fontSizeSlider, themeToggle, targetWordCountInput].forEach(el => el.addEventListener('change', savePreferences));
             fontSizeSlider.addEventListener('input', () => applyFontSize(fontSizeSlider.value));
-            targetWordCountInput.addEventListener('input', debouncedUpdateStats);
+            targetWordCountInput.addEventListener('input', debouncedUpdateStats); // Stats update doesn't need to save state
+
             saveProjectBtn.addEventListener('click', () => handleSaveProject(false));
             saveAsProjectBtn.addEventListener('click', () => handleSaveProject(true));
             loadProjectBtn.addEventListener('click', handleLoadProject);
@@ -1279,12 +1466,31 @@
             importProjectsBtn.addEventListener('click', () => importFileElement.click());
             importFileElement.addEventListener('change', handleImportFile);
             clearAllProjectsBtn.addEventListener('click', handleClearAllProjects);
-            
-            // NEW Listeners
+
             undoBtn.addEventListener('click', handleUndo);
             redoBtn.addEventListener('click', handleRedo);
-            findToggleBtn.addEventListener('click', () => { findReplacePanel.classList.toggle('visible'); if (findReplacePanel.classList.contains('visible')) findInput.focus(); });
-            findInput.addEventListener('input', () => { findReplaceButtons.forEach(b => b.disabled = findInput.value.trim() === ''); resetFind(); });
+            findToggleBtn.addEventListener('click', () => {
+                findReplacePanel.classList.toggle('visible');
+                if (findReplacePanel.classList.contains('visible')) {
+                    findInput.focus();
+                    findReplaceButtons.forEach(b => b.disabled = findInput.value.trim() === '');
+                } else {
+                    resetFind(); // Clear selection when hiding panel
+                }
+            });
+            findInput.addEventListener('input', () => {
+                findReplaceButtons.forEach(b => b.disabled = findInput.value.trim() === '');
+                resetFind(); // Reset if find term changes
+                // Optionally, auto-find as user types: debounce(findAndHighlight, 300)();
+            });
+            // Enable buttons if findInput has text when panel becomes visible
+            new MutationObserver(() => {
+                if (findReplacePanel.classList.contains('visible')) {
+                     findReplaceButtons.forEach(b => b.disabled = findInput.value.trim() === '');
+                }
+            }).observe(findReplacePanel, { attributes: true, attributeFilter: ['class'] });
+
+
             findBtn.addEventListener('click', handleFindNext);
             replaceBtn.addEventListener('click', handleReplace);
             replaceAllBtn.addEventListener('click', handleReplaceAll);
@@ -1293,31 +1499,37 @@
             helpModalClose.addEventListener('click', hideHelp);
             helpModalGotIt.addEventListener('click', hideHelp);
 
-            downloadHtmlBtn.addEventListener('click', () => { downloadFile(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Formatted Output</title></head><body>${outputDiv.innerHTML}</body></html>`, 'formatted.html', 'text/html'); showFeedback(downloadHtmlBtn, 'HTML!', 'success'); });
-            downloadTextBtn.addEventListener('click', () => { downloadFile(outputDiv.innerText, 'formatted.txt', 'text/plain;charset=utf-8'); showFeedback(downloadTextBtn, 'TXT!', 'success'); });
+            downloadHtmlBtn.addEventListener('click', () => {
+                if (outputDiv.innerHTML.trim() === '') { showFeedback(downloadHtmlBtn, 'Empty!', 'warning', 1000); return; }
+                downloadFile(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Formatted Output</title><style>body{font-family: sans-serif; margin: 20px;} p {margin-bottom: 1em;}</style></head><body>\n${outputDiv.innerHTML}\n</body></html>`, 'formatted_output.html', 'text/html');
+                showFeedback(downloadHtmlBtn, 'HTML!', 'success');
+            });
+            downloadTextBtn.addEventListener('click', () => {
+                if (outputDiv.innerText.trim() === '') { showFeedback(downloadTextBtn, 'Empty!', 'warning', 1000); return; }
+                downloadFile(outputDiv.innerText, 'formatted_output.txt', 'text/plain;charset=utf-8');
+                showFeedback(downloadTextBtn, 'TXT!', 'success');
+            });
 
             // --- Initialization ---
             loadPreferences();
             loadAllProjectsFromStorage();
             currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
-            if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
-                currentProjectName = null; 
+            if(currentProjectName && !PROJECT_STORE[currentProjectName]) { // Validate current project still exists
+                currentProjectName = null;
                 sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
             }
-            loadDraftSettings(); 
+            loadDraftSettings();
             const savedInput = sessionStorage.getItem(SESSION_KEY_DRAFT);
             if (savedInput) inputDiv.innerText = savedInput;
-            
-            // Initial state for undo
-            undoStack.push(inputDiv.innerText);
-            updateUndoRedoButtons();
-            
-            updateProjectUI();
-            processText(false); // Initial process without saving state
 
-            // Show help on first visit
+            undoStack = [inputDiv.innerText]; // Initialize undo stack with the starting content
+            updateUndoRedoButtons();
+
+            updateProjectUI(); // Must be after loading projects and currentProjectName
+            processText(false); // Initial process, don't save this initial state to undo again
+
             if (!localStorage.getItem(STORAGE_KEY_HELP)) {
-                showHelp();
+                setTimeout(showHelp, 500); // Show help on first visit after a slight delay
             }
         });
     </script>
