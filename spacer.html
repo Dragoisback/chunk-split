@@ -114,7 +114,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
-             /* Removed flex-grow */
         }
         
         .card {
@@ -127,14 +126,13 @@
             flex-direction: column;
             gap: 0.8rem;
             overflow: hidden;
-             height: 100%; /* Ensure cards fill grid row height */
+             height: 100%;
         }
         body.dark-mode .card {
             background-color: var(--surface-dark);
             box-shadow: 0 4px 15px var(--shadow-color-dark);
             border-color: var(--border-dark);
         }
-        /* NEW: Project Manager */
          .project-manager {
             flex-direction: row;
             align-items: center;
@@ -147,22 +145,30 @@
            .project-controls { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;}
 
         /* --- Controls Bar --- */
+        /* MODIFIED: The main bar is now a column container for its groups */
         .controls-bar {
-           /* grid-column: 1 / -1; */
             display: flex;
-            flex-direction: column; /* MODIFIED: Stack controls vertically */
+            flex-direction: column;
             gap: 1rem;
-             padding-bottom: 0.5rem;
-             border-bottom: 1px dashed var(--border-light);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border-light);
         }
          body.dark-mode .controls-bar {
              border-bottom-color: var(--border-dark);
          }
+        /* MODIFIED: Group for primary actions, now separate from options */
+        .actions-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
         .control-group {
              display: flex;
              flex-wrap: wrap;
-             gap: 0.8rem 1.2rem; /* row-gap col-gap */
+             gap: 0.8rem 1.2rem;
              align-items: center;
         }
 
@@ -178,8 +184,20 @@
              gap: 0.8rem 1.2rem; 
              align-items: center;
        }
+       /* NEW QoL FEATURE: Find/Replace Panel */
+       .find-replace-panel {
+            display: none; /* Hidden by default */
+            gap: 0.8rem 1.2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-top: 0.5rem;
+            width: 100%;
+        }
+        .find-replace-panel.visible {
+            display: flex; /* Show it */
+        }
 
-        .input-control { /* Generic control wrapper */
+        .input-control { 
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -191,7 +209,6 @@
          body.dark-mode .input-control {
              color: var(--subtle-text-dark);
          }
-         /* Checkbox specific */
          .input-control input[type="checkbox"],
          .input-control input[type="range"]
           {
@@ -212,10 +229,9 @@
             cursor: pointer;
            }
 
-        /* Input & Select fields */
         #separatorInput, #targetWordCount, #projectSelect,
-        #findInput, #replaceInput /* MODIFIED: Add new inputs */
-        {
+        #findInput, #replaceInput /* NEW */
+         {
             padding: 0.4rem 0.6rem;
             border: 1px solid var(--border-light);
             border-radius: var(--radius-sm);
@@ -226,28 +242,27 @@
              font-size: 0.85rem;
         }
          #separatorInput {
-             font-family: 'Inter', monospace; /* monospace for \n */
+             font-family: 'Inter', monospace;
               width: 70px;
          }
          #targetWordCount {
              width: 75px;
+         }
+         #findInput, #replaceInput {
+            flex-grow: 1;
+            min-width: 120px;
          }
          #projectSelect {
              min-width: 150px;
              max-width: 300px;
              flex-grow: 1;
          }
-         /* MODIFIED: Find/Replace styles */
-         #findInput, #replaceInput {
-            width: 150px;
-         }
-
 
         body.dark-mode #separatorInput,
         body.dark-mode #targetWordCount,
         body.dark-mode #projectSelect,
-        body.dark-mode #findInput, /* MODIFIED */
-        body.dark-mode #replaceInput /* MODIFIED */
+        body.dark-mode #findInput, 
+        body.dark-mode #replaceInput
          {
             border-color: var(--border-dark);
             background-color: var(--bg-dark);
@@ -257,8 +272,8 @@
         #separatorInput:focus, 
         #targetWordCount:focus,
         #projectSelect:focus,
-        #findInput:focus, /* MODIFIED */
-        #replaceInput:focus /* MODIFIED */
+        #findInput:focus, 
+        #replaceInput:focus
          {
             outline: none;
             border-color: var(--primary-light);
@@ -268,57 +283,42 @@
         body.dark-mode #separatorInput:focus,
         body.dark-mode #targetWordCount:focus,
         body.dark-mode #projectSelect:focus,
-        body.dark-mode #findInput:focus, /* MODIFIED */
-        body.dark-mode #replaceInput:focus /* MODIFIED */
+        body.dark-mode #findInput:focus,
+        body.dark-mode #replaceInput:focus
          {
             border-color: var(--primary-dark);
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
         }
-        
-        /* MODIFIED: Find & Replace Container */
-        .find-replace-container {
-            display: none; /* Hidden by default */
-            gap: 0.8rem;
-            align-items: center;
-            flex-wrap: wrap;
-            padding-top: 0.5rem;
-            width: 100%;
-        }
-        .find-replace-container.visible {
-            display: flex; /* Show it */
-        }
-
 
         /* --- Text Area Columns --- */
         .column-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 0.2rem;
-            margin-bottom: 0rem;
         }
 
         .column-title {
             font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.1rem;
         }
 
         .stats {
             font-size: 0.8rem;
             color: var(--subtle-text-light);
             font-weight: 500;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.5rem;
+            justify-content: flex-end;
         }
-         .stats.target-met { color: var(--success-light); font-weight: 700; }
-         body.dark-mode .stats.target-met { color: var(--success-dark); }
-         /* MODIFIED: Add subtle separator for stats */
          .stats .stat-item:not(:last-child)::after {
             content: "•";
             display: inline-block;
-            margin: 0 0.5em;
+            margin-left: 0.5rem;
             opacity: 0.5;
          }
-
+         .stats .target-met { color: var(--success-light); font-weight: 700; }
+         body.dark-mode .stats .target-met { color: var(--success-dark); }
         body.dark-mode .stats {
             color: var(--subtle-text-dark);
         }
@@ -326,40 +326,35 @@
         /* --- Content Editable Div Styling --- */
         .text-area {
             width: 100%;
-            flex-grow: 1; /* Fill available card height */
-            min-height: 250px; /* Increased min height */
+            flex-grow: 1;
+            min-height: 250px;
             padding: 0.5rem 0;
             background-color: transparent;
             color: var(--text-light);
-            font-size: var(--text-area-font-size); /* Use variable */
+            font-size: var(--text-area-font-size);
             line-height: 1.7;
-            resize: none; /* divs dont resize anyway */
-            transition: border-color 0.3s, box-shadow 0.3s;
-            overflow-y: auto; /* Scroll if content overflows */
-            outline: none; /* Remove default outline */
-            white-space: pre-wrap; /* Respect whitespace and wrap lines */
-            word-wrap: break-word; /* Break long words */
+            overflow-y: auto;
+            outline: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
          
-        /* Placeholder simulation for contenteditable */
         .text-area:empty::before {
             content: attr(data-placeholder);
             color: var(--subtle-text-light);
-            pointer-events: none; /* Allow click-through */
-            display: block; /* Ensure it takes space */
+            pointer-events: none;
+            display: block;
         }
         body.dark-mode .text-area:empty::before {
             color: var(--subtle-text-dark);
         }
 
         #outputDiv {
-            /* Prevent editing but allow selection */
-            user-select: text; /* 'all' can be annoying */
+            user-select: text;
             -webkit-user-modify: read-only;
             -moz-user-modify: read-only;
             cursor: text;
         }
-        /* Style actual strong/em/a/p tags */
         .text-area strong { font-weight: 700; }
         .text-area em { font-style: italic; }
         .text-area p { margin-bottom: 1em; }
@@ -367,12 +362,7 @@
         .text-area a { 
             color: var(--link-light); 
             text-decoration: underline;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 2px;
-         }
-         .text-area a:hover {
-             text-decoration-thickness: 2px;
-         }
+        }
          body.dark-mode .text-area a {
              color: var(--link-dark);
          }
@@ -386,7 +376,6 @@
         .text-area::-webkit-scrollbar-track { background: var(--border-light); border-radius: 4px; margin: 2px 0;}
         .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-light);  border-radius: 4px; }
         .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
-         /* Firefox */
          .text-area {
             scrollbar-width: thin;
             scrollbar-color: var(--subtle-text-light) var(--border-light);
@@ -394,7 +383,6 @@
         body.dark-mode .text-area::-webkit-scrollbar-track { background: var(--border-dark); }
         body.dark-mode .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-dark); }
         body.dark-mode .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-dark); }
-         /* Firefox Dark */
          body.dark-mode .text-area {
              scrollbar-color: var(--subtle-text-dark) var(--border-dark);
          }
@@ -406,13 +394,12 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 0.9rem;
-            border: none;
             border-radius: var(--radius-sm);
             font-family: 'Inter', sans-serif;
             font-weight: 500;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+            transition: all 0.2s;
             background-color: var(--primary-light);
             color: var(--accent-light);
             box-shadow: 0 1px 3px var(--shadow-color);
@@ -420,8 +407,7 @@
             white-space: nowrap;
         }
         .btn svg {
-             flex-shrink: 0; /* prevent svg shrinking */
-              width: 16px; height: 16px;
+             width: 16px; height: 16px;
         }
 
         .btn:hover:not([disabled]) {
@@ -434,7 +420,6 @@
             transform: translateY(0px);
             box-shadow: 0 1px 2px var(--shadow-color);
         }
-        /* NEW: Disabled State */
          .btn[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
@@ -443,7 +428,7 @@
         
         body.dark-mode .btn {
             background-color: var(--primary-dark);
-            color: var(--bg-dark); /* Better contrast */
+            color: var(--bg-dark);
             box-shadow: 0 1px 3px var(--shadow-color-dark);
         }
 
@@ -478,14 +463,11 @@
             border-color: var(--subtle-text-dark);
              color: var(--text-dark);
         }
-         /* Feedback states */
-          .btn.feedback-success { background-color: var(--success-light) !important; color: white !important; border-color: transparent !important;}
-          .btn.feedback-danger { background-color: var(--danger-light) !important; color: white !important; border-color: transparent !important;}
+          .btn.feedback-success { background-color: var(--success-light) !important; color: white !important; }
+          .btn.feedback-danger { background-color: var(--danger-light) !important; color: white !important; }
            body.dark-mode .btn.feedback-success { background-color: var(--success-dark) !important; color: var(--bg-dark) !important;}
            body.dark-mode .btn.feedback-danger { background-color: var(--danger-dark) !important; color: var(--bg-dark) !important;}
 
-
-         /* Special case for header clear */
          .btn-danger-hover:hover:not([disabled]) {
              background-color: #fee2e2;
              border-color: #fca5a5;
@@ -497,7 +479,6 @@
              color: #fca5a5;
          }
 
-
         .btn-group {
             display: flex;
              flex-wrap: wrap;
@@ -505,140 +486,42 @@
         }
         
         /* --- Theme Toggle Switch --- */
-        .theme-switch {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            font-size: 1.1rem; /* size icons */
-        }
-        
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px; /* slightly smaller */
-            height: 20px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--border-light);
-            transition: .3s;
-            border-radius: 20px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: var(--surface-light);
-            transition: .3s;
-            border-radius: 50%;
-             box-shadow: 0 1px 3px rgba(0,0,0, 0.2);
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary-light);
-        }
-        body.dark-mode input:checked + .slider {
-            background-color: var(--primary-dark); 
-        }
-        body.dark-mode input + .slider {
-            background-color: var(--border-dark); 
-        }
-        body.dark-mode input + .slider:before {
-           background-color: var(--surface-dark); 
-            border: 1px solid var(--border-dark);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px); /* match width-height */
-        }
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-             flex-wrap: wrap;
-        }
+        .theme-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 1.1rem; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-light); transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: var(--surface-light); transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0, 0.2); }
+        input:checked + .slider { background-color: var(--primary-light); }
+        body.dark-mode input:checked + .slider { background-color: var(--primary-dark);  }
+        body.dark-mode input + .slider { background-color: var(--border-dark);  }
+        body.dark-mode input + .slider:before { background-color: var(--surface-dark); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .header-controls { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
        
         /* --- Responsive Design --- */
         @media (max-width: 992px) {
-             .container {
-                 margin: 1rem auto;
-                 min-height: calc(100vh - 2rem);
-                 padding: 0 1rem;
-             }
-             header {
-                 padding: 0.8rem 1rem;
-             }
-             .workspace {
-                 grid-template-columns: 1fr;
-                 gap: 1rem;
-             }
-              .card {
-                 padding: 1rem;
-             }
-             .text-area {
-                 min-height: 40vh;
-             }
-              /* MODIFIED: Keep controls bar as column */
-              .controls-bar {
-                 align-items: flex-start;
-             }
-              .control-group {
-                 justify-content: flex-start;
-             }
-             .options-group {
-                 align-items: flex-start;
-             }
-              .project-manager {
-                 flex-direction: column;
-                 align-items: stretch;
-              }
-              .project-group {
-                 flex-direction: column;
-                 align-items: stretch;
-              }
+             .container { margin: 1rem auto; padding: 0 1rem; }
+             header { padding: 0.8rem 1rem; }
+             .workspace { grid-template-columns: 1fr; gap: 1rem; }
+              .card { padding: 1rem; }
+             .text-area { min-height: 40vh; }
+              .actions-group { flex-direction: column-reverse; align-items: stretch; }
+              .control-group { justify-content: center; }
+             .options-group { align-items: center; }
+              .project-manager { flex-direction: column; align-items: stretch; }
+              .project-group { flex-direction: column; align-items: stretch; }
               #projectSelect { max-width: 100%;}
               .project-controls { justify-content: center;}
         }
-        
         @media (max-width: 600px) {
-            .main-title {
-                font-size: 1.2rem;
-            }
-            header {
-                flex-direction: column;
-                gap: 0.8rem;
-                 padding: 1rem;
-                 align-items: flex-start;
-            }
-            .header-controls {
-                width: 100%;
-                justify-content: space-between;
-            }
-             .btn {
-                 padding: 0.6rem 0.8rem;
-                 font-size: 0.8rem;
-             }
+            .main-title { font-size: 1.2rem; }
+            header { flex-direction: column; gap: 0.8rem; padding: 1rem; align-items: flex-start; }
+            .header-controls { width: 100%; justify-content: space-between; }
+             .btn { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
              .btn svg { width: 14px; height: 14px;}
-              .text-area {
-                 min-height: 30vh;
-             }
+             .text-area { min-height: 30vh; }
+             .actions-group { flex-direction: row; justify-content: space-between; align-items: center; }
+             .options-group { align-items: flex-start; }
         }
     </style>
 </head>
@@ -652,7 +535,6 @@
             </h1>
            
             <div class="header-controls">
-                 <!-- QoL Options -->
                  <div class="input-control">
                    <label for="fontSizeSlider" title="Adjust Text Size">Size:</label>
                     <input type="range" id="fontSizeSlider" min="0.7" max="1.5" step="0.05" value="0.95" style="width: 80px;">
@@ -670,11 +552,9 @@
                     </div>
                     <span>🌙</span>
                 </label>
-                 <!-- MODIFIED: Clear button moved out of here -->
             </div>
         </header>
         
-         <!-- PROJECT MANAGER -->
          <section class="card project-manager">
              <h2 class="column-title">Projects:</h2>
               <div class="project-group">
@@ -696,63 +576,62 @@
                 </div>
          </section>
 
-
         <main class="workspace">
             <!-- Input Column -->
             <div class="card">
                  <div class="column-header">
-                    <div>
-                        <h2 class="column-title">Input Text</h2>
-                        <div id="inputStats" class="stats">0 words, 0 characters</div>
-                    </div>
+                    <h2 class="column-title">Input Text</h2>
+                    <div id="inputStats" class="stats"></div>
                 </div>
-                <!-- MODIFIED: Restructured control bar -->
+                <!-- MODIFIED: Restructured controls bar for clarity and new features -->
                 <div class="controls-bar">
-                    <div class="options-group">
-                        <div class="options-row">
-                            <div class="input-control">
-                                <label for="separatorInput">Separator:</label>
-                                <input type="text" id="separatorInput" value="\\n\\n" title="Separator between paragraphs. Use \\n for a line break (<br>). Ignored if 'Wrap in <p>' is checked. Default is two line breaks.">
+                    <div class="actions-group">
+                        <div class="options-group">
+                           <div class="options-row">
+                              <div class="input-control">
+                                    <label for="separatorInput">Separator:</label>
+                                    <input type="text" id="separatorInput" value="\\n\\n" title="Separator between paragraphs. Use \\n for a line break (<br>). Ignored if 'Wrap in <p>' is checked. Default is two line breaks.">
+                                </div>
+                                 <div class="input-control">
+                                    <input type="checkbox" id="wrapPCheckbox" title="Wrap each paragraph in <p> tags">
+                                    <label for="wrapPCheckbox">Wrap in <p> tags</label>
+                                </div>
+                                 <div class="input-control">
+                                     <input type="checkbox" id="cleanSpacesCheckbox" title="Collapse multiple spaces, tabs and newlines within a paragraph into a single space.">
+                                     <label for="cleanSpacesCheckbox">Clean extra spaces</label>
+                                 </div>
+                           </div>
+                        </div>
+                         <div class="control-group">
+                            <div class="btn-group" title="Change case of INPUT text">
+                                 <button id="caseSentenceBtn" class="btn btn-secondary">Sentence</button>
+                                 <button id="caseTitleBtn" class="btn btn-secondary">Title</button>
+                                 <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
+                                 <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
                             </div>
-                            <div class="input-control">
-                                <input type="checkbox" id="wrapPCheckbox" title="Wrap each paragraph in <p> tags">
-                                <label for="wrapPCheckbox">Wrap in <p> tags</label>
-                            </div>
-                            <div class="input-control">
-                                <input type="checkbox" id="cleanSpacesCheckbox" title="Collapse multiple spaces, tabs and newlines within a paragraph into a single space.">
-                                <label for="cleanSpacesCheckbox">Clean extra spaces</label>
+                            <div class="btn-group">
+                                <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
+                                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
+                                    Paste 
+                                </button>
+                                <!-- NEW QoL FEATURE: Find & Replace Toggle -->
+                                <button id="findToggleBtn" class="btn btn-secondary" title="Find and Replace text">Find...</button>
+                                <!-- MOVED: Clear Draft Button -->
+                                <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                                    Clear Draft
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <div class="btn-group" title="Change case of INPUT text">
-                            <button id="caseSentenceBtn" class="btn btn-secondary">Sentence</button>
-                            <button id="caseTitleBtn" class="btn btn-secondary">Title</button>
-                            <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
-                            <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
-                        </div>
-                        <div class="btn-group">
-                            <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
-                                Paste
-                            </button>
-                            <!-- MODIFIED: New QoL Find button -->
-                            <button id="findToggleBtn" class="btn btn-secondary" title="Find and Replace text">Find...</button>
-                            <!-- MODIFIED: Clear Draft button moved here -->
-                            <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
-                                Clear Draft
-                           </button>
-                        </div>
-                    </div>
-                     <!-- MODIFIED: New Find & Replace container -->
-                    <div id="findReplaceContainer" class="find-replace-container">
-                        <div class="input-control">
+                     <!-- NEW QoL FEATURE: Find & Replace Panel -->
+                    <div id="findReplacePanel" class="find-replace-panel">
+                        <div class="input-control" style="flex-grow: 1;">
                             <label for="findInput">Find:</label>
                             <input type="text" id="findInput" placeholder="text to find">
                         </div>
-                         <div class="input-control">
-                            <label for="replaceInput">Replace:</label>
+                         <div class="input-control" style="flex-grow: 1;">
+                            <label for="replaceInput">With:</label>
                             <input type="text" id="replaceInput" placeholder="replacement text">
                         </div>
                         <button id="replaceAllBtn" class="btn" title="Replace all occurrences" disabled>Replace All</button>
@@ -773,13 +652,10 @@
             <!-- Output Column -->
             <div class="card">
                  <div class="column-header">
-                     <div>
-                        <h2 class="column-title">Formatted Output</h2>
-                        <div id="outputStats" class="stats">0 words, 0 characters</div>
-                    </div>
+                     <h2 class="column-title">Formatted Output</h2>
+                     <div id="outputStats" class="stats"></div>
                 </div>
                 <div class="controls-bar">
-                     <!-- Output Actions -->
                      <div class="control-group">
                          <button id="copyBtn" class="btn" title="Copy output to clipboard as Rich Text (HTML) and Plain Text">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
@@ -794,7 +670,6 @@
                              Text
                         </button>
                     </div>
-                   <div><!-- spacer --></div>
                 </div>
                
                 <div 
@@ -817,13 +692,13 @@
             const separatorInput = document.getElementById('separatorInput');
             const wrapPCheckbox = document.getElementById('wrapPCheckbox'); 
             const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); 
-            const targetWordCountInput = document.getElementById('targetWordCount'); // QoL
-            const fontSizeSlider = document.getElementById('fontSizeSlider'); //QoL
-            const currentProjectTitleEl = document.getElementById('currentProjectTitle'); // Project
+            const targetWordCountInput = document.getElementById('targetWordCount');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const currentProjectTitleEl = document.getElementById('currentProjectTitle');
 
             const pasteBtn = document.getElementById('pasteBtn');
             const copyBtn = document.getElementById('copyBtn');
-            const clearBtn = document.getElementById('clearBtn'); // Clear DRAFT button
+            const clearBtn = document.getElementById('clearBtn'); // MOVED
             const inputStats = document.getElementById('inputStats');
             const outputStats = document.getElementById('outputStats');
             const themeToggle = document.getElementById('themeToggleCheckbox');
@@ -833,10 +708,10 @@
             const caseTitleBtn = document.getElementById('caseTitleBtn');
             const caseLowerBtn = document.getElementById('caseLowerBtn');
             const caseUpperBtn = document.getElementById('caseUpperBtn');
-
-            // MODIFIED: QoL Find & Replace elements
+            
+             // NEW QoL FEATURE: Find & Replace elements
             const findToggleBtn = document.getElementById('findToggleBtn');
-            const findReplaceContainer = document.getElementById('findReplaceContainer');
+            const findReplacePanel = document.getElementById('findReplacePanel');
             const findInput = document.getElementById('findInput');
             const replaceInput = document.getElementById('replaceInput');
             const replaceAllBtn = document.getElementById('replaceAllBtn');
@@ -852,564 +727,307 @@
              const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
              const importFileElement = document.getElementById('importFileElement');
 
-
-            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn]; // for disabling
-            const projectActionButtons = [loadProjectBtn, deleteProjectBtn]; // for disabling
+            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn];
+            const projectActionButtons = [loadProjectBtn, deleteProjectBtn];
 
             // --- CONSTANTS & STATE ---
             const DEFAULT_SEPARATOR = '\\n\\n';
             const SESSION_KEY_DRAFT = 'pfp_draftContent';
-            const SESSION_KEY_SETTINGS = 'pfp_draftSettings'; // project-specific settings
+            const SESSION_KEY_SETTINGS = 'pfp_draftSettings';
             const SESSION_KEY_CURRENT_PROJECT = 'pfp_currentProjectName';
-            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjects'; // localStorage
-            const STORAGE_KEY_PREFS = 'pfp_Preferences'; // theme, font, target
-            const WPM = 225; // MODIFIED: Average words per minute for read time calc
+            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjects';
+            const STORAGE_KEY_PREFS = 'pfp_Preferences';
+            const WPM = 225; // NEW: Average words per minute for read time calc
 
-            let feedbackTimeout;
-            let PROJECT_STORE = {}; // In-memory cache of projects
+            let PROJECT_STORE = {};
             let currentProjectName = null;
 
-
-            // --- Helper: Debounce --- 
+            // --- Helper Functions ---
              const debounce = (func, delay) => {
                  let timeout;
-                 return function(...args) {
-                     clearTimeout(timeout);
-                     timeout = setTimeout(() => func.apply(this, args), delay);
-                 };
+                 return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); };
              };
-
-            // --- Helper: Escape HTML ---
-            const escapeHTML = (str) => String(str) 
-                .replace(/&/g, '&')
-                .replace(/</g, '<')
-                .replace(/>/g, '>')
-                .replace(/"/g, '"')
-                .replace(/'/g, ''');
-
-            // --- Helper: Convert Markdown --- 
+            const escapeHTML = (str) => String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
             const convertMarkdown = (text) => {
                 let html = escapeHTML(text);
                 html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
                 html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
-                 // Re-run to catch basic nesting 
-                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); 
-                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+                html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); 
+                html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
                 return html;
             };
 
-             // --- Core Processing Function ---
+            // --- Core Processing Function ---
             const processText = () => {
                 const inputText = inputDiv.innerText; 
+                sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
+                saveDraftSettings();
+                
                 const isWrapP = wrapPCheckbox.checked;
                 const isCleanSpaces = cleanSpacesCheckbox.checked;
-
-                // Save DRAFT text & settings to SESSION storage 
-                sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
-                saveDraftSettings(); // Save settings related to this draft
-                
-                const escapedSeparator = escapeHTML(separatorInput.value);
-                const htmlSeparator = escapedSeparator.replace(/\\n/g, '<br>\n');
-                const finalSeparator = isWrapP ? '\n' : htmlSeparator;
+                const finalSeparator = isWrapP ? '\n' : escapeHTML(separatorInput.value).replace(/\\n/g, '<br>\n');
 
                 const outputIsEmpty = !inputText || inputText.trim() === '';
-                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
-                 saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
-                 saveAsProjectBtn.disabled = outputIsEmpty;
-
+                outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
+                saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
+                saveAsProjectBtn.disabled = outputIsEmpty;
 
                 if (outputIsEmpty) {
                     outputDiv.innerHTML = '';
                     updateStats();
-                     updateProjectUI(); // update button states
+                    updateProjectUI();
                     return;
                 }
 
-                 const htmlParagraphs = inputText
-                    .split(/\n\s*\n/g) 
-                    .filter(p => p.trim() !== '')
-                    .map(p => {
-                         let processedP = p.trim();
-                         if(isCleanSpaces) {
-                             // Collapse all whitespace/newlines to single space
-                             processedP = processedP.replace(/\s+/g, ' '); 
-                         }
-                         processedP = convertMarkdown(processedP);
-                          // If not cleaning spaces, convert remaining single newlines within the paragraph to <br>
-                          if(!isCleanSpaces) {
-                               processedP = processedP.replace(/\n/g, '<br>\n');
-                          }
-                         return isWrapP ? `<p>${processedP}</p>` : processedP;
-                    });
+                 const htmlParagraphs = inputText.split(/\n\s*\n/g).filter(p => p.trim() !== '').map(p => {
+                    let processedP = p.trim();
+                    if(isCleanSpaces) {
+                        processedP = processedP.replace(/\s+/g, ' '); 
+                    }
+                    processedP = convertMarkdown(processedP);
+                    if(!isCleanSpaces) {
+                        processedP = processedP.replace(/\n/g, '<br>\n');
+                    }
+                    return isWrapP ? `<p>${processedP}</p>` : processedP;
+                 });
                 
                 outputDiv.innerHTML = htmlParagraphs.join(finalSeparator);
                 updateStats();
-                 updateProjectUI(); // update button states
+                updateProjectUI();
             };
             const debouncedProcessText = debounce(processText, 250); 
 
-             // --- QoL: Target Word Count ---
+             // --- UI & Stats Updaters ---
              const getTargetCount = () => parseInt(targetWordCountInput.value, 10) || 0;
-
-            // --- Helper: Update Stats & Button State ---
             // MODIFIED: Enhanced updateStats function
             const updateStats = () => {
-                const target = getTargetCount();
                 const inputText = inputDiv.innerText || '';
-                const inputCharCount = inputText.length;
                 const inputWordCount = inputText.match(/\S+/g)?.length || 0;
                 
-                // New stat calculations
+                // Input Stats
+                const target = getTargetCount();
                 const paragraphCount = inputText.trim() === '' ? 0 : (inputText.split(/\n\s*\n/g).filter(p => p.trim() !== '').length);
                 const readTime = Math.ceil(inputWordCount / WPM);
-
                 let wordsAndTarget = `${inputWordCount} words`;
+                inputStats.classList.remove('target-met');
                 if (target > 0) {
-                    wordsAndTarget = `${inputWordCount} / ${target} words (${Math.min(100, Math.round(inputWordCount/target*100))}%)`;
-                    inputStats.classList.toggle('target-met', inputWordCount >= target);
-                } else {
-                    inputStats.classList.remove('target-met');
+                    wordsAndTarget = `${inputWordCount} / ${target} words`;
+                    if (inputWordCount >= target) inputStats.classList.add('target-met');
                 }
-
-                // Build the stats string with new info
                 const statItems = [
-                    `<span class="stat-item">${wordsAndTarget}</span>`,
-                    `<span class="stat-item">${inputCharCount} chars</span>`,
+                    `<span class="stat-item target-met">${wordsAndTarget}</span>`,
+                    `<span class="stat-item">${inputText.length} chars</span>`,
                     `<span class="stat-item">${paragraphCount} paragraphs</span>`
                 ];
-                if (inputWordCount > 0) {
-                     statItems.push(`<span class="stat-item">~${readTime} min read</span>`);
-                }
+                if (inputWordCount > 0) statItems.push(`<span class="stat-item">~${readTime} min read</span>`);
                 inputStats.innerHTML = statItems.join('');
-                
-                const outputText = outputDiv.innerText || ''; 
-                const outputCharCount = outputText.length;
-                const outputWordCount = outputText.match(/\S+/g)?.length || 0;
-                outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
-            };
-             const debouncedUpdateStats = debounce(updateStats, 200); // for target input
 
-             // --- Case Conversion Helpers ---
-             const applyCase = (caseFunc) => {
-                  inputDiv.innerText = caseFunc(inputDiv.innerText);
-                  processText(); // process immediately
-             }
-            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
-            const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-            
-            // --- GENERIC Button Feedback ---
+                // Output Stats
+                const outputText = outputDiv.innerText || ''; 
+                outputStats.innerHTML = `<span class="stat-item">${outputText.match(/\S+/g)?.length || 0} words</span><span class="stat-item">${outputText.length} characters</span>`;
+            };
+             const debouncedUpdateStats = debounce(updateStats, 200);
+
+            // --- Case Conversion & Actions ---
+            const applyCase = (caseFunc) => { inputDiv.innerText = caseFunc(inputDiv.innerText); processText(); }
+            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase());
+            const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
             const showFeedback = (button, text, type = 'success', duration = 1500) => {
                  if(button.dataset.feedbackActive) return; 
-                 if(feedbackTimeout) {}
                  button.dataset.feedbackActive = "true";
                 const originalHTML = button.innerHTML;
-                const feedbackClass = `feedback-${type}`;
-                button.classList.add(feedbackClass);
+                button.classList.add(`feedback-${type}`);
                 button.innerHTML = text;
-
                 setTimeout(() => {
-                     button.classList.remove(feedbackClass);
-                     requestAnimationFrame(() => {
-                         button.innerHTML = originalHTML;
-                          delete button.dataset.feedbackActive;
-                      })
+                     button.classList.remove(`feedback-${type}`);
+                     requestAnimationFrame(() => { button.innerHTML = originalHTML; delete button.dataset.feedbackActive; })
                 }, duration);
             };
 
-            // --- Theme & Pref Management (localStorage) ---
-             const savePreferences = () => {
-                 const prefs = {
-                     theme: themeToggle.checked ? 'dark' : 'light',
-                     fontSize: fontSizeSlider.value,
-                     target: targetWordCountInput.value,
-                 }
-                  localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(prefs));
-             }
-             const applyFontSize = (size) => {
-                 document.body.style.setProperty('--text-area-font-size', `${size}rem`);
-                 fontSizeSlider.value = size;
-             }
-              const applyTheme = (isDark) => {
-                document.body.classList.toggle('dark-mode', isDark);
-                themeToggle.checked = isDark;
-            };
-
+            // --- Persistence (Preferences, Draft, Projects) ---
+            const savePreferences = () => localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify({ theme: themeToggle.checked ? 'dark' : 'light', fontSize: fontSizeSlider.value, target: targetWordCountInput.value }));
+            const applyFontSize = (size) => { document.body.style.setProperty('--text-area-font-size', `${size}rem`); fontSizeSlider.value = size; }
+            const applyTheme = (isDark) => { document.body.classList.toggle('dark-mode', isDark); themeToggle.checked = isDark; };
             const loadPreferences = () => {
-                 const prefsJSON = localStorage.getItem(STORAGE_KEY_PREFS);
-                 let theme = 'light';
-                 let fontSize = '0.95';
-                 let target = '0';
-                  if(prefsJSON) {
-                     try {
-                         const prefs = JSON.parse(prefsJSON);
-                         theme = prefs.theme ?? 'light';
-                         fontSize = prefs.fontSize ?? '0.95';
-                         target = prefs.target ?? '0';
-                     } catch(e) { console.error("Failed loading prefs", e); }
-                 }
-                 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                 applyTheme(prefsJSON ? (theme === 'dark') : prefersDark); 
-                 applyFontSize(fontSize);
-                 targetWordCountInput.value = target;
-            }
-             themeToggle.addEventListener('change', () => {
-                applyTheme(themeToggle.checked);
-                savePreferences();
-            });
-             fontSizeSlider.addEventListener('input', () => { 
-                 applyFontSize(fontSizeSlider.value);
-             });
-             fontSizeSlider.addEventListener('change', savePreferences);
-             targetWordCountInput.addEventListener('input', () => {
-                 debouncedUpdateStats();
-                 debounce(savePreferences, 500)();
-             });
-
-
-            // --- Draft Settings Persistence (sessionStorage) ---
-             const getCurrentSettings = () => ({
-                  separator: separatorInput.value,
-                  wrapP: wrapPCheckbox.checked,
-                  cleanSpaces: cleanSpacesCheckbox.checked,
-             });
-             const applySettings = (settings) => {
-                 separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
-                 wrapPCheckbox.checked = settings.wrapP ?? false;
-                 cleanSpacesCheckbox.checked = settings.cleanSpaces ?? false;
-             }
-             const saveDraftSettings = () => {
-                 sessionStorage.setItem(SESSION_KEY_SETTINGS, JSON.stringify(getCurrentSettings()));
-             }
-             const loadDraftSettings = () => {
-                 const settingsJSON = sessionStorage.getItem(SESSION_KEY_SETTINGS);
-                 if(settingsJSON) {
-                    try {
-                         applySettings(JSON.parse(settingsJSON));
-                    } catch(e) {
-                         console.error("Failed loading draft settings", e);
-                         applySettings({});
-                    }
-                 } else {
-                      applySettings({});
-                 }
-             }
-              const clearDraft = () => {
-                   sessionStorage.removeItem(SESSION_KEY_SETTINGS);
-                   sessionStorage.removeItem(SESSION_KEY_DRAFT);
-                   sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                   currentProjectName = null;
-                   inputDiv.innerHTML = '';
-                   outputDiv.innerHTML = '';
-                   applySettings({}); 
-                   updateProjectUI();
-                   processText();
-                   inputDiv.focus();
-              }
-
-            // --- PROJECT MANAGEMENT (localStorage) ---
-            const loadAllProjectsFromStorage = () => {
-                 try {
-                    PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}');
-                 } catch (e) {
-                     console.error("Error loading projects", e);
-                     PROJECT_STORE = {};
-                 }
+                const prefs = JSON.parse(localStorage.getItem(STORAGE_KEY_PREFS) || '{}');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefs.theme ? (prefs.theme === 'dark') : prefersDark); 
+                applyFontSize(prefs.fontSize || '0.95');
+                targetWordCountInput.value = prefs.target || '0';
             };
-            const saveAllProjectsToStorage = () => {
-                 localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(PROJECT_STORE));
+            const getCurrentSettings = () => ({ separator: separatorInput.value, wrapP: wrapPCheckbox.checked, cleanSpaces: cleanSpacesCheckbox.checked });
+            const applySettings = (settings) => {
+                separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
+                wrapPCheckbox.checked = settings.wrapP ?? false;
+                cleanSpacesCheckbox.checked = settings.cleanSpaces ?? false;
+            };
+            const saveDraftSettings = () => sessionStorage.setItem(SESSION_KEY_SETTINGS, JSON.stringify(getCurrentSettings()));
+            const loadDraftSettings = () => applySettings(JSON.parse(sessionStorage.getItem(SESSION_KEY_SETTINGS) || '{}'));
+            const clearDraft = () => {
+                ['removeItem', 'removeItem', 'removeItem'].forEach((action, i) => sessionStorage[action]([SESSION_KEY_SETTINGS, SESSION_KEY_DRAFT, SESSION_KEY_CURRENT_PROJECT][i]));
+                currentProjectName = null;
+                inputDiv.innerHTML = '';
+                applySettings({});
+                processText();
+                inputDiv.focus();
             };
 
+            // --- PROJECT MANAGEMENT ---
+            const loadAllProjectsFromStorage = () => { PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}'); };
+            const saveAllProjectsToStorage = () => { localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(PROJECT_STORE)); };
             const updateProjectUI = () => {
                 projectSelect.innerHTML = '';
                 const sortedNames = Object.keys(PROJECT_STORE).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
-                
                 const hasProjects = sortedNames.length > 0;
                 exportProjectsBtn.disabled = !hasProjects;
                 clearAllProjectsBtn.disabled = !hasProjects;
-
-                 if (!hasProjects) {
-                      projectSelect.add(new Option("-- No Projects Saved --", "", true, true));
-                      projectSelect.disabled = true;
-                 } else {
-                     projectSelect.disabled = false;
-                     projectSelect.add(new Option("-- Select Project --", "", true, true));
-                     sortedNames.forEach(name => {
-                         projectSelect.add(new Option(name, name, false, name === currentProjectName));
-                     });
-                 }
-                 const projectSelected = projectSelect.value !== "";
-                 projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelected );
-                 currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
-                 saveProjectBtn.disabled = (!currentProjectName) || (inputDiv.innerText.trim() === '');
+                projectSelect.disabled = !hasProjects;
+                const defaultOptionText = hasProjects ? "-- Select Project --" : "-- No Projects Saved --";
+                projectSelect.add(new Option(defaultOptionText, "", true, true));
+                sortedNames.forEach(name => projectSelect.add(new Option(name, name, false, name === currentProjectName)));
+                projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelect.value);
+                currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
+                saveProjectBtn.disabled = !currentProjectName || (inputDiv.innerText.trim() === '');
             };
-
             const handleSaveProject = (isSaveAs = false) => {
-                 if(inputDiv.innerText.trim() === '') return;
-                 let name = currentProjectName;
-                 if(isSaveAs || !name) {
-                     name = prompt("Enter project name:", name || "");
-                      if (!name || name.trim() === "") return;
-                      name = name.trim();
-                      if ((isSaveAs || !currentProjectName) && PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) {
-                           return;
-                      }
-                 }
-                 
-                 const projectData = {
-                     content: inputDiv.innerText,
-                     settings: getCurrentSettings(),
-                     timestamp: Date.now(),
-                 };
-                 PROJECT_STORE[name] = projectData;
-                 currentProjectName = name;
-                 sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
-                 saveAllProjectsToStorage();
-                 updateProjectUI();
-                 showFeedback(isSaveAs ? saveAsProjectBtn : saveProjectBtn, 'Saved!', 'success');
+                if (inputDiv.innerText.trim() === '') return;
+                let name = currentProjectName;
+                if (isSaveAs || !name) {
+                    name = prompt("Enter project name:", name || "");
+                    if (!name || !(name = name.trim())) return;
+                    if (PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) return;
+                }
+                PROJECT_STORE[name] = { content: inputDiv.innerText, settings: getCurrentSettings(), timestamp: Date.now() };
+                currentProjectName = name;
+                sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                saveAllProjectsToStorage();
+                updateProjectUI();
+                showFeedback(isSaveAs ? saveAsProjectBtn : saveProjectBtn, 'Saved!', 'success');
             };
-            
-             const handleLoadProject = () => {
-                 const name = projectSelect.value;
-                 if(!name || !PROJECT_STORE[name]) return;
-                  if(inputDiv.innerText.trim() !== '' && !confirm(`Load "${name}"? Current unsaved draft changes will be lost.`)){
-                     return;
-                  }
-                 
-                  const project = PROJECT_STORE[name];
-                   currentProjectName = name;
-                  sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
-                  inputDiv.innerText = project.content || '';
-                  applySettings(project.settings || {});
-                  processText();
-                  updateProjectUI();
-                  showFeedback(loadProjectBtn, 'Loaded!', 'success');
-             }
-
-             const handleDeleteProject = () => {
-                 const name = projectSelect.value;
-                 if(!name || !PROJECT_STORE[name]) return;
-                 if(!confirm(`Are you sure you want to delete project "${name}"?`)) return;
-
-                 delete PROJECT_STORE[name];
-                 if(currentProjectName === name) {
-                     currentProjectName = null;
-                     sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                 }
-                 saveAllProjectsToStorage();
-                 updateProjectUI();
-                  showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
-             }
-             
+            const handleLoadProject = () => {
+                const name = projectSelect.value;
+                if (!name || !PROJECT_STORE[name]) return;
+                if (inputDiv.innerText.trim() && !confirm(`Load "${name}"? Current draft will be lost.`)) return;
+                const project = PROJECT_STORE[name];
+                currentProjectName = name;
+                sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                inputDiv.innerText = project.content || '';
+                applySettings(project.settings || {});
+                processText();
+                showFeedback(loadProjectBtn, 'Loaded!', 'success');
+            };
+            const handleDeleteProject = () => {
+                const name = projectSelect.value;
+                if (!name || !PROJECT_STORE[name] || !confirm(`Delete project "${name}"?`)) return;
+                delete PROJECT_STORE[name];
+                if (currentProjectName === name) { currentProjectName = null; sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT); }
+                saveAllProjectsToStorage();
+                updateProjectUI();
+                showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
+            };
             const handleExport = () => {
-                 if(Object.keys(PROJECT_STORE).length === 0) return;
-                 const content = JSON.stringify(PROJECT_STORE, null, 2);
-                 const date = new Date().toISOString().split('T')[0];
-                 downloadFile(content, `formatter_projects_export_${date}.json`, 'application/json');
-                 showFeedback(exportProjectsBtn, 'Exported!', 'success');
-            }
-
-            const handleImportClick = () => {
-                 importFileElement.value = null;
-                 importFileElement.click();
-            }
-             const handleImportFile = (event) => {
-                 const file = event.target.files[0];
-                 if (!file) return;
-
-                 const reader = new FileReader();
-                 reader.onload = (e) => {
-                     try {
-                         const importedProjects = JSON.parse(e.target.result);
-                         if (typeof importedProjects !== 'object' || importedProjects === null || Array.isArray(importedProjects)) {
-                             throw new Error("Invalid file format.");
-                         }
-                          const count = Object.keys(importedProjects).length;
-                          if(count === 0) {
-                               showFeedback(importProjectsBtn, 'No projects found', 'danger', 2000);
-                               return;
-                          }
-                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name will be overwritten.`)){
-                            return;
-                         }
-                         PROJECT_STORE = { ...PROJECT_STORE, ...importedProjects};
-                         saveAllProjectsToStorage();
-                         updateProjectUI();
-                          showFeedback(importProjectsBtn, 'Imported!', 'success');
-
-                     } catch (err) {
-                         console.error("Import failed:", err);
-                         alert("Failed to import projects. Ensure the file is valid JSON export.");
-                          showFeedback(importProjectsBtn, 'Error!', 'danger', 2000);
-                     }
-                 };
-                  reader.onerror = () => {
-                       alert("Error reading file.");
-                       showFeedback(importProjectsBtn, 'Error!', 'danger', 2000);
-                  }
-                 reader.readAsText(file);
-             }
-              const handleClearAllProjects = () => {
-                 if(Object.keys(PROJECT_STORE).length === 0) return;
-                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis cannot be undone! Consider exporting first.")) return;
-                   localStorage.removeItem(STORAGE_KEY_PROJECTS);
-                   PROJECT_STORE = {};
-                   currentProjectName = null;
-                   sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                   updateProjectUI();
-                   showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger', 2000);
-              }
-
-            // --- MODIFIED: QoL Find & Replace Logic ---
+                if(Object.keys(PROJECT_STORE).length === 0) return;
+                downloadFile(JSON.stringify(PROJECT_STORE, null, 2), `pfp_export_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+                showFeedback(exportProjectsBtn, 'Exported!', 'success');
+            };
+            const handleImportFile = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (typeof imported !== 'object' || imported === null || Array.isArray(imported)) throw new Error("Invalid file format.");
+                        const count = Object.keys(imported).length;
+                        if (count === 0 || !confirm(`Import and merge ${count} project(s)? Existing projects will be overwritten.`)) return;
+                        PROJECT_STORE = { ...PROJECT_STORE, ...imported };
+                        saveAllProjectsToStorage();
+                        updateProjectUI();
+                        showFeedback(importProjectsBtn, 'Imported!', 'success');
+                    } catch (err) { alert("Import failed. Ensure file is a valid JSON export."); showFeedback(importProjectsBtn, 'Error!', 'danger'); }
+                };
+                reader.onerror = () => { alert("Error reading file."); showFeedback(importProjectsBtn, 'Error!', 'danger'); };
+                reader.readAsText(file);
+            };
+            const handleClearAllProjects = () => {
+                if(Object.keys(PROJECT_STORE).length === 0 || !confirm("DELETE ALL SAVED PROJECTS?\nThis cannot be undone!")) return;
+                localStorage.removeItem(STORAGE_KEY_PROJECTS);
+                PROJECT_STORE = {};
+                if (currentProjectName) { currentProjectName = null; sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT); }
+                updateProjectUI();
+                showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger');
+            };
+            // NEW QoL FEATURE: Find & Replace Logic
             const handleReplaceAll = () => {
                 const findTerm = findInput.value;
                 const replaceTerm = replaceInput.value;
                 if (!findTerm) return;
-                
-                // Escape special regex characters from user input to treat it as a literal string
                 const escapedFindTerm = findTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                
-                // 'g' for global, 'i' for case-insensitive
                 const regex = new RegExp(escapedFindTerm, 'gi');
-                
-                let originalText = inputDiv.innerText;
-                let newText = originalText.replace(regex, replaceTerm);
-
+                const originalText = inputDiv.innerText;
+                const newText = originalText.replace(regex, replaceTerm);
                 if (originalText !== newText) {
                     inputDiv.innerText = newText;
-                    processText(); // Reprocess the text to update output and stats
+                    processText();
                     const matches = originalText.match(regex) || [];
                     showFeedback(replaceAllBtn, `Replaced ${matches.length}`, 'success');
                 } else {
-                    showFeedback(replaceAllBtn, 'Not found', 'danger', 2000);
+                    showFeedback(replaceAllBtn, 'Not found', 'danger');
                 }
-            }
+            };
 
+            // Download Helpers
+            const downloadFile = (content, filename, type) => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([content], { type }));
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            };
 
-            // --- Event Listeners ---
+            // --- Event Listeners Setup ---
             inputDiv.addEventListener('input', debouncedProcessText);
-            separatorInput.addEventListener('input', debouncedProcessText);
-            wrapPCheckbox.addEventListener('change', debouncedProcessText); 
-            cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); 
-             projectSelect.addEventListener('change', updateProjectUI);
-
-            // Force paste as plain text
-            inputDiv.addEventListener("paste", function(e) {
-                e.preventDefault();
-                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-                 document.execCommand("insertText", false, text);
-            });
-
-            pasteBtn.addEventListener('click', async () => {
-                try {
-                    const text = await navigator.clipboard.readText();
-                    currentProjectName = null;
-                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                    inputDiv.innerText = text;
-                    processText();
-                    updateProjectUI();
-                    inputDiv.focus();
-                } catch (err) {
-                    console.error('Failed to read clipboard: ', err);
-                     showFeedback(pasteBtn, 'Error!', 'danger', 2000);
-                }
-            });
-            
+            [separatorInput, wrapPCheckbox, cleanSpacesCheckbox].forEach(el => el.addEventListener('input', debouncedProcessText));
+            projectSelect.addEventListener('change', updateProjectUI);
+            inputDiv.addEventListener("paste", e => { e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData('text/plain')); });
+            pasteBtn.addEventListener('click', async () => { try { inputDiv.innerText = await navigator.clipboard.readText(); processText(); inputDiv.focus(); } catch (err) { showFeedback(pasteBtn, 'Error!', 'danger'); } });
             caseSentenceBtn.addEventListener('click', () => applyCase(toSentenceCase));
             caseTitleBtn.addEventListener('click', () => applyCase(toTitleCase));
             caseLowerBtn.addEventListener('click', () => applyCase(text => text.toLowerCase()));
             caseUpperBtn.addEventListener('click', () => applyCase(text => text.toUpperCase()));
-
-            copyBtn.addEventListener('click', async () => {
-                if (outputDiv.innerText.trim() && navigator.clipboard && window.ClipboardItem) {
-                    try {
-                        const plainText = outputDiv.innerText;
-                        const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
-                        const blobHtml = new Blob([htmlText], { type: "text/html" });
-                        const blobPlain = new Blob([plainText], { type: "text/plain" });
-                        const data = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain });
-                        await navigator.clipboard.write([data]);
-                        showFeedback(copyBtn, 'Copied!');
-                        window.getSelection().removeAllRanges();
-                    } catch (err) {
-                        console.error('Failed to copy rich text: ', err);
-                         navigator.clipboard.writeText(outputDiv.innerText).then(() => {
-                             showFeedback(copyBtn, 'Copied Plain');
-                         }).catch(err =>  showFeedback(copyBtn, 'Error!', 'danger', 2500));
-                    }
-                } 
-            });
-            
-            clearBtn.addEventListener('click', () => {
-                 if (confirm("Clear current draft text and reset its options to default?\n(Saved projects will NOT be deleted).")) {
-                    clearDraft();
-                    showFeedback(clearBtn, 'Draft Cleared!', 'success');
-                 }
-            });
-            
-             // Project Listeners
-             saveProjectBtn.addEventListener('click', () => handleSaveProject(false));
-             saveAsProjectBtn.addEventListener('click', () => handleSaveProject(true));
-             loadProjectBtn.addEventListener('click', handleLoadProject);
-             deleteProjectBtn.addEventListener('click', handleDeleteProject);
-             exportProjectsBtn.addEventListener('click', handleExport);
-             importProjectsBtn.addEventListener('click', handleImportClick);
-             importFileElement.addEventListener('change', handleImportFile);
-             clearAllProjectsBtn.addEventListener('click', handleClearAllProjects);
-
-            // MODIFIED: Find & Replace Listeners
-            findToggleBtn.addEventListener('click', () => {
-                findReplaceContainer.classList.toggle('visible');
-                if (findReplaceContainer.classList.contains('visible')) {
-                    findInput.focus();
-                }
-            });
-            findInput.addEventListener('input', () => {
-                replaceAllBtn.disabled = findInput.value.trim() === '';
-            });
+            copyBtn.addEventListener('click', async () => { try { const plain = outputDiv.innerText; await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([`<div>${outputDiv.innerHTML}</div>`], { type: "text/html" }), "text/plain": new Blob([plain], { type: "text/plain" }) })]); showFeedback(copyBtn, 'Copied!'); } catch (err) { navigator.clipboard.writeText(outputDiv.innerText).then(() => showFeedback(copyBtn, 'Copied Plain')).catch(() => showFeedback(copyBtn, 'Error!', 'danger')); } });
+            clearBtn.addEventListener('click', () => { if (confirm("Clear current draft?")) { clearDraft(); showFeedback(clearBtn, 'Cleared!', 'success'); }});
+            [fontSizeSlider, themeToggle, targetWordCountInput].forEach(el => el.addEventListener('change', savePreferences));
+            fontSizeSlider.addEventListener('input', () => applyFontSize(fontSizeSlider.value));
+            targetWordCountInput.addEventListener('input', debouncedUpdateStats);
+            saveProjectBtn.addEventListener('click', () => handleSaveProject(false));
+            saveAsProjectBtn.addEventListener('click', () => handleSaveProject(true));
+            loadProjectBtn.addEventListener('click', handleLoadProject);
+            deleteProjectBtn.addEventListener('click', handleDeleteProject);
+            exportProjectsBtn.addEventListener('click', handleExport);
+            importProjectsBtn.addEventListener('click', () => importFileElement.click());
+            importFileElement.addEventListener('change', handleImportFile);
+            clearAllProjectsBtn.addEventListener('click', handleClearAllProjects);
+            findToggleBtn.addEventListener('click', () => { findReplacePanel.classList.toggle('visible'); if (findReplacePanel.classList.contains('visible')) findInput.focus(); });
+            findInput.addEventListener('input', () => { replaceAllBtn.disabled = findInput.value.trim() === ''; });
             replaceAllBtn.addEventListener('click', handleReplaceAll);
-
-
-            // Download helpers
-             const downloadFile = (content, filename, type) => {
-                 const blob = new Blob([content], { type: type });
-                 const url = URL.createObjectURL(blob);
-                 const a = document.createElement('a');
-                 a.href = url;
-                 a.download = filename;
-                 document.body.appendChild(a); 
-                 a.click();
-                 document.body.removeChild(a);
-                 URL.revokeObjectURL(url); 
-             }
-
-            downloadHtmlBtn.addEventListener('click', () => {
-                const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentProjectName || 'Formatted Output'}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px;} p {margin-bottom: 1em;} a {color: #0369a1;}</style></head><body><h1>${currentProjectName || 'Formatted Output'}</h1>${outputDiv.innerHTML}</body></html>`;
-                 downloadFile(content, `${currentProjectName || 'formatted_output'}.html`, 'text/html');
-                  showFeedback(downloadHtmlBtn, 'HTML!', 'success');
-            });
-
-            downloadTextBtn.addEventListener('click', () => {
-                 const content = outputDiv.innerText;
-                 downloadFile(content, `${currentProjectName || 'formatted_output'}.txt`, 'text/plain;charset=utf-8');
-                  showFeedback(downloadTextBtn, 'TXT!', 'success');
-            });
+            downloadHtmlBtn.addEventListener('click', () => { downloadFile(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Formatted Output</title></head><body>${outputDiv.innerHTML}</body></html>`, 'formatted.html', 'text/html'); showFeedback(downloadHtmlBtn, 'HTML!', 'success'); });
+            downloadTextBtn.addEventListener('click', () => { downloadFile(outputDiv.innerText, 'formatted.txt', 'text/plain;charset=utf-8'); showFeedback(downloadTextBtn, 'TXT!', 'success'); });
 
             // --- Initialization ---
-             loadPreferences();
-             loadAllProjectsFromStorage();
-             currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
-             if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
-                 currentProjectName = null; 
-                  sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-             }
+            loadPreferences();
+            loadAllProjectsFromStorage();
+            currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
+            if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
+                currentProjectName = null; 
+                sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+            }
             loadDraftSettings(); 
             const savedInput = sessionStorage.getItem(SESSION_KEY_DRAFT);
-            if (savedInput) {
-                inputDiv.innerText = savedInput;
-            }
-             updateProjectUI();
+            if (savedInput) inputDiv.innerText = savedInput;
+            updateProjectUI();
             processText();
         });
     </script>
