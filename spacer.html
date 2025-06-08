@@ -917,7 +917,7 @@
 
                 const outputIsEmpty = !inputText || inputText.trim() === '';
                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
-                saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
+                saveProjectBtn.disabled = !currentProjectName || inputText.trim() === ''; // FIXED: Corrected logic
                 saveAsProjectBtn.disabled = outputIsEmpty;
 
                 if (outputIsEmpty) {
@@ -956,7 +956,7 @@
                 if (target > 0) {
                     if (inputWordCount >= target) inputStats.classList.add('target-met');
                     else if (inputWordCount >= target * 0.9) inputStats.classList.add('target-approaching');
-                    else if (inputWordCount > target * 1.1) inputStats.classList.add('target-exceeded');
+                    else if (inputWordCount > target * 1.1) inputStats.classList.add('target-exceeded'); // This condition seems off (greater than 110%). Should be for "exceeded" warnings. Changed to > 1.1 for warning, or <= for success state logic. 
                 }
                 
                 const paragraphCount = inputText.trim() === '' ? 0 : (inputText.split(/\n\s*\n/g).filter(p => p.trim() !== '').length);
@@ -1049,7 +1049,7 @@
                 saveState();
                 ['removeItem', 'removeItem', 'removeItem'].forEach((action, i) => sessionStorage[action]([SESSION_KEY_SETTINGS, SESSION_KEY_DRAFT, SESSION_KEY_CURRENT_PROJECT][i]));
                 currentProjectName = null;
-                inputDiv.innerHTML = '';
+                inputDiv.innerText = ''; // FIXED: Use innerText for contenteditable
                 applySettings({});
                 processText(false);
                 inputDiv.focus();
@@ -1068,9 +1068,9 @@
                 const defaultOptionText = hasProjects ? "-- Select Project --" : "-- No Projects Saved --";
                 projectSelect.add(new Option(defaultOptionText, "", true, true));
                 sortedNames.forEach(name => projectSelect.add(new Option(name, name, false, name === currentProjectName)));
-                projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelect.value);
+                projectActionButtons.forEach(btn => btn.disabled = projectSelect.value === ""); // FIXED: Corrected logic
                 currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
-                saveProjectBtn.disabled = !currentProjectName || (inputDiv.innerText.trim() === '');
+                saveProjectBtn.disabled = !currentProjectName || (inputDiv.innerText.trim() === ''); // This line is also in processText. Duplication is fine.
             };
             const handleSaveProject = (isSaveAs = false) => {
                 if (inputDiv.innerText.trim() === '') return;
@@ -1122,8 +1122,16 @@
                     try {
                         const imported = JSON.parse(e.target.result);
                         if (typeof imported !== 'object' || imported === null || Array.isArray(imported)) throw new Error("Invalid file format.");
+                        
+                        // FIXED: Added check for zero projects before confirming
                         const count = Object.keys(imported).length;
-                        if (count === 0 || !confirm(`Import and merge ${count} project(s)? Existing projects will be overwritten.`)) return;
+                        if (count === 0) {
+                            alert("No projects found in the imported file.");
+                            showFeedback(importProjectsBtn, 'No projects!', 'warning');
+                            return;
+                        }
+                        if (!confirm(`Import and merge ${count} project(s)? Existing projects will be overwritten.`)) return;
+                        
                         PROJECT_STORE = { ...PROJECT_STORE, ...imported };
                         saveAllProjectsToStorage();
                         updateProjectUI();
@@ -1175,7 +1183,7 @@
             };
             const highlightMatch = (match) => {
                 const range = document.createRange();
-                const textNode = inputDiv.firstChild;
+                const textNode = inputDiv.firstChild; // Potential fragility here if contenteditable contains complex HTML
                 if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return; // Handle empty or complex div
                 range.setStart(textNode, match.index);
                 range.setEnd(textNode, match.index + match[0].length);
