@@ -61,7 +61,7 @@
             grid-template-columns: minmax(450px, 1fr) 1.5fr;
         }
         #output-column {
-             max-height: calc(100vh - 2rem);
+             max-height: calc(100vh - 5rem);
              overflow-y: auto;
              padding-right: 1rem;
         }
@@ -76,6 +76,7 @@
       padding: 0.5rem 1rem;
       background-color: var(--fg-color);
       border-bottom: 1px solid var(--border-color);
+      position: sticky; top: 0; z-index: 20;
     }
     .app-header h1 { margin: 0; font-size: 1.5rem; }
     
@@ -101,38 +102,40 @@
     .fieldset-header {
         display: flex; justify-content: space-between; align-items: center;
         padding: 0.75rem 1rem; cursor: pointer; user-select: none;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color-light);
     }
-    .fieldset-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-color); }
+    .fieldset-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-color); pointer-events: none; }
     .fieldset-content { padding: 1rem; border-top: 1px solid var(--border-color); display: block; }
     .collapsible-fieldset.collapsed .fieldset-content { display: none; }
     .collapsible-fieldset.collapsed .fieldset-header { border-bottom: none; }
-    .toggle-icon { transition: transform 0.2s; }
+    .toggle-icon { transition: transform 0.2s; pointer-events: none; }
     .collapsible-fieldset.collapsed .toggle-icon { transform: rotate(-90deg); }
 
 
     /* --- Mode Switcher --- */
     .mode-switcher { display: flex; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; }
-    .mode-switcher button { flex: 1; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: var(--text-muted-color); font-weight: bold; }
+    .mode-switcher button { flex: 1; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: var(--text-muted-color); font-weight: bold; font-size: 0.9rem; }
     .mode-switcher button.active { background-color: var(--primary-color); color: white; }
 
     /* --- Inputs and Controls --- */
-    .input-container { margin-bottom: 1rem; position: relative; }
+    .input-container { margin-bottom: 1rem; }
     .input-container label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-color); }
     .input-container label.inline-label { display: inline; margin-left: 5px; font-weight: normal; }
 
-    .textarea-actions { position: absolute; top: 0; right: 5px; display: flex; gap: 4px; }
+    .textarea-with-actions { position: relative; }
+    .textarea-actions { position: absolute; top: 4px; right: 5px; display: flex; gap: 4px; background-color: var(--fg-color); padding: 2px; border-radius: 4px; opacity: 0.8; }
     .textarea-action-btn { background: var(--border-color-light); border: 1px solid var(--border-color); color: var(--text-muted-color); padding: 2px 6px; font-size: 11px; border-radius: 4px; cursor: pointer; }
     .textarea-action-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-hover-color); }
 
     /* JSON Input Specifics */
     .json-chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 8px; }
-    .json-chapter-header label { flex-grow: 1;}
+    .json-chapter-header label { flex-grow: 1; font-weight: normal; }
     .json-chapter-input-container { border: 1px dashed var(--border-color); padding: 10px; margin-bottom: 10px; border-radius: var(--border-radius); background-color: var(--bg-color); }
 
     /* Find & Replace Specifics */
     #findReplacePairsContainer { max-height: 250px; overflow-y: auto; padding-right: 5px; }
     .find-replace-pair { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+    .find-replace-pair .arrow { flex-shrink: 0; }
     
     /* --- Buttons --- */
     button, .button {
@@ -156,13 +159,15 @@
     .btn-sm { padding: 5px 10px; font-size: 12px; }
     .btn-icon { padding: 0.5rem; }
     .btn-block { width: 100%; display: block; }
+    button:disabled { background-color: #ccc !important; cursor: not-allowed; }
+    body.dark-mode button:disabled { background-color: #555 !important; }
 
     /* --- Output Section --- */
     #output-column { display: none; }
     #outputControls {
       display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
       padding: 10px; background-color: var(--fg-color); border-radius: var(--border-radius);
-      border: 1px solid var(--border-color); margin-bottom: 1rem; position: sticky; top: 0; z-index: 10;
+      border: 1px solid var(--border-color); margin-bottom: 1rem; position: sticky; top: 60px; z-index: 10;
     }
     #outputControls h4 { margin: 0; padding: 0; color: var(--primary-color); }
 
@@ -181,23 +186,15 @@
     .copy-count-display { font-size: 0.8em; color: var(--text-muted-color); }
 
     /* --- Status & Indicators --- */
-     #loadingIndicator {
-        display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px;
-        background-color: rgba(0, 0, 0, 0.8); color: white; border-radius: 8px; z-index: 1000; font-size: 1.1em; box-shadow: var(--shadow-md);
-     }
-     .status-message { font-size: 0.85em; margin-top: 4px; display: block; padding: 5px 8px; border-radius: 4px; border: 1px solid transparent;}
+     #loadingIndicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; background-color: rgba(0, 0, 0, 0.8); color: white; border-radius: 8px; z-index: 1000; font-size: 1.1em; box-shadow: var(--shadow-md); }
+     .status-message { font-size: 0.85em; margin-top: 4px; display: inline-block; padding: 5px 8px; border-radius: 4px; border: 1px solid transparent;}
      .status-success { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc;}
      .status-error   { color: #842029; background-color: #f8d7da; border-color: #f5c2c7;}
      body.dark-mode .status-success { background-color: #032d18; color: #75b798; border-color: #198754; }
      body.dark-mode .status-error   { background-color: #381114; color: #f1aeb5; border-color: #842029; }
-     
-    #scrollToTopBtn {
-        display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99; opacity: 0.7;
-    }
-    #scrollToTopBtn:hover { opacity: 1; }
-
-    /* For brevity, other status and info counter styles are minimally adjusted but will inherit theme colors */
-    .info-counter { background-color: var(--border-color-light); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size:0.9em; }
+     #scrollToTopBtn { display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99; opacity: 0.7; }
+     #scrollToTopBtn:hover { opacity: 1; }
+     .info-counter { background-color: var(--border-color-light); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size:0.9em; }
     
   </style>
 </head>
@@ -230,7 +227,6 @@
         </div>
       </div>
       
-      <!-- JSON SECTION -->
       <div id="jsonModeSections">
         <div class="collapsible-fieldset">
           <div class="fieldset-header"><h3>2. JSON Input Chapters</h3> <span class="toggle-icon">▼</span></div>
@@ -250,7 +246,6 @@
             </div>
           </div>
         </div>
-
         <div class="collapsible-fieldset">
           <div class="fieldset-header"><h3>3. Paired Find & Replace</h3><span class="toggle-icon">▼</span></div>
           <div class="fieldset-content">
@@ -262,13 +257,12 @@
             <div id="findReplacePairsContainer"></div>
             <div style="margin-top:10px;">
               <button id="addFindReplacePairButton" class="button btn-success btn-sm">+ Add Rule</button>
-              <span id="glossaryReplaceStatus" class="status-message" style="margin-left: 10px; display: inline-block;"></span>
+              <span id="glossaryReplaceStatus" class="status-message" style="margin-left: 10px; display: none;"></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PLAIN TEXT SECTION -->
       <div id="plainTextModeSections" style="display:none;">
         <div class="collapsible-fieldset">
           <div class="fieldset-header"><h3>2. Plain Text Input</h3> <span class="toggle-icon">▼</span></div>
@@ -294,7 +288,6 @@
         </div>
       </div>
 
-      <!-- COMMON SECTIONS -->
       <div class="collapsible-fieldset">
         <div class="fieldset-header">
           <h3 id="commonSectionHeader">4. Chunk Header & Footer</h3>
@@ -304,32 +297,36 @@
           <p>Use <code>$X</code> for current part number and <code>$Y</code> for total parts.</p>
           <div class="input-container">
             <label for="addToTop">Add to top of each chunk:</label>
-            <div class="textarea-actions">
-              <button class="textarea-action-btn" onclick="copyFromTextarea('addToTop')">Copy</button>
-              <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToTop')">Paste</button>
-              <button class="textarea-action-btn" onclick="clearTextarea('addToTop')">Clear</button>
+            <div class="textarea-with-actions">
+              <div class="textarea-actions">
+                <button class="textarea-action-btn" onclick="copyFromTextarea('addToTop')">Copy</button>
+                <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToTop')">Paste</button>
+                <button class="textarea-action-btn" onclick="clearTextarea('addToTop')">Clear</button>
+              </div>
+              <textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea>
             </div>
-            <textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea>
           </div>
           <div class="input-container">
             <label for="addToBottom">Add to bottom of each chunk:</label>
-             <div class="textarea-actions">
-              <button class="textarea-action-btn" onclick="copyFromTextarea('addToBottom')">Copy</button>
-              <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToBottom')">Paste</button>
-              <button class="textarea-action-btn" onclick="clearTextarea('addToBottom')">Clear</button>
+            <div class="textarea-with-actions">
+              <div class="textarea-actions">
+                <button class="textarea-action-btn" onclick="copyFromTextarea('addToBottom')">Copy</button>
+                <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToBottom')">Paste</button>
+                <button class="textarea-action-btn" onclick="clearTextarea('addToBottom')">Clear</button>
+              </div>
+              <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
             </div>
-            <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
           </div>
         </div>
       </div>
 
       <button id="mainSplitButton" class="button btn-success btn-block" style="font-size: 1.2rem; padding: 12px;">⚙️ Process & Split</button>
-      <span id="processStatus" class="status-message"></span>
+      <span id="processStatus" class="status-message" style="display:none;"></span>
 
     </div>
 
     <div id="output-column">
-      <div id="outputControls">
+      <div id="outputControls" style="display:none;">
         <h4 id="outputSummary">Output</h4>
         <button id="copyNextButton" class="button btn-warning btn-sm">⭐ Copy NEXT Uncopied</button>
         <button id="copyAllButton" class="button btn-info btn-sm">Copy ALL Chunks</button>
@@ -344,16 +341,10 @@
 
 
   <script>
-    // The JavaScript code remains largely the same in its core logic (chunking, state, etc.)
-    // but has been adapted for the new UI elements (mode switcher, collapsible sections, new buttons).
-    // The following is a summary of key JS changes and additions.
-    // The full original JS code will be adapted to fit this new structure.
-
-    // --- State & Config (with Theme added) ---
+    // --- State & Config ---
     let lastClickedButton = null;
-    let findReplacePairCount = 0;
     let jsonChapterInputIdCounter = 0;
-    const STATE_KEY = 'chunkerAppState_V3'; // Incremented version for new state structure
+    const STATE_KEY = 'chunkerAppState_V3';
     const statusTimeouts = {};
 
     const newDefaultAddToTopPreset = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis"
@@ -395,30 +386,58 @@
         jsonObjectsPerChunk: '1',
         plainText: '',
         jsonInputs: [''],
-        findReplacePairs: [{find:"", replace:""}, {find:"", replace:""}, {find:"", replace:""}],
+        findReplacePairs: [{find:"", replace:""}],
         applyRules: false,
         caseInsensitive: false,
-        collapsedSections: [], // To remember which sections are collapsed
+        collapsedSections: [],
     };
-     let currentAppState = {...defaultState};
+    let currentAppState = {...defaultState};
 
-    // --- QoL Functions for New Buttons ---
+    // --- Helpers & Utilities ---
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+    const debouncedSaveState = debounce(saveState, 500);
+    const debouncedUpdateTotalJsonObjectCount = debounce(updateTotalJsonObjectCount, 400);
+    const debouncedUpdatePlainTextInfo = debounce(updatePlainTextInfo, 400);
+
+    function showStatus(elementId, message, type = 'success', timeout = 4000) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        if(statusTimeouts[elementId]) clearTimeout(statusTimeouts[elementId]);
+        element.innerHTML = message;
+        element.className = `status-message status-${type}`;
+        element.style.display = 'inline-block';
+        if (timeout > 0) {
+            statusTimeouts[elementId] = setTimeout(() => {
+                if(element) element.style.display = 'none';
+                delete statusTimeouts[elementId];
+            }, timeout);
+        }
+    }
+    
+    function showLoading() { document.getElementById('loadingIndicator').style.display = 'block'; }
+    function hideLoading() {  document.getElementById('loadingIndicator').style.display = 'none'; }
+    function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    
     function copyFromTextarea(id) {
         const textarea = document.getElementById(id);
-        if (textarea) navigator.clipboard.writeText(textarea.value).then(() => showStatus('mainStatus', 'Copied to clipboard!', 'success', 2000));
+        if (textarea) navigator.clipboard.writeText(textarea.value).then(() => showStatus('mainStatus', 'Copied!', 'success', 2000));
     }
 
     async function pasteIntoTextarea(id) {
         const textarea = document.getElementById(id);
         if (textarea) {
             try {
-                const text = await navigator.clipboard.readText();
-                textarea.value = text;
-                textarea.dispatchEvent(new Event('input', { bubbles: true })); // Trigger updates
-                showStatus('mainStatus', 'Pasted from clipboard!', 'success', 2000);
+                textarea.value = await navigator.clipboard.readText();
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                showStatus('mainStatus', 'Pasted!', 'success', 2000);
             } catch (err) {
-                showStatus('mainStatus', 'Failed to paste.', 'error', 3000);
-                console.error('Paste failed:', err);
+                showStatus('mainStatus', 'Paste failed.', 'error', 3000);
             }
         }
     }
@@ -432,17 +451,14 @@
     }
 
     async function pasteIntoJsonInput(button) {
-        const container = button.closest('.json-chapter-input-container');
-        const textarea = container?.querySelector('.json-chapter-input');
+        const textarea = button.closest('.json-chapter-input-container')?.querySelector('.json-chapter-input');
         if (textarea) {
             try {
-                const text = await navigator.clipboard.readText();
-                textarea.value = text;
+                textarea.value = await navigator.clipboard.readText();
                 textarea.dispatchEvent(new Event('input', { bubbles: true }));
                 button.textContent = 'Pasted!';
                 setTimeout(() => { button.textContent = 'Paste'; }, 1500);
             } catch (err) {
-                console.error('Paste failed:', err);
                 button.textContent = 'Failed!';
                 setTimeout(() => { button.textContent = 'Paste'; }, 1500);
             }
@@ -451,13 +467,8 @@
     
     // --- Theme Management ---
     function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('theme-toggle').textContent = '☀️';
-        } else {
-            document.body.classList.remove('dark-mode');
-            document.getElementById('theme-toggle').textContent = '🌓';
-        }
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+        document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌓';
     }
 
     function toggleTheme() {
@@ -465,11 +476,10 @@
         applyTheme(currentAppState.theme);
         saveState();
     }
-    
-    // --- State Management (Adapted for new UI) ---
+
+    // --- State Management ---
     function saveState() {
        currentAppState.splitMode = document.getElementById('splitModeSelect').value;
-       // ... (rest of the state saving is identical to original, e.g., maxChars, addToTop, etc.)
        currentAppState.maxChars = document.getElementById('maxChars').value;
        currentAppState.addToTop = document.getElementById('addToTop').value;
        currentAppState.addToBottom = document.getElementById('addToBottom').value;
@@ -478,51 +488,37 @@
        currentAppState.plainText = document.getElementById('plainTextInputArea').value;
        currentAppState.applyRules = document.getElementById('applyRulesCheckbox').checked;
        currentAppState.caseInsensitive = document.getElementById('caseInsensitiveCheckbox').checked;
-        const chapterTextareas = document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input');
-        currentAppState.jsonInputs = Array.from(chapterTextareas).map(textarea => textarea.value);
-         const pairElements = document.querySelectorAll('#findReplacePairsContainer .find-replace-pair');
-         currentAppState.findReplacePairs = Array.from(pairElements).map(pair => ({
-             find: pair.querySelector('.find-text')?.value || "",
-             replace: pair.querySelector('.replace-text')?.value || ""
-         })).filter(p => p.find || p.replace);
-
-        // Save collapsed state
-        currentAppState.collapsedSections = [];
-        document.querySelectorAll('.collapsible-fieldset.collapsed').forEach(fs => {
-            // Create a simple ID from the h3 text
-            const id = fs.querySelector('h3').textContent.trim().replace(/\s+/g, '-');
-            currentAppState.collapsedSections.push(id);
-        });
+       currentAppState.jsonInputs = Array.from(document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input')).map(t => t.value);
+       currentAppState.findReplacePairs = Array.from(document.querySelectorAll('#findReplacePairsContainer .find-replace-pair')).map(p => ({
+           find: p.querySelector('.find-text')?.value || "",
+           replace: p.querySelector('.replace-text')?.value || ""
+       })).filter(p => p.find || p.replace);
+       currentAppState.collapsedSections = Array.from(document.querySelectorAll('.collapsible-fieldset.collapsed')).map(fs => fs.querySelector('h3').textContent.trim());
 
        try {
            localStorage.setItem(STATE_KEY, JSON.stringify(currentAppState));
        } catch (e) {
            console.error("LocalStorage save failed:", e);
-           showStatus('mainStatus', 'Error: Could not save settings.', 'error', 10000);
+           showStatus('mainStatus', 'Error saving settings.', 'error', 10000);
        }
     }
 
    function loadState() {
        try {
           const savedStateJSON = localStorage.getItem(STATE_KEY);
-           if (!savedStateJSON) {
-               currentAppState = {...defaultState};
-               showStatus('mainStatus', 'Loaded default settings.', 'success', 3000);
-           } else {
+           if (savedStateJSON) {
               const savedState = JSON.parse(savedStateJSON);
               currentAppState = { ...defaultState, ...savedState };
-              showStatus('mainStatus', 'Loaded saved settings.', 'success', 3000);
+           } else {
+              currentAppState = {...defaultState};
            }
         } catch (e) {
            console.error("LocalStorage load failed:", e);
            currentAppState = {...defaultState};
-           showStatus('mainStatus', 'Error loading settings, using defaults.', 'error', 5000);
         }
         
-        // Apply state to UI
         applyTheme(currentAppState.theme);
         document.getElementById('splitModeSelect').value = currentAppState.splitMode;
-        // ... (rest of state loading is identical, maps state to element values)
         document.getElementById('maxChars').value = currentAppState.maxChars;
         document.getElementById('addToTop').value = currentAppState.addToTop;
         document.getElementById('addToBottom').value = currentAppState.addToBottom;
@@ -532,17 +528,13 @@
         document.getElementById('applyRulesCheckbox').checked = !!currentAppState.applyRules;
         document.getElementById('caseInsensitiveCheckbox').checked = !!currentAppState.caseInsensitive;
         
-        // Restore collapsed sections
         if (currentAppState.collapsedSections) {
              document.querySelectorAll('.collapsible-fieldset').forEach(fs => {
-                const id = fs.querySelector('h3').textContent.trim().replace(/\s+/g, '-');
-                if (currentAppState.collapsedSections.includes(id)) {
-                    fs.classList.add('collapsed');
-                }
+                const title = fs.querySelector('h3').textContent.trim();
+                fs.classList.toggle('collapsed', currentAppState.collapsedSections.includes(title));
              });
         }
-
-        // Load JSON inputs
+        
         document.getElementById('jsonInputsContainer').innerHTML = '';
         jsonChapterInputIdCounter = 0;
         if (currentAppState.jsonInputs && currentAppState.jsonInputs.length > 0) {
@@ -550,55 +542,49 @@
         } else {
              addJsonChapterInput('', false);
         }
-
-        // Load Find/Replace
-         document.getElementById('findReplacePairsContainer').innerHTML = '';
-         findReplacePairCount = 0;
-          if (currentAppState.findReplacePairs && currentAppState.findReplacePairs.length > 0) {
+        
+        document.getElementById('findReplacePairsContainer').innerHTML = '';
+        if (currentAppState.findReplacePairs && currentAppState.findReplacePairs.length > 0) {
              currentAppState.findReplacePairs.forEach(pair => addFindReplacePair(pair.find, pair.replace, false));
-          } else {
+        } else {
              addFindReplacePair("","", false);
-          }
+        }
    }
-
-    // --- UI Element Management (Adapted) ---
+   
+    function resetAllToDefaults() {
+         if(confirm("Are you sure you want to clear all inputs and settings? This will reload the page.")) {
+            localStorage.removeItem(STATE_KEY);
+            window.location.reload();
+         }
+     }
+    
+    // --- UI Element Management ---
     function toggleInputSections() {
         const splitMode = document.getElementById('splitModeSelect').value;
 
-        // Update mode switcher buttons
-        document.querySelectorAll('.mode-switcher button').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.mode === splitMode);
-        });
-
-        // Show/hide sections
+        document.querySelectorAll('.mode-switcher button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === splitMode));
         document.getElementById('jsonModeSections').style.display = (splitMode === 'json' ? 'block' : 'none');
         document.getElementById('plainTextModeSections').style.display = (splitMode === 'text' ? 'block' : 'none');
-        
-        // Adjust common section header number
-        const commonHeader = document.getElementById('commonSectionHeader');
-        commonHeader.textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
+        document.getElementById('commonSectionHeader').textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
         
         clearOutput();
-         if (splitMode === 'json') updateTotalJsonObjectCount();
-         else updatePlainTextInfo();
-         saveState();
-     }
-
+        if (splitMode === 'json') updateTotalJsonObjectCount(); else updatePlainTextInfo();
+        debouncedSaveState();
+    }
+    
     function addJsonChapterInput(content = '', save = true) {
         jsonChapterInputIdCounter++;
         const container = document.getElementById('jsonInputsContainer');
         const chapterDiv = document.createElement('div');
-        chapterDiv.classList.add('json-chapter-input-container');
+        chapterDiv.className = 'json-chapter-input-container';
         chapterDiv.innerHTML = `
          <div class="json-chapter-header">
-            <label>JSON Input ${jsonChapterInputIdCounter}:</label>
+            <label>JSON Input ${jsonChapterInputIdCounter}</label>
             <span class="json-chapter-status status-message">Objects: 0</span>
             <button type="button" class="button btn-secondary btn-sm" onclick="pasteIntoJsonInput(this)">Paste</button>
             <button type="button" class="button btn-danger btn-sm" onclick="removeJsonChapterInput(this)">Remove</button>
          </div>
-         <textarea class="json-chapter-input" placeholder='[ { "id":1, ... } ]'>${content}</textarea>
-        `;
-        // Attach listeners and perform updates as in original code...
+         <textarea class="json-chapter-input" placeholder='[ { "id":1, ... } ]'>${content}</textarea>`;
         const textarea = chapterDiv.querySelector('textarea');
         const statusSpan = chapterDiv.querySelector('.json-chapter-status');
         textarea.addEventListener('input', () => {
@@ -608,30 +594,272 @@
         });
         container.appendChild(chapterDiv);
         updateIndividualJsonCount(textarea, statusSpan);
+        if (save) {
+            updateTotalJsonObjectCount();
+            debouncedSaveState();
+        }
+    }
+
+    function removeJsonChapterInput(buttonElement) {
+        buttonElement.closest('.json-chapter-input-container')?.remove();
         updateTotalJsonObjectCount();
-        if (save) debouncedSaveState();
+        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) {
+            addJsonChapterInput('', false);
+        }
+        debouncedSaveState();
     }
     
+    function clearAllJsonInputs() {
+        document.getElementById('jsonInputsContainer').innerHTML = '';
+        jsonChapterInputIdCounter = 0;
+        addJsonChapterInput('', false);
+        updateTotalJsonObjectCount();
+        debouncedSaveState();
+    }
+
+    function updateIndividualJsonCount(textarea, statusSpan) {
+        const jsonString = textarea.value.trim();
+        statusSpan.className = 'json-chapter-status status-message';
+        if (!jsonString) { statusSpan.textContent = 'Objects: 0'; return 0; }
+        try {
+            if (!jsonString.startsWith('[')) throw new Error("Not Array");
+            const jsonData = JSON.parse(jsonString);
+            if (!Array.isArray(jsonData)) throw new Error("Not Array");
+            statusSpan.textContent = `Objects: ${jsonData.length}`;
+            statusSpan.classList.add('status-success');
+        } catch (e) {
+            statusSpan.textContent = e.message === "Not Array" ? 'Error: Must be an Array []' : 'Error: Invalid JSON';
+            statusSpan.classList.add('status-error');
+        }
+    }
+
+    function updateTotalJsonObjectCount() {
+        let totalObjects = 0;
+        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
+             const jsonString = textarea.value.trim();
+             try {
+                 if (jsonString.startsWith('[') && jsonString.endsWith(']')) {
+                    const jsonData = JSON.parse(jsonString);
+                    if (Array.isArray(jsonData)) totalObjects += jsonData.length;
+                 }
+             } catch (e) { /* ignore invalid json */ }
+        });
+        document.getElementById('jsonObjectsCount').textContent = `Total Objects: ${totalObjects}`;
+    }
+
     function addFindReplacePair(findVal = "", replaceVal = "", save=true) {
         const container = document.getElementById('findReplacePairsContainer');
         const pairDiv = document.createElement('div');
-        pairDiv.classList.add('find-replace-pair');
+        pairDiv.className = 'find-replace-pair';
         pairDiv.innerHTML = `
-            <input type="text" class="find-text" placeholder="Find" value="${findVal}" >
+            <input type="text" class="find-text" placeholder="Find" value="${findVal}">
             <span class="arrow">➔</span>
             <input type="text" class="replace-text" placeholder="Replace" value="${replaceVal}">
-            <button type="button" class="button btn-danger btn-sm" onclick="removeFindReplacePair(this)">－</button>
-        `;
-         pairDiv.querySelectorAll('input').forEach(input => input.addEventListener('input', debouncedSaveState));
+            <button type="button" class="button btn-danger btn-sm" onclick="removeFindReplacePair(this)">－</button>`;
+        pairDiv.querySelectorAll('input').forEach(input => input.addEventListener('input', debouncedSaveState));
         container.appendChild(pairDiv);
         if(save) debouncedSaveState();
     }
+
+    function removeFindReplacePair(button) {
+        button.parentElement.remove();
+        if (document.querySelectorAll('#findReplacePairsContainer .find-replace-pair').length === 0) {
+             addFindReplacePair("","", false);
+        }
+        debouncedSaveState();
+    }
+
+    function updatePlainTextInfo() {
+        const text = document.getElementById('plainTextInputArea').value;
+        const maxChars = parseInt(document.getElementById('maxChars').value, 10);
+        const charCount = text.length;
+        let chunks = (charCount > 0 && maxChars > 0) ? Math.ceil(charCount / maxChars) : (charCount > 0 ? 1 : 0);
+        document.getElementById('plainTextInfo').textContent = `Chars: ${charCount} / Approx. Chunks: ${chunks}`;
+        if (isNaN(maxChars) || maxChars <= 0) {
+            showStatus('plainTextStatus', "Max characters must be > 0", 'error');
+        } else {
+            showStatus('plainTextStatus', "", 'success', 1);
+        }
+    }
+
+    function formatPlainText() {
+      const formatSelect = document.getElementById('formatSelect').value;
+      const textArea = document.getElementById('plainTextInputArea');
+      if (formatSelect === 'pretty') {
+         textArea.value = currentAppState.plainText.split('\n').map(p => p.trim()).filter(p => p).join('\n\n');
+      } else {
+         textArea.value = currentAppState.plainText;
+      }
+       updatePlainTextInfo();
+       debouncedSaveState();
+    }
     
+    // --- Core Logic ---
+    function processAndChunk() {
+       clearOutput();
+       showLoading();
+       setTimeout(() => {
+        try {
+          const splitMode = document.getElementById('splitModeSelect').value;
+          const addToTop = document.getElementById('addToTop').value;
+          const addToBottom = document.getElementById('addToBottom').value;
+          const container = document.getElementById('chunkedTextContainer');
+          let chunkCount = 0;
+          
+          if (splitMode === 'json') {
+             const { data, success, allEmpty } = getAllCombinedJsonData();
+             if (allEmpty) throw new Error("All JSON inputs are empty.");
+             if (!success) throw new Error("Invalid JSON found. See errors on input boxes.");
+             const { data: processedJsonData } = applyGlossaryRules(data);
+             chunkCount = chunkJsonInput(processedJsonData, addToTop, addToBottom, container);
+          } else {
+             const text = document.getElementById('plainTextInputArea').value;
+             const maxChars = parseInt(document.getElementById('maxChars').value);
+             if (!text.trim()) throw new Error("Plain text input is empty.");
+             if (isNaN(maxChars) || maxChars <= 0) throw new Error("Max characters must be > 0.");
+             chunkCount = chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container);
+          }
+           if (chunkCount > 0) {
+                document.getElementById('output-column').style.display = 'block';
+                document.getElementById('outputControls').style.display = 'flex';
+                document.getElementById('outputSummary').textContent = `Output: ${chunkCount} Chunk${chunkCount === 1 ? '' : 's'}`;
+                document.getElementById('copyNextButton').disabled = false;
+                document.getElementById('copyAllButton').disabled = false;
+                showStatus('processStatus', `Success: Generated ${chunkCount} chunks.`, 'success');
+           } else {
+                throw new Error("No chunks were generated from the input.");
+           }
+        } catch (error) {
+           showStatus('processStatus', error.message, 'error', 8000);
+        } finally {
+          hideLoading();
+        }
+      }, 50);
+    }
+
+    function getAllCombinedJsonData() {
+        let combinedData = [], allInputsValid = true, allEmpty = true;
+        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
+            const jsonString = textarea.value.trim();
+            if (!jsonString) return;
+            allEmpty = false;
+            try {
+                if (!jsonString.startsWith('[')) throw new Error();
+                const jsonData = JSON.parse(jsonString);
+                if (Array.isArray(jsonData)) {
+                    combinedData = combinedData.concat(jsonData);
+                } else { throw new Error(); }
+            } catch (e) { allInputsValid = false; }
+        });
+        return { data: combinedData, success: allInputsValid, allEmpty };
+    }
+
+    function applyGlossaryRules(jsonData) {
+        if (!document.getElementById('applyRulesCheckbox').checked || !jsonData || jsonData.length === 0) {
+            return { data: jsonData, count: 0 };
+        }
+        const flags = document.getElementById('caseInsensitiveCheckbox').checked ? 'gi' : 'g';
+        const rules = currentAppState.findReplacePairs.map(p => {
+             if (!p.find) return null;
+             try { return { findRegExp: new RegExp(escapeRegExp(p.find), flags), replace: p.replace }; }
+             catch (e) { return null; }
+        }).filter(Boolean);
+
+        if (rules.length === 0) return { data: jsonData, count: 0 };
+        
+        const processedData = JSON.parse(JSON.stringify(jsonData));
+        let totalInstancesReplaced = 0;
+
+        processedData.forEach(obj => {
+            if (obj && Array.isArray(obj.terms)) {
+                obj.terms.forEach(term => {
+                    if (term && typeof term.translation === 'string') {
+                        rules.forEach(rule => {
+                            const matches = term.translation.match(rule.findRegExp);
+                            if(matches) {
+                                totalInstancesReplaced += matches.length;
+                                term.translation = term.translation.replace(rule.findRegExp, rule.replace);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        if (totalInstancesReplaced > 0) {
+            showStatus('glossaryReplaceStatus', `Applied ${totalInstancesReplaced} replacements.`, 'success');
+        } else {
+            showStatus('glossaryReplaceStatus', 'No matching terms found to replace.', 'info');
+        }
+        return { data: processedData, count: totalInstancesReplaced };
+    }
+
+    function chunkJsonInput(jsonData, addToTop, addToBottom, container) {
+        const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
+        const totalChunks = Math.ceil(jsonData.length / objectsToGroup);
+        for (let i = 0; i < jsonData.length; i += objectsToGroup) {
+            const group = jsonData.slice(i, i + objectsToGroup);
+            const partNum = (i / objectsToGroup) + 1;
+            const title = `Seg ${partNum}/${totalChunks}\n(Items ${i + 1}-${i + group.length})`;
+            const content = JSON.stringify(objectsToGroup === 1 && group.length === 1 ? group[0] : group, null, 2);
+            const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
+            const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
+            displayChunk([top, content, bottom].filter(Boolean).join('\n\n'), title, container);
+        }
+        return totalChunks;
+    }
+    
+    function smartSplit(text, maxLength) {
+        if (text.length <= maxLength) return [text];
+        const chunks = []; let currentText = text;
+        const breakChars = ['. ', '! ', '? ', '\n', ' ', ','];
+        while (currentText.length > maxLength) {
+            let breakPoint = -1;
+            for(const char of breakChars) {
+                const index = currentText.lastIndexOf(char, maxLength);
+                if(index !== -1) { breakPoint = index + (char.trim() ? char.length : 0); break; }
+            }
+            if (breakPoint === -1) breakPoint = maxLength;
+            chunks.push(currentText.substring(0, breakPoint).trim());
+            currentText = currentText.substring(breakPoint).trim();
+        }
+        if (currentText) chunks.push(currentText);
+        return chunks;
+    }
+    
+    function chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container) {
+       let chunks = []; let currentChunk = "";
+       text.split('\n').forEach(paragraph => {
+           if (paragraph.length > maxChars) {
+               if (currentChunk) chunks.push(currentChunk);
+               chunks.push(...smartSplit(paragraph, maxChars));
+               currentChunk = "";
+               return;
+           }
+           if (currentChunk && (currentChunk.length + paragraph.length + 1 > maxChars)) {
+                chunks.push(currentChunk);
+                currentChunk = paragraph;
+           } else {
+               currentChunk = currentChunk ? `${currentChunk}\n${paragraph}` : paragraph;
+           }
+       });
+       if (currentChunk) chunks.push(currentChunk);
+       chunks = chunks.map(c => c.trim()).filter(Boolean);
+       const totalChunks = chunks.length;
+       chunks.forEach((chunk, index) => {
+         const partNum = index + 1;
+         const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
+         const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
+         displayChunk([top, chunk, bottom].filter(Boolean).join('\n\n'), `Part ${partNum}/${totalChunks}`, container);
+       });
+       return totalChunks;
+    }
+    
+    // --- Output & Copying ---
     function displayChunk(content, title, container) {
-        const chunkContainerDiv = document.createElement('div');
-        chunkContainerDiv.classList.add('chunk-container');
-        chunkContainerDiv.dataset.copied = "false";
-        chunkContainerDiv.innerHTML = `
+        const chunkDiv = document.createElement('div');
+        chunkDiv.className = 'chunk-container';
+        chunkDiv.dataset.copied = "false";
+        chunkDiv.innerHTML = `
          <div class="chunk-title">${title.replace(/\n/g, '<br>')}</div>
          <div class="chunk-textarea-wrapper">
              <textarea readonly>${content}</textarea>
@@ -639,371 +867,137 @@
          <div class="button-action-wrapper">
             <button class="button btn-primary copy-button" data-copy-count="0">Copy<span class="tick" style="display:none;"> ✔️</span></button>
             <span class="copy-count-display">(0)</span>
-         </div>
-        `;
-         const copyButton = chunkContainerDiv.querySelector('.copy-button');
-         const countDisplay = chunkContainerDiv.querySelector('.copy-count-display');
-         const textarea = chunkContainerDiv.querySelector('textarea');
-         copyButton.addEventListener('click', function () { copyToClipboard(textarea.value, this, countDisplay); });
-       container.appendChild(chunkContainerDiv);
+         </div>`;
+        const copyButton = chunkDiv.querySelector('.copy-button');
+        copyButton.addEventListener('click', function () {
+            copyToClipboard(
+                chunkDiv.querySelector('textarea').value, 
+                this, 
+                chunkDiv.querySelector('.copy-count-display')
+            );
+        });
+        container.appendChild(chunkDiv);
     }
-
-    // --- Process & Chunk (Adapted) ---
-    function processAndChunk() {
-       clearOutput();
-       showLoading();
-       setTimeout(() => {
-        try {
-          const splitMode = document.getElementById('splitModeSelect').value;
-          // ... (rest of the logic is identical to original)
-          // It now displays in the right-hand column when successful.
-          const addToTop = document.getElementById('addToTop').value;
-          const addToBottom = document.getElementById('addToBottom').value;
-          const container = document.getElementById('chunkedTextContainer');
-          let chunkCount = 0;
-          
-          if (splitMode === 'json') {
-             showStatus('glossaryReplaceStatus', "", 'info', 1); // clear previous
-             const { data: rawJsonData, success, allEmpty, errorMessages } = getAllCombinedJsonData();
-             if (allEmpty) {
-                showStatus('processStatus', "All JSON inputs are empty.", 'warning');
-             } else if (success && rawJsonData.length > 0) {
-                 const { data: processedJsonData } = applyGlossaryRules(rawJsonData); 
-                 chunkCount = chunkJsonInput(processedJsonData, addToTop, addToBottom, container);
-                 showStatus('processStatus', `Success: Generated ${chunkCount} JSON chunks.`, 'success');
-             } else if (!success) {
-                  showStatus('processStatus', `Chunking aborted due to JSON error(s): ${errorMessages.join('. ')}`, 'error', 15000);
-             } else {
-                 showStatus('processStatus', "No valid JSON objects found.", 'warning');
-             }
-          } else { // text mode
-             chunkCount = chunkPlainTextInput(addToTop, addToBottom, container);
-              if(chunkCount > 0)
-                 showStatus('processStatus', `Success: Generated ${chunkCount} text chunks.`, 'success');
-          }
-
-           if(chunkCount > 0) {
-               document.getElementById('output-column').style.display = 'block';
-           }
-           document.getElementById('outputSummary').textContent = `Output: ${chunkCount} Chunk${chunkCount===1?'':'s'}`;
-           document.getElementById('copyNextButton').disabled = chunkCount === 0;
-           document.getElementById('copyAllButton').disabled = chunkCount === 0;
-
-        } catch (error) {
-          console.error("Error during chunking:", error);
-           showStatus('processStatus', "An unexpected error occurred: " + error.message, 'error', 15000);
-        } finally {
-          hideLoading();
-        }
-      }, 50); 
-    }
-
-    // --- Init & Event Listeners ---
-    document.addEventListener('DOMContentLoaded', () => {
-      // Load state first
-      loadState();
-      
-      // NEW UI Listeners
-      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-      document.getElementById('resetAllButton').addEventListener('click', resetAllToDefaults);
-      document.getElementById('modeSwitcher').addEventListener('click', (e) => {
-          if (e.target.tagName === 'BUTTON') {
-              document.getElementById('splitModeSelect').value = e.target.dataset.mode;
-              toggleInputSections();
-          }
-      });
-      document.querySelectorAll('.collapsible-fieldset .fieldset-header').forEach(header => {
-          header.addEventListener('click', () => {
-              header.parentElement.classList.toggle('collapsed');
-              saveState(); // Save the collapsed state
-          });
-      });
-      document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
-      document.getElementById('clearOutputButton').addEventListener('click', clearOutput);
-      document.getElementById('addJsonChapterButton').addEventListener('click', () => addJsonChapterInput());
-      document.getElementById('clearAllJsonButton').addEventListener('click', clearAllJsonInputs);
-      document.getElementById('addFindReplacePairButton').addEventListener('click', () => addFindReplacePair());
-      document.getElementById('copyNextButton').addEventListener('click', copyNextUncopied);
-      document.getElementById('copyAllButton').addEventListener('click', copyAllChunks);
-
-      // Original Listeners (debounced)
-      const debouncedSaveState = debounce(saveState, 600);
-      const debouncedUpdateTotalJsonObjectCount = debounce(updateTotalJsonObjectCount, 400);
-      const debouncedUpdatePlainTextInfo = debounce(updatePlainTextInfo, 400);
-
-      document.getElementById('maxChars').addEventListener('input', debouncedUpdatePlainTextInfo);
-      document.getElementById('addToTop').addEventListener('input', debouncedSaveState);
-      document.getElementById('addToBottom').addEventListener('input', debouncedSaveState);
-      document.getElementById('jsonObjectsPerChunk').addEventListener('change', debouncedSaveState);
-      document.getElementById('plainTextInputArea').addEventListener('input', debouncedUpdatePlainTextInfo);
-      document.getElementById('applyRulesCheckbox').addEventListener('change', debouncedSaveState);
-      document.getElementById('caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
-      
-      document.getElementById('formatSelect').addEventListener('change', () => {
-         currentAppState.plainText = document.getElementById('plainTextInputArea').value;
-         formatPlainText();
-      });
-      
-      // Initialize UI based on loaded state
-      toggleInputSections();
-       if (currentAppState.splitMode === 'json') {
-         updateTotalJsonObjectCount(); 
-       } else {
-         updatePlainTextInfo();
-       }
-        clearOutput();
-    });
-
-    // --- ALL OTHER ORIGINAL HELPER AND CORE LOGIC FUNCTIONS ---
-    // (debounce, showStatus, hideLoading, saveState, loadState, etc. are assumed to be here,
-    // with minor adaptations as shown in the snippets above. The core chunking logic is unchanged.)
-    // For brevity, the full, unchanged JS is not repeated. The functions below are the original ones.
     
-    function debounce(func, delay) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
-    function showStatus(elementId, message, type = 'info', timeout = 4000) {
-        const element = document.getElementById(elementId); if (!element) return;
-        if(statusTimeouts[elementId]) clearTimeout(statusTimeouts[elementId]);
-        element.innerHTML = message;
-        element.className = `status-message status-${type}`;
-        element.style.display = 'inline-block';
-        if (timeout > 0) {
-            statusTimeouts[elementId] = setTimeout(() => { if(element) element.style.display = 'none'; delete statusTimeouts[elementId]; }, timeout);
-        }
+    function clearOutput() {
+        document.getElementById('chunkedTextContainer').innerHTML = '';
+        document.getElementById('output-column').style.display = 'none';
+        document.getElementById('outputControls').style.display = 'none';
+        lastClickedButton = null;
     }
-    function showLoading() { document.getElementById('loadingIndicator').style.display = 'block'; }
-    function hideLoading() {  document.getElementById('loadingIndicator').style.display = 'none'; }
-    function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-    window.onscroll = function() {
-       const btn = document.getElementById("scrollToTopBtn");
-       if (document.getElementById("output-column").style.display !== 'none' && (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200)) {
-            btn.style.display = "block";
-        } else {
-            btn.style.display = "none";
-        }
-    };
-    function resetAllToDefaults() {
-         if(confirm("Are you sure you want to clear all inputs, settings and reload defaults?")) {
-            localStorage.removeItem(STATE_KEY);
-            window.location.reload();
-         }
-     }
-    function updateButtonState(button) {
-      if (lastClickedButton && lastClickedButton !== button && lastClickedButton.classList.contains('copy-button')) {
-         lastClickedButton.classList.remove('btn-success'); lastClickedButton.classList.add('btn-primary');
-         const tick = lastClickedButton.querySelector('.tick'); if (tick) tick.style.display = 'none';
+    
+    function updateCopyButtonState(button) {
+      if (lastClickedButton && lastClickedButton !== button) {
+         lastClickedButton.classList.remove('btn-success');
+         lastClickedButton.classList.add('btn-primary');
+         lastClickedButton.querySelector('.tick').style.display = 'none';
       }
-       if(button.classList.contains('copy-button')) {
-           button.classList.remove('btn-primary'); button.classList.add('btn-success');
-           const tick = button.querySelector('.tick'); if (tick) tick.style.display = 'inline-block';
-            lastClickedButton = button;
-       }
+      button.classList.remove('btn-primary');
+      button.classList.add('btn-success');
+      button.querySelector('.tick').style.display = 'inline-block';
+      lastClickedButton = button;
     }
-    function removeFindReplacePair(button) {
-        button.parentElement.remove();
-        if (document.querySelectorAll('#findReplacePairsContainer .find-replace-pair').length === 0) { addFindReplacePair("","", false); }
-        saveState();
-    }
-    function removeJsonChapterInput(buttonElement) {
-        buttonElement.closest('.json-chapter-input-container')?.remove();
-        updateTotalJsonObjectCount();
-        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) { addJsonChapterInput('', false); }
-        saveState();
-    }
-    function clearAllJsonInputs() {
-        document.getElementById('jsonInputsContainer').innerHTML = '';
-        jsonChapterInputIdCounter = 0; addJsonChapterInput('', false);
-        updateTotalJsonObjectCount(); saveState();
-    }
-    function updateIndividualJsonCount(textarea, statusSpan) {
-        const jsonString = textarea.value.trim(); statusSpan.className = 'json-chapter-status status-message';
-        if (!jsonString) { statusSpan.textContent = 'Objects: 0'; return 0; }
-        try {
-             if (!jsonString.startsWith('[')) throw new Error("Not Array");
-            const jsonData = JSON.parse(jsonString);
-            if (Array.isArray(jsonData)) {
-                statusSpan.textContent = `Objects: ${jsonData.length}`; statusSpan.classList.add('status-success'); return jsonData.length;
-            } else { throw new Error("Not Array"); }
-        } catch (e) {
-             if (e.message === "Not Array") { statusSpan.textContent = 'Error: Must be an Array []'; }
-             else { statusSpan.textContent = 'Error: Invalid JSON'; }
-             statusSpan.classList.add('status-error'); return 0;
-        }
-    }
-    function updateTotalJsonObjectCount() {
-        let totalObjects = 0;
-        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach( textarea => {
-             const jsonString = textarea.value.trim();
-             try {
-                 if (jsonString && jsonString.startsWith('[') && jsonString.endsWith(']')) {
-                    const jsonData = JSON.parse(jsonString);
-                    if (Array.isArray(jsonData)) totalObjects += jsonData.length;
-                 }
-             } catch (e) { /* ignore */ }
-        });
-        document.getElementById('jsonObjectsCount').textContent = `Total Objects: ${totalObjects}`;
-    }
-    function updatePlainTextInfo() {
-        const charCount = document.getElementById('plainTextInputArea').value.length;
-        const maxChars = parseInt(document.getElementById('maxChars').value, 10);
-        let chunks = (charCount > 0 && maxChars > 0) ? Math.ceil(charCount / maxChars) : (charCount > 0 ? 1 : 0);
-        document.getElementById('plainTextInfo').textContent = `Chars: ${charCount} / Approx. Chunks: ${chunks}`;
-        if (isNaN(maxChars) || maxChars <= 0) { showStatus('plainTextStatus', "Max characters must be > 0", 'error'); }
-        else { showStatus('plainTextStatus', "", 'info', 1); }
-        saveState();
-    }
-    function formatPlainText() {
-      const formatSelect = document.getElementById('formatSelect');
-      const textArea = document.getElementById('plainTextInputArea');
-      const originalText = currentAppState.plainText || textArea.value; 
-      if (formatSelect.value === 'pretty') {
-         textArea.value = originalText.split('\n').map(p => p.trim()).filter(p => p).join('\n\n');
-      } else { textArea.value = originalText; }
-       updatePlainTextInfo();
-    }
-    function getAllCombinedJsonData() {
-        let combinedData = [], allInputsValid = true, allEmpty = true, errorMessages = [];
-        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach((textarea, index) => {
-            const jsonString = textarea.value.trim(); if (!jsonString) return; allEmpty = false;
-            try {
-                if (!jsonString.startsWith('[') || !jsonString.endsWith(']')) throw new Error(`Input ${index + 1} is not a JSON array`);
-                const jsonData = JSON.parse(jsonString);
-                if (Array.isArray(jsonData)) { combinedData = combinedData.concat(jsonData); }
-                else { throw new Error(`Input ${index + 1} is not an array`); }
-            } catch (e) { errorMessages.push(e.message); allInputsValid = false; }
-        });
-        if(!allInputsValid) { showStatus('processStatus', "JSON Error(s): " + errorMessages.join('; '), 'error', 15000); }
-        return { data: combinedData, success: allInputsValid, allEmpty, errorMessages };
-    }
-    function applyGlossaryRules(jsonData) {
-         const applyRules = document.getElementById('applyRulesCheckbox').checked;
-         if (!applyRules || !jsonData || jsonData.length === 0) return { data: jsonData, count: 0};
-         const flags = document.getElementById('caseInsensitiveCheckbox').checked ? 'gi' : 'g';
-         const rules = [];
-         document.querySelectorAll('#findReplacePairsContainer .find-replace-pair').forEach(el => {
-             const findText = el.querySelector('.find-text')?.value;
-             if (findText) { rules.push({ findRegExp: new RegExp(escapeRegExp(findText), flags), replace: el.querySelector('.replace-text')?.value ?? '' }); }
-         });
-        if (rules.length === 0) return { data: jsonData, count: 0};
-        const processedData = JSON.parse(JSON.stringify(jsonData)); let totalInstancesReplaced = 0;
-        processedData.forEach(obj => {
-            (Array.isArray(obj) ? obj : [obj]).forEach(item => {
-                if (item && Array.isArray(item.terms)) {
-                    item.terms.forEach(term => {
-                        if (term && typeof term.translation === 'string') {
-                            let current = term.translation;
-                             rules.forEach(rule => {
-                                 const matches = current.match(rule.findRegExp);
-                                 if(matches) { totalInstancesReplaced += matches.length; current = current.replace(rule.findRegExp, rule.replace); }
-                             });
-                             term.translation = current;
-                        }
-                    });
-                }
-            });
-         });
-        showStatus('glossaryReplaceStatus', `Applied ${totalInstancesReplaced} replacements.`, 'success');
-        return { data: processedData, count: totalInstancesReplaced} ;
-     }
-    function chunkJsonInput(jsonData, addToTop, addToBottom, container) {
-      if (!jsonData || jsonData.length === 0) return 0;
-      const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
-      const totalNewChunks = Math.ceil(jsonData.length / objectsToGroup);
-      let displayCount = 0;
-      for (let i = 0; i < jsonData.length; i += objectsToGroup) {
-        const group = jsonData.slice(i, i + objectsToGroup); if (group.length === 0) continue;
-        displayCount++; const partNum = displayCount;
-        let title = `Seg ${partNum}/${totalNewChunks}\n(Items ${i + 1}-${i + group.length})`;
-        const content = JSON.stringify(objectsToGroup === 1 && group.length === 1 ? group[0] : group, null, 2);
-        const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalNewChunks);
-        const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalNewChunks);
-        displayChunk([top, content, bottom].filter(Boolean).join('\n\n').trim(), title, container);
-      }
-       return displayCount;
-    }
-    function smartSplit(text, maxLength) {
-        if (text.length <= maxLength) return [text];
-        const chunks = []; let currentText = text;
-        while (currentText.length > maxLength) {
-            let breakPoint = -1;
-            for(const char of ['. ', '! ', '? ', '\n', ' ', ',']) {
-                 const index = currentText.lastIndexOf(char, maxLength);
-                 if(index > 0 && index <= maxLength) { breakPoint = (char === ' ') ? index : index + char.length; break; }
+    
+    function copyToClipboard(text, buttonEl, countEl) {
+       navigator.clipboard.writeText(text).then(() => {
+            updateCopyButtonState(buttonEl);
+            const container = buttonEl.closest('.chunk-container');
+            container.dataset.copied = "true";
+            container.classList.add('copied');
+            
+            let count = parseInt(buttonEl.dataset.copyCount, 10) + 1;
+            buttonEl.dataset.copyCount = count;
+            countEl.textContent = `(${count})`;
+
+            if (!document.querySelector('.chunk-container[data-copied="false"]')) {
+                document.getElementById('copyNextButton').disabled = true;
             }
-            if (breakPoint <= 0) { breakPoint = maxLength; }
-            chunks.push(currentText.substring(0, breakPoint).trim());
-            currentText = currentText.substring(breakPoint).trim();
+        }).catch(err => { showStatus('processStatus', 'Failed to copy text.', 'error'); });
+    }
+    
+    function copyNextUncopied() {
+        const nextContainer = document.querySelector('.chunk-container[data-copied="false"]');
+        if(nextContainer) {
+            nextContainer.querySelector('.copy-button').click();
+            nextContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
         }
-        if (currentText.length > 0) chunks.push(currentText);
-        return chunks;
     }
-    function chunkPlainTextInput(addToTop, addToBottom, container) {
-       const text = document.getElementById('plainTextInputArea').value; const maxChars = parseInt(document.getElementById('maxChars').value);
-       if (!text.trim()) { showStatus('processStatus', "Input is empty.", 'warning'); return 0; }
-       if (isNaN(maxChars) || maxChars <= 0) { showStatus('processStatus', "Max characters must be > 0.", 'error'); return 0; }
-       let chunks = []; let currentChunk = "";
-       text.split('\n').forEach(p => {
-           if (p.length > maxChars) { if (currentChunk) chunks.push(currentChunk); chunks = chunks.concat(smartSplit(p, maxChars)); currentChunk = ""; return; }
-           const potentialLength = currentChunk.length + (currentChunk && p ? 1: 0) + p.length;
-           if (currentChunk && potentialLength > maxChars) { chunks.push(currentChunk); currentChunk = p; }
-           else { currentChunk += (currentChunk && p ? '\n' : '') + p; if (!p && currentChunk) currentChunk += '\n'; }
-       });
-       if (currentChunk) chunks.push(currentChunk);
-       chunks = chunks.map(c => c.trim()).filter(Boolean); const totalChunks = chunks.length;
-       if(totalChunks === 0) return 0;
-       chunks.forEach((chunk, index) => {
-         const partNum = index + 1; const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-         const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-         displayChunk([top, chunk, bottom].filter(Boolean).join('\n\n').trim(), `Part ${partNum}/${totalChunks}`, container);
-       });
-       return chunks.length;
-    }
-     function clearOutput() {
-         document.getElementById('chunkedTextContainer').innerHTML = '';
-         document.getElementById('output-column').style.display = 'none';
-         lastClickedButton = null;
-         showStatus('processStatus', 'Output cleared', 'success', 2000);
-         document.getElementById('scrollToTopBtn').style.display = 'none';
-     }
-     function copyAllChunks() {
-        const textareas = document.querySelectorAll('#chunkedTextContainer textarea'); if (textareas.length === 0) return;
-        const allText = Array.from(textareas).map(ta => ta.value).join("\n\n" + "-".repeat(20) + "\n\n");
+    
+    function copyAllChunks() {
+        const textareas = document.querySelectorAll('#chunkedTextContainer textarea');
+        if (textareas.length === 0) return;
+        const separator = "\n\n" + "-".repeat(30) + "\n\n";
+        const allText = Array.from(textareas).map(ta => ta.value).join(separator);
         navigator.clipboard.writeText(allText).then(() => {
             showStatus('processStatus', `Copied all ${textareas.length} chunks!`, 'success');
             document.querySelectorAll('.chunk-container').forEach(div => {
-               div.dataset.copied = "true"; div.classList.add('copied');
+                div.dataset.copied = "true";
+                div.classList.add('copied');
             });
             document.getElementById('copyNextButton').disabled = true;
         });
-     }
-     function copyNextUncopied() {
-          const nextContainer = document.querySelector('.chunk-container[data-copied="false"]');
-          if(nextContainer) {
-              const textarea = nextContainer.querySelector('textarea'); const button = nextContainer.querySelector('.copy-button');
-              copyToClipboard(textarea.value, button, nextContainer.querySelector('.copy-count-display'));
-              nextContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
-              showStatus('processStatus', `Copied next chunk.`, 'success', 2000);
-          } else {
-               showStatus('processStatus', `All chunks have been copied.`, 'info');
-               document.getElementById('copyNextButton').disabled = true;
-          }
-     }
-    function copyToClipboard(text, buttonElement, countDisplayElement) {
-       navigator.clipboard.writeText(text).then(() => {
-            if (buttonElement) {
-                 updateButtonState(buttonElement);
-                 const container = buttonElement.closest('.chunk-container');
-                 if(container) {
-                     container.dataset.copied = "true"; container.classList.add('copied');
-                     if (!document.querySelector('.chunk-container[data-copied="false"]')) { document.getElementById('copyNextButton').disabled = true; }
-                 }
-                 if (countDisplayElement) {
-                    let count = parseInt(buttonElement.dataset.copyCount, 10) + 1;
-                    buttonElement.dataset.copyCount = count.toString();
-                    countDisplayElement.textContent = `(${count})`;
-                 }
-            }
-        }).catch(err => { console.error('Copy failed:', err); showStatus('processStatus', 'Failed to copy.', 'error'); });
     }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        loadState();
+        
+        // --- Event Listeners ---
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        document.getElementById('resetAllButton').addEventListener('click', resetAllToDefaults);
+        document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
+        
+        document.getElementById('modeSwitcher').addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                document.getElementById('splitModeSelect').value = e.target.dataset.mode;
+                toggleInputSections();
+            }
+        });
+        
+        document.querySelectorAll('.collapsible-fieldset .fieldset-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('collapsed');
+                debouncedSaveState();
+            });
+        });
+
+        // JSON Mode Listeners
+        document.getElementById('addJsonChapterButton').addEventListener('click', () => addJsonChapterInput());
+        document.getElementById('clearAllJsonButton').addEventListener('click', clearAllJsonInputs);
+        document.getElementById('addFindReplacePairButton').addEventListener('click', () => addFindReplacePair());
+        document.getElementById('jsonObjectsPerChunk').addEventListener('change', debouncedSaveState);
+        document.getElementById('applyRulesCheckbox').addEventListener('change', debouncedSaveState);
+        document.getElementById('caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
+
+        // Plain Text Mode Listeners
+        document.getElementById('plainTextInputArea').addEventListener('input', () => {
+            currentAppState.plainText = document.getElementById('plainTextInputArea').value;
+            debouncedUpdatePlainTextInfo();
+            debouncedSaveState();
+        });
+        document.getElementById('maxChars').addEventListener('input', debouncedUpdatePlainTextInfo);
+        document.getElementById('formatSelect').addEventListener('change', formatPlainText);
+
+        // Common Listeners
+        document.getElementById('addToTop').addEventListener('input', debouncedSaveState);
+        document.getElementById('addToBottom').addEventListener('input', debouncedSaveState);
+        
+        // Output Listeners
+        document.getElementById('clearOutputButton').addEventListener('click', clearOutput);
+        document.getElementById('copyNextButton').addEventListener('click', copyNextUncopied);
+        document.getElementById('copyAllButton').addEventListener('click', copyAllChunks);
+        
+        window.onscroll = () => {
+            const btn = document.getElementById("scrollToTopBtn");
+            const show = document.getElementById("output-column").style.display !== 'none' && document.documentElement.scrollTop > 200;
+            btn.style.display = show ? "block" : "none";
+        };
+
+        // --- Final UI Setup ---
+        toggleInputSections();
+        clearOutput();
+        showStatus('mainStatus', 'Ready!', 'success', 2500);
+    });
 
   </script>
 </body>
