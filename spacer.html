@@ -220,7 +220,6 @@
 
         /* Input & Select fields */
         #separatorInput, #targetWordCount, #projectSelect,
-        /* <!-- NEW --> */
         #findInput, #replaceInput {
             padding: 0.4rem 0.6rem;
             border: 1px solid var(--border-light);
@@ -248,7 +247,6 @@
         body.dark-mode #separatorInput,
         body.dark-mode #targetWordCount,
         body.dark-mode #projectSelect,
-        /* <!-- NEW --> */
         body.dark-mode #findInput,
         body.dark-mode #replaceInput
          {
@@ -260,7 +258,6 @@
         #separatorInput:focus, 
         #targetWordCount:focus,
         #projectSelect:focus,
-        /* <!-- NEW --> */
         #findInput:focus,
         #replaceInput:focus
          {
@@ -272,7 +269,6 @@
         body.dark-mode #separatorInput:focus,
         body.dark-mode #targetWordCount:focus,
         body.dark-mode #projectSelect:focus,
-        /* <!-- NEW --> */
         body.dark-mode #findInput:focus,
         body.dark-mode #replaceInput:focus
          {
@@ -382,7 +378,7 @@
              scrollbar-color: var(--subtle-text-dark) var(--border-dark);
          }
 
-        /* <!-- NEW: Find & Replace Bar --> */
+        /* Find & Replace Bar */
         .find-replace-bar {
             display: flex;
             flex-wrap: wrap;
@@ -445,7 +441,6 @@
             transform: translateY(0px);
             box-shadow: 0 1px 2px var(--shadow-color);
         }
-        /* NEW: Disabled State */
          .btn[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
@@ -681,7 +676,7 @@
                     </div>
                     <span>🌙</span>
                 </label>
-                <!-- NEW: Go To Output Button -->
+                <!-- Go To Output Button -->
                  <button id="goToOutputBtn" class="btn btn-secondary" title="Scroll to Formatted Output">
                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
                     Go to Output
@@ -747,16 +742,16 @@
                              <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
                              <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
                         </div>
-                        <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
+                        <button id="pasteBtn" class="btn" title="Paste rich text or plain text from clipboard">
                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
                             Paste 
                         </button>
-                        <!-- NEW: Find Button -->
+                        <!-- Find Button -->
                         <button id="findBtn" class="btn btn-secondary" title="Find and Replace text">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
                             Find
                         </button>
-                        <!-- MOVED: Clear Draft Button -->
+                        <!-- Clear Draft Button -->
                         <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
                            Clear Draft
@@ -764,7 +759,7 @@
                     </div>
                 </div>
                 
-                <!-- NEW: Find and Replace Bar -->
+                <!-- Find and Replace Bar -->
                 <div id="findReplaceBar" class="find-replace-bar hidden">
                     <input type="text" id="findInput" placeholder="Find text...">
                     <input type="text" id="replaceInput" placeholder="Replace with...">
@@ -858,7 +853,7 @@
              const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
              const importFileElement = document.getElementById('importFileElement');
             
-            // <!-- NEW: Element Selection -->
+            // Element Selection for new features
             const goToOutputBtn = document.getElementById('goToOutputBtn');
             const outputCard = document.getElementById('outputCard');
             const findBtn = document.getElementById('findBtn');
@@ -989,7 +984,7 @@
                 const outputWordCount = outputText.match(/\S+/g)?.length || 0;
                 outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
 
-                // <!-- NEW: Update find count if bar is visible -->
+                // Update find count if bar is visible
                 if (!findReplaceBar.classList.contains('hidden')) {
                     updateFindCount();
                 }
@@ -1266,7 +1261,7 @@
                    showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger', 2000);
               }
 
-            // --- NEW: Find and Replace Logic ---
+            // --- Find and Replace Logic ---
             const updateFindCount = () => {
                 const findText = findInput.value;
                 if (!findText) {
@@ -1299,45 +1294,65 @@
             cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); 
              projectSelect.addEventListener('change', updateProjectUI);
 
-            // <!-- MODIFIED: Handle rich text paste -->
+            // <!-- CORRECTED: Robust rich text paste handler -->
             inputDiv.addEventListener("paste", (e) => {
                 e.preventDefault();
                 const clipboardData = e.clipboardData || window.clipboardData;
                 const html = clipboardData.getData('text/html');
                 const text = clipboardData.getData('text/plain');
 
-                // If HTML is available and contains formatting tags, use it. Otherwise, fall back to plain text.
-                if (html && (html.includes('<i') || html.includes('<em') || html.includes('<b') || html.includes('<strong'))) {
-                    // Insert the HTML, let the browser parse it
-                    document.execCommand("insertHTML", false, html);
-                    
-                    // After the browser has inserted the HTML, clean it up into our markdown format.
-                    // Use a timeout to ensure the DOM has updated.
-                    setTimeout(() => {
-                        // Replace <i> and <em> with *
-                        inputDiv.querySelectorAll('i, em').forEach(el => {
-                            const textNode = document.createTextNode(`*${el.textContent}*`);
-                            el.parentNode.replaceChild(textNode, el);
-                        });
-                        // Replace <b> and <strong> with **
-                        inputDiv.querySelectorAll('b, strong').forEach(el => {
-                            const textNode = document.createTextNode(`**${el.textContent}**`);
-                            el.parentNode.replaceChild(textNode, el);
-                        });
-                        // The browser might add its own styles, so we normalize the div content
-                        // by getting the innerText and setting it back. This cleans up leftover spans etc.
-                        inputDiv.innerText = inputDiv.innerText;
-                        processText(); // Re-process after cleanup
-                    }, 10);
-
-                } else {
-                    // Fallback to plain text insertion
+                if (!html) {
                     document.execCommand("insertText", false, text);
+                    return;
                 }
+
+                // Use a temporary div to parse the HTML safely
+                const sandbox = document.createElement('div');
+                sandbox.innerHTML = html;
+
+                // Recursive function to traverse the DOM and convert to markdown
+                function traverseAndConvert(node) {
+                    let markdown = '';
+                    for (const child of node.childNodes) {
+                        if (child.nodeType === Node.TEXT_NODE) {
+                            markdown += child.textContent;
+                        } else if (child.nodeType === Node.ELEMENT_NODE) {
+                            const tagName = child.tagName.toLowerCase();
+                            let prefix = '', suffix = '', blockSuffix = '';
+
+                            if (['b', 'strong'].includes(tagName)) {
+                                prefix = '**'; suffix = '**';
+                            } else if (['i', 'em'].includes(tagName)) {
+                                prefix = '*'; suffix = '*';
+                            } else if (['p', 'div', 'h1', 'h2', 'h3', 'li', 'blockquote', 'tr', 'hr'].includes(tagName)) {
+                                // Add a line break *before* processing the block content if it's not the first element
+                                if (markdown.length > 0 && !markdown.endsWith('\n\n')) {
+                                    markdown += '\n\n';
+                                }
+                                blockSuffix = ''; // Paragraphs are handled by newlines
+                            } else if (tagName === 'br') {
+                                blockSuffix = '\n';
+                            }
+
+                            markdown += prefix + traverseAndConvert(child) + suffix + blockSuffix;
+                        }
+                    }
+                    return markdown;
+                }
+
+                let convertedText = traverseAndConvert(sandbox);
+
+                // Clean up excessive newlines that might be generated
+                convertedText = convertedText
+                    .replace(/(\n\s*){3,}/g, '\n\n') // Collapse 3+ newlines to 2
+                    .trim();
+
+                document.execCommand("insertText", false, convertedText);
             });
 
             pasteBtn.addEventListener('click', async () => {
                 try {
+                    // We use the paste event handler now, but this button can trigger a plain text paste
                     const text = await navigator.clipboard.readText();
                     currentProjectName = null;
                     sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
@@ -1393,7 +1408,7 @@
              importFileElement.addEventListener('change', handleImportFile);
              clearAllProjectsBtn.addEventListener('click', handleClearAllProjects);
 
-            // <!-- NEW: New Feature Listeners -->
+            // New Feature Listeners
             goToOutputBtn.addEventListener('click', () => {
                 outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
