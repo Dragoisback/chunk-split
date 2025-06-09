@@ -815,7 +815,6 @@
                 </div>
             </div>
         </main>
-
     </div>
 
     <script>
@@ -886,7 +885,7 @@
                  };
             };
 
-            // --- Helper: Escape HTML (CRITICAL FIX) ---
+            // --- Helper: Escape HTML ---
             const escapeHTML = (str) => {
                 if (str === null || str === undefined) return '';
                 return String(str)
@@ -897,7 +896,7 @@
                     .replace(/'/g, ''');
             };
             
-            // --- Helper: Escape RegExp characters (NEW) ---
+            // --- Helper: Escape RegExp characters ---
             const escapeRegExp = (string) => {
                 if (string === null || string === undefined) return '';
                 return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
@@ -905,14 +904,10 @@
 
             // --- Helper: Convert Markdown --- 
             const convertMarkdown = (text) => {
-                let html = escapeHTML(text); // Escape the entire raw text first
-                // Links: [text](url) - $1 is linkText, $2 is url. Both are already escaped.
+                let html = escapeHTML(text);
                 html = html.replace(/\[([^\[\]]+?)\]\((https?:\/\/[^\s()]+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-                // Bold Italic: ***text*** or ___text___ - $2 is content, already escaped.
                 html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
-                // Bold: **text** or __text__ - $2 is content, already escaped.
                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
-                // Italic: *text* or _text_ - $2 is content, already escaped.
                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
                 return html;
             };
@@ -926,12 +921,9 @@
                 sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
                 saveDraftSettings(); 
                 
-                // Separator logic needs to handle escaped \n for <br>
-                // Do not escapeHTML the separatorInput.value here, as it's meant to contain literal \n for <br>
                 const rawSeparator = separatorInput.value;
-                const htmlSeparator = rawSeparator.replace(/\\n/g, '<br>\n'); // Convert literal \n to <br>
+                const htmlSeparator = rawSeparator.replace(/\\n/g, '<br>\n');
                 const finalSeparator = isWrapP ? '\n' : htmlSeparator;
-
 
                 const outputIsEmpty = !inputText || inputText.trim() === '';
                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
@@ -953,21 +945,9 @@
                          if(isCleanSpaces) {
                              processedP = processedP.replace(/\s+/g, ' '); 
                          }
-                         processedP = convertMarkdown(processedP); // Markdown conversion
+                         processedP = convertMarkdown(processedP);
                           
                           if(!isCleanSpaces) {
-                               // Convert literal newlines within a paragraph block to <br> AFTER markdown
-                               // This ensures markdown like lists (if supported later) isn't broken
-                               // And that `escapeHTML` has already run.
-                               // We need to be careful not to convert \n inside HTML tags produced by convertMarkdown.
-                               // This is tricky. A simpler approach is to let convertMarkdown handle internal newlines
-                               // if they are meant to be <br>s, or rely on CSS white-space for pre-wrap.
-                               // For now, this will convert all remaining \n to <br>.
-                               // If convertMarkdown produces HTML with newlines for formatting, those will also become <br>.
-                               // This might be acceptable for simple cases.
-                               // A more robust solution would involve more complex parsing.
-                               // The current `convertMarkdown` escapes newlines to `\n` if they were in the original text.
-                               // So this replace will turn them into `<br>`.
                                processedP = processedP.replace(/\n/g, '<br>\n');
                           }
                          return isWrapP ? `<p>${processedP}</p>` : processedP;
@@ -1013,42 +993,36 @@
                   inputDiv.innerText = caseFunc(inputDiv.innerText);
                   processText();
              }
-            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
+            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[.\!\?]\s*\w)/g, char => char.toUpperCase());
             const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
             
-            // --- GENERIC Button Feedback (REFINED) ---
+            // --- GENERIC Button Feedback ---
             const showFeedback = (button, text, type = 'success', duration = 1500) => {
-                // Clear any existing timeout for this specific button
                 if (button.dataset.feedbackTimeoutId) {
                     clearTimeout(parseInt(button.dataset.feedbackTimeoutId));
                 }
 
-                // Store original HTML if not already stored for this feedback session
-                // This ensures that if feedback is triggered multiple times rapidly,
-                // we always revert to the very first state before any feedback.
-                if (!button.dataset.originalHTML && button.innerHTML !== text) { // Only store if not already in feedback mode with this text
+                if (!button.dataset.originalHTML && button.innerHTML !== text) {
                     button.dataset.originalHTML = button.innerHTML;
                 }
                 
-                button.classList.remove('feedback-success', 'feedback-danger'); // Clear previous types
+                button.classList.remove('feedback-success', 'feedback-danger');
                 const feedbackClass = `feedback-${type}`;
                 button.classList.add(feedbackClass);
                 button.innerHTML = text;
 
                 const timeoutId = setTimeout(() => {
                     button.classList.remove(feedbackClass);
-                    if (button.dataset.originalHTML) { // Restore if originalHTML is known
+                    if (button.dataset.originalHTML) {
                         button.innerHTML = button.dataset.originalHTML;
                     }
-                    // Clean up dataset properties for this button
                     delete button.dataset.originalHTML;
                     delete button.dataset.feedbackTimeoutId;
                 }, duration);
-                button.dataset.feedbackTimeoutId = timeoutId.toString(); // Store the new timeout ID
+                button.dataset.feedbackTimeoutId = timeoutId.toString();
             };
 
-
-            // --- Theme & Pref Management (localStorage) ---
+            // --- Theme & Pref Management ---
              const savePreferences = () => {
                  const prefs = {
                      theme: themeToggle.checked ? 'dark' : 'light',
@@ -1084,21 +1058,8 @@
                  applyFontSize(fontSize);
                  targetWordCountInput.value = target;
             }
-             themeToggle.addEventListener('change', () => {
-                applyTheme(themeToggle.checked);
-                savePreferences();
-            });
-             fontSizeSlider.addEventListener('input', () => {
-                 applyFontSize(fontSizeSlider.value);
-             });
-             fontSizeSlider.addEventListener('change', savePreferences);
-             targetWordCountInput.addEventListener('input', () => {
-                 debouncedUpdateStats();
-                 debounce(savePreferences, 500)();
-             });
 
-
-            // --- Draft Settings Persistence (sessionStorage) ---
+            // --- Draft Settings Persistence ---
              const getCurrentSettings = () => ({
                   separator: separatorInput.value,
                   wrapP: wrapPCheckbox.checked,
@@ -1119,10 +1080,10 @@
                          applySettings(JSON.parse(settingsJSON));
                     } catch(e) {
                          console.error("Failed loading draft settings", e);
-                         applySettings({}); // Apply defaults on error
+                         applySettings({});
                     }
                  } else {
-                      applySettings({}); // Apply defaults if no settings saved
+                      applySettings({});
                  }
              }
               const clearDraft = () => {
@@ -1130,15 +1091,14 @@
                    sessionStorage.removeItem(SESSION_KEY_DRAFT);
                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
                    currentProjectName = null;
-                   inputDiv.innerHTML = ''; // Use innerHTML to clear contenteditable and trigger placeholder
-                   // outputDiv.innerHTML = ''; // processText will handle this
-                   applySettings({}); // Reset to default settings
+                   inputDiv.innerHTML = '';
+                   applySettings({});
                    updateProjectUI();
-                   processText(); // This will clear output and update stats
+                   processText();
                    inputDiv.focus();
               }
 
-            // --- PROJECT MANAGEMENT (localStorage) ---
+            // --- PROJECT MANAGEMENT ---
             const loadAllProjectsFromStorage = () => {
                  try {
                     PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}');
@@ -1164,12 +1124,12 @@
                       projectSelect.disabled = true;
                  } else {
                      projectSelect.disabled = false;
-                     projectSelect.add(new Option("-- Select Project --", "", !currentProjectName, !currentProjectName)); // Select if no current project
+                     projectSelect.add(new Option("-- Select Project --", "", !currentProjectName, !currentProjectName));
                      sortedNames.forEach(name => {
                          projectSelect.add(new Option(name, name, false, name === currentProjectName));
                      });
                  }
-                 const projectSelected = projectSelect.value !== "" && projectSelect.value !== "-- Select Project --"; // Ensure a real project is selected
+                 const projectSelected = projectSelect.value !== "" && projectSelect.value !== "-- Select Project --";
                  projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelected );
                  currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
                  saveProjectBtn.disabled = (!currentProjectName) || (inputDiv.innerText.trim() === '');
@@ -1200,21 +1160,20 @@
                  currentProjectName = name;
                  sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                  saveAllProjectsToStorage();
-                 updateProjectUI(); // This will re-select the current project in the dropdown
+                 updateProjectUI();
                  showFeedback(isSaveAs ? saveAsProjectBtn : saveProjectBtn, 'Saved!', 'success');
             };
             
              const handleLoadProject = () => {
                  const name = projectSelect.value;
                  if(!name || !PROJECT_STORE[name]) {
-                    // This case should ideally not happen if UI is updated correctly
                     alert("Please select a valid project to load.");
                     return;
                  }
                   if(inputDiv.innerText.trim() !== '' && 
-                     sessionStorage.getItem(SESSION_KEY_DRAFT) !== PROJECT_STORE[name].content && // Check if content actually changed
+                     sessionStorage.getItem(SESSION_KEY_DRAFT) !== PROJECT_STORE[name].content &&
                      !confirm(`Load "${name}"? Current unsaved draft changes will be lost.`)){
-                     projectSelect.value = currentProjectName || ""; // Revert selection if cancelled
+                     projectSelect.value = currentProjectName || "";
                      return;
                   }
                  
@@ -1222,8 +1181,8 @@
                    currentProjectName = name;
                   sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                   inputDiv.innerText = project.content || '';
-                  applySettings(project.settings || {}); // Apply project specific settings
-                  saveDraftSettings(); // Persist these settings for the session draft
+                  applySettings(project.settings || {});
+                  saveDraftSettings();
                   processText();
                   updateProjectUI();
                   showFeedback(loadProjectBtn, 'Loaded!', 'success');
@@ -1238,8 +1197,6 @@
                  if(currentProjectName === name) {
                      currentProjectName = null;
                      sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                     // Optionally clear draft or leave it as "Unsaved Draft"
-                     // clearDraft(); // If you want to clear the editor too
                  }
                  saveAllProjectsToStorage();
                  updateProjectUI();
@@ -1258,7 +1215,7 @@
             }
 
             const handleImportClick = () => {
-                 importFileElement.value = null; // Reset file input
+                 importFileElement.value = null;
                  importFileElement.click();
             }
              const handleImportFile = (event) => {
@@ -1277,10 +1234,9 @@
                                showFeedback(importProjectsBtn, 'No projects in file', 'danger', 2000);
                                return;
                           }
-                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name in your current store will be overwritten.`)){
+                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name will be overwritten.`)){
                             return;
                          }
-                         // Basic validation for project structure (optional but good)
                          for (const projName in importedProjects) {
                             if (typeof importedProjects[projName] !== 'object' || 
                                 !importedProjects[projName].hasOwnProperty('content') ||
@@ -1311,10 +1267,10 @@
                     alert("No projects to clear.");
                     return;
                  }
-                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis action cannot be undone! Consider exporting your projects first.")) return;
+                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis action cannot be undone! Consider exporting first.")) return;
                    localStorage.removeItem(STORAGE_KEY_PROJECTS);
                    PROJECT_STORE = {};
-                   if (currentProjectName) { // If current draft was a saved project
+                   if (currentProjectName) {
                         currentProjectName = null;
                         sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
                    }
@@ -1335,14 +1291,14 @@
                     findCount.textContent = `${matches.length} found`;
                     replaceAllBtn.disabled = matches.length === 0;
                 } catch (e) {
-                    findCount.textContent = 'Invalid regex'; // Should not happen with escapeRegExp
+                    findCount.textContent = 'Invalid regex';
                     replaceAllBtn.disabled = true;
                 }
             };
 
             const handleReplaceAll = () => {
                 const findText = findInput.value;
-                const replaceText = replaceInput.value; // No need to escape replaceText
+                const replaceText = replaceInput.value;
                 if (!findText) return;
 
                 const originalText = inputDiv.innerText;
@@ -1350,15 +1306,90 @@
                     const newText = originalText.replace(new RegExp(escapeRegExp(findText), 'g'), replaceText);
                     if (originalText !== newText) {
                         inputDiv.innerText = newText;
-                        processText(); // Re-process the entire text
-                        // updateFindCount(); // processText calls updateStats which calls updateFindCount
+                        processText();
                     }
                 } catch (e) {
-                     // Should be rare with escaped findText
-                    alert("Error during replacement. Your find pattern might be too complex even after escaping.");
+                    alert("Error during replacement.");
                 }
             };
 
+            // --- Download helpers ---
+             const downloadFile = (content, filename, type) => {
+                 const blob = new Blob([content], { type: type });
+                 const url = URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = filename;
+                 document.body.appendChild(a); 
+                 a.click();
+                 document.body.removeChild(a);
+                 URL.revokeObjectURL(url); 
+             }
+
+            // --- *** FIXED & ROBUST *** Rich Text Paste Handler ---
+            const handlePaste = (e) => {
+                e.preventDefault();
+                const clipboardData = e.clipboardData || window.clipboardData;
+                let pastedData = clipboardData.getData('text/html');
+                
+                if (pastedData) {
+                    const sandbox = document.createElement('div');
+                    sandbox.innerHTML = pastedData;
+                    
+                    // Function to recursively convert HTML nodes to a markdown-like string
+                    function htmlToMarkdown(node) {
+                        // Node types: 1 for element, 3 for text
+                        if (node.nodeType === 3) return node.textContent;
+                        if (node.nodeType !== 1) return '';
+
+                        const tagName = node.tagName.toUpperCase();
+                        let content = '';
+                        // Recursively process child nodes
+                        for (const child of node.childNodes) {
+                            content += htmlToMarkdown(child);
+                        }
+
+                        // Apply markdown based on tag
+                        switch (tagName) {
+                            case 'B': case 'STRONG':
+                                return `**${content}**`;
+                            case 'I': case 'EM':
+                                return `*${content}*`;
+                            case 'A':
+                                // Only add link if href exists
+                                return node.href ? `[${content}](${node.href})` : content;
+                            case 'BR':
+                                return '\n';
+                            // Block-level elements that should create paragraph breaks
+                            case 'P': case 'DIV': case 'H1': case 'H2': case 'H3': case 'H4': case 'H5': case 'H6':
+                            case 'LI': case 'BLOCKQUOTE': case 'TR': case 'HR':
+                                // Add double newline to ensure separation, then trim to remove internal fluff
+                                return `\n\n${content.trim()}\n\n`;
+                            default:
+                                return content;
+                        }
+                    }
+
+                    let convertedText = htmlToMarkdown(sandbox);
+                    
+                    // Clean up the generated string:
+                    // 1. Replace multiple spaces/tabs with a single space
+                    // 2. Collapse more than two consecutive newlines into exactly two
+                    // 3. Trim leading/trailing whitespace
+                    convertedText = convertedText
+                        .replace(/[ \t\r\f\v]+/g, ' ')
+                        .replace(/(\n\s*){3,}/g, '\n\n')
+                        .trim();
+                        
+                    // Insert the cleaned-up text into the editor
+                    document.execCommand("insertText", false, convertedText);
+
+                } else {
+                    // Fallback to plain text if no HTML is in the clipboard
+                    pastedData = clipboardData.getData('text/plain');
+                    document.execCommand("insertText", false, pastedData);
+                }
+            };
 
             // --- Event Listeners ---
             inputDiv.addEventListener('input', debouncedProcessText);
@@ -1366,100 +1397,17 @@
             wrapPCheckbox.addEventListener('change', debouncedProcessText); 
             cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); 
             projectSelect.addEventListener('change', () => {
-                // Don't auto-load, let user click "Load"
-                // handleLoadProject(); // This would auto-load on select change
-                updateProjectUI(); // Just update button states based on selection
+                updateProjectUI(); // Just update button states, don't auto-load
             });
 
-
-            inputDiv.addEventListener("paste", (e) => {
-                e.preventDefault();
-                const clipboardData = e.clipboardData || window.clipboardData;
-                let pastedData = clipboardData.getData('text/html');
-                let isHTML = true;
-
-                if (!pastedData) {
-                    pastedData = clipboardData.getData('text/plain');
-                    isHTML = false;
-                }
-                
-                if (!pastedData) return;
-
-                let convertedText = pastedData;
-
-                if (isHTML) {
-                    const sandbox = document.createElement('div');
-                    sandbox.innerHTML = pastedData;
-
-                    function traverseAndConvert(node) {
-                        let markdown = '';
-                        for (const child of node.childNodes) {
-                            if (child.nodeType === Node.TEXT_NODE) {
-                                markdown += child.textContent;
-                            } else if (child.nodeType === Node.ELEMENT_NODE) {
-                                const tagName = child.tagName.toLowerCase();
-                                let prefix = '', suffix = '', blockSeparator = '';
-
-                                if (['b', 'strong'].includes(tagName)) {
-                                    prefix = '**'; suffix = '**';
-                                } else if (['i', 'em'].includes(tagName)) {
-                                    prefix = '*'; suffix = '*';
-                                } else if (['a'].includes(tagName) && child.href) {
-                                    prefix = '['; 
-                                    suffix = `](${child.href})`;
-                                } else if (['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'tr', 'hr', 'br'].includes(tagName)) {
-                                    // Ensure separation for block-level elements or line breaks
-                                    // Add \n\n before processing the child's content if markdown isn't empty and doesn't end with \n\n
-                                    // Add \n for <br>
-                                    if (markdown.length > 0 && !markdown.endsWith('\n')) {
-                                         blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
-                                    } else if (markdown.length === 0 && tagName !== 'br') {
-                                        // For the very first block, don't prepend newlines unless it's a BR
-                                    } else {
-                                        blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
-                                    }
-                                    // If current markdown does not end with enough newlines, add them
-                                    if (blockSeparator === '\n\n' && markdown.length > 0 && !markdown.endsWith('\n\n')) {
-                                        if (markdown.endsWith('\n')) markdown += '\n'; else markdown += '\n\n';
-                                    } else if (blockSeparator === '\n' && markdown.length > 0 && !markdown.endsWith('\n')) {
-                                        markdown += '\n';
-                                    }
-
-                                }
-                                markdown += prefix + traverseAndConvert(child) + suffix;
-                            }
-                        }
-                        return markdown;
-                    }
-                    convertedText = traverseAndConvert(sandbox);
-                    convertedText = convertedText
-                        .replace(/(\n\s*){3,}/g, '\n\n') 
-                        .replace(/^\s+|\s+$/g, ''); // trim leading/trailing whitespace including newlines
-                }
-                
-                // Insert the processed text
-                // Try to insert at cursor position if possible
-                const selection = window.getSelection();
-                if (selection.rangeCount > 0) {
-                    selection.deleteFromDocument(); // Delete selected text
-                    selection.getRangeAt(0).insertNode(document.createTextNode(convertedText));
-                    selection.collapseToEnd(); // Move cursor to end of inserted text
-                } else { // Fallback if no selection
-                    document.execCommand("insertText", false, convertedText);
-                }
-                // debouncedProcessText will be triggered by the 'input' event from execCommand or node insertion
-            });
+            // Use the new, robust paste handler
+            inputDiv.addEventListener("paste", handlePaste);
 
             pasteBtn.addEventListener('click', async () => {
                 try {
                     const text = await navigator.clipboard.readText();
-                    // currentProjectName = null; // Pasting should make it an unsaved draft from current project
-                    // sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT); // Don't remove, just mark as dirty
-                    
-                    // Clear existing content and paste
                     inputDiv.innerText = text; 
-                    processText(); // This will update stats and output
-                    // updateProjectUI(); // processText calls this
+                    processText();
                     inputDiv.focus();
                     showFeedback(pasteBtn, 'Pasted!', 'success');
                 } catch (err) {
@@ -1475,39 +1423,28 @@
             caseUpperBtn.addEventListener('click', () => applyCase(text => text.toUpperCase()));
 
             copyBtn.addEventListener('click', async () => {
-                if (outputDiv.innerText.trim() && navigator.clipboard && window.ClipboardItem) {
-                    try {
-                        const plainText = outputDiv.innerText;
-                        // Ensure the HTML is wrapped in a single root for better clipboard compatibility
-                        const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
-                        const blobHtml = new Blob([htmlText], { type: "text/html" });
-                        const blobPlain = new Blob([plainText], { type: "text/plain" });
-                        const data = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain });
-                        await navigator.clipboard.write([data]);
-                        showFeedback(copyBtn, 'Copied Rich Text!');
-                        window.getSelection()?.removeAllRanges();
-                    } catch (err) {
-                        console.warn('Failed to copy rich text, falling back to plain text: ', err);
-                         try {
-                            await navigator.clipboard.writeText(outputDiv.innerText);
-                            showFeedback(copyBtn, 'Copied Plain Text');
-                         } catch (plainErr) {
-                            console.error('Failed to copy plain text: ', plainErr);
-                            showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
-                            alert("Could not copy to clipboard.");
-                         }
-                    }
-                } else if (outputDiv.innerText.trim() && navigator.clipboard) { // Fallback for browsers without ClipboardItem
+                if (!outputDiv.innerText.trim()) {
+                    showFeedback(copyBtn, 'Nothing to copy', 'danger', 1500);
+                    return;
+                }
+                try {
+                    const plainText = outputDiv.innerText;
+                    const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
+                    const blobHtml = new Blob([htmlText], { type: "text/html" });
+                    const blobPlain = new Blob([plainText], { type: "text/plain" });
+                    const data = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain });
+                    await navigator.clipboard.write([data]);
+                    showFeedback(copyBtn, 'Copied Rich Text!');
+                    window.getSelection()?.removeAllRanges();
+                } catch (err) {
+                    console.warn('Fallback to plain text copy: ', err);
                      try {
                         await navigator.clipboard.writeText(outputDiv.innerText);
                         showFeedback(copyBtn, 'Copied Plain Text');
-                     } catch (err) {
-                        console.error('Failed to copy plain text: ', err);
+                     } catch (plainErr) {
+                        console.error('Failed to copy: ', plainErr);
                         showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
-                        alert("Could not copy to clipboard.");
                      }
-                } else if (!outputDiv.innerText.trim()){
-                    showFeedback(copyBtn, 'Nothing to copy', 'danger', 1500);
                 }
             });
             
@@ -1519,8 +1456,8 @@
                         showFeedback(clearBtn, 'Already Clear', 'success', 1000);
                         return;
                  }
-                 if (confirm("Clear current draft text and reset its options to default?\n(This will not delete any saved projects).")) {
-                    clearDraft(); // This now calls processText
+                 if (confirm("Clear current draft text and reset its options?")) {
+                    clearDraft();
                     showFeedback(clearBtn, 'Draft Cleared!', 'success');
                  }
             });
@@ -1551,22 +1488,8 @@
             });
 
             findInput.addEventListener('input', debounce(updateFindCount, 200));
-            replaceInput.addEventListener('input', debounce(updateFindCount, 200)); // Update count if replace text changes (e.g. for future "replace next")
+            replaceInput.addEventListener('input', debounce(updateFindCount, 200));
             replaceAllBtn.addEventListener('click', handleReplaceAll);
-
-
-            // Download helpers
-             const downloadFile = (content, filename, type) => {
-                 const blob = new Blob([content], { type: type });
-                 const url = URL.createObjectURL(blob);
-                 const a = document.createElement('a');
-                 a.href = url;
-                 a.download = filename;
-                 document.body.appendChild(a); 
-                 a.click();
-                 document.body.removeChild(a);
-                 URL.revokeObjectURL(url); 
-             }
 
             downloadHtmlBtn.addEventListener('click', () => {
                 if (!outputDiv.innerHTML.trim()) {
@@ -1574,7 +1497,7 @@
                     return;
                 }
                 const projectTitle = currentProjectName || 'Formatted Output';
-                const content = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${escapeHTML(projectTitle)}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto;} p {margin-bottom: 1em;} a {color: #0369a1; text-decoration: underline;} strong {font-weight: bold;} em {font-style: italic;}</style></head><body><h1>${escapeHTML(projectTitle)}</h1>${outputDiv.innerHTML}</body></html>`;
+                const content = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${escapeHTML(projectTitle)}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto;} p {margin-bottom: 1em;} a {color: #0369a1;} strong {font-weight: bold;} em {font-style: italic;}</style></head><body><h1>${escapeHTML(projectTitle)}</h1>${outputDiv.innerHTML}</body></html>`;
                 const filename = (currentProjectName || 'formatted_output').replace(/[^a-z0-9_.-]/gi, '_') + '.html';
                 downloadFile(content, filename, 'text/html;charset=utf-8');
                 showFeedback(downloadHtmlBtn, 'HTML Downloaded!', 'success');
@@ -1591,26 +1514,40 @@
                 showFeedback(downloadTextBtn, 'TXT Downloaded!', 'success');
             });
 
+            // --- *** FIXED *** Correctly attached all remaining listeners ---
+            themeToggle.addEventListener('change', () => {
+                applyTheme(themeToggle.checked);
+                savePreferences();
+            });
+            fontSizeSlider.addEventListener('input', () => {
+                applyFontSize(fontSizeSlider.value);
+            });
+            fontSizeSlider.addEventListener('change', savePreferences);
+            targetWordCountInput.addEventListener('input', () => {
+                debouncedUpdateStats();
+                debounce(savePreferences, 500)();
+            });
+
             // --- Initialization ---
             loadPreferences();
             loadAllProjectsFromStorage();
             
             currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
-            if(currentProjectName && !PROJECT_STORE[currentProjectName]) { // Validate current project
+            if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
                  currentProjectName = null; 
                  sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
             }
             
-            loadDraftSettings(); // Load general draft settings (separator, wrapP etc.)
+            loadDraftSettings();
             
             const savedInput = sessionStorage.getItem(SESSION_KEY_DRAFT);
             if (savedInput) {
-                inputDiv.innerText = savedInput; // Load draft content
+                inputDiv.innerText = savedInput;
             }
             
-            updateProjectUI(); // Update project dropdown and button states
-            processText(); // Initial processing of content (if any)
-            updateFindCount(); // Initialize find count and button state
+            updateProjectUI();
+            processText();
+            updateFindCount();
         });
     </script>
 
