@@ -826,13 +826,13 @@
             const separatorInput = document.getElementById('separatorInput');
             const wrapPCheckbox = document.getElementById('wrapPCheckbox'); 
             const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); 
-             const targetWordCountInput = document.getElementById('targetWordCount'); // QoL
-             const fontSizeSlider = document.getElementById('fontSizeSlider'); //QoL
-             const currentProjectTitleEl = document.getElementById('currentProjectTitle'); // Project
+            const targetWordCountInput = document.getElementById('targetWordCount');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const currentProjectTitleEl = document.getElementById('currentProjectTitle');
 
             const pasteBtn = document.getElementById('pasteBtn');
             const copyBtn = document.getElementById('copyBtn');
-            const clearBtn = document.getElementById('clearBtn'); // MOVED
+            const clearBtn = document.getElementById('clearBtn');
             const inputStats = document.getElementById('inputStats');
             const outputStats = document.getElementById('outputStats');
             const themeToggle = document.getElementById('themeToggleCheckbox');
@@ -842,18 +842,17 @@
             const caseTitleBtn = document.getElementById('caseTitleBtn');
             const caseLowerBtn = document.getElementById('caseLowerBtn');
             const caseUpperBtn = document.getElementById('caseUpperBtn');
-             // Project Elements
-             const projectSelect = document.getElementById('projectSelect');
-             const loadProjectBtn = document.getElementById('loadProjectBtn');
-             const saveProjectBtn = document.getElementById('saveProjectBtn');
-             const saveAsProjectBtn = document.getElementById('saveAsProjectBtn');
-             const deleteProjectBtn = document.getElementById('deleteProjectBtn');
-             const importProjectsBtn = document.getElementById('importProjectsBtn');
-             const exportProjectsBtn = document.getElementById('exportProjectsBtn');
-             const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
-             const importFileElement = document.getElementById('importFileElement');
             
-            // Element Selection for new features
+            const projectSelect = document.getElementById('projectSelect');
+            const loadProjectBtn = document.getElementById('loadProjectBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const saveAsProjectBtn = document.getElementById('saveAsProjectBtn');
+            const deleteProjectBtn = document.getElementById('deleteProjectBtn');
+            const importProjectsBtn = document.getElementById('importProjectsBtn');
+            const exportProjectsBtn = document.getElementById('exportProjectsBtn');
+            const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
+            const importFileElement = document.getElementById('importFileElement');
+            
             const goToOutputBtn = document.getElementById('goToOutputBtn');
             const outputCard = document.getElementById('outputCard');
             const findBtn = document.getElementById('findBtn');
@@ -864,50 +863,57 @@
             const replaceAllBtn = document.getElementById('replaceAllBtn');
             const closeFindBtn = document.getElementById('closeFindBtn');
 
-
-            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn]; // for disabling
-            const projectActionButtons = [loadProjectBtn, deleteProjectBtn]; // for disabling
+            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn];
+            const projectActionButtons = [loadProjectBtn, deleteProjectBtn];
 
             // --- CONSTANTS & STATE ---
             const DEFAULT_SEPARATOR = '\\n\\n';
             const SESSION_KEY_DRAFT = 'pfp_draftContent';
-            const SESSION_KEY_SETTINGS = 'pfp_draftSettings'; // project-specific settings
+            const SESSION_KEY_SETTINGS = 'pfp_draftSettings';
             const SESSION_KEY_CURRENT_PROJECT = 'pfp_currentProjectName';
-            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjects'; // localStorage
-            const STORAGE_KEY_PREFS = 'pfp_Preferences'; // theme, font, target
+            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjects';
+            const STORAGE_KEY_PREFS = 'pfp_Preferences';
 
-            let feedbackTimeout;
-            let PROJECT_STORE = {}; // In-memory cache of projects
+            let PROJECT_STORE = {};
             let currentProjectName = null;
 
-
             // --- Helper: Debounce --- 
-             const debounce = (func, delay) => {
+            const debounce = (func, delay) => {
                  let timeout;
                  return function(...args) {
                      clearTimeout(timeout);
                      timeout = setTimeout(() => func.apply(this, args), delay);
                  };
-             };
+            };
 
-            // --- Helper: Escape HTML ---
-            const escapeHTML = (str) => String(str) 
-                .replace(/&/g, '&')
-                .replace(/</g, '<')
-                .replace(/>/g, '>')
-                .replace(/"/g, '"')
-                .replace(/'/g, ''');
+            // --- Helper: Escape HTML (CRITICAL FIX) ---
+            const escapeHTML = (str) => {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&')
+                    .replace(/</g, '<')
+                    .replace(/>/g, '>')
+                    .replace(/"/g, '"')
+                    .replace(/'/g, ''');
+            };
+            
+            // --- Helper: Escape RegExp characters (NEW) ---
+            const escapeRegExp = (string) => {
+                if (string === null || string === undefined) return '';
+                return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+            }
 
             // --- Helper: Convert Markdown --- 
             const convertMarkdown = (text) => {
-                let html = escapeHTML(text);
-                html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+                let html = escapeHTML(text); // Escape the entire raw text first
+                // Links: [text](url) - $1 is linkText, $2 is url. Both are already escaped.
+                html = html.replace(/\[([^\[\]]+?)\]\((https?:\/\/[^\s()]+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+                // Bold Italic: ***text*** or ___text___ - $2 is content, already escaped.
                 html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
+                // Bold: **text** or __text__ - $2 is content, already escaped.
                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+                // Italic: *text* or _text_ - $2 is content, already escaped.
                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
-                 // Re-run to catch basic nesting 
-                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); 
-                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
                 return html;
             };
 
@@ -917,39 +923,51 @@
                 const isWrapP = wrapPCheckbox.checked;
                 const isCleanSpaces = cleanSpacesCheckbox.checked;
 
-                // Save DRAFT text & settings to SESSION storage 
                 sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
-                saveDraftSettings(); // Save settings related to this draft
+                saveDraftSettings(); 
                 
-                const escapedSeparator = escapeHTML(separatorInput.value);
-                const htmlSeparator = escapedSeparator.replace(/\\n/g, '<br>\n');
+                // Separator logic needs to handle escaped \n for <br>
+                // Do not escapeHTML the separatorInput.value here, as it's meant to contain literal \n for <br>
+                const rawSeparator = separatorInput.value;
+                const htmlSeparator = rawSeparator.replace(/\\n/g, '<br>\n'); // Convert literal \n to <br>
                 const finalSeparator = isWrapP ? '\n' : htmlSeparator;
 
-                const outputIsEmpty = !inputText || inputText.trim() === '';
-                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
-                 saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
-                 saveAsProjectBtn.disabled = outputIsEmpty;
 
+                const outputIsEmpty = !inputText || inputText.trim() === '';
+                outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
+                saveProjectBtn.disabled = outputIsEmpty || !currentProjectName;
+                saveAsProjectBtn.disabled = outputIsEmpty;
 
                 if (outputIsEmpty) {
                     outputDiv.innerHTML = '';
                     updateStats();
-                     updateProjectUI(); // update button states
+                    updateProjectUI();
                     return;
                 }
 
-                 const htmlParagraphs = inputText
-                    .split(/\n\s*\n/g) 
+                const htmlParagraphs = inputText
+                    .split(/\n\s*\n+/g) // Split by one or more blank lines
                     .filter(p => p.trim() !== '')
                     .map(p => {
                          let processedP = p.trim();
                          if(isCleanSpaces) {
-                             // Collapse all whitespace/newlines to single space
                              processedP = processedP.replace(/\s+/g, ' '); 
                          }
-                         processedP = convertMarkdown(processedP);
-                          // If not cleaning spaces, convert remaining single newlines within the paragraph to <br>
+                         processedP = convertMarkdown(processedP); // Markdown conversion
+                          
                           if(!isCleanSpaces) {
+                               // Convert literal newlines within a paragraph block to <br> AFTER markdown
+                               // This ensures markdown like lists (if supported later) isn't broken
+                               // And that `escapeHTML` has already run.
+                               // We need to be careful not to convert \n inside HTML tags produced by convertMarkdown.
+                               // This is tricky. A simpler approach is to let convertMarkdown handle internal newlines
+                               // if they are meant to be <br>s, or rely on CSS white-space for pre-wrap.
+                               // For now, this will convert all remaining \n to <br>.
+                               // If convertMarkdown produces HTML with newlines for formatting, those will also become <br>.
+                               // This might be acceptable for simple cases.
+                               // A more robust solution would involve more complex parsing.
+                               // The current `convertMarkdown` escapes newlines to `\n` if they were in the original text.
+                               // So this replace will turn them into `<br>`.
                                processedP = processedP.replace(/\n/g, '<br>\n');
                           }
                          return isWrapP ? `<p>${processedP}</p>` : processedP;
@@ -957,7 +975,7 @@
                 
                 outputDiv.innerHTML = htmlParagraphs.join(finalSeparator);
                 updateStats();
-                 updateProjectUI(); // update button states
+                updateProjectUI();
             };
             const debouncedProcessText = debounce(processText, 250); 
 
@@ -984,38 +1002,51 @@
                 const outputWordCount = outputText.match(/\S+/g)?.length || 0;
                 outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
 
-                // Update find count if bar is visible
                 if (!findReplaceBar.classList.contains('hidden')) {
                     updateFindCount();
                 }
             };
-             const debouncedUpdateStats = debounce(updateStats, 200); // for target input
+             const debouncedUpdateStats = debounce(updateStats, 200);
 
              // --- Case Conversion Helpers ---
              const applyCase = (caseFunc) => {
                   inputDiv.innerText = caseFunc(inputDiv.innerText);
-                  processText(); // process immediately
+                  processText();
              }
             const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
             const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
             
-            // --- GENERIC Button Feedback ---
+            // --- GENERIC Button Feedback (REFINED) ---
             const showFeedback = (button, text, type = 'success', duration = 1500) => {
-                 if(button.dataset.feedbackActive) return; 
-                 if(feedbackTimeout) {}
-                 button.dataset.feedbackActive = "true";
-                const originalHTML = button.innerHTML;
+                // Clear any existing timeout for this specific button
+                if (button.dataset.feedbackTimeoutId) {
+                    clearTimeout(parseInt(button.dataset.feedbackTimeoutId));
+                }
+
+                // Store original HTML if not already stored for this feedback session
+                // This ensures that if feedback is triggered multiple times rapidly,
+                // we always revert to the very first state before any feedback.
+                if (!button.dataset.originalHTML && button.innerHTML !== text) { // Only store if not already in feedback mode with this text
+                    button.dataset.originalHTML = button.innerHTML;
+                }
+                
+                button.classList.remove('feedback-success', 'feedback-danger'); // Clear previous types
                 const feedbackClass = `feedback-${type}`;
                 button.classList.add(feedbackClass);
                 button.innerHTML = text;
+
                 const timeoutId = setTimeout(() => {
-                     button.classList.remove(feedbackClass);
-                     requestAnimationFrame(() => {
-                         button.innerHTML = originalHTML;
-                          delete button.dataset.feedbackActive;
-                      })
+                    button.classList.remove(feedbackClass);
+                    if (button.dataset.originalHTML) { // Restore if originalHTML is known
+                        button.innerHTML = button.dataset.originalHTML;
+                    }
+                    // Clean up dataset properties for this button
+                    delete button.dataset.originalHTML;
+                    delete button.dataset.feedbackTimeoutId;
                 }, duration);
+                button.dataset.feedbackTimeoutId = timeoutId.toString(); // Store the new timeout ID
             };
+
 
             // --- Theme & Pref Management (localStorage) ---
              const savePreferences = () => {
@@ -1088,10 +1119,10 @@
                          applySettings(JSON.parse(settingsJSON));
                     } catch(e) {
                          console.error("Failed loading draft settings", e);
-                         applySettings({});
+                         applySettings({}); // Apply defaults on error
                     }
                  } else {
-                      applySettings({});
+                      applySettings({}); // Apply defaults if no settings saved
                  }
              }
               const clearDraft = () => {
@@ -1099,11 +1130,11 @@
                    sessionStorage.removeItem(SESSION_KEY_DRAFT);
                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
                    currentProjectName = null;
-                   inputDiv.innerHTML = '';
-                   outputDiv.innerHTML = '';
-                   applySettings({});
+                   inputDiv.innerHTML = ''; // Use innerHTML to clear contenteditable and trigger placeholder
+                   // outputDiv.innerHTML = ''; // processText will handle this
+                   applySettings({}); // Reset to default settings
                    updateProjectUI();
-                   processText();
+                   processText(); // This will clear output and update stats
                    inputDiv.focus();
               }
 
@@ -1112,7 +1143,7 @@
                  try {
                     PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}');
                  } catch (e) {
-                     console.error("Error loading projects", e);
+                     console.error("Error loading projects from localStorage", e);
                      PROJECT_STORE = {};
                  }
             };
@@ -1133,26 +1164,29 @@
                       projectSelect.disabled = true;
                  } else {
                      projectSelect.disabled = false;
-                     projectSelect.add(new Option("-- Select Project --", "", true, true));
+                     projectSelect.add(new Option("-- Select Project --", "", !currentProjectName, !currentProjectName)); // Select if no current project
                      sortedNames.forEach(name => {
                          projectSelect.add(new Option(name, name, false, name === currentProjectName));
                      });
                  }
-                 const projectSelected = projectSelect.value !== "";
+                 const projectSelected = projectSelect.value !== "" && projectSelect.value !== "-- Select Project --"; // Ensure a real project is selected
                  projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelected );
                  currentProjectTitleEl.textContent = currentProjectName || 'Unsaved Draft';
                  saveProjectBtn.disabled = (!currentProjectName) || (inputDiv.innerText.trim() === '');
             };
 
             const handleSaveProject = (isSaveAs = false) => {
-                 if(inputDiv.innerText.trim() === '') return;
+                 if(inputDiv.innerText.trim() === '') {
+                    alert("Cannot save an empty draft.");
+                    return;
+                 }
 
                  let name = currentProjectName;
                  if(isSaveAs || !name) {
                      name = prompt("Enter project name:", name || "");
                       if (!name || name.trim() === "") return;
                       name = name.trim();
-                      if ((isSaveAs || !currentProjectName) && PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) {
+                      if (PROJECT_STORE[name] && (isSaveAs || !currentProjectName || name !== currentProjectName) && !confirm(`Project "${name}" exists. Overwrite?`)) {
                            return;
                       }
                  }
@@ -1166,14 +1200,21 @@
                  currentProjectName = name;
                  sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                  saveAllProjectsToStorage();
-                 updateProjectUI();
+                 updateProjectUI(); // This will re-select the current project in the dropdown
                  showFeedback(isSaveAs ? saveAsProjectBtn : saveProjectBtn, 'Saved!', 'success');
             };
             
              const handleLoadProject = () => {
                  const name = projectSelect.value;
-                 if(!name || !PROJECT_STORE[name]) return;
-                  if(inputDiv.innerText.trim() !== '' && !confirm(`Load "${name}"? Current unsaved draft changes will be lost.`)){
+                 if(!name || !PROJECT_STORE[name]) {
+                    // This case should ideally not happen if UI is updated correctly
+                    alert("Please select a valid project to load.");
+                    return;
+                 }
+                  if(inputDiv.innerText.trim() !== '' && 
+                     sessionStorage.getItem(SESSION_KEY_DRAFT) !== PROJECT_STORE[name].content && // Check if content actually changed
+                     !confirm(`Load "${name}"? Current unsaved draft changes will be lost.`)){
+                     projectSelect.value = currentProjectName || ""; // Revert selection if cancelled
                      return;
                   }
                  
@@ -1181,7 +1222,8 @@
                    currentProjectName = name;
                   sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
                   inputDiv.innerText = project.content || '';
-                  applySettings(project.settings || {});
+                  applySettings(project.settings || {}); // Apply project specific settings
+                  saveDraftSettings(); // Persist these settings for the session draft
                   processText();
                   updateProjectUI();
                   showFeedback(loadProjectBtn, 'Loaded!', 'success');
@@ -1190,20 +1232,25 @@
              const handleDeleteProject = () => {
                  const name = projectSelect.value;
                  if(!name || !PROJECT_STORE[name]) return;
-                 if(!confirm(`Are you sure you want to delete project "${name}"?`)) return;
+                 if(!confirm(`Are you sure you want to delete project "${name}"? This cannot be undone.`)) return;
 
                  delete PROJECT_STORE[name];
                  if(currentProjectName === name) {
                      currentProjectName = null;
                      sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                     // Optionally clear draft or leave it as "Unsaved Draft"
+                     // clearDraft(); // If you want to clear the editor too
                  }
                  saveAllProjectsToStorage();
                  updateProjectUI();
-                  showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
+                 showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
              }
              
             const handleExport = () => {
-                 if(Object.keys(PROJECT_STORE).length === 0) return;
+                 if(Object.keys(PROJECT_STORE).length === 0) {
+                    alert("No projects to export.");
+                    return;
+                 }
                  const content = JSON.stringify(PROJECT_STORE, null, 2);
                  const date = new Date().toISOString().split('T')[0];
                  downloadFile(content, `formatter_projects_export_${date}.json`, 'application/json');
@@ -1211,7 +1258,7 @@
             }
 
             const handleImportClick = () => {
-                 importFileElement.value = null;
+                 importFileElement.value = null; // Reset file input
                  importFileElement.click();
             }
              const handleImportFile = (event) => {
@@ -1223,40 +1270,54 @@
                      try {
                          const importedProjects = JSON.parse(e.target.result);
                          if (typeof importedProjects !== 'object' || importedProjects === null || Array.isArray(importedProjects)) {
-                             throw new Error("Invalid file format.");
+                             throw new Error("Invalid file format. Expected a JSON object of projects.");
                          }
                           const count = Object.keys(importedProjects).length;
                           if(count === 0) {
-                               showFeedback(importProjectsBtn, 'No projects found', 'danger', 2000);
+                               showFeedback(importProjectsBtn, 'No projects in file', 'danger', 2000);
                                return;
                           }
-                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name will be overwritten.`)){
+                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name in your current store will be overwritten.`)){
                             return;
                          }
+                         // Basic validation for project structure (optional but good)
+                         for (const projName in importedProjects) {
+                            if (typeof importedProjects[projName] !== 'object' || 
+                                !importedProjects[projName].hasOwnProperty('content') ||
+                                !importedProjects[projName].hasOwnProperty('settings')) {
+                                throw new Error(`Project "${projName}" has an invalid structure.`);
+                            }
+                         }
+
                          PROJECT_STORE = { ...PROJECT_STORE, ...importedProjects};
                          saveAllProjectsToStorage();
                          updateProjectUI();
-                          showFeedback(importProjectsBtn, 'Imported!', 'success');
+                         showFeedback(importProjectsBtn, `${count} Imported!`, 'success');
 
                      } catch (err) {
                          console.error("Import failed:", err);
-                         alert("Failed to import projects. Ensure the file is valid JSON export.");
-                          showFeedback(importProjectsBtn, 'Error!', 'danger', 2000);
+                         alert(`Failed to import projects: ${err.message}`);
+                         showFeedback(importProjectsBtn, 'Import Error!', 'danger', 2000);
                      }
                  };
                   reader.onerror = () => {
                        alert("Error reading file.");
-                       showFeedback(importProjectsBtn, 'Error!', 'danger', 2000);
+                       showFeedback(importProjectsBtn, 'File Read Error!', 'danger', 2000);
                   }
                  reader.readAsText(file);
              }
               const handleClearAllProjects = () => {
-                 if(Object.keys(PROJECT_STORE).length === 0) return;
-                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis cannot be undone! Consider exporting first.")) return;
+                 if(Object.keys(PROJECT_STORE).length === 0) {
+                    alert("No projects to clear.");
+                    return;
+                 }
+                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis action cannot be undone! Consider exporting your projects first.")) return;
                    localStorage.removeItem(STORAGE_KEY_PROJECTS);
                    PROJECT_STORE = {};
-                   currentProjectName = null;
-                   sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                   if (currentProjectName) { // If current draft was a saved project
+                        currentProjectName = null;
+                        sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                   }
                    updateProjectUI();
                    showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger', 2000);
               }
@@ -1266,23 +1327,35 @@
                 const findText = findInput.value;
                 if (!findText) {
                     findCount.textContent = '0 found';
+                    replaceAllBtn.disabled = true;
                     return;
                 }
-                const matches = inputDiv.innerText.match(new RegExp(findText, 'gi')) || [];
-                findCount.textContent = `${matches.length} found`;
+                try {
+                    const matches = inputDiv.innerText.match(new RegExp(escapeRegExp(findText), 'gi')) || [];
+                    findCount.textContent = `${matches.length} found`;
+                    replaceAllBtn.disabled = matches.length === 0;
+                } catch (e) {
+                    findCount.textContent = 'Invalid regex'; // Should not happen with escapeRegExp
+                    replaceAllBtn.disabled = true;
+                }
             };
 
             const handleReplaceAll = () => {
                 const findText = findInput.value;
-                const replaceText = replaceInput.value;
+                const replaceText = replaceInput.value; // No need to escape replaceText
                 if (!findText) return;
 
                 const originalText = inputDiv.innerText;
-                const newText = originalText.replace(new RegExp(findText, 'g'), replaceText);
-                
-                if (originalText !== newText) {
-                    inputDiv.innerText = newText;
-                    processText(); // Re-process the entire text
+                try {
+                    const newText = originalText.replace(new RegExp(escapeRegExp(findText), 'g'), replaceText);
+                    if (originalText !== newText) {
+                        inputDiv.innerText = newText;
+                        processText(); // Re-process the entire text
+                        // updateFindCount(); // processText calls updateStats which calls updateFindCount
+                    }
+                } catch (e) {
+                     // Should be rare with escaped findText
+                    alert("Error during replacement. Your find pattern might be too complex even after escaping.");
                 }
             };
 
@@ -1292,77 +1365,107 @@
             separatorInput.addEventListener('input', debouncedProcessText);
             wrapPCheckbox.addEventListener('change', debouncedProcessText); 
             cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); 
-             projectSelect.addEventListener('change', updateProjectUI);
+            projectSelect.addEventListener('change', () => {
+                // Don't auto-load, let user click "Load"
+                // handleLoadProject(); // This would auto-load on select change
+                updateProjectUI(); // Just update button states based on selection
+            });
 
-            // <!-- CORRECTED: Robust rich text paste handler -->
+
             inputDiv.addEventListener("paste", (e) => {
                 e.preventDefault();
                 const clipboardData = e.clipboardData || window.clipboardData;
-                const html = clipboardData.getData('text/html');
-                const text = clipboardData.getData('text/plain');
+                let pastedData = clipboardData.getData('text/html');
+                let isHTML = true;
 
-                if (!html) {
-                    document.execCommand("insertText", false, text);
-                    return;
+                if (!pastedData) {
+                    pastedData = clipboardData.getData('text/plain');
+                    isHTML = false;
                 }
+                
+                if (!pastedData) return;
 
-                // Use a temporary div to parse the HTML safely
-                const sandbox = document.createElement('div');
-                sandbox.innerHTML = html;
+                let convertedText = pastedData;
 
-                // Recursive function to traverse the DOM and convert to markdown
-                function traverseAndConvert(node) {
-                    let markdown = '';
-                    for (const child of node.childNodes) {
-                        if (child.nodeType === Node.TEXT_NODE) {
-                            markdown += child.textContent;
-                        } else if (child.nodeType === Node.ELEMENT_NODE) {
-                            const tagName = child.tagName.toLowerCase();
-                            let prefix = '', suffix = '', blockSuffix = '';
+                if (isHTML) {
+                    const sandbox = document.createElement('div');
+                    sandbox.innerHTML = pastedData;
 
-                            if (['b', 'strong'].includes(tagName)) {
-                                prefix = '**'; suffix = '**';
-                            } else if (['i', 'em'].includes(tagName)) {
-                                prefix = '*'; suffix = '*';
-                            } else if (['p', 'div', 'h1', 'h2', 'h3', 'li', 'blockquote', 'tr', 'hr'].includes(tagName)) {
-                                // Add a line break *before* processing the block content if it's not the first element
-                                if (markdown.length > 0 && !markdown.endsWith('\n\n')) {
-                                    markdown += '\n\n';
+                    function traverseAndConvert(node) {
+                        let markdown = '';
+                        for (const child of node.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                markdown += child.textContent;
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                const tagName = child.tagName.toLowerCase();
+                                let prefix = '', suffix = '', blockSeparator = '';
+
+                                if (['b', 'strong'].includes(tagName)) {
+                                    prefix = '**'; suffix = '**';
+                                } else if (['i', 'em'].includes(tagName)) {
+                                    prefix = '*'; suffix = '*';
+                                } else if (['a'].includes(tagName) && child.href) {
+                                    prefix = '['; 
+                                    suffix = `](${child.href})`;
+                                } else if (['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'tr', 'hr', 'br'].includes(tagName)) {
+                                    // Ensure separation for block-level elements or line breaks
+                                    // Add \n\n before processing the child's content if markdown isn't empty and doesn't end with \n\n
+                                    // Add \n for <br>
+                                    if (markdown.length > 0 && !markdown.endsWith('\n')) {
+                                         blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
+                                    } else if (markdown.length === 0 && tagName !== 'br') {
+                                        // For the very first block, don't prepend newlines unless it's a BR
+                                    } else {
+                                        blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
+                                    }
+                                    // If current markdown does not end with enough newlines, add them
+                                    if (blockSeparator === '\n\n' && markdown.length > 0 && !markdown.endsWith('\n\n')) {
+                                        if (markdown.endsWith('\n')) markdown += '\n'; else markdown += '\n\n';
+                                    } else if (blockSeparator === '\n' && markdown.length > 0 && !markdown.endsWith('\n')) {
+                                        markdown += '\n';
+                                    }
+
                                 }
-                                blockSuffix = ''; // Paragraphs are handled by newlines
-                            } else if (tagName === 'br') {
-                                blockSuffix = '\n';
+                                markdown += prefix + traverseAndConvert(child) + suffix;
                             }
-
-                            markdown += prefix + traverseAndConvert(child) + suffix + blockSuffix;
                         }
+                        return markdown;
                     }
-                    return markdown;
+                    convertedText = traverseAndConvert(sandbox);
+                    convertedText = convertedText
+                        .replace(/(\n\s*){3,}/g, '\n\n') 
+                        .replace(/^\s+|\s+$/g, ''); // trim leading/trailing whitespace including newlines
                 }
-
-                let convertedText = traverseAndConvert(sandbox);
-
-                // Clean up excessive newlines that might be generated
-                convertedText = convertedText
-                    .replace(/(\n\s*){3,}/g, '\n\n') // Collapse 3+ newlines to 2
-                    .trim();
-
-                document.execCommand("insertText", false, convertedText);
+                
+                // Insert the processed text
+                // Try to insert at cursor position if possible
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    selection.deleteFromDocument(); // Delete selected text
+                    selection.getRangeAt(0).insertNode(document.createTextNode(convertedText));
+                    selection.collapseToEnd(); // Move cursor to end of inserted text
+                } else { // Fallback if no selection
+                    document.execCommand("insertText", false, convertedText);
+                }
+                // debouncedProcessText will be triggered by the 'input' event from execCommand or node insertion
             });
 
             pasteBtn.addEventListener('click', async () => {
                 try {
-                    // We use the paste event handler now, but this button can trigger a plain text paste
                     const text = await navigator.clipboard.readText();
-                    currentProjectName = null;
-                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-                    inputDiv.innerText = text;
-                    processText();
-                    updateProjectUI();
+                    // currentProjectName = null; // Pasting should make it an unsaved draft from current project
+                    // sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT); // Don't remove, just mark as dirty
+                    
+                    // Clear existing content and paste
+                    inputDiv.innerText = text; 
+                    processText(); // This will update stats and output
+                    // updateProjectUI(); // processText calls this
                     inputDiv.focus();
+                    showFeedback(pasteBtn, 'Pasted!', 'success');
                 } catch (err) {
                     console.error('Failed to read clipboard: ', err);
-                     showFeedback(pasteBtn, 'Error!', 'danger', 2000);
+                    showFeedback(pasteBtn, 'Paste Error!', 'danger', 2000);
+                    alert("Could not paste from clipboard. Your browser might not allow it or an error occurred.");
                 }
             });
             
@@ -1375,25 +1478,49 @@
                 if (outputDiv.innerText.trim() && navigator.clipboard && window.ClipboardItem) {
                     try {
                         const plainText = outputDiv.innerText;
+                        // Ensure the HTML is wrapped in a single root for better clipboard compatibility
                         const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
                         const blobHtml = new Blob([htmlText], { type: "text/html" });
                         const blobPlain = new Blob([plainText], { type: "text/plain" });
                         const data = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain });
                         await navigator.clipboard.write([data]);
-                        showFeedback(copyBtn, 'Copied!');
-                        window.getSelection().removeAllRanges();
+                        showFeedback(copyBtn, 'Copied Rich Text!');
+                        window.getSelection()?.removeAllRanges();
                     } catch (err) {
-                        console.error('Failed to copy rich text: ', err);
-                         navigator.clipboard.writeText(outputDiv.innerText).then(() => {
-                             showFeedback(copyBtn, 'Copied Plain');
-                         }).catch(err =>  showFeedback(copyBtn, 'Error!', 'danger', 2500));
+                        console.warn('Failed to copy rich text, falling back to plain text: ', err);
+                         try {
+                            await navigator.clipboard.writeText(outputDiv.innerText);
+                            showFeedback(copyBtn, 'Copied Plain Text');
+                         } catch (plainErr) {
+                            console.error('Failed to copy plain text: ', plainErr);
+                            showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
+                            alert("Could not copy to clipboard.");
+                         }
                     }
-                } 
+                } else if (outputDiv.innerText.trim() && navigator.clipboard) { // Fallback for browsers without ClipboardItem
+                     try {
+                        await navigator.clipboard.writeText(outputDiv.innerText);
+                        showFeedback(copyBtn, 'Copied Plain Text');
+                     } catch (err) {
+                        console.error('Failed to copy plain text: ', err);
+                        showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
+                        alert("Could not copy to clipboard.");
+                     }
+                } else if (!outputDiv.innerText.trim()){
+                    showFeedback(copyBtn, 'Nothing to copy', 'danger', 1500);
+                }
             });
             
             clearBtn.addEventListener('click', () => {
-                 if (confirm("Clear current draft text and reset its options to default?\n(Saved projects will NOT be deleted).")) {
-                    clearDraft();
+                 if (inputDiv.innerText.trim() === '' && 
+                     separatorInput.value === DEFAULT_SEPARATOR &&
+                     !wrapPCheckbox.checked &&
+                     !cleanSpacesCheckbox.checked) {
+                        showFeedback(clearBtn, 'Already Clear', 'success', 1000);
+                        return;
+                 }
+                 if (confirm("Clear current draft text and reset its options to default?\n(This will not delete any saved projects).")) {
+                    clearDraft(); // This now calls processText
                     showFeedback(clearBtn, 'Draft Cleared!', 'success');
                  }
             });
@@ -1424,6 +1551,7 @@
             });
 
             findInput.addEventListener('input', debounce(updateFindCount, 200));
+            replaceInput.addEventListener('input', debounce(updateFindCount, 200)); // Update count if replace text changes (e.g. for future "replace next")
             replaceAllBtn.addEventListener('click', handleReplaceAll);
 
 
@@ -1441,32 +1569,48 @@
              }
 
             downloadHtmlBtn.addEventListener('click', () => {
-                const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${currentProjectName || 'Formatted Output'}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px;} p {margin-bottom: 1em;} a {color: #0369a1;}</style></head><body><h1>${currentProjectName || 'Formatted Output'}</h1>${outputDiv.innerHTML}</body></html>`;
-                 downloadFile(content, `${currentProjectName || 'formatted_output'}.html`, 'text/html');
-                  showFeedback(downloadHtmlBtn, 'HTML!', 'success');
+                if (!outputDiv.innerHTML.trim()) {
+                    showFeedback(downloadHtmlBtn, 'Nothing to download', 'danger', 1500);
+                    return;
+                }
+                const projectTitle = currentProjectName || 'Formatted Output';
+                const content = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${escapeHTML(projectTitle)}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto;} p {margin-bottom: 1em;} a {color: #0369a1; text-decoration: underline;} strong {font-weight: bold;} em {font-style: italic;}</style></head><body><h1>${escapeHTML(projectTitle)}</h1>${outputDiv.innerHTML}</body></html>`;
+                const filename = (currentProjectName || 'formatted_output').replace(/[^a-z0-9_.-]/gi, '_') + '.html';
+                downloadFile(content, filename, 'text/html;charset=utf-8');
+                showFeedback(downloadHtmlBtn, 'HTML Downloaded!', 'success');
             });
 
             downloadTextBtn.addEventListener('click', () => {
-                 const content = outputDiv.innerText;
-                 downloadFile(content, `${currentProjectName || 'formatted_output'}.txt`, 'text/plain;charset=utf-8');
-                  showFeedback(downloadTextBtn, 'TXT!', 'success');
+                if (!outputDiv.innerText.trim()) {
+                    showFeedback(downloadTextBtn, 'Nothing to download', 'danger', 1500);
+                    return;
+                }
+                const content = outputDiv.innerText;
+                const filename = (currentProjectName || 'formatted_output').replace(/[^a-z0-9_.-]/gi, '_') + '.txt';
+                downloadFile(content, filename, 'text/plain;charset=utf-8');
+                showFeedback(downloadTextBtn, 'TXT Downloaded!', 'success');
             });
 
             // --- Initialization ---
-             loadPreferences();
-             loadAllProjectsFromStorage();
-             currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
-             if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
+            loadPreferences();
+            loadAllProjectsFromStorage();
+            
+            currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
+            if(currentProjectName && !PROJECT_STORE[currentProjectName]) { // Validate current project
                  currentProjectName = null; 
-                  sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
-             }
-            loadDraftSettings(); 
+                 sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+            }
+            
+            loadDraftSettings(); // Load general draft settings (separator, wrapP etc.)
+            
             const savedInput = sessionStorage.getItem(SESSION_KEY_DRAFT);
             if (savedInput) {
-                inputDiv.innerText = savedInput;
+                inputDiv.innerText = savedInput; // Load draft content
             }
-             updateProjectUI();
-            processText();
+            
+            updateProjectUI(); // Update project dropdown and button states
+            processText(); // Initial processing of content (if any)
+            updateFindCount(); // Initialize find count and button state
         });
     </script>
 
