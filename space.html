@@ -19,6 +19,9 @@
             --primary-hover-light: #0284c7;
             --accent-light: #ffffff;
             --link-light: #0369a1;
+            --success-light: #16a34a;
+            --danger-light: #dc2626;
+
 
             --bg-dark: #0f172a; /* Slate 900 */
             --surface-dark: #1e293b; /* Slate 800 */
@@ -29,17 +32,25 @@
             --primary-hover-dark: #7dd3fc;
              --accent-dark: #cbd5e1;
             --link-dark: #7dd3fc;
+             --success-dark: #22c55e;
+             --danger-dark:#f87171;
 
             --shadow-color: rgba(0, 0, 0, 0.08);
             --shadow-color-dark: rgba(0, 0, 0, 0.3);
             --radius: 12px;
              --radius-sm: 8px;
+             /* QoL */
+             --text-area-font-size: 0.95rem; 
         }
 
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -70,23 +81,46 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--surface-light);
+             background-color: var(--surface-light);
             border: 1px solid var(--border-light);
-            padding: 0.8rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: 0 2px 8px var(--shadow-color);
+             padding: 0.8rem 1.5rem;
+             border-radius: var(--radius);
+             box-shadow: 0 2px 8px var(--shadow-color);
         }
-        body.dark-mode header {
-            background-color: var(--surface-dark);
-            border-color: var(--border-dark);
-            box-shadow: 0 2px 8px var(--shadow-color-dark);
-        }
+         body.dark-mode header {
+             background-color: var(--surface-dark);
+             border-color: var(--border-dark);
+             box-shadow: 0 2px 8px var(--shadow-color-dark);
+         }
+
 
         .main-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--primary-hover-light);
+             display: flex;
+             flex-direction: column;
+             line-height: 1.3;
         }
+         .main-title small {
+             font-size: 0.8rem;
+             color: var(--subtle-text-light);
+             font-weight: 500;
+         }
+         /* NEW: Unsaved changes indicator */
+         .main-title small .dirty-indicator {
+             color: var(--danger-light);
+             font-weight: 700;
+             margin-left: 4px;
+             display: none; /* Hidden by default */
+         }
+         body.dark-mode .main-title small .dirty-indicator {
+             color: var(--danger-dark);
+         }
+
+          body.dark-mode .main-title small {
+             color: var(--subtle-text-dark);
+         }
         body.dark-mode .main-title {
             color: var(--primary-hover-dark);
         }
@@ -95,7 +129,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
-            flex-grow: 1; /* Allow workspace to fill height */
         }
         
         .card {
@@ -108,16 +141,27 @@
             flex-direction: column;
             gap: 0.8rem;
             overflow: hidden;
+             height: 100%; /* Ensure cards fill grid row height */
         }
         body.dark-mode .card {
             background-color: var(--surface-dark);
             box-shadow: 0 4px 15px var(--shadow-color-dark);
             border-color: var(--border-dark);
         }
+        /* NEW: Project Manager */
+         .project-manager {
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            padding: 1rem 1.2rem;
+         }
+          .project-manager .column-title { margin-bottom: 0;}
+          .project-group { display: flex; align-items: center; gap: 0.8rem; flex-grow: 1; flex-wrap: wrap;}
+           .project-controls { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;}
 
         /* --- Controls Bar --- */
         .controls-bar {
-           /* grid-column: 1 / -1; */
             display: flex;
             justify-content: space-between;
             align-items: flex-start; /* align top */
@@ -157,50 +201,86 @@
              font-weight: 500;
              font-size: 0.85rem;
              color: var(--subtle-text-light);
+             white-space: nowrap;
         }
          body.dark-mode .input-control {
              color: var(--subtle-text-dark);
          }
          /* Checkbox specific */
-         .input-control input[type="checkbox"] {
-             width: 1rem;
-             height: 1rem;
+         .input-control input[type="checkbox"],
+         .input-control input[type="range"]
+          {
              accent-color: var(--primary-light);
              cursor: pointer;
          }
-          body.dark-mode .input-control input[type="checkbox"] {
+          .input-control input[type="checkbox"] {
+             width: 1rem;
+             height: 1rem;
+          }
+
+          body.dark-mode .input-control input[type="checkbox"],
+           body.dark-mode .input-control input[type="range"]
+           {
                accent-color: var(--primary-dark);
           }
            .input-control label {
             cursor: pointer;
            }
 
-
-        #separatorInput {
+        /* Input & Select fields */
+        #separatorInput, #targetWordCount, #projectSelect,
+        #findInput, #replaceInput {
             padding: 0.4rem 0.6rem;
             border: 1px solid var(--border-light);
             border-radius: var(--radius-sm);
-            font-family: 'Inter', monospace; /* monospace for \n */
+            font-family: 'Inter', sans-serif; 
             background-color: var(--bg-light);
             color: var(--text-light);
-            width: 80px;
             transition: all 0.3s;
              font-size: 0.85rem;
         }
+         #separatorInput {
+             font-family: 'Inter', monospace; /* monospace for \n */
+              width: 70px;
+         }
+         #targetWordCount {
+             width: 75px;
+         }
+         #projectSelect {
+             min-width: 150px;
+             max-width: 300px;
+             flex-grow: 1;
+         }
 
-        body.dark-mode #separatorInput {
+
+        body.dark-mode #separatorInput,
+        body.dark-mode #targetWordCount,
+        body.dark-mode #projectSelect,
+        body.dark-mode #findInput,
+        body.dark-mode #replaceInput
+         {
             border-color: var(--border-dark);
             background-color: var(--bg-dark);
             color: var(--text-dark);
         }
         
-        #separatorInput:focus {
+        #separatorInput:focus, 
+        #targetWordCount:focus,
+        #projectSelect:focus,
+        #findInput:focus,
+        #replaceInput:focus
+         {
             outline: none;
             border-color: var(--primary-light);
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
         
-        body.dark-mode #separatorInput:focus {
+        body.dark-mode #separatorInput:focus,
+        body.dark-mode #targetWordCount:focus,
+        body.dark-mode #projectSelect:focus,
+        body.dark-mode #findInput:focus,
+        body.dark-mode #replaceInput:focus
+         {
             border-color: var(--primary-dark);
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
         }
@@ -210,13 +290,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem; /* NEW: Add gap */
             padding-bottom: 0.2rem;
-           /* border-bottom: 1px dashed var(--border-light); */
             margin-bottom: 0rem;
         }
-      /*  body.dark-mode .column-header {
-            border-bottom-color: var(--border-dark);
-        } */
+        /* NEW: Header Actions Container */
+        .column-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
 
         .column-title {
             font-size: 1.1rem;
@@ -229,7 +313,9 @@
             color: var(--subtle-text-light);
             font-weight: 500;
         }
-        
+         .stats.target-met { color: var(--success-light); font-weight: 700; }
+         body.dark-mode .stats.target-met { color: var(--success-dark); }
+
         body.dark-mode .stats {
             color: var(--subtle-text-dark);
         }
@@ -238,11 +324,11 @@
         .text-area {
             width: 100%;
             flex-grow: 1; /* Fill available card height */
-            min-height: 200px;
-            padding: 0.5rem 0;
+            min-height: 250px; /* Increased min height */
+            padding: 0.5rem 0.75rem; /* Add horizontal padding */
             background-color: transparent;
             color: var(--text-light);
-            font-size: 0.95rem;
+            font-size: var(--text-area-font-size); /* Use variable */
             line-height: 1.7;
             resize: none; /* divs dont resize anyway */
             transition: border-color 0.3s, box-shadow 0.3s;
@@ -264,11 +350,9 @@
         }
 
         #outputDiv {
-            /* Prevent editing but allow selection */
-            user-select: text; /* 'all' can be annoying */
+            user-select: text;
             -webkit-user-modify: read-only;
             -moz-user-modify: read-only;
-           /* user-modify: read-only; */ /* Not standard */
             cursor: text;
         }
         /* Style actual strong/em/a/p tags */
@@ -294,13 +378,51 @@
         }
         
         /* Custom scrollbar */
-        .text-area::-webkit-scrollbar { width: 8px; }
+       .text-area::-webkit-scrollbar { width: 8px; }
         .text-area::-webkit-scrollbar-track { background: var(--border-light); border-radius: 4px; margin: 2px 0;}
         .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-light);  border-radius: 4px; }
         .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+         /* Firefox */
+         .text-area {
+            scrollbar-width: thin;
+            scrollbar-color: var(--subtle-text-light) var(--border-light);
+         }
         body.dark-mode .text-area::-webkit-scrollbar-track { background: var(--border-dark); }
         body.dark-mode .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-dark); }
         body.dark-mode .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-dark); }
+         /* Firefox Dark */
+         body.dark-mode .text-area {
+             scrollbar-color: var(--subtle-text-dark) var(--border-dark);
+         }
+
+        /* Find & Replace Bar */
+        .find-replace-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+        }
+        body.dark-mode .find-replace-bar {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+        }
+        .find-replace-bar.hidden {
+            display: none;
+        }
+        .find-replace-bar input {
+            flex-grow: 1;
+            min-width: 120px;
+        }
+        .find-replace-bar .stats {
+            min-width: 80px;
+            text-align: center;
+        }
+
 
         /* --- Buttons --- */
         .btn {
@@ -323,6 +445,7 @@
         }
         .btn svg {
              flex-shrink: 0; /* prevent svg shrinking */
+              width: 16px; height: 16px;
         }
 
         .btn:hover:not([disabled]) {
@@ -335,7 +458,6 @@
             transform: translateY(0px);
             box-shadow: 0 1px 2px var(--shadow-color);
         }
-        /* NEW: Disabled State */
          .btn[disabled] {
             opacity: 0.5;
             cursor: not-allowed;
@@ -379,13 +501,20 @@
             border-color: var(--subtle-text-dark);
              color: var(--text-dark);
         }
+         /* Feedback states */
+          .btn.feedback-success { background-color: var(--success-light) !important; color: white !important; border-color: transparent !important;}
+          .btn.feedback-danger { background-color: var(--danger-light) !important; color: white !important; border-color: transparent !important;}
+           body.dark-mode .btn.feedback-success { background-color: var(--success-dark) !important; color: var(--bg-dark) !important;}
+           body.dark-mode .btn.feedback-danger { background-color: var(--danger-dark) !important; color: var(--bg-dark) !important;}
+
+
          /* Special case for header clear */
-         #clearBtn:hover {
+         .btn-danger-hover:hover:not([disabled]) {
              background-color: #fee2e2;
              border-color: #fca5a5;
              color: #b91c1c;
          }
-          body.dark-mode #clearBtn:hover {
+          body.dark-mode .btn-danger-hover:hover:not([disabled]) {
              background-color: #450a0a;
              border-color: #7f1d1d;
              color: #fca5a5;
@@ -466,6 +595,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
+             flex-wrap: wrap;
         }
        
         /* --- Responsive Design --- */
@@ -486,7 +616,7 @@
                  padding: 1rem;
              }
              .text-area {
-                 min-height: 30vh;
+                 min-height: 40vh;
              }
               .controls-bar {
                  flex-direction: column-reverse; /* options below buttons on stack */
@@ -498,6 +628,16 @@
              .options-group {
                  align-items: center;
              }
+              .project-manager {
+                 flex-direction: column;
+                 align-items: stretch;
+              }
+              .project-group {
+                 flex-direction: column;
+                 align-items: stretch;
+              }
+              #projectSelect { max-width: 100%;}
+              .project-controls { justify-content: center;}
         }
         
         @media (max-width: 600px) {
@@ -508,6 +648,7 @@
                 flex-direction: column;
                 gap: 0.8rem;
                  padding: 1rem;
+                 align-items: flex-start;
             }
             .header-controls {
                 width: 100%;
@@ -518,6 +659,9 @@
                  font-size: 0.8rem;
              }
              .btn svg { width: 14px; height: 14px;}
+              .text-area {
+                 min-height: 30vh;
+             }
         }
     </style>
 </head>
@@ -525,8 +669,21 @@
 
     <div class="container">
         <header>
-            <h1 class="main-title">Paragraph Formatter Pro</h1>
+             <h1 class="main-title">
+                Paragraph Formatter Pro
+                <small id="currentProjectTitle">Unsaved Draft<span class="dirty-indicator">*</span></small>
+            </h1>
+           
             <div class="header-controls">
+                 <div class="input-control">
+                   <label for="fontSizeSlider" title="Adjust Text Size">Size:</label>
+                    <input type="range" id="fontSizeSlider" min="0.7" max="1.5" step="0.05" value="0.95" style="width: 80px;">
+                 </div>
+                  <div class="input-control">
+                     <label for="targetWordCount" title="Set a word count goal">Target:</label>
+                     <input type="number" id="targetWordCount" min="0" step="50" value="0">
+                 </div>
+
                  <label class="theme-switch" for="themeToggleCheckbox" title="Toggle Dark/Light Mode">
                     <span>☀️</span>
                     <div class="switch">
@@ -535,28 +692,46 @@
                     </div>
                     <span>🌙</span>
                 </label>
-                 <button id="clearBtn" class="btn btn-secondary" title="Clear All Content and Reset Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                       <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                       <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                     </svg>
-                    Clear All
-                </button>
             </div>
         </header>
+        
+         <section class="card project-manager">
+             <h2 class="column-title">Projects:</h2>
+              <div class="project-group">
+                  <select id="projectSelect" title="Select a saved project">
+                      <option value="">-- No Projects Saved --</option>
+                  </select>
+                   <div class="btn-group">
+                       <button id="loadProjectBtn" class="btn" title="Load selected project">Load</button>
+                       <button id="saveProjectBtn" class="btn btn-secondary" title="Save current project">Save</button>
+                       <button id="deleteProjectBtn" class="btn btn-secondary btn-danger-hover" title="Delete selected project">Delete</button>
+                  </div>
+              </div>
+               <div class="project-controls">
+                   <input type="file" id="importFileElement" accept=".json" style="display: none;" aria-hidden="true">
+                    <button id="importProjectsBtn" class="btn btn-secondary" title="Import projects from JSON file">Import</button>
+                    <button id="exportProjectsBtn" class="btn btn-secondary" title="Export all projects to JSON file">Export All</button>
+                    <button id="clearAllProjectsBtn" class="btn btn-secondary btn-danger-hover" title="Delete ALL saved projects from local storage!">Clear All Saved</button>
+                </div>
+         </section>
+
 
         <main class="workspace">
-            <!-- Input Column -->
             <div class="card">
                  <div class="column-header">
                     <div>
                         <h2 class="column-title">Input Text</h2>
                         <div id="inputStats" class="stats">0 words, 0 characters</div>
                     </div>
+                    <div class="column-header-actions">
+                         <button id="toggleSpellcheckBtn" class="btn btn-secondary" title="Toggle Spell Checker">Spellcheck: Off</button>
+                         <button id="goToOutputBtn" class="btn btn-secondary" title="Scroll to Formatted Output">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="controls-bar">
-                     <!-- Input Options -->
-                    <div class="options-group">
+                     <div class="options-group">
                        <div class="options-row">
                           <div class="input-control">
                                 <label for="separatorInput">Separator:</label>
@@ -564,17 +739,14 @@
                             </div>
                              <div class="input-control">
                                 <input type="checkbox" id="wrapPCheckbox" title="Wrap each paragraph in <p> tags">
-                                <label for="wrapPCheckbox">Wrap in &lt;p&gt; tags</label>
+                                <label for="wrapPCheckbox">Wrap in <p> tags</label>
                             </div>
-                       </div>
-                        <div class="options-row">
-                            <div class="input-control">
+                             <div class="input-control">
                                  <input type="checkbox" id="cleanSpacesCheckbox" title="Collapse multiple spaces, tabs and newlines within a paragraph into a single space.">
                                  <label for="cleanSpacesCheckbox">Clean extra spaces</label>
                              </div>
-                        </div>
+                       </div>
                     </div>
-                     <!-- Input Actions -->
                      <div class="control-group">
                         <div class="btn-group" title="Change case of INPUT text">
                              <button id="caseSentenceBtn" class="btn btn-secondary">Sentence</button>
@@ -582,13 +754,32 @@
                              <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
                              <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
                         </div>
-                        <button id="pasteBtn" class="btn" title="Paste plain text from clipboard">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
+                         <button id="copyMarkdownBtn" class="btn btn-secondary" title="Copy input to clipboard as plain text Markdown">
+                            Copy Markdown
+                        </button>
+                        <button id="pasteBtn" class="btn" title="Paste rich text or plain text from clipboard">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
                             Paste 
                         </button>
+                        <button id="findBtn" class="btn btn-secondary" title="Find and Replace text">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
+                            Find
+                        </button>
+                        <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                           Clear Draft
+                       </button>
                     </div>
                 </div>
-               
+                
+                <div id="findReplaceBar" class="find-replace-bar hidden">
+                    <input type="text" id="findInput" placeholder="Find text...">
+                    <input type="text" id="replaceInput" placeholder="Replace with...">
+                    <span id="findCount" class="stats">0 found</span>
+                    <button id="replaceAllBtn" class="btn btn-secondary">Replace All</button>
+                    <button id="closeFindBtn" class="btn btn-secondary" title="Close Find/Replace">X</button>
+                </div>
+
                 <div 
                     id="inputDiv" 
                     class="text-area" 
@@ -600,31 +791,29 @@
                 </div>
             </div>
 
-            <!-- Output Column -->
-            <div class="card">
-                 <div class="column-header">
+            <div class="card" id="outputCard"> 
+                <div class="column-header">
                      <div>
                         <h2 class="column-title">Formatted Output</h2>
                         <div id="outputStats" class="stats">0 words, 0 characters</div>
                     </div>
                 </div>
                 <div class="controls-bar">
-                     <!-- Output Actions -->
                      <div class="control-group">
                          <button id="copyBtn" class="btn" title="Copy output to clipboard as Rich Text (HTML) and Plain Text">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
                              Copy Rich Text
                         </button>
                         <button id="downloadHtmlBtn" class="btn btn-secondary" title="Download formatted output as HTML file">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"> <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 0-1 0z"/> <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/></svg>
-                            Download HTML
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"> <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/> </svg>
+                             HTML
                         </button>
                         <button id="downloadTextBtn" class="btn btn-secondary" title="Download formatted output as plain text file">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"> <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 0-1 0z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/></svg>
-                             Download Text
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"> <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/> </svg>
+                             Text
                         </button>
                     </div>
-                   <div><!-- spacer --></div>
+                   <div></div>
                 </div>
                
                 <div 
@@ -636,6 +825,7 @@
                 </div>
             </div>
         </main>
+
     </div>
 
     <script>
@@ -644,9 +834,12 @@
             const inputDiv = document.getElementById('inputDiv');
             const outputDiv = document.getElementById('outputDiv');
             const separatorInput = document.getElementById('separatorInput');
-            const wrapPCheckbox = document.getElementById('wrapPCheckbox'); // NEW
-            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); // NEW
-            
+            const wrapPCheckbox = document.getElementById('wrapPCheckbox'); 
+            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); 
+            const targetWordCountInput = document.getElementById('targetWordCount');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const currentProjectTitleEl = document.getElementById('currentProjectTitle');
+
             const pasteBtn = document.getElementById('pasteBtn');
             const copyBtn = document.getElementById('copyBtn');
             const clearBtn = document.getElementById('clearBtn');
@@ -655,289 +848,753 @@
             const themeToggle = document.getElementById('themeToggleCheckbox');
             const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
             const downloadTextBtn = document.getElementById('downloadTextBtn');
-            // NEW: Case buttons
             const caseSentenceBtn = document.getElementById('caseSentenceBtn');
             const caseTitleBtn = document.getElementById('caseTitleBtn');
             const caseLowerBtn = document.getElementById('caseLowerBtn');
             const caseUpperBtn = document.getElementById('caseUpperBtn');
+            
+            const projectSelect = document.getElementById('projectSelect');
+            const loadProjectBtn = document.getElementById('loadProjectBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const deleteProjectBtn = document.getElementById('deleteProjectBtn');
+            const importProjectsBtn = document.getElementById('importProjectsBtn');
+            const exportProjectsBtn = document.getElementById('exportProjectsBtn');
+            const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
+            const importFileElement = document.getElementById('importFileElement');
+            
+            const goToOutputBtn = document.getElementById('goToOutputBtn');
+            const outputCard = document.getElementById('outputCard');
+            const findBtn = document.getElementById('findBtn');
+            const findReplaceBar = document.getElementById('findReplaceBar');
+            const findInput = document.getElementById('findInput');
+            const replaceInput = document.getElementById('replaceInput');
+            const findCount = document.getElementById('findCount');
+            const replaceAllBtn = document.getElementById('replaceAllBtn');
+            const closeFindBtn = document.getElementById('closeFindBtn');
 
-            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn]; // for disabling
+            // --- NEW: Element selections for new features ---
+            const dirtyIndicator = document.querySelector('.dirty-indicator');
+            const copyMarkdownBtn = document.getElementById('copyMarkdownBtn');
+            const toggleSpellcheckBtn = document.getElementById('toggleSpellcheckBtn');
 
-            let copyTimeout;
+
+            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn, copyMarkdownBtn];
+            const projectActionButtons = [loadProjectBtn, deleteProjectBtn];
+
+            // --- CONSTANTS & STATE ---
             const DEFAULT_SEPARATOR = '\\n\\n';
+            const SESSION_KEY_DRAFT = 'pfp_draftContent';
+            const SESSION_KEY_SETTINGS = 'pfp_draftSettings';
+            const SESSION_KEY_CURRENT_PROJECT = 'pfp_currentProjectName';
+            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjects';
+            const STORAGE_KEY_PREFS = 'pfp_Preferences';
 
-            // --- Helper: Debounce --- NEW
-             const debounce = (func, delay) => {
+            let PROJECT_STORE = {};
+            let currentProjectName = null;
+            let isDraftDirty = false;
+            let savedContentState = '';
+            let isScrolling = false; // NEW: For sync scroll
+
+            // --- Helper: Debounce --- 
+            const debounce = (func, delay) => {
                  let timeout;
                  return function(...args) {
                      clearTimeout(timeout);
                      timeout = setTimeout(() => func.apply(this, args), delay);
                  };
-             };
+            };
 
-            // --- Helper: Escape HTML ---
-            const escapeHTML = (str) => String(str) // ensure string
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            // --- Helper: Escape HTML (CRITICAL FIX) ---
+            const escapeHTML = (str) => {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+            
+            // --- Helper: Escape RegExp characters (NEW) ---
+            const escapeRegExp = (string) => {
+                if (string === null || string === undefined) return '';
+                return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+            }
 
-            // --- Helper: Convert Markdown --- ENHANCED
+            // --- Helper: Convert Markdown --- 
             const convertMarkdown = (text) => {
-                // 1. Escape HTML first to prevent injection
-                let html = escapeHTML(text);
-                
-                // Order matters for nesting and links!
-                 // 2. Links: [text](url) - BEFORE bold/italic, add target/rel
-                 // Basic URL validation added
-                html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s()]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-                 // 3. Bold & Italic ***text*** or ___text___ (non-greedy)
+                let html = escapeHTML(text); // Escape the entire raw text first
+                // Links: [text](url) - $1 is linkText, $2 is url. Both are already escaped.
+                html = html.replace(/\[([^\[\]]+?)\]\((https?:\/\/[^\s()]+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+                // Bold Italic: ***text*** or ___text___ - $2 is content, already escaped.
                 html = html.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>');
-                 // 4. Bold **text** or __text__ (non-greedy)
+                // Bold: **text** or __text__ - $2 is content, already escaped.
                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
-                // 5. Italic *text* or _text_ (non-greedy)
-                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
-                 // Re-run to catch basic nesting like **bold *and italic*** or *italic __and bold__*
-                 html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); 
-                 html = html.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+                // Italic: *text* or _text* - $2 is content, already escaped.
+                html = html.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
                 return html;
             };
 
-            // --- Core Processing Function --- ENHANCED
+             // --- Core Processing Function ---
             const processText = () => {
-                 // Get plain text
                 const inputText = inputDiv.innerText; 
-                const isWrapP = wrapPCheckbox.checked;
-                const isCleanSpaces = cleanSpacesCheckbox.checked;
 
-                // Save text & settings to localStorage 
-                localStorage.setItem('savedInput', inputText);
-                saveSettings();
+                // --- NEW: Check if draft is dirty and update indicator ---
+                if (inputText !== savedContentState && !isDraftDirty) {
+                    isDraftDirty = true;
+                    updateProjectUI(); // Update UI to show dirty indicator
+                }
                 
-                // SECURITY FIX: Escape separator value before replacing \n
-                const escapedSeparator = escapeHTML(separatorInput.value);
-                const htmlSeparator = escapedSeparator.replace(/\\n/g, '<br>\n');
-                // If wrapping in <p>, the separator is just a newline for source readability, <p> margin handles visual space
-                const finalSeparator = isWrapP ? '\n' : htmlSeparator;
+                sessionStorage.setItem(SESSION_KEY_DRAFT, inputText);
+                saveDraftSettings(); 
+                
+                const rawSeparator = separatorInput.value;
+                const htmlSeparator = rawSeparator.replace(/\\n/g, '<br>\n');
+                const finalSeparator = wrapPCheckbox.checked ? '\n' : htmlSeparator;
+
 
                 const outputIsEmpty = !inputText || inputText.trim() === '';
-                 outputButtons.forEach(btn => btn.disabled = outputIsEmpty); // Disable buttons
+                outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
+                saveAsProjectBtn.disabled = outputIsEmpty;
 
                 if (outputIsEmpty) {
                     outputDiv.innerHTML = '';
                     updateStats();
+                    // updateProjectUI(); // No need to call this here, it's called on state changes
                     return;
                 }
 
-                // ENHANCED: Split by one or more BLANK lines, allowing single newlines *within* a paragraph
-                 const htmlParagraphs = inputText
-                    .split(/\n\s*\n/g) 
+                const htmlParagraphs = inputText
+                    .split(/\n\s*\n+/g) // Split by one or more blank lines
                     .filter(p => p.trim() !== '')
                     .map(p => {
                          let processedP = p.trim();
-                          // NEW: Clean Spaces Option
-                         if(isCleanSpaces) {
-                             processedP = processedP.replace(/\s+/g, ' '); // collapse all whitespace/newlines to single space
+                         if(cleanSpacesCheckbox.checked) {
+                             processedP = processedP.replace(/\s+/g, ' '); 
                          }
-                         // Convert Markdown
-                         processedP = convertMarkdown(processedP);
-
-                          // If not cleaning spaces, convert remaining single newlines within the paragraph to <br>
-                          if(!isCleanSpaces) {
+                         processedP = convertMarkdown(processedP); // Markdown conversion
+                          
+                          if(!cleanSpacesCheckbox.checked) {
                                processedP = processedP.replace(/\n/g, '<br>\n');
                           }
-                        
-                         // NEW: Wrap in P tags Option
-                         if (isWrapP) {
-                              return `<p>${processedP}</p>`;
-                         }
-                         return processedP;
+                         return wrapPCheckbox.checked ? `<p>${processedP}</p>` : processedP;
                     });
                 
-                const outputHTML = htmlParagraphs.join(finalSeparator);
-                outputDiv.innerHTML = outputHTML;
+                outputDiv.innerHTML = htmlParagraphs.join(finalSeparator);
                 updateStats();
+                // updateProjectUI();
             };
-            // Create debounced version for input events
-            const debouncedProcessText = debounce(processText, 250); // NEW
+            const debouncedProcessText = debounce(processText, 250); 
+
+             // --- QoL: Target Word Count ---
+             const getTargetCount = () => parseInt(targetWordCountInput.value, 10) || 0;
 
             // --- Helper: Update Stats & Button State ---
             const updateStats = () => {
+                const target = getTargetCount();
                 const inputText = inputDiv.innerText || '';
                 const inputCharCount = inputText.length;
-                // Handle text with only whitespace correctly
                 const inputWordCount = inputText.match(/\S+/g)?.length || 0;
-                inputStats.textContent = `${inputWordCount} words, ${inputCharCount} characters`;
+                let inputStatText = `${inputWordCount} words, ${inputCharCount} characters`;
+                 if (target > 0) {
+                    inputStatText = `${inputWordCount} / ${target} words (${Math.min(100, Math.round(inputWordCount/target*100))}%), ${inputCharCount} characters`;
+                     inputStats.classList.toggle('target-met', inputWordCount >= target);
+                 } else {
+                     inputStats.classList.remove('target-met');
+                 }
+                inputStats.textContent = inputStatText;
 
-                const outputText = outputDiv.innerText || ''; // innerText ignores <p>, <br> etc
+                const outputText = outputDiv.innerText || ''; 
                 const outputCharCount = outputText.length;
                 const outputWordCount = outputText.match(/\S+/g)?.length || 0;
                 outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
-            };
 
-             // --- NEW: Case Conversion Helpers ---
+                if (!findReplaceBar.classList.contains('hidden')) {
+                    updateFindCount();
+                }
+            };
+             const debouncedUpdateStats = debounce(updateStats, 200);
+
+             // --- Case Conversion Helpers ---
              const applyCase = (caseFunc) => {
-                  const currentText = inputDiv.innerText;
-                  inputDiv.innerText = caseFunc(currentText);
-                  processText(); // process immediately
+                  inputDiv.innerText = caseFunc(inputDiv.innerText);
+                  debouncedProcessText();
              }
-            const toSentenceCase = (text) => {
-                 // lowercase all, then uppercase first letter of text and first letter after . ! ?
-                const lower = text.toLowerCase();
-                 return lower.replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
-            }
-             const toTitleCase = (text) => {
-                  // Basic title case, does not handle 'a', 'the', 'of' etc.
-                 return text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-             }
-            // --- End Case Conversion ---
+            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
+            const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+            
+            // --- GENERIC Button Feedback (REFINED) ---
+            const showFeedback = (button, text, type = 'success', duration = 1500) => {
+                if (button.dataset.feedbackTimeoutId) {
+                    clearTimeout(parseInt(button.dataset.feedbackTimeoutId));
+                }
+                if (!button.dataset.originalHTML && button.innerHTML !== text) {
+                    button.dataset.originalHTML = button.innerHTML;
+                }
+                
+                button.classList.remove('feedback-success', 'feedback-danger');
+                const feedbackClass = `feedback-${type}`;
+                button.classList.add(feedbackClass);
+                button.innerHTML = text;
 
-
-            // --- Copy Feedback ---
-            const showCopyFeedback = (button) => {
-                if(copyTimeout) clearTimeout(copyTimeout);
-                const originalHTML = button.innerHTML;
-                 // Store original bg if inline style exists, otherwise rely on CSS
-                 const originalStyle = button.getAttribute("style") || "";
-                button.style.transition = 'none';
-                button.style.backgroundColor = '#22c55e'; // Green feedback
-                button.style.color = '#fff';
-                button.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.07a.733.733 0 0 1-1.047 0L3.217 8.383a.733.733 0 0 1 .01-1.05.733.733 0 0 1 1.047 0L7 9.893l4.736-5.923z"/>
-                    </svg>
-                    Copied!
-                `;
-                copyTimeout = setTimeout(() => {
-                     button.setAttribute("style", originalStyle); // Restore original styles
-                      // Need a tiny delay for transition to re-enable visually
-                      requestAnimationFrame(() => {
-                           button.style.transition = ''; 
-                      })
-                    button.innerHTML = originalHTML;
-                }, 1500);
+                const timeoutId = setTimeout(() => {
+                    button.classList.remove(feedbackClass);
+                    if (button.dataset.originalHTML) {
+                        button.innerHTML = button.dataset.originalHTML;
+                    }
+                    delete button.dataset.originalHTML;
+                    delete button.dataset.feedbackTimeoutId;
+                }, duration);
+                button.dataset.feedbackTimeoutId = timeoutId.toString();
             };
 
-            // --- Theme Management ---
-            const applyTheme = (isDark) => {
+
+            // --- Theme & Pref Management (localStorage) ---
+             const savePreferences = () => {
+                 const prefs = {
+                     theme: themeToggle.checked ? 'dark' : 'light',
+                     fontSize: fontSizeSlider.value,
+                     target: targetWordCountInput.value,
+                 }
+                  localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(prefs));
+             }
+             const applyFontSize = (size) => {
+                 document.body.style.setProperty('--text-area-font-size', `${size}rem`);
+                 fontSizeSlider.value = size;
+             }
+              const applyTheme = (isDark) => {
                 document.body.classList.toggle('dark-mode', isDark);
                 themeToggle.checked = isDark;
             };
-             themeToggle.addEventListener('change', () => {
-                const isDark = themeToggle.checked;
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                applyTheme(isDark);
-            });
 
-            // --- NEW: Settings Persistence ---
-             const saveSettings = () => {
-                 const settings = {
-                     separator: separatorInput.value,
-                     wrapP: wrapPCheckbox.checked,
-                     cleanSpaces: cleanSpacesCheckbox.checked,
-                 };
-                 localStorage.setItem('formatterSettings', JSON.stringify(settings));
+            const loadPreferences = () => {
+                 const prefsJSON = localStorage.getItem(STORAGE_KEY_PREFS);
+                 let theme = 'light';
+                 let fontSize = '0.95';
+                 let target = '0';
+                  if(prefsJSON) {
+                     try {
+                         const prefs = JSON.parse(prefsJSON);
+                         theme = prefs.theme ?? 'light';
+                         fontSize = prefs.fontSize ?? '0.95';
+                         target = prefs.target ?? '0';
+                     } catch(e) { console.error("Failed loading prefs", e); }
+                 }
+                 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                 applyTheme(prefsJSON ? (theme === 'dark') : prefersDark); 
+                 applyFontSize(fontSize);
+                 targetWordCountInput.value = target;
+            }
+             themeToggle.addEventListener('change', () => {
+                applyTheme(themeToggle.checked);
+                savePreferences();
+            });
+             fontSizeSlider.addEventListener('input', () => {
+                 applyFontSize(fontSizeSlider.value);
+             });
+             fontSizeSlider.addEventListener('change', savePreferences);
+             targetWordCountInput.addEventListener('input', () => {
+                 debouncedUpdateStats();
+                 debounce(savePreferences, 500)();
+             });
+
+
+            // --- Draft Settings Persistence (sessionStorage) ---
+             const getCurrentSettings = () => ({
+                  separator: separatorInput.value,
+                  wrapP: wrapPCheckbox.checked,
+                  cleanSpaces: cleanSpacesCheckbox.checked,
+             });
+             const applySettings = (settings) => {
+                 separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
+                 wrapPCheckbox.checked = settings.wrapP ?? false;
+                 cleanSpacesCheckbox.checked = settings.cleanSpaces ?? false;
              }
-             const loadSettings = () => {
-                 const settingsJSON = localStorage.getItem('formatterSettings');
+             const saveDraftSettings = () => {
+                 sessionStorage.setItem(SESSION_KEY_SETTINGS, JSON.stringify(getCurrentSettings()));
+             }
+             const loadDraftSettings = () => {
+                 const settingsJSON = sessionStorage.getItem(SESSION_KEY_SETTINGS);
                  if(settingsJSON) {
                     try {
-                         const settings = JSON.parse(settingsJSON);
-                         separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
-                         wrapPCheckbox.checked = settings.wrapP ?? false;
-                         cleanSpacesCheckbox.checked = settings.cleanSpaces ?? false;
+                         applySettings(JSON.parse(settingsJSON));
                     } catch(e) {
-                         console.error("Failed loading settings", e);
-                         separatorInput.value = DEFAULT_SEPARATOR; // default
+                         console.error("Failed loading draft settings", e);
+                         applySettings({});
                     }
                  } else {
-                      separatorInput.value = DEFAULT_SEPARATOR; // Ensure default on first load
+                      applySettings({});
                  }
              }
-              const clearSettings = () => {
-                   localStorage.removeItem('formatterSettings');
-                   separatorInput.value = DEFAULT_SEPARATOR;
-                   wrapPCheckbox.checked = false;
-                   cleanSpacesCheckbox.checked = false;
+              const clearDraft = () => {
+                   sessionStorage.removeItem(SESSION_KEY_SETTINGS);
+                   sessionStorage.removeItem(SESSION_KEY_DRAFT);
+                   sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                   currentProjectName = null;
+                   inputDiv.innerHTML = '';
+                   savedContentState = '';
+                   isDraftDirty = false;
+                   applySettings({});
+                   processText();
+                   updateProjectUI();
+                   inputDiv.focus();
               }
+
+            // --- PROJECT MANAGEMENT (localStorage) ---
+            const loadAllProjectsFromStorage = () => {
+                 try {
+                    PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}');
+                 } catch (e) {
+                     console.error("Error loading projects from localStorage", e);
+                     PROJECT_STORE = {};
+                 }
+            };
+            const saveAllProjectsToStorage = () => {
+                 localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(PROJECT_STORE));
+            };
+
+            const updateProjectUI = () => {
+                projectSelect.innerHTML = '';
+                const sortedNames = Object.keys(PROJECT_STORE).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+                
+                const hasProjects = sortedNames.length > 0;
+                exportProjectsBtn.disabled = !hasProjects;
+                clearAllProjectsBtn.disabled = !hasProjects;
+
+                 if (!hasProjects) {
+                      projectSelect.add(new Option("-- No Projects Saved --", "", true, true));
+                      projectSelect.disabled = true;
+                 } else {
+                     projectSelect.disabled = false;
+                     projectSelect.add(new Option("-- Select Project --", "", !currentProjectName, !currentProjectName));
+                     sortedNames.forEach(name => {
+                         projectSelect.add(new Option(name, name, false, name === currentProjectName));
+                     });
+                 }
+                 const projectSelected = projectSelect.value !== "" && projectSelect.value !== "-- Select Project --";
+                 projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelected );
+                
+                 // Update title and dirty indicator
+                 currentProjectTitleEl.firstChild.textContent = (currentProjectName || 'Unsaved Draft') + ' ';
+                 dirtyIndicator.style.display = isDraftDirty ? 'inline' : 'none';
+                 
+                 // Enable/disable save button based on dirty state or if it's a new draft
+                 saveProjectBtn.disabled = !isDraftDirty && !!currentProjectName;
+            };
+
+            // --- NEW: Smarter Save Button Logic ---
+            const handleSaveProject = () => {
+                 if(inputDiv.innerText.trim() === '') {
+                    alert("Cannot save an empty draft.");
+                    return;
+                 }
+
+                 let name = currentProjectName;
+                 // If there's no current project name, it's a new draft, so we must ask for a name.
+                 if(!name) {
+                     name = prompt("Enter project name:", "");
+                      if (!name || name.trim() === "") return; // User cancelled or entered empty name
+                      name = name.trim();
+                      // If a project with this name already exists, confirm overwrite.
+                      if (PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) {
+                           return;
+                      }
+                 }
+                 
+                 const projectData = {
+                     content: inputDiv.innerText,
+                     settings: getCurrentSettings(),
+                     timestamp: Date.now(),
+                 };
+                 PROJECT_STORE[name] = projectData;
+                 currentProjectName = name;
+                 sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                 saveAllProjectsToStorage();
+
+                 // After saving, the draft is no longer dirty.
+                 isDraftDirty = false;
+                 savedContentState = projectData.content;
+                 
+                 updateProjectUI(); // This will update the dropdown and hide the dirty indicator
+                 showFeedback(saveProjectBtn, 'Saved!', 'success');
+            };
+            
+             const handleLoadProject = () => {
+                 const name = projectSelect.value;
+                 if(!name || !PROJECT_STORE[name]) {
+                    alert("Please select a valid project to load.");
+                    return;
+                 }
+                  if(isDraftDirty && !confirm(`Load "${name}"? Current unsaved changes will be lost.`)){
+                     projectSelect.value = currentProjectName || ""; // Revert selection if cancelled
+                     return;
+                  }
+                 
+                  const project = PROJECT_STORE[name];
+                   currentProjectName = name;
+                  sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                  inputDiv.innerText = project.content || '';
+                  
+                  // After loading, the state is clean.
+                  savedContentState = project.content || '';
+                  isDraftDirty = false;
+
+                  applySettings(project.settings || {});
+                  saveDraftSettings();
+                  processText();
+                  updateProjectUI();
+                  showFeedback(loadProjectBtn, 'Loaded!', 'success');
+             }
+
+             const handleDeleteProject = () => {
+                 const name = projectSelect.value;
+                 if(!name || !PROJECT_STORE[name]) return;
+                 if(!confirm(`Are you sure you want to delete project "${name}"? This cannot be undone.`)) return;
+
+                 delete PROJECT_STORE[name];
+                 if(currentProjectName === name) {
+                     currentProjectName = null;
+                     sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                     // The current text becomes an "unsaved draft"
+                     savedContentState = ''; // It's now compared against a blank slate
+                     isDraftDirty = inputDiv.innerText.trim() !== '';
+                 }
+                 saveAllProjectsToStorage();
+                 updateProjectUI();
+                 showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
+             }
+             
+            const handleExport = () => {
+                 if(Object.keys(PROJECT_STORE).length === 0) {
+                    alert("No projects to export.");
+                    return;
+                 }
+                 const content = JSON.stringify(PROJECT_STORE, null, 2);
+                 const date = new Date().toISOString().split('T')[0];
+                 downloadFile(content, `formatter_projects_export_${date}.json`, 'application/json');
+                 showFeedback(exportProjectsBtn, 'Exported!', 'success');
+            }
+
+            const handleImportClick = () => {
+                 importFileElement.value = null;
+                 importFileElement.click();
+            }
+             const handleImportFile = (event) => {
+                 const file = event.target.files[0];
+                 if (!file) return;
+
+                 const reader = new FileReader();
+                 reader.onload = (e) => {
+                     try {
+                         const importedProjects = JSON.parse(e.target.result);
+                         if (typeof importedProjects !== 'object' || importedProjects === null || Array.isArray(importedProjects)) {
+                             throw new Error("Invalid file format. Expected a JSON object of projects.");
+                         }
+                          const count = Object.keys(importedProjects).length;
+                          if(count === 0) {
+                               showFeedback(importProjectsBtn, 'No projects in file', 'danger', 2000);
+                               return;
+                          }
+                         if(!confirm(`Import and merge ${count} project(s)? Projects with the same name will be overwritten.`)){
+                            return;
+                         }
+                         for (const projName in importedProjects) {
+                            if (typeof importedProjects[projName] !== 'object' || 
+                                !importedProjects[projName].hasOwnProperty('content') ||
+                                !importedProjects[projName].hasOwnProperty('settings')) {
+                                throw new Error(`Project "${projName}" has an invalid structure.`);
+                            }
+                         }
+
+                         PROJECT_STORE = { ...PROJECT_STORE, ...importedProjects};
+                         saveAllProjectsToStorage();
+                         updateProjectUI();
+                         showFeedback(importProjectsBtn, `${count} Imported!`, 'success');
+
+                     } catch (err) {
+                         console.error("Import failed:", err);
+                         alert(`Failed to import projects: ${err.message}`);
+                         showFeedback(importProjectsBtn, 'Import Error!', 'danger', 2000);
+                     }
+                 };
+                  reader.onerror = () => {
+                       alert("Error reading file.");
+                       showFeedback(importProjectsBtn, 'File Read Error!', 'danger', 2000);
+                  }
+                 reader.readAsText(file);
+             }
+              const handleClearAllProjects = () => {
+                 if(Object.keys(PROJECT_STORE).length === 0) {
+                    alert("No projects to clear.");
+                    return;
+                 }
+                  if(!confirm("DELETE ALL SAVED PROJECTS?\nThis action cannot be undone!")) return;
+                   localStorage.removeItem(STORAGE_KEY_PROJECTS);
+                   PROJECT_STORE = {};
+                   if (currentProjectName) {
+                        currentProjectName = null;
+                        sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                        savedContentState = '';
+                        isDraftDirty = inputDiv.innerText.trim() !== '';
+                   }
+                   updateProjectUI();
+                   showFeedback(clearAllProjectsBtn, 'All Cleared!', 'danger', 2000);
+              }
+
+            // --- Find and Replace Logic ---
+            const updateFindCount = () => {
+                const findText = findInput.value;
+                if (!findText) {
+                    findCount.textContent = '0 found';
+                    replaceAllBtn.disabled = true;
+                    return;
+                }
+                try {
+                    const matches = inputDiv.innerText.match(new RegExp(escapeRegExp(findText), 'gi')) || [];
+                    findCount.textContent = `${matches.length} found`;
+                    replaceAllBtn.disabled = matches.length === 0;
+                } catch (e) {
+                    findCount.textContent = 'Invalid regex';
+                    replaceAllBtn.disabled = true;
+                }
+            };
+
+            const handleReplaceAll = () => {
+                const findText = findInput.value;
+                const replaceText = replaceInput.value;
+                if (!findText) return;
+
+                const originalText = inputDiv.innerText;
+                try {
+                    const newText = originalText.replace(new RegExp(escapeRegExp(findText), 'g'), replaceText);
+                    if (originalText !== newText) {
+                        inputDiv.innerText = newText;
+                        debouncedProcessText();
+                    }
+                } catch (e) {
+                    alert("Error during replacement.");
+                }
+            };
 
 
             // --- Event Listeners ---
-            // Use debounced version for typing/options
             inputDiv.addEventListener('input', debouncedProcessText);
             separatorInput.addEventListener('input', debouncedProcessText);
-            wrapPCheckbox.addEventListener('change', debouncedProcessText); // NEW
-            cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); // NEW
-
-            // Force paste as plain text - prevent messy HTML
-            inputDiv.addEventListener("paste", function(e) {
-                e.preventDefault();
-                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-                 // Use insertText for better undo/redo behaviour than insertHTML, but need to handle newlines
-                 document.execCommand("insertText", false, text);
-                 // processText(); // input event should fire, triggering debounce
+            wrapPCheckbox.addEventListener('change', debouncedProcessText); 
+            cleanSpacesCheckbox.addEventListener('change', debouncedProcessText); 
+            projectSelect.addEventListener('change', () => {
+                updateProjectUI(); 
             });
 
-            // Buttons - trigger processText() directly for immediate effect
+
+            inputDiv.addEventListener("paste", (e) => {
+                e.preventDefault();
+                const clipboardData = e.clipboardData || window.clipboardData;
+                let pastedData = clipboardData.getData('text/html');
+                let isHTML = true;
+
+                if (!pastedData) {
+                    pastedData = clipboardData.getData('text/plain');
+                    isHTML = false;
+                }
+                
+                if (!pastedData) return;
+
+                let convertedText = pastedData;
+
+                if (isHTML) {
+                    const sandbox = document.createElement('div');
+                    sandbox.innerHTML = pastedData;
+                    function traverseAndConvert(node) {
+                        let markdown = '';
+                        for (const child of node.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                markdown += child.textContent;
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                const tagName = child.tagName.toLowerCase();
+                                let prefix = '', suffix = '', blockSeparator = '';
+
+                                if (['b', 'strong'].includes(tagName)) {
+                                    prefix = '**'; suffix = '**';
+                                } else if (['i', 'em'].includes(tagName)) {
+                                    prefix = '*'; suffix = '*';
+                                } else if (['a'].includes(tagName) && child.href) {
+                                    prefix = '['; 
+                                    suffix = `](${child.href})`;
+                                } else if (['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'tr', 'hr', 'br'].includes(tagName)) {
+                                    if (markdown.length > 0 && !markdown.endsWith('\n')) {
+                                         blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
+                                    } else if (markdown.length === 0 && tagName !== 'br') {
+                                    } else {
+                                        blockSeparator = (tagName === 'br') ? '\n' : '\n\n';
+                                    }
+                                    if (blockSeparator === '\n\n' && markdown.length > 0 && !markdown.endsWith('\n\n')) {
+                                        if (markdown.endsWith('\n')) markdown += '\n'; else markdown += '\n\n';
+                                    } else if (blockSeparator === '\n' && markdown.length > 0 && !markdown.endsWith('\n')) {
+                                        markdown += '\n';
+                                    }
+                                }
+                                markdown += prefix + traverseAndConvert(child) + suffix;
+                            }
+                        }
+                        return markdown;
+                    }
+                    convertedText = traverseAndConvert(sandbox);
+                    convertedText = convertedText
+                        .replace(/(\n\s*){3,}/g, '\n\n') 
+                        .replace(/^\s+|\s+$/g, '');
+                }
+                
+                document.execCommand("insertText", false, convertedText);
+            });
+
             pasteBtn.addEventListener('click', async () => {
                 try {
                     const text = await navigator.clipboard.readText();
-                    inputDiv.innerText = text;
-                    processText(); // immediate
+                    inputDiv.innerText = text; 
+                    debouncedProcessText();
                     inputDiv.focus();
+                    showFeedback(pasteBtn, 'Pasted!', 'success');
                 } catch (err) {
-                    console.error('Failed to read clipboard contents: ', err);
-                    alert('Could not paste from clipboard. Please check browser permissions or use Ctrl+V / Cmd+V.');
+                    console.error('Failed to read clipboard: ', err);
+                    showFeedback(pasteBtn, 'Paste Error!', 'danger', 2000);
+                    alert("Could not paste from clipboard.");
                 }
             });
             
-            // NEW: Case Button Listeners
             caseSentenceBtn.addEventListener('click', () => applyCase(toSentenceCase));
             caseTitleBtn.addEventListener('click', () => applyCase(toTitleCase));
             caseLowerBtn.addEventListener('click', () => applyCase(text => text.toLowerCase()));
             caseUpperBtn.addEventListener('click', () => applyCase(text => text.toUpperCase()));
 
-
             copyBtn.addEventListener('click', async () => {
-                 // Check innerText not innerHTML to see if there's actual content
                 if (outputDiv.innerText.trim() && navigator.clipboard && window.ClipboardItem) {
                     try {
-                        // Provide both plain and html versions
                         const plainText = outputDiv.innerText;
-                        // Wrap in div so things like <p> tags copy correctly into apps like Word/Docs
                         const htmlText = `<div>${outputDiv.innerHTML}</div>`; 
                         const blobHtml = new Blob([htmlText], { type: "text/html" });
                         const blobPlain = new Blob([plainText], { type: "text/plain" });
-                        const data = new ClipboardItem({
-                            "text/html": blobHtml,
-                            "text/plain": blobPlain,
-                        });
+                        const data = new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain });
                         await navigator.clipboard.write([data]);
-                        showCopyFeedback(copyBtn);
-                        // Clear selection that might happen on copy
-                        window.getSelection().removeAllRanges();
-                       // outputDiv.blur();
+                        showFeedback(copyBtn, 'Copied Rich Text!');
+                        window.getSelection()?.removeAllRanges();
                     } catch (err) {
-                        console.error('Failed to copy rich text: ', err);
-                         // Fallback to plain text copy if modern API fails
-                         navigator.clipboard.writeText(outputDiv.innerText).then(() => {
-                             showCopyFeedback(copyBtn);
-                         }).catch(err =>  alert('Failed to copy text even with fallback. Please copy manually.'));
+                        console.warn('Fallback to plain text: ', err);
+                         try {
+                            await navigator.clipboard.writeText(outputDiv.innerText);
+                            showFeedback(copyBtn, 'Copied Plain Text');
+                         } catch (plainErr) {
+                            console.error('Failed to copy plain text: ', plainErr);
+                            showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
+                         }
                     }
-                } 
+                } else if (outputDiv.innerText.trim() && navigator.clipboard) {
+                     try {
+                        await navigator.clipboard.writeText(outputDiv.innerText);
+                        showFeedback(copyBtn, 'Copied Plain Text');
+                     } catch (err) {
+                        console.error('Failed to copy plain text: ', err);
+                        showFeedback(copyBtn, 'Copy Error!', 'danger', 2500);
+                     }
+                } else if (!outputDiv.innerText.trim()){
+                    showFeedback(copyBtn, 'Nothing to copy', 'danger', 1500);
+                }
             });
             
             clearBtn.addEventListener('click', () => {
-                 if (confirm("Clear all text and reset options to default?")) {
-                     inputDiv.innerHTML = '';
-                     outputDiv.innerHTML = '';
-                     localStorage.removeItem('savedInput');
-                     clearSettings(); // NEW
-                     processText(); // immediate
-                     inputDiv.focus();
+                 if (inputDiv.innerText.trim() === '' && !isDraftDirty) {
+                        showFeedback(clearBtn, 'Already Clear', 'success', 1000);
+                        return;
+                 }
+                 if (confirm("Clear current draft text and reset its options?")) {
+                    clearDraft();
+                    showFeedback(clearBtn, 'Draft Cleared!', 'success');
                  }
             });
+            
+             // Project Listeners
+             saveProjectBtn.addEventListener('click', handleSaveProject);
+             loadProjectBtn.addEventListener('click', handleLoadProject);
+             deleteProjectBtn.addEventListener('click', handleDeleteProject);
+             exportProjectsBtn.addEventListener('click', handleExport);
+             importProjectsBtn.addEventListener('click', handleImportClick);
+             importFileElement.addEventListener('change', handleImportFile);
+             clearAllProjectsBtn.addEventListener('click', handleClearAllProjects);
+
+            // --- ALL NEW EVENT LISTENERS ---
+
+            // Sync Scrolling
+            const syncScroll = (source, dest) => {
+                if (isScrolling) return;
+                isScrolling = true;
+                const sourceScrollTop = source.scrollTop;
+                const sourceScrollHeight = source.scrollHeight - source.clientHeight;
+                const destScrollHeight = dest.scrollHeight - dest.clientHeight;
+                
+                if (sourceScrollHeight > 0) { // Avoid division by zero
+                    const scrollRatio = sourceScrollTop / sourceScrollHeight;
+                    dest.scrollTop = scrollRatio * destScrollHeight;
+                }
+                setTimeout(() => { isScrolling = false; }, 100); // Debounce to prevent infinite loops
+            };
+            inputDiv.addEventListener('scroll', () => syncScroll(inputDiv, outputDiv));
+            outputDiv.addEventListener('scroll', () => syncScroll(outputDiv, inputDiv));
+
+            // Confirm Before Unload
+            window.addEventListener('beforeunload', (e) => {
+                if (isDraftDirty) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Required for legacy browsers
+                }
+            });
+
+            // Copy as Markdown button
+            copyMarkdownBtn.addEventListener('click', async () => {
+                 if (!inputDiv.innerText.trim()) {
+                    showFeedback(copyMarkdownBtn, 'Nothing to copy', 'danger', 1500);
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(inputDiv.innerText);
+                    showFeedback(copyMarkdownBtn, 'Copied Markdown!', 'success');
+                } catch(err) {
+                    console.error("Failed to copy markdown: ", err);
+                    showFeedback(copyMarkdownBtn, 'Copy Error!', 'danger');
+                }
+            });
+
+            // Toggle Spellcheck button
+            toggleSpellcheckBtn.addEventListener('click', () => {
+                const currentState = inputDiv.getAttribute('spellcheck') === 'true';
+                const newState = !currentState;
+                inputDiv.setAttribute('spellcheck', newState);
+                toggleSpellcheckBtn.textContent = `Spellcheck: ${newState ? 'On' : 'Off'}`;
+                showFeedback(toggleSpellcheckBtn, `Spellcheck is ${newState ? 'ON' : 'OFF'}`, 'success', 1000);
+                inputDiv.focus(); // Re-focus to see the change
+            });
+
+
+            // --- End of New Listeners ---
+
+
+            goToOutputBtn.addEventListener('click', () => {
+                outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            findBtn.addEventListener('click', () => {
+                findReplaceBar.classList.remove('hidden');
+                findInput.focus();
+                updateFindCount();
+            });
+
+            closeFindBtn.addEventListener('click', () => {
+                findReplaceBar.classList.add('hidden');
+            });
+
+            findInput.addEventListener('input', debounce(updateFindCount, 200));
+            replaceInput.addEventListener('input', debounce(updateFindCount, 200));
+            replaceAllBtn.addEventListener('click', handleReplaceAll);
+
 
             // Download helpers
              const downloadFile = (content, filename, type) => {
@@ -946,42 +1603,69 @@
                  const a = document.createElement('a');
                  a.href = url;
                  a.download = filename;
-                 document.body.appendChild(a); // Required for Firefox
+                 document.body.appendChild(a); 
                  a.click();
                  document.body.removeChild(a);
-                 URL.revokeObjectURL(url); // Clean up
+                 URL.revokeObjectURL(url); 
              }
 
             downloadHtmlBtn.addEventListener('click', () => {
-                 // Simple HTML wrapper for download
-                const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Formatted Output</title><style>body{font-family: sans-serif; line-height: 1.6;} p {margin-bottom: 1em;} a {color: #0369a1;}</style></head><body>${outputDiv.innerHTML}</body></html>`;
-                 downloadFile(content, 'formatted_output.html', 'text/html');
+                if (!outputDiv.innerHTML.trim()) {
+                    showFeedback(downloadHtmlBtn, 'Nothing to download', 'danger', 1500);
+                    return;
+                }
+                const projectTitle = currentProjectName || 'Formatted Output';
+                const content = `<!DOCTYPEhtml><html lang="en"><head><meta charset="UTF-8"><title>${escapeHTML(projectTitle)}</title><style>body{font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto;} p {margin-bottom: 1em;} a {color: #0369a1; text-decoration: underline;} strong {font-weight: bold;} em {font-style: italic;}</style></head><body><h1>${escapeHTML(projectTitle)}</h1>${outputDiv.innerHTML}</body></html>`;
+                const filename = (currentProjectName || 'formatted_output').replace(/[^a-z0-9_.-]/gi, '_') + '.html';
+                downloadFile(content, filename, 'text/html;charset=utf-8');
+                showFeedback(downloadHtmlBtn, 'HTML Downloaded!', 'success');
             });
 
             downloadTextBtn.addEventListener('click', () => {
-                 // Use innerText which preserves line breaks conceptually but strips HTML
-                 const content = outputDiv.innerText;
-                 downloadFile(content, 'formatted_output.txt', 'text/plain;charset=utf-8');
+                if (!outputDiv.innerText.trim()) {
+                    showFeedback(downloadTextBtn, 'Nothing to download', 'danger', 1500);
+                    return;
+                }
+                const content = outputDiv.innerText;
+                const filename = (currentProjectName || 'formatted_output').replace(/[^a-z0-9_.-]/gi, '_') + '.txt';
+                downloadFile(content, filename, 'text/plain;charset=utf-8');
+                showFeedback(downloadTextBtn, 'TXT Downloaded!', 'success');
             });
 
             // --- Initialization ---
-            // 1. Theme
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            applyTheme(savedTheme ? (savedTheme === 'dark') : prefersDark);
-            
-            // 2. Settings
-            loadSettings(); // NEW
+            const init = () => {
+                loadPreferences();
+                loadAllProjectsFromStorage();
+                
+                currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
+                if(currentProjectName && !PROJECT_STORE[currentProjectName]) {
+                     currentProjectName = null; 
+                     sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                }
+                
+                loadDraftSettings();
+                
+                const savedInput = sessionStorage.getItem(SESSION_KEY_DRAFT);
+                if (savedInput) {
+                    inputDiv.innerText = savedInput;
+                }
+                
+                if (currentProjectName && PROJECT_STORE[currentProjectName]) {
+                    savedContentState = PROJECT_STORE[currentProjectName].content;
+                } else {
+                    savedContentState = ''; // New draft starts clean
+                }
 
-            // 3. Content
-            const savedInput = localStorage.getItem('savedInput');
-            if (savedInput) {
-                inputDiv.innerText = savedInput;
-            }
-            
-            // 4. Initial processing & stats
-            processText(); // Call directly on load, not debounced
-           // updateStats(); // processText calls this
+                // A freshly loaded page is dirty ONLY if the session draft differs from the saved project state.
+                isDraftDirty = (inputDiv.innerText !== savedContentState);
+
+                updateProjectUI();
+                processText();
+                updateFindCount();
+            };
+
+            init();
+
         });
     </script>
 
