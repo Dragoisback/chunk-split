@@ -3,454 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chunker Pro - Revamped</title>
+    <title>Super Chunker Pro</title>
     <style>
-        /* --- Google Fonts & Root Variables --- */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+      :root {
+          --sidebar-width: 450px;
+          --header-height: 60px;
+          --bg-color: #f7f8fc;
+          --fg-color: #ffffff;
+          --text-color: #2c3e50;
+          --text-muted-color: #7f8c8d;
+          --border-color: #e0e0e0;
+          --primary-color: #3498db;
+          --primary-hover-color: #2980b9;
+          --success-color: #2ecc71;
+          --success-hover-color: #27ae60;
+          --danger-color: #e74c3c;
+          --danger-hover-color: #c0392b;
+          --warning-color: #f1c40f;
+          --warning-hover-color: #f39c12;
+          --font-sans-serif: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+          --font-monospace: 'Fira Code', 'Consolas', 'Courier New', monospace;
+          --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+          --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+          --border-radius: 6px;
+      }
 
-        :root {
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --font-monospace: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+      body.dark-mode {
+          --bg-color: #1a1d21;
+          --fg-color: #252a30;
+          --text-color: #ecf0f1;
+          --text-muted-color: #95a5a6;
+          --border-color: #404a59;
+          --primary-color: #3498db;
+          --primary-hover-color: #4aa3df;
+      }
 
-            /* Light Theme */
-            --bg-color: #f4f5f7;
-            --surface-color: #ffffff;
-            --surface-accent-color: #f9fafb;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --primary-color: #4f46e5;
-            --primary-hover-color: #4338ca;
-            --danger-color: #ef4444;
-            --danger-hover-color: #dc2626;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --info-color: #3b82f6;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --radius: 0.5rem;
-        }
+      /* --- Base Styles --- */
+      body {
+          font-family: var(--font-sans-serif);
+          margin: 0;
+          background-color: var(--bg-color);
+          color: var(--text-color);
+          transition: background-color 0.3s, color 0.3s;
+      }
 
-        .dark-mode {
-            /* Dark Theme */
-            --bg-color: #111827;
-            --surface-color: #1f2937;
-            --surface-accent-color: #374151;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --border-color: #374151;
-            --primary-color: #6366f1;
-            --primary-hover-color: #4f46e5;
-        }
+      * {
+          box-sizing: border-box;
+      }
+      
+      /* --- Layout: Sidebar and Main Content --- */
+      .app-wrapper {
+          display: flex;
+          height: 100vh;
+      }
 
-        /* --- Base & Reset --- */
-        * { box-sizing: border-box; }
-        body {
-            font-family: var(--font-primary);
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0;
-            transition: background-color 0.2s, color 0.2s;
-        }
+      .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: var(--sidebar-width);
+          height: 100%;
+          background-color: var(--fg-color);
+          border-right: 1px solid var(--border-color);
+          z-index: 100;
+          display: flex;
+          flex-direction: column;
+          transform: translateX(0);
+          transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+          box-shadow: var(--shadow-md);
+      }
+      
+      .main-content {
+          flex-grow: 1;
+          margin-left: var(--sidebar-width);
+          padding-top: var(--header-height);
+          transition: margin-left 0.3s ease-in-out;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+      }
 
-        /* --- SVG Icons --- */
-        .icon {
-            width: 1.25em;
-            height: 1.25em;
-            stroke-width: 2;
-            fill: none;
-            stroke: currentColor;
-        }
+      .output-container-wrapper {
+          flex-grow: 1;
+          overflow-y: auto;
+          padding: 1.5rem;
+      }
 
-        /* --- Layout --- */
-        .page-header {
-            background-color: var(--surface-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .page-header h1 { font-size: 1.5rem; margin: 0; }
-        .page-header .controls { display: flex; align-items: center; gap: 1rem; }
+      /* Mobile & Tablet Responsive Layout */
+      @media (max-width: 1024px) {
+          .sidebar {
+              transform: translateX(-100%);
+              box-shadow: none;
+          }
+          body.sidebar-open .sidebar {
+              transform: translateX(0);
+              box-shadow: var(--shadow-md);
+          }
+          .main-content {
+              margin-left: 0;
+          }
+          .sidebar-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0,0,0,0.5);
+              z-index: 99;
+              opacity: 0;
+              visibility: hidden;
+              transition: opacity 0.3s, visibility 0.3s;
+          }
+          body.sidebar-open .sidebar-overlay {
+              opacity: 1;
+              visibility: visible;
+          }
+      }
 
-        .main-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            max-width: 1800px;
-            margin: 0 auto;
-        }
-        
-        @media (min-width: 1024px) {
-            .main-container {
-                grid-template-columns: minmax(450px, 1fr) 1.5fr;
-            }
-        }
+      /* --- Header --- */
+      .app-header {
+          position: fixed;
+          top: 0;
+          left: var(--sidebar-width);
+          right: 0;
+          height: var(--header-height);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 1.5rem;
+          background-color: var(--fg-color);
+          border-bottom: 1px solid var(--border-color);
+          z-index: 50;
+          transition: left 0.3s ease-in-out;
+      }
+      
+      @media (max-width: 1024px) {
+          .app-header { left: 0; }
+      }
 
-        .panel-sticky-top {
-            position: sticky;
-            top: 90px; /* Header height + padding */
-            z-index: 50;
-        }
-        
-        #output-column {
-            max-height: calc(100vh - 110px);
-            overflow-y: auto;
-        }
+      .header-controls { display: flex; align-items: center; gap: 0.75rem; }
+      #mainStatus { font-size: 0.85rem; }
+      
+      /* --- Sidebar Content --- */
+      .sidebar-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          height: var(--header-height);
+          padding: 0 1rem;
+          border-bottom: 1px solid var(--border-color);
+          flex-shrink: 0;
+      }
+      .sidebar-header h1 { margin: 0; font-size: 1.5rem; }
 
-        /* --- Card Component --- */
-        .card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
-        }
-        .card-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-        .card-header h3 { font-size: 1.1rem; margin: 0; }
-        .card-content { padding: 1.25rem; }
-        .card.collapsed .card-content { display: none; }
-        .card-header .toggle-icon { transition: transform 0.2s; }
-        .card.collapsed .toggle-icon { transform: rotate(-90deg); }
+      .sidebar-content {
+          padding: 1.5rem;
+          overflow-y: auto;
+          flex-grow: 1;
+      }
 
-        /* --- Form Elements --- */
-        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
-        textarea, input[type="text"], input[type="number"], select {
-            width: 100%;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            color: var(--text-primary);
-            font-family: var(--font-monospace);
-            font-size: 0.9rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        textarea:focus, input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
-        }
-        textarea { resize: vertical; min-height: 120px; }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group p.description {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin: 0.5rem 0 0;
-            line-height: 1.5;
-        }
-        
-        /* --- Buttons --- */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-            font-family: var(--font-primary); font-weight: 600; font-size: 0.95rem;
-            padding: 0.65rem 1rem; border-radius: 0.375rem; border: 1px solid transparent;
-            cursor: pointer; transition: all 0.2s; white-space: nowrap;
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:not(:disabled):hover { background-color: var(--primary-hover-color); }
-        .btn-secondary { background-color: var(--surface-accent-color); color: var(--text-primary); border-color: var(--border-color); }
-        .btn-secondary:not(:disabled):hover { background-color: color-mix(in srgb, var(--border-color) 50%, var(--surface-accent-color)); }
-        .btn-danger { background-color: var(--danger-color); color: white; }
-        .btn-danger:not(:disabled):hover { background-color: var(--danger-hover-color); }
-        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.875rem; }
-        .btn-icon { padding: 0.5rem; }
-        .btn-block { width: 100%; }
+      .sidebar-footer {
+          padding: 1rem;
+          border-top: 1px solid var(--border-color);
+          background-color: var(--fg-color);
+          flex-shrink: 0;
+          box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      }
+      body.dark-mode .sidebar-footer { box-shadow: 0 -2px 10px rgba(0,0,0,0.2); }
 
-        /* --- Mode Switcher --- */
-        .mode-switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .mode-switcher .btn {
-            background-color: var(--surface-accent-color);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            font-weight: 500;
-        }
-        .mode-switcher .btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
+      /* --- Collapsible Fieldset (using details/summary) --- */
+      details {
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius);
+          background-color: var(--fg-color);
+          box-shadow: var(--shadow-sm);
+          margin-bottom: 1.5rem;
+          overflow: hidden;
+      }
+      details[open] { border-bottom: 1px solid var(--border-color); }
+      details summary {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          user-select: none;
+          font-weight: 600;
+          font-size: 1.1rem;
+          list-style: none; /* Remove marker */
+      }
+      details summary::-webkit-details-marker { display: none; } /* Chrome/Safari */
+      details summary::marker { display: none; } /* Firefox */
+      details summary .toggle-icon {
+          transition: transform 0.2s;
+          pointer-events: none;
+      }
+      details[open] summary .toggle-icon { transform: rotate(90deg); }
+      .fieldset-content { padding: 1rem; border-top: 1px solid var(--border-color); }
+      details p { font-size: 0.9em; color: var(--text-muted-color); margin-top: 5px; line-height: 1.5; }
 
-        /* --- Specific Component Styling --- */
-        /* JSON Input */
-        .json-input-wrapper {
-            position: relative;
-            padding: 1rem;
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
-            background-color: var(--bg-color);
-            transition: border-color 0.2s, background-color 0.2s;
-        }
-        .json-input-wrapper.drag-over {
-            border-color: var(--primary-color);
-            background-color: color-mix(in srgb, var(--primary-color) 10%, var(--bg-color));
-        }
-        .json-input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; gap: 0.5rem; }
-        .json-input-header .title { font-weight: 600; color: var(--text-secondary); }
-        #jsonInputsContainer .actions { display: flex; gap: 0.5rem; }
+      /* --- General Elements Styling --- */
+      textarea, input, select {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 10px;
+          border: 1px solid var(--border-color);
+          border-radius: var(--border-radius);
+          background-color: var(--bg-color);
+          color: var(--text-color);
+          font-family: var(--font-monospace);
+          margin-bottom: 5px;
+          font-size: 14px;
+          transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      textarea:focus, input:focus, select:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+      }
+      textarea { resize: vertical; }
 
-        /* Find & Replace */
-        .find-replace-pair { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; }
-        .find-replace-pair .arrow { color: var(--text-secondary); }
-        #findReplacePairsContainer { max-height: 250px; overflow-y: auto; padding: 0.25rem; }
+      /* --- Buttons --- */
+      .button, button {
+          padding: 10px 15px;
+          color: white;
+          border: none;
+          border-radius: var(--border-radius);
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 500;
+          transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          -webkit-tap-highlight-color: transparent; /* for mobile */
+      }
+      .button:hover, button:hover {
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      button:active, .button:active { transform: scale(0.97); }
+      button:disabled { background-color: #bdc3c7 !important; cursor: not-allowed; box-shadow: none; }
+      body.dark-mode button:disabled { background-color: #7f8c8d !important; }
 
-        /* Textarea Actions */
-        .textarea-with-actions { position: relative; }
-        .textarea-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
-        .textarea-actions .btn { background-color: var(--surface-color); opacity: 0.8; }
+      .btn-primary { background-color: var(--primary-color); }
+      .btn-primary:hover { background-color: var(--primary-hover-color); }
+      .btn-success { background-color: var(--success-color); }
+      .btn-success:hover { background-color: var(--success-hover-color); }
+      .btn-secondary { background-color: var(--text-muted-color); color: white; }
+      .btn-secondary:hover { background-color: color-mix(in srgb, var(--text-muted-color) 80%, black); }
+      .btn-danger { background-color: var(--danger-color); }
+      .btn-danger:hover { background-color: var(--danger-hover-color); }
+      .btn-warning { background-color: var(--warning-color); color: #333; }
+      .btn-warning:hover { background-color: var(--warning-hover-color); }
+      .btn-block { width: 100%; display: flex; }
+      .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+      .btn-icon { padding: 0.6rem; line-height: 1; }
+      
+      .input-container label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.95rem; }
+      
+      /* --- Mode Switcher --- */
+      .mode-switcher { display: flex; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; }
+      .mode-switcher button { flex: 1; background: transparent; border: none; border-radius: 0; cursor: pointer; color: var(--text-muted-color); font-weight: bold; font-size: 0.9rem; padding: 0.75rem; }
+      .mode-switcher button.active { background-color: var(--primary-color); color: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+      
+      /* --- Output Section --- */
+      .initial-output-view { text-align: center; padding: 4rem 2rem; color: var(--text-muted-color); }
+      .initial-output-view svg { width: 80px; height: 80px; margin-bottom: 1rem; opacity: 0.5; }
+      #outputControls {
+          display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+          padding: 1rem; background-color: var(--fg-color);
+          border-radius: var(--border-radius);
+          border: 1px solid var(--border-color);
+          margin-bottom: 1.5rem; position: sticky; top: 0; z-index: 10;
+          box-shadow: var(--shadow-sm);
+      }
+      #outputControls h4 { margin: 0; padding: 0; color: var(--text-color); font-weight: 600; }
 
-        /* Output Area */
-        #outputControls {
-            background-color: color-mix(in srgb, var(--surface-color) 80%, transparent);
-            backdrop-filter: blur(8px);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        #outputControls h4 { margin: 0; color: var(--text-primary); font-size: 1.1rem; }
-        
-        .chunk-container {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 1rem;
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .chunk-container.copied {
-            border-left: 4px solid var(--success-color);
-            box-shadow: 0 0 15px color-mix(in srgb, var(--success-color) 10%, transparent);
-        }
-        .chunk-actions { grid-row: 1 / 3; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-        .chunk-title { font-weight: 600; color: var(--primary-color); align-self: center; }
-        .chunk-content textarea { min-height: 150px; background-color: var(--bg-color); }
-        .copy-count-display { font-size: 0.8rem; color: var(--text-secondary); }
-        .copy-button .tick { display: none; }
-        .copy-button.copied-once .tick { display: inline; color: var(--success-color); }
-
-        /* --- Status & Helpers --- */
-        .status-message {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: center;
-            margin-top: 1rem;
-        }
-        .status-error { background-color: color-mix(in srgb, var(--danger-color) 15%, transparent); color: var(--danger-hover-color); }
-        .dark-mode .status-error { color: #fca5a5; }
-        .status-success { background-color: color-mix(in srgb, var(--success-color) 15%, transparent); color: #166534; }
-        .dark-mode .status-success { color: #86efac; }
-
-        #loadingIndicator {
-            display: none; position: fixed; inset: 0;
-            background-color: color-mix(in srgb, var(--surface-color) 50%, transparent);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            justify-content: center; align-items: center;
-        }
-        #loadingIndicator div {
-            background-color: var(--surface-color); padding: 2rem; border-radius: var(--radius);
-            box-shadow: var(--shadow-md); font-size: 1.2rem; font-weight: 500;
-        }
-
-        #scrollToTopBtn {
-            display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99;
-        }
-
+      .chunk-container {
+          margin-bottom: 1rem; display: flex; background-color: var(--fg-color);
+          padding: 1rem; border-radius: var(--border-radius); border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm); gap: 1rem;
+          transition: border-color 0.3s, background-color 0.3s;
+      }
+      .chunk-container.copied { border-left: 4px solid var(--success-color); background-color: color-mix(in srgb, var(--success-color) 8%, var(--fg-color)); }
+      .chunk-content-wrapper { flex-grow: 1; }
+      .chunk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+      .chunk-title { font-weight: bold; color: var(--primary-color); font-size: 1.1em; }
+      .chunk-actions { display: flex; align-items: center; gap: 5px; }
+      .copy-count-display { font-size: 0.8em; color: var(--text-muted-color); background-color: var(--bg-color); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); }
+      .chunk-textarea-wrapper textarea { background-color: var(--bg-color); min-height: 150px; }
+      
+      /* --- Misc Components --- */
+      .info-counter { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size: 0.9em; }
+      .json-chapter-input-container { border: 1px dashed var(--border-color); padding: 10px; margin-bottom: 10px; border-radius: var(--border-radius); }
+      .json-chapter-header { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 5px; gap: 8px; }
+      .json-chapter-header label { flex-grow: 1; font-weight: 600; }
+      #findReplacePairsContainer { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+      .find-replace-pair { display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; margin-bottom: 8px; gap: 8px; }
+      .find-replace-pair .arrow { flex-shrink: 0; color: var(--text-muted-color); }
+      .status-message { font-size: 0.85em; margin-top: 4px; display: inline-block; padding: 5px 8px; border-radius: 4px; border: 1px solid transparent;}
+      .status-success { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc;}
+      .status-error   { color: #842029; background-color: #f8d7da; border-color: #f5c2c7;}
+      body.dark-mode .status-success { background-color: #032d18; color: #75b798; border-color: #198754; }
+      body.dark-mode .status-error   { background-color: #381114; color: #f1aeb5; border-color: #842029; }
+      #loadingIndicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; background-color: rgba(0, 0, 0, 0.85); color: white; border-radius: 8px; z-index: 1001; font-size: 1.1em; box-shadow: var(--shadow-md); }
+      #scrollToTopBtn { display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99; }
+      
+      /* Helper SVGs */
+      .icon {
+          width: 1em;
+          height: 1em;
+          display: inline-block;
+          vertical-align: middle;
+      }
     </style>
 </head>
 <body>
-
-    <svg width="0" height="0" style="display: none;">
-        <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 1v2m-6.36 1.64l1.41 1.41M3.5 12h-2m1.64 6.36l1.41-1.41M12 21v2m6.36-1.64l-1.41-1.41M20.5 12h2m-1.64-6.36l-1.41 1.41M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"></path></symbol>
-        <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></symbol>
-        <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol>
-        <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></symbol>
-        <symbol id="icon-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></symbol>
-        <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></symbol>
-        <symbol id="icon-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
-        <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></symbol>
-        <symbol id="icon-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></symbol>
-    </svg>
-
-    <header class="page-header">
-        <h1>Chunker Pro</h1>
-        <div class="controls">
-            <button id="theme-toggle" class="btn btn-secondary btn-icon" title="Toggle Dark/Light Theme">
-                <svg class="icon"><use href="#icon-moon"></use></svg>
-            </button>
-            <button id="resetAllButton" class="btn btn-danger btn-sm" title="Clear all settings and inputs">
-                <svg class="icon"><use href="#icon-refresh"></use></svg>
-                <span>Reset All</span>
-            </button>
-        </div>
-    </header>
-
-    <main class="main-container">
-        <div id="settings-column">
-            <div class="card">
-                <div class="card-header">
-                    <h3>1. Input Mode</h3>
-                </div>
-                <div class="card-content">
-                    <div class="mode-switcher" id="modeSwitcher">
-                        <button data-mode="json" class="btn active">JSON Objects</button>
-                        <button data-mode="text" class="btn">Plain Text</button>
-                    </div>
-                    <input type="hidden" id="splitModeSelect" value="json">
-                </div>
-            </div>
-
-            <div id="jsonModeSections">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>2. JSON Input Chapters</h3>
-                        <span class="toggle-icon"><svg class="icon"><use href="#icon-chevron-down"></use></svg></span>
-                    </div>
-                    <div class="card-content">
-                        <p class="description">Add one or more JSON arrays. You can also drag & drop .json files onto the boxes below.</p>
-                        <div id="jsonInputsContainer"></div>
-                        <div style="display:flex; align-items:center; gap:10px; margin-top:1rem;">
-                            <button id="addJsonChapterButton" class="btn btn-primary btn-sm">
-                                <svg class="icon"><use href="#icon-plus"></use></svg> Add Input
-                            </button>
-                            <span id="jsonObjectsCount" class="info-counter" style="margin-left: auto; font-size: 0.9rem; color: var(--text-secondary);">Total Objects: 0</span>
-                        </div>
-                         <div class="form-group" style="margin-top: 1.5rem;">
-                            <label for="jsonObjectsPerChunk">Combine objects per chunk</label>
-                            <select id="jsonObjectsPerChunk">
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="20">20</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3>3. Find & Replace</h3>
-                        <span class="toggle-icon"><svg class="icon"><use href="#icon-chevron-down"></use></svg></span>
-                    </div>
-                    <div class="card-content">
-                        <p class="description">Applied to <code>object.terms[*].translation</code> during processing.</p>
-                        <div style="display:flex; gap: 1rem; margin-bottom: 1rem;">
-                            <label style="font-weight:normal;"><input type="checkbox" id="applyRulesCheckbox"> Apply Rules</label>
-                            <label style="font-weight:normal;"><input type="checkbox" id="caseInsensitiveCheckbox"> Case-insensitive</label>
-                        </div>
-                        <div id="findReplacePairsContainer"></div>
-                        <div style="margin-top:1rem;">
-                            <button id="addFindReplacePairButton" class="btn btn-secondary btn-sm">
-                                <svg class="icon"><use href="#icon-plus"></use></svg> Add Rule
-                            </button>
-                        </div>
-                        <div id="glossaryReplaceStatus" style="margin-top: 1rem;"></div>
-                    </div>
-                </div>
+    <div class="app-wrapper">
+        <aside class="sidebar" id="settings-sidebar">
+            <div class="sidebar-header">
+                <svg class="icon" style="font-size: 2rem; color: var(--primary-color);" viewBox="0 0 24 24" fill="currentColor"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1a6.887 6.887 0 0 0 0 9.8c2.73 2.7 7.15 2.8 9.88.1l-2.74-2.82H21c.55 0 1-.45 1-1s-.45-1-1-1zM6.82 12c.05-.1.1-.19.16-.29L3 11.62V12c0 1.1.9 2 2 2h4.59l-2.26 2.22a7.014 7.014 0 0 1-9.77-9.84C1.09 3.87 5.03 2.49 8.32 4.14l-2.9 2.9H3c-.55 0-1 .45-1 1s.45 1 1 1h3.82z"/></svg>
+                <h1>Chunker Pro</h1>
             </div>
             
-            <div id="plainTextModeSections" style="display:none;">
-                 <div class="card">
-                    <div class="card-header">
-                        <h3>2. Plain Text Input</h3>
-                         <span class="toggle-icon"><svg class="icon"><use href="#icon-chevron-down"></use></svg></span>
-                    </div>
-                    <div class="card-content">
-                        <p class="description">Text will be split by max characters, intelligently breaking at sentence or word boundaries.</p>
-                        <div class="form-group">
-                            <textarea id="plainTextInputArea" placeholder="Paste or type plain text here..."></textarea>
-                             <div style="text-align: right; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);" id="plainTextInfo">Chars: 0 / Approx. Chunks: 0</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="formatSelect">Format text (before splitting)</label>
-                            <select id="formatSelect">
-                                <option value="as-is">Show text as is</option>
-                                <option value="pretty">Pretty (trim lines, join with double newlines)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="maxChars">Max characters per chunk</label>
-                            <input type="number" id="maxChars" value="1800" min="1">
-                        </div>
-                    </div>
+            <div class="sidebar-content" id="settings-column">
+              <details open>
+                <summary>1. Input Mode & Source<span class="toggle-icon">▶</span></summary>
+                <div class="fieldset-content">
+                  <div class="mode-switcher" id="modeSwitcher">
+                    <button data-mode="json" class="active">JSON Objects</button>
+                    <button data-mode="text">Plain Text</button>
+                  </div>
+                  <input type="hidden" id="splitModeSelect" value="json">
                 </div>
+              </details>
+              
+              <div id="jsonModeSections">
+                <details open>
+                  <summary>2. JSON Input Chapters<span class="toggle-icon">▶</span></summary>
+                  <div class="fieldset-content">
+                    <p>Add one or more JSON array "chapters". Content from all valid inputs will be combined.</p>
+                    <div id="jsonInputsContainer"></div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                      <button id="addJsonChapterButton" class="button btn-primary btn-sm">+ Add Input</button>
+                      <button id="clearAllJsonButton" class="button btn-secondary btn-sm">Clear All</button>
+                      <span id="jsonObjectsCount" class="info-counter" style="margin-left: auto;">Total Objects: 0</span>
+                    </div>
+                    <div class="input-container" style="margin-top: 1rem;">
+                      <label for="jsonObjectsPerChunk">Combine objects per chunk:</label>
+                      <select id="jsonObjectsPerChunk"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="10">10</option><option value="20">20</option></select>
+                    </div>
+                  </div>
+                </details>
+                <details>
+                  <summary>3. Paired Find & Replace<span class="toggle-icon">▶</span></summary>
+                  <div class="fieldset-content">
+                    <p>Applied to <code>object.terms[any].translation</code> on a copy of the data during splitting.</p>
+                    <div style="display:flex; gap: 15px; margin-bottom: 10px;">
+                      <label><input type="checkbox" id="applyRulesCheckbox"> Apply Rules</label>
+                      <label><input type="checkbox" id="caseInsensitiveCheckbox"> Case-insensitive</label>
+                    </div>
+                    <div id="findReplacePairsContainer"></div>
+                    <div style="margin-top:10px;">
+                      <button id="addFindReplacePairButton" class="button btn-success btn-sm">+ Add Rule</button>
+                      <span id="glossaryReplaceStatus" class="status-message" style="margin-left: 10px; display: none;"></span>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <div id="plainTextModeSections" style="display:none;">
+                <details open>
+                  <summary>2. Plain Text Input<span class="toggle-icon">▶</span></summary>
+                  <div class="fieldset-content">
+                    <p>Text will be split by max characters, intelligently breaking at sentence or word boundaries.</p>
+                    <div style="text-align: right; margin-bottom: 5px;">
+                      <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
+                    </div>
+                    <textarea id="plainTextInputArea" placeholder="Paste plain text here..." style="height: 250px;"></textarea>
+                    <span id="plainTextStatus" class="status-message"></span>
+                    <div class="input-container" style="margin-top: 1rem;">
+                      <label for="formatSelect">Format text (before splitting):</label>
+                      <select id="formatSelect"><option value="as-is">Show text as is</option><option value="pretty">Pretty (trim lines, join with double newlines)</option></select>
+                    </div>
+                    <div class="input-container">
+                      <label for="maxChars">Max characters per chunk:</label>
+                      <input type="number" id="maxChars" value="1800" min="1">
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <details>
+                <summary id="commonSectionHeader">4. Chunk Header & Footer<span class="toggle-icon">▶</span></summary>
+                <div class="fieldset-content">
+                  <p>Use <code>$X</code> for current part number and <code>$Y</code> for total parts.</p>
+                  <div class="input-container"><label for="addToTop">Add to top of each chunk:</label><textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea></div>
+                  <div class="input-container"><label for="addToBottom">Add to bottom of each chunk:</label><textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea></div>
+                </div>
+              </details>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3 id="commonSectionHeader">4. Chunk Header & Footer</h3>
-                    <span class="toggle-icon"><svg class="icon"><use href="#icon-chevron-down"></use></svg></span>
-                </div>
-                <div class="card-content">
-                    <p class="description">Use <code>$X</code> for current part and <code>$Y</code> for total parts. <br><span id="headerFooterPreview" style="color: var(--primary-color); font-style: italic;"></span></p>
-                    <div class="form-group">
-                        <label for="addToTop">Header (prepended to each chunk)</label>
-                        <textarea id="addToTop" placeholder="Text to add to the top..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="addToBottom">Footer (appended to each chunk)</label>
-                        <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel-sticky-top">
-                <button id="mainSplitButton" class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 0.8rem;">
+            <div class="sidebar-footer">
+                <button id="mainSplitButton" class="button btn-success btn-block" style="font-size: 1.2rem;">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17a.75.75 0 01.07 1.063l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 011.13-1.063L6 5.87l3.43-3.44a.75.75 0 011.06-.07zM4.34 8.75a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06L8.13 15l-3.44-3.44a.75.75 0 010-1.06zm9.02-3.56a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06L9 8.13l3.44-3.44a.75.75 0 011.06 0z" clip-rule="evenodd" /></svg>
                     Process & Split
                 </button>
-                <div id="processStatus"></div>
+                <span id="processStatus" class="status-message" style="display:none; text-align:center; width: 100%; margin-top: 10px;"></span>
             </div>
-        </div>
+        </aside>
+        
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <div id="output-column-wrapper" style="display:none;">
-            <div class="panel-sticky-top">
-                <div id="outputControls">
-                    <h4 id="outputSummary">Output</h4>
-                    <button id="copyNextButton" class="btn btn-sm" style="background-color: var(--warning-color); color: #422006; margin-left:auto;">Copy NEXT</button>
-                    <button id="clearOutputButton" class="btn btn-secondary btn-sm">Clear Output</button>
+        <main class="main-content">
+            <header class="app-header">
+                <button id="sidebar-toggle" class="button btn-secondary btn-icon">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 9.75A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zM2 14.75A.75.75 0 012.75 14h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 14.75z" clip-rule="evenodd" /></svg>
+                </button>
+                <div class="header-controls">
+                    <span id="mainStatus" class="status-message" style="display:none;"></span>
+                    <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
+                    <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
                 </div>
-            </div>
-            <div id="output-column">
+            </header>
+            
+            <div class="output-container-wrapper" id="output-column">
+                <div id="initial-view" class="initial-output-view">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C6.34 4.01 5.25 4.973 5.25 6.108V18.75c0 1.242 1.008 2.25 2.25 2.25H15M9 18h3.75" /></svg>
+                    <h2>Ready to Process</h2>
+                    <p>Configure your inputs in the sidebar, then click "Process & Split" to see the output here.</p>
+                </div>
+                <div id="outputControls" style="display:none;">
+                    <h4 id="outputSummary">Output</h4>
+                    <button id="copyNextButton" class="button btn-warning btn-sm">⭐ Copy NEXT</button>
+                    <button id="copyAllButton" class="button btn-primary btn-sm">Copy ALL Chunks</button>
+                    <button id="clearOutputButton" class="button btn-secondary btn-sm">Clear Output</button>
+                </div>
                 <div id="chunkedTextContainer"></div>
             </div>
-        </div>
-    </main>
-    
-    <div id="loadingIndicator"><div >Processing...</div></div>
-    <button id="scrollToTopBtn" class="btn btn-primary btn-icon" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to top">
-        <svg class="icon" style="transform: rotate(-90deg);"><use href="#icon-chevron-down"></use></svg>
+        </main>
+    </div>
+  
+    <div id="loadingIndicator">Processing...</div>
+    <button id="scrollToTopBtn" class="button btn-primary btn-icon">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.03 9.83a.75.75 0 01-1.06-1.06l5.25-5.25a.75.75 0 011.06 0l5.25 5.25a.75.75 0 11-1.06 1.06L10.75 5.612V16.25A.75.75 0 0110 17z" clip-rule="evenodd" /></svg>
     </button>
-    
 
     <script>
     // --- State & Config ---
     let lastClickedButton = null;
     let jsonChapterInputIdCounter = 0;
-    const STATE_KEY = 'chunkerAppState_V4_Revamped'; // New state key for the new UI
+    const STATE_KEY = 'chunkerAppState_V4'; // Incremented version for new layout
     const statusTimeouts = {};
 
     const newDefaultAddToTopPreset = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis"
@@ -458,19 +463,30 @@
 1. Analyze raw Passage and Translation: 
    - FOR EACH line, summarize its meaning and compare it very thoroughly to the translation.
    - Note if the translation matches the original or deviates, explaining any ambiguities or potential errors.
+   - Check if phrases are adapted naturally (e.g., idiomatic expressions retain flavor without literal awkwardness or being too formal and literal).
 
 2. Identify Errors:
-  - Spot issues related to: Accuracy, Logic, Language.
+  - Spot issues related to:
+     - Accuracy: Missing, Overly condensed sentences or lines, added, or incorrect glossary terms
+        * Note : Only ignore glossary if certain it's wrong, if certain its not appropriately conveying the meaning or have grammatical error
+  - Logic: Pronoun mistakes, wrong speaker, or mixed-up character names.
+  - Language: Awkward or unnatural English or Overly condensed sentences.
   - Analyze every line thoroughly.
 
-3. Verify Errors & Fix the Translation:
-  - Correct the verified errors and use English major level proficiency to make the prose flows smoothly.
-  - Do not use only colon and bullet points in your translation.
-  - DO NOT transliterate honorifics unless the glossary says so.
-  - Do not over condense sentences.
+3. Verify Errors: 
+   - Double-check all identified errors, ensuring each has clear evidence.
+   - keep all the minor and major valid errors.
+   - Verify if the tone matches the context (majestic for epic scenes, colloquial for dialogue).
 
-4. Give only the Fixed human like English translation as output and not the Whole JSON format.`;
+4. Fix the Translation :
+  - Correct the verified errors and use English major level proficiency to make the prose flows smoothly with Rich descriptive and faithful rendering of key dialogue
+  - Don't use Only colon and bullet points in your translation and while during their removal make sure the English is natural and idiomatic.
+  - "DO NOT transliterate the honorifics unless the glossary says so. For example, you should use 'Senior Brother X' instead of 'X-shixiong'."
+  - Do not over condense the sentence and dialogue while making sure the English is natural and idiomatic.
+  - Where necessary for comprehension, add brief, unobtrusive context or explanations for cultural terms or implied meanings. Avoid overly complex or literary phrasing if it sacrifices clarity
 
+5. Give only the Fixed human like English translation as output and not the Whole JSON format. and Separately mention when a glossary is wrong or have variations and is fixed in the output.`;
+	
     const defaultState = {
         theme: 'light',
         splitMode: 'json',
@@ -484,14 +500,11 @@
         findReplacePairs: [{find:"", replace:""}],
         applyRules: false,
         caseInsensitive: false,
-        collapsedSections: [],
+        openSections: ['1. Input Mode & Source', '2. JSON Input Chapters'],
     };
     let currentAppState = {...defaultState};
 
     // --- Helpers & Utilities ---
-    const $ = (selector) => document.querySelector(selector);
-    const $$ = (selector) => document.querySelectorAll(selector);
-
     function debounce(func, delay) {
         let timeout;
         return function(...args) {
@@ -502,18 +515,14 @@
     const debouncedSaveState = debounce(saveState, 500);
     const debouncedUpdateTotalJsonObjectCount = debounce(updateTotalJsonObjectCount, 400);
     const debouncedUpdatePlainTextInfo = debounce(updatePlainTextInfo, 400);
-    const debouncedUpdateHeaderFooterPreview = debounce(updateHeaderFooterPreview, 300);
 
     function showStatus(elementId, message, type = 'success', timeout = 4000) {
-        const element = $(`#${elementId}`);
+        const element = document.getElementById(elementId);
         if (!element) return;
-        
+        if(statusTimeouts[elementId]) clearTimeout(statusTimeouts[elementId]);
         element.innerHTML = message;
         element.className = `status-message status-${type}`;
-        element.style.display = 'block';
-
-        if(statusTimeouts[elementId]) clearTimeout(statusTimeouts[elementId]);
-        
+        element.style.display = 'inline-block';
         if (timeout > 0) {
             statusTimeouts[elementId] = setTimeout(() => {
                 if(element) element.style.display = 'none';
@@ -522,15 +531,29 @@
         }
     }
     
-    function showLoading() { $('#loadingIndicator').style.display = 'flex'; }
-    function hideLoading() { $('#loadingIndicator').style.display = 'none'; }
+    function showLoading() { document.getElementById('loadingIndicator').style.display = 'block'; }
+    function hideLoading() { document.getElementById('loadingIndicator').style.display = 'none'; }
     function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    
+    async function pasteIntoJsonInput(button) {
+        const textarea = button.closest('.json-chapter-input-container')?.querySelector('.json-chapter-input');
+        if (textarea) {
+            try {
+                textarea.value = await navigator.clipboard.readText();
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                button.textContent = 'Pasted!';
+                setTimeout(() => { button.textContent = 'Paste'; }, 1500);
+            } catch (err) {
+                button.textContent = 'Failed!';
+                setTimeout(() => { button.textContent = 'Paste'; }, 1500);
+            }
+        }
+    }
     
     // --- Theme Management ---
     function applyTheme(theme) {
         document.body.classList.toggle('dark-mode', theme === 'dark');
-        const themeIcon = $('#theme-toggle .icon use');
-        themeIcon.setAttribute('href', theme === 'dark' ? '#icon-sun' : '#icon-moon');
+        document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌓';
     }
 
     function toggleTheme() {
@@ -539,29 +562,34 @@
         saveState();
     }
 
+    // --- Sidebar Management (New) ---
+    function toggleSidebar() {
+        document.body.classList.toggle('sidebar-open');
+    }
+
     // --- State Management ---
     function saveState() {
-       currentAppState.splitMode = $('#splitModeSelect').value;
-       currentAppState.maxChars = $('#maxChars').value;
-       currentAppState.addToTop = $('#addToTop').value;
-       currentAppState.addToBottom = $('#addToBottom').value;
-       currentAppState.formatSelect = $('#formatSelect').value;
-       currentAppState.jsonObjectsPerChunk = $('#jsonObjectsPerChunk').value;
-       currentAppState.plainText = $('#plainTextInputArea').value;
-       currentAppState.applyRules = $('#applyRulesCheckbox').checked;
-       currentAppState.caseInsensitive = $('#caseInsensitiveCheckbox').checked;
-       currentAppState.jsonInputs = Array.from($$('#jsonInputsContainer textarea')).map(t => t.value);
-       currentAppState.findReplacePairs = Array.from($$('#findReplacePairsContainer .find-replace-pair')).map(p => ({
+       currentAppState.splitMode = document.getElementById('splitModeSelect').value;
+       currentAppState.maxChars = document.getElementById('maxChars').value;
+       currentAppState.addToTop = document.getElementById('addToTop').value;
+       currentAppState.addToBottom = document.getElementById('addToBottom').value;
+       currentAppState.formatSelect = document.getElementById('formatSelect').value;
+       currentAppState.jsonObjectsPerChunk = document.getElementById('jsonObjectsPerChunk').value;
+       currentAppState.plainText = document.getElementById('plainTextInputArea').value;
+       currentAppState.applyRules = document.getElementById('applyRulesCheckbox').checked;
+       currentAppState.caseInsensitive = document.getElementById('caseInsensitiveCheckbox').checked;
+       currentAppState.jsonInputs = Array.from(document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input')).map(t => t.value);
+       currentAppState.findReplacePairs = Array.from(document.querySelectorAll('#findReplacePairsContainer .find-replace-pair')).map(p => ({
            find: p.querySelector('.find-text')?.value || "",
            replace: p.querySelector('.replace-text')?.value || ""
        })).filter(p => p.find || p.replace);
-       currentAppState.collapsedSections = Array.from($$('.card.collapsed')).map(fs => fs.querySelector('h3').textContent.trim());
+       currentAppState.openSections = Array.from(document.querySelectorAll('details[open] summary')).map(s => s.firstChild.textContent.trim());
 
        try {
            localStorage.setItem(STATE_KEY, JSON.stringify(currentAppState));
        } catch (e) {
            console.error("LocalStorage save failed:", e);
-           // Non-intrusive error
+           showStatus('mainStatus', 'Error saving settings.', 'error', 10000);
        }
     }
 
@@ -571,35 +599,46 @@
            if (savedStateJSON) {
               const savedState = JSON.parse(savedStateJSON);
               currentAppState = { ...defaultState, ...savedState };
+           } else {
+              currentAppState = {...defaultState};
            }
         } catch (e) {
            console.error("LocalStorage load failed:", e);
+           currentAppState = {...defaultState};
         }
         
         applyTheme(currentAppState.theme);
-        $('#splitModeSelect').value = currentAppState.splitMode;
-        $('#maxChars').value = currentAppState.maxChars;
-        $('#addToTop').value = currentAppState.addToTop;
-        $('#addToBottom').value = currentAppState.addToBottom;
-        $('#formatSelect').value = currentAppState.formatSelect;
-        $('#jsonObjectsPerChunk').value = currentAppState.jsonObjectsPerChunk;
-        $('#plainTextInputArea').value = currentAppState.plainText;
-        $('#applyRulesCheckbox').checked = !!currentAppState.applyRules;
-        $('#caseInsensitiveCheckbox').checked = !!currentAppState.caseInsensitive;
+        document.getElementById('splitModeSelect').value = currentAppState.splitMode;
+        document.getElementById('maxChars').value = currentAppState.maxChars;
+        document.getElementById('addToTop').value = currentAppState.addToTop;
+        document.getElementById('addToBottom').value = currentAppState.addToBottom;
+        document.getElementById('formatSelect').value = currentAppState.formatSelect;
+        document.getElementById('jsonObjectsPerChunk').value = currentAppState.jsonObjectsPerChunk;
+        document.getElementById('plainTextInputArea').value = currentAppState.plainText;
+        document.getElementById('applyRulesCheckbox').checked = !!currentAppState.applyRules;
+        document.getElementById('caseInsensitiveCheckbox').checked = !!currentAppState.caseInsensitive;
         
-        if (currentAppState.collapsedSections) {
-             $$('.card').forEach(fs => {
-                const title = fs.querySelector('h3').textContent.trim();
-                fs.classList.toggle('collapsed', currentAppState.collapsedSections.includes(title));
+        if (currentAppState.openSections) {
+             document.querySelectorAll('details').forEach(d => {
+                const title = d.querySelector('summary').firstChild.textContent.trim();
+                d.open = currentAppState.openSections.includes(title);
              });
         }
         
-        $('#jsonInputsContainer').innerHTML = '';
+        document.getElementById('jsonInputsContainer').innerHTML = '';
         jsonChapterInputIdCounter = 0;
-        (currentAppState.jsonInputs?.length > 0 ? currentAppState.jsonInputs : ['']).forEach(content => addJsonChapterInput(content, false));
+        if (currentAppState.jsonInputs && currentAppState.jsonInputs.length > 0) {
+             currentAppState.jsonInputs.forEach(content => addJsonChapterInput(content, false));
+        } else {
+             addJsonChapterInput('', false);
+        }
         
-        $('#findReplacePairsContainer').innerHTML = '';
-        (currentAppState.findReplacePairs?.length > 0 ? currentAppState.findReplacePairs : [{find:"", replace:""}]).forEach(pair => addFindReplacePair(pair.find, pair.replace, false));
+        document.getElementById('findReplacePairsContainer').innerHTML = '';
+        if (currentAppState.findReplacePairs && currentAppState.findReplacePairs.length > 0) {
+             currentAppState.findReplacePairs.forEach(pair => addFindReplacePair(pair.find, pair.replace, false));
+        } else {
+             addFindReplacePair("","", false);
+        }
    }
    
     function resetAllToDefaults() {
@@ -607,60 +646,42 @@
             localStorage.removeItem(STATE_KEY);
             window.location.reload();
          }
-    }
+     }
     
     // --- UI Element Management ---
     function toggleInputSections() {
-        const splitMode = $('#splitModeSelect').value;
+        const splitMode = document.getElementById('splitModeSelect').value;
 
-        $$('.mode-switcher .btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === splitMode));
-        $('#jsonModeSections').style.display = (splitMode === 'json' ? 'block' : 'none');
-        $('#plainTextModeSections').style.display = (splitMode === 'text' ? 'block' : 'none');
-        $('#commonSectionHeader').textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
+        document.querySelectorAll('.mode-switcher button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === splitMode));
+        document.getElementById('jsonModeSections').style.display = (splitMode === 'json' ? 'block' : 'none');
+        document.getElementById('plainTextModeSections').style.display = (splitMode === 'text' ? 'block' : 'none');
+        document.getElementById('commonSectionHeader').textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
         
         clearOutput();
-        splitMode === 'json' ? updateTotalJsonObjectCount() : updatePlainTextInfo();
+        if (splitMode === 'json') updateTotalJsonObjectCount(); else updatePlainTextInfo();
         debouncedSaveState();
     }
     
-    // --- JSON Input Management (with Drag & Drop) ---
     function addJsonChapterInput(content = '', save = true) {
         jsonChapterInputIdCounter++;
-        const container = $('#jsonInputsContainer');
+        const container = document.getElementById('jsonInputsContainer');
         const chapterDiv = document.createElement('div');
-        chapterDiv.className = 'json-input-wrapper';
+        chapterDiv.className = 'json-chapter-input-container';
         chapterDiv.innerHTML = `
-         <div class="json-input-header">
-            <span class="title">JSON Input #${jsonChapterInputIdCounter}</span>
-            <div class="actions">
-                <button type="button" class="btn btn-secondary btn-sm btn-icon remove-json-btn" title="Remove">
-                    <svg class="icon"><use href="#icon-trash"></use></svg>
-                </button>
-            </div>
+         <div class="json-chapter-header">
+            <label>JSON Input ${jsonChapterInputIdCounter}</label>
+            <span class="json-chapter-status status-message">Objects: 0</span>
+            <button type="button" class="button btn-secondary btn-sm" onclick="pasteIntoJsonInput(this)">Paste</button>
+            <button type="button" class="button btn-danger btn-sm" onclick="removeJsonChapterInput(this)">Remove</button>
          </div>
-         <textarea placeholder='Paste JSON array here or drop a .json file...' class="json-chapter-input">${content}</textarea>
-         <div class="status-message" style="display: none; margin-top: 0.5rem; padding: 0.25rem 0.5rem;"></div>`;
-        
-        // Add event listeners
+         <textarea class="json-chapter-input" placeholder='[ { "id":1, ... } ]'>${content}</textarea>`;
         const textarea = chapterDiv.querySelector('textarea');
-        const statusSpan = chapterDiv.querySelector('.status-message');
+        const statusSpan = chapterDiv.querySelector('.json-chapter-status');
         textarea.addEventListener('input', () => {
             updateIndividualJsonCount(textarea, statusSpan);
             debouncedUpdateTotalJsonObjectCount();
             debouncedSaveState();
         });
-        chapterDiv.querySelector('.remove-json-btn').addEventListener('click', () => removeJsonChapterInput(chapterDiv));
-        
-        // Drag and Drop listeners
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => chapterDiv.addEventListener(eventName, preventDefaults, false));
-        ['dragenter', 'dragover'].forEach(eventName => {
-            chapterDiv.addEventListener(eventName, () => chapterDiv.classList.add('drag-over'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            chapterDiv.addEventListener(eventName, () => chapterDiv.classList.remove('drag-over'), false);
-        });
-        chapterDiv.addEventListener('drop', handleDrop, false);
-
         container.appendChild(chapterDiv);
         updateIndividualJsonCount(textarea, statusSpan);
         if (save) {
@@ -669,108 +690,91 @@
         }
     }
 
-    function removeJsonChapterInput(element) {
-        element.remove();
+    function removeJsonChapterInput(buttonElement) {
+        buttonElement.closest('.json-chapter-input-container')?.remove();
         updateTotalJsonObjectCount();
-        if ($$('#jsonInputsContainer .json-input-wrapper').length === 0) {
+        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) {
             addJsonChapterInput('', false);
         }
         debouncedSaveState();
     }
     
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const file = dt.files[0];
-        const textarea = e.currentTarget.querySelector('textarea');
-        const statusSpan = e.currentTarget.querySelector('.status-message');
-
-        if (file && file.type === "application/json") {
-            const reader = new FileReader();
-            reader.onload = (readEvent) => {
-                textarea.value = readEvent.target.result;
-                textarea.dispatchEvent(new Event('input', { bubbles: true })); // Trigger updates
-            };
-            reader.readAsText(file);
-        } else {
-            statusSpan.textContent = 'Error: Please drop a .json file.';
-            statusSpan.className = 'status-message status-error';
-            statusSpan.style.display = 'block';
-        }
+    function clearAllJsonInputs() {
+        document.getElementById('jsonInputsContainer').innerHTML = '';
+        jsonChapterInputIdCounter = 0;
+        addJsonChapterInput('', false);
+        updateTotalJsonObjectCount();
+        debouncedSaveState();
     }
 
     function updateIndividualJsonCount(textarea, statusSpan) {
         const jsonString = textarea.value.trim();
-        if (!jsonString) {
-            statusSpan.style.display = 'none';
-            return;
-        }
+        statusSpan.className = 'json-chapter-status status-message';
+        if (!jsonString) { statusSpan.textContent = 'Objects: 0'; return 0; }
         try {
-            if (!jsonString.startsWith('[')) throw new Error("Must be an Array []");
+            if (!jsonString.startsWith('[')) throw new Error("Not Array");
             const jsonData = JSON.parse(jsonString);
-            if (!Array.isArray(jsonData)) throw new Error("Must be an Array []");
-            statusSpan.textContent = `Valid Array with ${jsonData.length} objects.`;
-            statusSpan.className = 'status-message status-success';
-            statusSpan.style.display = 'block';
+            if (!Array.isArray(jsonData)) throw new Error("Not Array");
+            statusSpan.textContent = `Objects: ${jsonData.length}`;
+            statusSpan.classList.add('status-success');
         } catch (e) {
-            statusSpan.textContent = `Error: ${e.message}`;
-            statusSpan.className = 'status-message status-error';
-            statusSpan.style.display = 'block';
+            statusSpan.textContent = e.message === "Not Array" ? 'Error: Must be an Array []' : 'Error: Invalid JSON';
+            statusSpan.classList.add('status-error');
         }
     }
 
     function updateTotalJsonObjectCount() {
         let totalObjects = 0;
-        $$('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
+        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
              const jsonString = textarea.value.trim();
              try {
                  if (jsonString.startsWith('[') && jsonString.endsWith(']')) {
                     const jsonData = JSON.parse(jsonString);
                     if (Array.isArray(jsonData)) totalObjects += jsonData.length;
                  }
-             } catch (e) { /* ignore */ }
+             } catch (e) { /* ignore invalid json */ }
         });
-        $('#jsonObjectsCount').textContent = `Total Objects: ${totalObjects}`;
+        document.getElementById('jsonObjectsCount').textContent = `Total Objects: ${totalObjects}`;
     }
 
-    // --- Find/Replace, Plain Text, Common UI ---
     function addFindReplacePair(findVal = "", replaceVal = "", save=true) {
-        const container = $('#findReplacePairsContainer');
+        const container = document.getElementById('findReplacePairsContainer');
         const pairDiv = document.createElement('div');
         pairDiv.className = 'find-replace-pair';
         pairDiv.innerHTML = `
             <input type="text" class="find-text" placeholder="Find" value="${findVal}">
-            <span class="arrow">→</span>
+            <span class="arrow">➔</span>
             <input type="text" class="replace-text" placeholder="Replace" value="${replaceVal}">
-            <button type="button" class="btn btn-secondary btn-sm btn-icon">
-                 <svg class="icon"><use href="#icon-trash"></use></svg>
-            </button>`;
-        pairDiv.querySelector('button').addEventListener('click', () => removeFindReplacePair(pairDiv));
+            <button type="button" class="button btn-danger btn-sm" onclick="removeFindReplacePair(this)">－</button>`;
         pairDiv.querySelectorAll('input').forEach(input => input.addEventListener('input', debouncedSaveState));
         container.appendChild(pairDiv);
         if(save) debouncedSaveState();
     }
 
-    function removeFindReplacePair(element) {
-        element.remove();
-        if ($$('#findReplacePairsContainer .find-replace-pair').length === 0) {
+    function removeFindReplacePair(button) {
+        button.parentElement.remove();
+        if (document.querySelectorAll('#findReplacePairsContainer .find-replace-pair').length === 0) {
              addFindReplacePair("","", false);
         }
         debouncedSaveState();
     }
 
     function updatePlainTextInfo() {
-        const text = $('#plainTextInputArea').value;
-        const maxChars = parseInt($('#maxChars').value, 10);
+        const text = document.getElementById('plainTextInputArea').value;
+        const maxChars = parseInt(document.getElementById('maxChars').value, 10);
         const charCount = text.length;
-        const chunks = (charCount > 0 && maxChars > 0) ? Math.ceil(charCount / maxChars) : (charCount > 0 ? 1 : 0);
-        $('#plainTextInfo').textContent = `Chars: ${charCount} / Approx. Chunks: ${chunks}`;
+        let chunks = (charCount > 0 && maxChars > 0) ? Math.ceil(charCount / maxChars) : (charCount > 0 ? 1 : 0);
+        document.getElementById('plainTextInfo').textContent = `Chars: ${charCount} / Approx. Chunks: ${chunks}`;
+        if (isNaN(maxChars) || maxChars <= 0) {
+            showStatus('plainTextStatus', "Max characters must be > 0", 'error');
+        } else {
+            showStatus('plainTextStatus', "", 'success', 1);
+        }
     }
 
     function formatPlainText() {
-      const formatSelect = $('#formatSelect').value;
-      const textArea = $('#plainTextInputArea');
+      const formatSelect = document.getElementById('formatSelect').value;
+      const textArea = document.getElementById('plainTextInputArea');
       if (formatSelect === 'pretty') {
          textArea.value = currentAppState.plainText.split('\n').map(p => p.trim()).filter(p => p).join('\n\n');
       } else {
@@ -779,65 +783,53 @@
        updatePlainTextInfo();
        debouncedSaveState();
     }
-
-    function updateHeaderFooterPreview() {
-        const top = $('#addToTop').value;
-        const bottom = $('#addToBottom').value;
-        let preview = '';
-        if(top) preview += `Preview: "${top.replace(/\$X/g, '1').replace(/\$Y/g, 'N').substring(0, 30)}..."`;
-        if(bottom) preview += ` ... "${bottom.replace(/\$X/g, '1').replace(/\$Y/g, 'N')}"`;
-        $('#headerFooterPreview').textContent = preview;
-    }
     
-    // --- Core Logic (largely unchanged) ---
+    // --- Core Logic ---
     function processAndChunk() {
        clearOutput();
        showLoading();
        setTimeout(() => {
         try {
-          const splitMode = $('#splitModeSelect').value;
-          const addToTop = $('#addToTop').value;
-          const addToBottom = $('#addToBottom').value;
-          const container = $('#chunkedTextContainer');
+          const splitMode = document.getElementById('splitModeSelect').value;
+          const addToTop = document.getElementById('addToTop').value;
+          const addToBottom = document.getElementById('addToBottom').value;
+          const container = document.getElementById('chunkedTextContainer');
           let chunkCount = 0;
           
           if (splitMode === 'json') {
              const { data, success, allEmpty } = getAllCombinedJsonData();
              if (allEmpty) throw new Error("All JSON inputs are empty.");
              if (!success) throw new Error("Invalid JSON found. See errors on input boxes.");
-             const { data: processedJsonData, count: replacementCount } = applyGlossaryRules(data);
-             if (replacementCount > 0) {
-                showStatus('glossaryReplaceStatus', `Applied ${replacementCount} replacements.`, 'success', 5000);
-             } else if ($('#applyRulesCheckbox').checked) {
-                showStatus('glossaryReplaceStatus', `No matching terms found to replace.`, 'info', 5000);
-             }
+             const { data: processedJsonData } = applyGlossaryRules(data);
              chunkCount = chunkJsonInput(processedJsonData, addToTop, addToBottom, container);
           } else {
-             const text = $('#plainTextInputArea').value;
-             const maxChars = parseInt($('#maxChars').value);
+             const text = document.getElementById('plainTextInputArea').value;
+             const maxChars = parseInt(document.getElementById('maxChars').value);
              if (!text.trim()) throw new Error("Plain text input is empty.");
              if (isNaN(maxChars) || maxChars <= 0) throw new Error("Max characters must be > 0.");
              chunkCount = chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container);
           }
            if (chunkCount > 0) {
-                $('#output-column-wrapper').style.display = 'block';
-                $('#outputSummary').textContent = `Output: ${chunkCount} Chunk${chunkCount === 1 ? '' : 's'}`;
-                $('#copyNextButton').disabled = false;
-                showStatus('processStatus', `<div class="status-message status-success">Success: Generated ${chunkCount} chunks.</div>`, 'success', 0);
+                document.getElementById('initial-view').style.display = 'none';
+                document.getElementById('outputControls').style.display = 'flex';
+                document.getElementById('outputSummary').textContent = `Output: ${chunkCount} Chunk${chunkCount === 1 ? '' : 's'}`;
+                document.getElementById('copyNextButton').disabled = false;
+                document.getElementById('copyAllButton').disabled = false;
+                showStatus('processStatus', `Success: Generated ${chunkCount} chunks.`, 'success');
            } else {
                 throw new Error("No chunks were generated from the input.");
            }
         } catch (error) {
-           showStatus('processStatus', `<div class="status-message status-error">${error.message}</div>`, 'error', 0);
+           showStatus('processStatus', error.message, 'error', 8000);
         } finally {
           hideLoading();
         }
       }, 50);
     }
-    
+
     function getAllCombinedJsonData() {
         let combinedData = [], allInputsValid = true, allEmpty = true;
-        $$('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
+        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
             const jsonString = textarea.value.trim();
             if (!jsonString) return;
             allEmpty = false;
@@ -853,10 +845,10 @@
     }
 
     function applyGlossaryRules(jsonData) {
-        if (!$('#applyRulesCheckbox').checked || !jsonData || jsonData.length === 0) {
+        if (!document.getElementById('applyRulesCheckbox').checked || !jsonData || jsonData.length === 0) {
             return { data: jsonData, count: 0 };
         }
-        const flags = $('#caseInsensitiveCheckbox').checked ? 'gi' : 'g';
+        const flags = document.getElementById('caseInsensitiveCheckbox').checked ? 'gi' : 'g';
         const rules = currentAppState.findReplacePairs.map(p => {
              if (!p.find) return null;
              try { return { findRegExp: new RegExp(escapeRegExp(p.find), flags), replace: p.replace }; }
@@ -865,7 +857,7 @@
 
         if (rules.length === 0) return { data: jsonData, count: 0 };
         
-        const processedData = JSON.parse(JSON.stringify(jsonData)); // Deep copy
+        const processedData = JSON.parse(JSON.stringify(jsonData));
         let totalInstancesReplaced = 0;
 
         processedData.forEach(obj => {
@@ -883,11 +875,16 @@
                 });
             }
         });
+        if (totalInstancesReplaced > 0) {
+            showStatus('glossaryReplaceStatus', `Applied ${totalInstancesReplaced} replacements.`, 'success');
+        } else {
+            showStatus('glossaryReplaceStatus', 'No matching terms found to replace.', 'info');
+        }
         return { data: processedData, count: totalInstancesReplaced };
     }
-    
+
     function chunkJsonInput(jsonData, addToTop, addToBottom, container) {
-        const objectsToGroup = parseInt($('#jsonObjectsPerChunk').value, 10) || 1;
+        const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
         const totalChunks = Math.ceil(jsonData.length / objectsToGroup);
         for (let i = 0; i < jsonData.length; i += objectsToGroup) {
             const group = jsonData.slice(i, i + objectsToGroup);
@@ -896,7 +893,7 @@
             const content = JSON.stringify(objectsToGroup === 1 && group.length === 1 ? group[0] : group, null, 2);
             const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
             const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-            displayChunk([top, content, bottom].filter(Boolean).join('\n\n'), title, container, partNum);
+            displayChunk([top, content, bottom].filter(Boolean).join('\n\n'), title, container);
         }
         return totalChunks;
     }
@@ -942,139 +939,152 @@
          const partNum = index + 1;
          const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
          const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-         displayChunk([top, chunk, bottom].filter(Boolean).join('\n\n'), `Part ${partNum}/${totalChunks}`, container, partNum);
+         displayChunk([top, chunk, bottom].filter(Boolean).join('\n\n'), `Part ${partNum}/${totalChunks}`, container);
        });
        return totalChunks;
     }
     
     // --- Output & Copying ---
-    function displayChunk(content, title, container, partNum) {
+    function displayChunk(content, title, container) {
         const chunkDiv = document.createElement('div');
         chunkDiv.className = 'chunk-container';
         chunkDiv.dataset.copied = "false";
-        chunkDiv.dataset.part = partNum;
         chunkDiv.innerHTML = `
-         <div class="chunk-actions">
-            <button class="btn btn-primary btn-icon copy-button" data-copy-count="0" title="Copy">
-                <svg class="icon"><use href="#icon-copy"></use></svg>
-                <svg class="icon tick"><use href="#icon-check"></use></svg>
-            </button>
-            <span class="copy-count-display">(0)</span>
-         </div>
-         <div class="chunk-title">${title}</div>
-         <div class="chunk-content">
-             <textarea readonly>${content}</textarea>
+         <div class="chunk-content-wrapper">
+            <div class="chunk-header">
+                <div class="chunk-title">${title}</div>
+                <div class="chunk-actions">
+                    <span class="copy-count-display">(0)</span>
+                    <button class="button btn-primary btn-sm copy-button" data-copy-count="0">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12A1.5 1.5 0 0117 6.622V16.5a1.5 1.5 0 01-1.5 1.5h-7A1.5 1.5 0 017 16.5v-13z" /><path d="M6 4.5A2.5 2.5 0 003.5 7v10A2.5 2.5 0 006 19.5h7a2.5 2.5 0 002.5-2.5V17a.5.5 0 01-1 0v.5a1.5 1.5 0 01-1.5 1.5h-7A1.5 1.5 0 015 17V7a1.5 1.5 0 011.5-1.5h.5a.5.5 0 010 1h-.5z" /></svg>
+                        Copy
+                        <span class="tick" style="display:none; color: var(--success-color);">✔️</span>
+                    </button>
+                </div>
+            </div>
+            <div class="chunk-textarea-wrapper">
+                <textarea readonly>${content}</textarea>
+            </div>
          </div>`;
         const copyButton = chunkDiv.querySelector('.copy-button');
-        copyButton.addEventListener('click', () => copyToClipboard(
-            chunkDiv.querySelector('textarea').value, 
-            copyButton,
-            chunkDiv.querySelector('.copy-count-display')
-        ));
+        copyButton.addEventListener('click', function () {
+            copyToClipboard(
+                chunkDiv.querySelector('textarea').value, 
+                this, 
+                chunkDiv.querySelector('.copy-count-display')
+            );
+        });
         container.appendChild(chunkDiv);
     }
     
     function clearOutput() {
-        $('#chunkedTextContainer').innerHTML = '';
-        $('#output-column-wrapper').style.display = 'none';
-        $('#processStatus').innerHTML = '';
-        $('#glossaryReplaceStatus').innerHTML = '';
+        document.getElementById('chunkedTextContainer').innerHTML = '';
+        document.getElementById('initial-view').style.display = 'block';
+        document.getElementById('outputControls').style.display = 'none';
         lastClickedButton = null;
     }
     
     function copyToClipboard(text, buttonEl, countEl) {
        navigator.clipboard.writeText(text).then(() => {
-            if (lastClickedButton && lastClickedButton !== buttonEl) {
-                lastClickedButton.classList.remove('copied-once');
-            }
-            buttonEl.classList.add('copied-once');
-            lastClickedButton = buttonEl;
-
             const container = buttonEl.closest('.chunk-container');
-            container.dataset.copied = "true";
             container.classList.add('copied');
             
             let count = parseInt(buttonEl.dataset.copyCount, 10) + 1;
             buttonEl.dataset.copyCount = count;
             countEl.textContent = `(${count})`;
 
-            if (!$('.chunk-container[data-copied="false"]')) {
-                $('#copyNextButton').disabled = true;
+            showStatus('mainStatus', 'Copied chunk to clipboard!', 'success', 2500);
+
+            if (!document.querySelector('.chunk-container:not(.copied)')) {
+                document.getElementById('copyNextButton').disabled = true;
             }
-        }).catch(err => { showStatus('processStatus', `<div class="status-message status-error">Failed to copy text.</div>`, 'error'); });
+        }).catch(err => { showStatus('processStatus', 'Failed to copy text.', 'error'); });
     }
     
     function copyNextUncopied() {
-        const nextContainer = $('.chunk-container[data-copied="false"]');
+        const nextContainer = document.querySelector('.chunk-container:not(.copied)');
         if(nextContainer) {
             nextContainer.querySelector('.copy-button').click();
             nextContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
         }
     }
     
+    function copyAllChunks() {
+        const textareas = document.querySelectorAll('#chunkedTextContainer textarea');
+        if (textareas.length === 0) return;
+        const separator = "\n\n" + "-".repeat(30) + "\n\n";
+        const allText = Array.from(textareas).map(ta => ta.value).join(separator);
+        navigator.clipboard.writeText(allText).then(() => {
+            showStatus('mainStatus', `Copied all ${textareas.length} chunks!`, 'success', 3000);
+            document.querySelectorAll('.chunk-container').forEach(div => div.classList.add('copied'));
+            document.getElementById('copyNextButton').disabled = true;
+        });
+    }
+
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         loadState();
         
-        // Event Listeners
-        $('#theme-toggle').addEventListener('click', toggleTheme);
-        $('#resetAllButton').addEventListener('click', resetAllToDefaults);
-        $('#mainSplitButton').addEventListener('click', processAndChunk);
+        // --- Event Listeners ---
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        document.getElementById('resetAllButton').addEventListener('click', resetAllToDefaults);
+        document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
         
-        $('#modeSwitcher').addEventListener('click', (e) => {
-            if (e.target.closest('button')) {
-                $('#splitModeSelect').value = e.target.closest('button').dataset.mode;
+        // Sidebar listeners
+        document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+        document.getElementById('sidebar-overlay').addEventListener('click', toggleSidebar);
+
+        document.getElementById('modeSwitcher').addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                document.getElementById('splitModeSelect').value = e.target.dataset.mode;
                 toggleInputSections();
             }
         });
         
-        $$('.card-header').forEach(header => {
-            header.addEventListener('click', (e) => {
-                if (e.target.closest('button')) return; // ignore button clicks in header
-                header.parentElement.classList.toggle('collapsed');
-                debouncedSaveState();
-            });
+        document.querySelectorAll('details').forEach(detail => {
+            detail.addEventListener('toggle', debouncedSaveState);
         });
 
-        $('#addJsonChapterButton').addEventListener('click', () => addJsonChapterInput());
-        $('#addFindReplacePairButton').addEventListener('click', () => addFindReplacePair());
-        
-        // Listen to any input/change/check and save state
-        $('#jsonObjectsPerChunk').addEventListener('change', debouncedSaveState);
-        $('#applyRulesCheckbox').addEventListener('change', debouncedSaveState);
-        $('#caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
-        $('#plainTextInputArea').addEventListener('input', () => {
-            currentAppState.plainText = $('#plainTextInputArea').value;
+        // JSON Mode Listeners
+        document.getElementById('addJsonChapterButton').addEventListener('click', () => addJsonChapterInput());
+        document.getElementById('clearAllJsonButton').addEventListener('click', clearAllJsonInputs);
+        document.getElementById('addFindReplacePairButton').addEventListener('click', () => addFindReplacePair());
+        document.getElementById('jsonObjectsPerChunk').addEventListener('change', debouncedSaveState);
+        document.getElementById('applyRulesCheckbox').addEventListener('change', debouncedSaveState);
+        document.getElementById('caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
+
+        // Plain Text Mode Listeners
+        document.getElementById('plainTextInputArea').addEventListener('input', () => {
+            currentAppState.plainText = document.getElementById('plainTextInputArea').value;
             debouncedUpdatePlainTextInfo();
             debouncedSaveState();
         });
-        $('#maxChars').addEventListener('input', debouncedUpdatePlainTextInfo);
-        $('#formatSelect').addEventListener('change', formatPlainText);
-        $('#addToTop').addEventListener('input', () => {
-            debouncedUpdateHeaderFooterPreview();
-            debouncedSaveState();
-        });
-        $('#addToBottom').addEventListener('input', () => {
-            debouncedUpdateHeaderFooterPreview();
-            debouncedSaveState();
-        });
-        
-        $('#clearOutputButton').addEventListener('click', clearOutput);
-        $('#copyNextButton').addEventListener('click', copyNextUncopied);
-        
-        // Scroll to top button visibility
-        const outputCol = $('#output-column');
-        const SUTBtn = $("#scrollToTopBtn");
-        if (outputCol) {
-            outputCol.onscroll = () => {
-                SUTBtn.style.display = outputCol.scrollTop > 200 ? "block" : "none";
-            };
-        }
+        document.getElementById('maxChars').addEventListener('input', debouncedUpdatePlainTextInfo);
+        document.getElementById('formatSelect').addEventListener('change', formatPlainText);
 
-        // Final UI Setup
+        // Common Listeners
+        document.getElementById('addToTop').addEventListener('input', debouncedSaveState);
+        document.getElementById('addToBottom').addEventListener('input', debouncedSaveState);
+        
+        // Output Listeners
+        document.getElementById('clearOutputButton').addEventListener('click', clearOutput);
+        document.getElementById('copyNextButton').addEventListener('click', copyNextUncopied);
+        document.getElementById('copyAllButton').addEventListener('click', copyAllChunks);
+        document.getElementById('scrollToTopBtn').addEventListener('click', () => {
+            document.getElementById('output-column').scrollTo({top: 0, behavior: 'smooth'});
+        });
+        
+        // Scroll listener for the output area
+        const outputCol = document.getElementById('output-column');
+        outputCol.onscroll = () => {
+            const btn = document.getElementById("scrollToTopBtn");
+            btn.style.display = outputCol.scrollTop > 200 ? "block" : "none";
+        };
+
+        // --- Final UI Setup ---
         toggleInputSections();
-        updateHeaderFooterPreview();
         clearOutput();
+        showStatus('mainStatus', 'Ready!', 'success', 2500);
     });
     </script>
 </body>
