@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragraph Formatter Pro | Rich Text</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        :root {
+            --bg-light: #f8fafc;
+            --surface-light: #ffffff;
+            --text-light: #0f172a;
+            --subtle-text-light: #64748b;
+            --border-light: #e2e8f0;
+            --primary-light: #0ea5e9; /* Sky Blue */
+            --primary-hover-light: #0284c7;
+            --accent-light: #ffffff;
+            --link-light: #0369a1;
+            --success-light: #16a34a;
+            --danger-light: #dc2626;
+            --highlight-bg-light: rgba(2, 132, 199, 0.25); /* primary-light at 25% opacity */
+
+
+            --bg-dark: #0f172a; /* Slate 900 */
+            --surface-dark: #1e293b; /* Slate 800 */
+            --text-dark: #e2e8f0;
+            --subtle-text-dark: #94a3b8;
+            --border-dark: #334155; /* Slate 700 */
+            --primary-dark: #38bdf8; /* Lighter Sky Blue */
+            --primary-hover-dark: #7dd3fc;
+             --accent-dark: #cbd5e1;
+            --link-dark: #7dd3fc;
+             --success-dark: #22c55e;
+             --danger-dark:#f87171;
+             --highlight-bg-dark: rgba(56, 189, 248, 0.25); /* primary-dark at 25% opacity */
+
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --shadow-color-dark: rgba(0, 0, 0, 0.3);
+            --radius: 12px;
+             --radius-sm: 8px;
+             /* QoL */
+             --text-area-font-size: 0.95rem; 
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+       
+        /* --- Layout & Containers --- */
+        .container {
+            max-width: 1350px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 3rem);
+            gap: 1rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+             background-color: var(--surface-light);
+            border: 1px solid var(--border-light);
+             padding: 0.8rem 1.5rem;
+             border-radius: var(--radius);
+             box-shadow: 0 2px 8px var(--shadow-color);
+        }
+         body.dark-mode header {
+             background-color: var(--surface-dark);
+             border-color: var(--border-dark);
+             box-shadow: 0 2px 8px var(--shadow-color-dark);
+         }
+
+
+        .main-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-hover-light);
+             display: flex;
+             flex-direction: column;
+             line-height: 1.3;
+        }
+         .main-title small {
+             font-size: 0.8rem;
+             color: var(--subtle-text-light);
+             font-weight: 500;
+         }
+         .main-title small .dirty-indicator {
+             color: var(--danger-light);
+             font-weight: 700;
+             margin-left: 4px;
+             display: none; /* Hidden by default */
+         }
+         body.dark-mode .main-title small .dirty-indicator {
+             color: var(--danger-dark);
+         }
+
+          body.dark-mode .main-title small {
+             color: var(--subtle-text-dark);
+         }
+        body.dark-mode .main-title {
+            color: var(--primary-hover-dark);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background-color: var(--surface-light);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border: 1px solid var(--border-light);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow: hidden;
+             height: 100%; /* Ensure cards fill grid row height */
+        }
+        body.dark-mode .card {
+            background-color: var(--surface-dark);
+            box-shadow: 0 4px 15px var(--shadow-color-dark);
+            border-color: var(--border-dark);
+        }
+         .project-manager {
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            padding: 1rem 1.2rem;
+         }
+          .project-manager .column-title { margin-bottom: 0;}
+          .project-group { display: flex; align-items: center; gap: 0.8rem; flex-grow: 1; flex-wrap: wrap;}
+           .project-controls { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;}
+
+        /* --- Controls Bar --- */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* align top */
+            flex-wrap: wrap;
+            gap: 1rem;
+             padding-bottom: 0.5rem;
+             border-bottom: 1px dashed var(--border-light);
+        }
+         body.dark-mode .controls-bar {
+             border-bottom-color: var(--border-dark);
+         }
+
+        .control-group {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 0.8rem 1.2rem; /* row-gap col-gap */
+             align-items: center;
+        }
+
+       .options-group {
+             display: flex;
+             flex-direction: column;
+             gap: 0.5rem;
+             align-items: flex-start;
+       }
+       .options-row {
+            display: flex;
+             flex-wrap: wrap;
+             gap: 0.8rem 1.2rem; 
+             align-items: center;
+       }
+
+        .input-control { /* Generic control wrapper */
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+             font-weight: 500;
+             font-size: 0.85rem;
+             color: var(--subtle-text-light);
+             white-space: nowrap;
+        }
+         body.dark-mode .input-control {
+             color: var(--subtle-text-dark);
+         }
+         .input-control input[type="checkbox"],
+         .input-control input[type="range"]
+          {
+             accent-color: var(--primary-light);
+             cursor: pointer;
+         }
+          .input-control input[type="checkbox"] {
+             width: 1rem;
+             height: 1rem;
+          }
+
+          body.dark-mode .input-control input[type="checkbox"],
+           body.dark-mode .input-control input[type="range"]
+           {
+               accent-color: var(--primary-dark);
+          }
+           .input-control label {
+            cursor: pointer;
+           }
+
+        /* Input & Select fields */
+        #separatorInput, #targetWordCount, #projectSelect,
+        #findInput, #replaceInput {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: all 0.3s;
+             font-size: 0.85rem;
+        }
+         #separatorInput {
+             font-family: 'Inter', monospace;
+              width: 70px;
+         }
+         #targetWordCount {
+             width: 75px;
+         }
+         #projectSelect {
+             min-width: 150px;
+             max-width: 300px;
+             flex-grow: 1;
+         }
+
+
+        body.dark-mode #separatorInput,
+        body.dark-mode #targetWordCount,
+        body.dark-mode #projectSelect,
+        body.dark-mode #findInput,
+        body.dark-mode #replaceInput
+         {
+            border-color: var(--border-dark);
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        #separatorInput:focus, 
+        #targetWordCount:focus,
+        #projectSelect:focus,
+        #findInput:focus,
+        #replaceInput:focus
+         {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        body.dark-mode #separatorInput:focus,
+        body.dark-mode #targetWordCount:focus,
+        body.dark-mode #projectSelect:focus,
+        body.dark-mode #findInput:focus,
+        body.dark-mode #replaceInput:focus
+         {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+        }
+
+        /* --- Text Area Columns --- */
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 0.2rem;
+            margin-bottom: 0rem;
+        }
+        .column-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+
+        .stats {
+            font-size: 0.8rem;
+            color: var(--subtle-text-light);
+            font-weight: 500;
+        }
+         .stats.target-met { color: var(--success-light); font-weight: 700; }
+         body.dark-mode .stats.target-met { color: var(--success-dark); }
+
+        body.dark-mode .stats {
+            color: var(--subtle-text-dark);
+        }
+        
+        /* --- Content Editable Div Styling --- */
+        .text-area {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 250px;
+            padding: 0.5rem 0.75rem;
+            background-color: transparent;
+            color: var(--text-light);
+            font-size: var(--text-area-font-size);
+            line-height: 1.7;
+            resize: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            overflow-y: auto;
+            outline: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+         
+        .text-area:empty::before {
+            content: attr(data-placeholder);
+            color: var(--subtle-text-light);
+            pointer-events: none;
+            display: block;
+        }
+        body.dark-mode .text-area:empty::before {
+            color: var(--subtle-text-dark);
+        }
+
+        #outputDiv {
+            user-select: text;
+            -webkit-user-modify: read-only;
+            -moz-user-modify: read-only;
+            cursor: text;
+        }
+        .text-area strong, .text-area b { font-weight: 700; }
+        .text-area em, .text-area i { font-style: italic; }
+        .text-area p { margin-bottom: 1em; }
+        .text-area p:last-child { margin-bottom: 0; }
+        .text-area a { 
+            color: var(--link-light); 
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+         }
+         .text-area a:hover {
+             text-decoration-thickness: 2px;
+         }
+         body.dark-mode .text-area a {
+             color: var(--link-dark);
+         }
+        
+        /* NEW: Highlighting for find feature */
+        .text-area mark {
+            background-color: var(--highlight-bg-light);
+            color: inherit;
+            border-radius: 3px;
+        }
+        body.dark-mode .text-area mark {
+            background-color: var(--highlight-bg-dark);
+        }
+
+
+        body.dark-mode .text-area {
+            color: var(--text-dark);
+        }
+        
+        .text-area::-webkit-scrollbar { width: 8px; }
+        .text-area::-webkit-scrollbar-track { background: var(--border-light); border-radius: 4px; margin: 2px 0;}
+        .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-light);  border-radius: 4px; }
+        .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+         .text-area {
+            scrollbar-width: thin;
+            scrollbar-color: var(--subtle-text-light) var(--border-light);
+         }
+        body.dark-mode .text-area::-webkit-scrollbar-track { background: var(--border-dark); }
+        body.dark-mode .text-area::-webkit-scrollbar-thumb { background: var(--subtle-text-dark); }
+        body.dark-mode .text-area::-webkit-scrollbar-thumb:hover { background: var(--text-dark); }
+         body.dark-mode .text-area {
+             scrollbar-color: var(--subtle-text-dark) var(--border-dark);
+         }
+
+        /* Find & Replace Bar */
+        .find-replace-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+        }
+        .find-replace-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        body.dark-mode .find-replace-bar {
+            background-color: var(--bg-dark);
+            border-color: var(--border-dark);
+        }
+        .find-replace-bar.hidden {
+            display: none;
+        }
+        .find-replace-controls input[type="text"] {
+            flex-grow: 1;
+            min-width: 120px;
+        }
+        .find-replace-controls .stats {
+            min-width: 80px;
+            text-align: center;
+        }
+        .find-replace-options {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            padding-left: 2px;
+        }
+
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.9rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+            background-color: var(--primary-light);
+            color: var(--accent-light);
+            box-shadow: 0 1px 3px var(--shadow-color);
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .btn svg {
+             flex-shrink: 0;
+              width: 16px; height: 16px;
+        }
+
+        .btn:hover:not([disabled]) {
+            background-color: var(--primary-hover-light);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px var(--shadow-color);
+        }
+        
+        .btn:active:not([disabled]) {
+            transform: translateY(0px);
+            box-shadow: 0 1px 2px var(--shadow-color);
+        }
+         .btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+             box-shadow: none;
+         }
+        
+        body.dark-mode .btn {
+            background-color: var(--primary-dark);
+            color: var(--bg-dark);
+            box-shadow: 0 1px 3px var(--shadow-color-dark);
+        }
+
+        body.dark-mode .btn:hover:not([disabled]) {
+            background-color: var(--primary-hover-dark);
+            box-shadow: 0 3px 6px var(--shadow-color-dark);
+        }
+         body.dark-mode .btn:active:not([disabled]) {
+            box-shadow: 0 1px 2px var(--shadow-color-dark);
+        }
+        
+        .btn.btn-secondary {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            border-color: var(--border-light);
+        }
+        
+        body.dark-mode .btn.btn-secondary {
+            background-color: var(--surface-dark);
+            color: var(--text-dark);
+            border-color: var(--border-dark);
+        }
+        
+        .btn.btn-secondary:hover:not([disabled]) {
+            background-color: var(--border-light);
+            border-color: var(--subtle-text-light);
+             color: var(--text-light);
+        }
+        
+        body.dark-mode .btn.btn-secondary:hover:not([disabled]) {
+            background-color: var(--border-dark);
+            border-color: var(--subtle-text-dark);
+             color: var(--text-dark);
+        }
+         .btn.feedback-success { background-color: var(--success-light) !important; color: white !important; border-color: transparent !important;}
+         .btn.feedback-danger { background-color: var(--danger-light) !important; color: white !important; border-color: transparent !important;}
+           body.dark-mode .btn.feedback-success { background-color: var(--success-dark) !important; color: var(--bg-dark) !important;}
+           body.dark-mode .btn.feedback-danger { background-color: var(--danger-dark) !important; color: var(--bg-dark) !important;}
+
+         .btn-danger-hover:hover:not([disabled]) {
+             background-color: #fee2e2;
+             border-color: #fca5a5;
+             color: #b91c1c;
+         }
+          body.dark-mode .btn-danger-hover:hover:not([disabled]) {
+             background-color: #450a0a;
+             border-color: #7f1d1d;
+             color: #fca5a5;
+         }
+
+        .btn-group {
+            display: flex;
+             flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        /* --- Theme Toggle Switch --- */
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-light);
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--surface-light);
+            transition: .3s;
+            border-radius: 50%;
+             box-shadow: 0 1px 3px rgba(0,0,0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-light);
+        }
+        body.dark-mode input:checked + .slider {
+            background-color: var(--primary-dark); 
+        }
+        body.dark-mode input + .slider {
+            background-color: var(--border-dark); 
+        }
+        body.dark-mode input + .slider:before {
+           background-color: var(--surface-dark); 
+            border: 1px solid var(--border-dark);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+             flex-wrap: wrap;
+        }
+
+        /* --- Side Slider Panel --- */
+        #side-slider {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+        #slider-toggle-btn {
+            width: 36px;
+            height: 48px;
+            padding: 0;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+            flex-shrink: 0;
+        }
+        #slider-toggle-btn svg {
+            transition: transform 0.3s;
+        }
+        .slider-content {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-light);
+            border-right: none;
+            border-radius: var(--radius) 0 0 var(--radius);
+            box-shadow: -4px 0 15px var(--shadow-color);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 260px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+         body.dark-mode .slider-content {
+            background-color: var(--surface-dark);
+            border-color: var(--border-dark);
+            box-shadow: -4px 0 15px var(--shadow-color-dark);
+        }
+        #side-slider.collapsed .slider-content {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #side-slider.collapsed #slider-toggle-btn svg {
+             transform: rotate(180deg);
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            border-top: 1px dashed var(--border-light);
+            padding-top: 1rem;
+        }
+         body.dark-mode .slider-group {
+             border-top-color: var(--border-dark);
+         }
+        .slider-group:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+        .slider-group .input-control {
+            justify-content: space-between;
+        }
+         .slider-group .btn {
+            justify-content: center;
+         }
+         .slider-group .stats-label {
+             font-weight: 700;
+             font-size: 0.9rem;
+             margin-bottom: -0.25rem;
+         }
+        #readability-stats {
+             text-align: center;
+             padding: 0.5rem;
+             background: var(--bg-light);
+             border-radius: var(--radius-sm);
+        }
+         body.dark-mode #readability-stats {
+             background: var(--bg-dark);
+         }
+       
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+             .container {
+                 margin: 1rem auto;
+                 min-height: calc(100vh - 2rem);
+                 padding: 0 1rem;
+             }
+             header {
+                 padding: 0.8rem 1rem;
+             }
+             .workspace {
+                 grid-template-columns: 1fr;
+                 gap: 1rem;
+             }
+              .card {
+                 padding: 1rem;
+             }
+             .text-area {
+                 min-height: 40vh;
+             }
+              .controls-bar {
+                 flex-direction: column-reverse;
+                 align-items: stretch;
+             }
+              .control-group {
+                 justify-content: center;
+             }
+             .options-group {
+                 align-items: center;
+             }
+              .project-manager {
+                 flex-direction: column;
+                 align-items: stretch;
+              }
+              .project-group {
+                 flex-direction: column;
+                 align-items: stretch;
+              }
+              #projectSelect { max-width: 100%;}
+              .project-controls { justify-content: center;}
+        }
+
+        /* UPDATED: Responsive slider for tablets/mobile */
+        @media (max-width: 768px) {
+            #side-slider {
+                top: auto;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                width: 100%;
+                transform: none;
+                z-index: 1001; /* Above backdrop */
+            }
+             #side-slider:not(.collapsed) {
+                 position: fixed;
+             }
+            #slider-toggle-btn {
+                position: fixed;
+                bottom: 1rem;
+                right: 1rem;
+                writing-mode: horizontal-tb;
+                text-orientation: unset;
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                box-shadow: 0 4px 12px var(--shadow-color-dark);
+                z-index: 1002;
+                transform: rotate(90deg);
+            }
+            #side-slider.collapsed #slider-toggle-btn {
+                 transform: rotate(0deg);
+            }
+            #side-slider.collapsed #slider-toggle-btn svg {
+                transform: none; /* Reset rotation */
+            }
+            #slider-toggle-btn svg {
+                transform: rotate(-90deg);
+            }
+            .slider-content {
+                width: 100%;
+                max-height: 50vh;
+                border-radius: var(--radius) var(--radius) 0 0;
+                border-right: 1px solid var(--border-light);
+                border-bottom: none;
+                transform: translateY(100%);
+                 transition: transform 0.3s ease-in-out;
+            }
+            body.dark-mode .slider-content {
+                 border-right-color: var(--border-dark);
+            }
+            #side-slider:not(.collapsed) .slider-content {
+                 transform: translateY(0);
+            }
+            #side-slider.collapsed .slider-content {
+                transform: translateY(100%);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .main-title {
+                font-size: 1.2rem;
+            }
+            header {
+                flex-direction: column;
+                gap: 0.8rem;
+                 padding: 1rem;
+                 align-items: flex-start;
+            }
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+             .btn {
+                 padding: 0.6rem 0.8rem;
+                 font-size: 0.8rem;
+             }
+             .btn svg { width: 14px; height: 14px;}
+              .text-area {
+                 min-height: 30vh;
+             }
+        }
+
+        /* NEW: Backdrop for mobile slider */
+        #slider-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #slider-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="slider-backdrop"></div>
+
+    <div class="container">
+        <header>
+             <h1 class="main-title">
+                Paragraph Formatter Pro
+                <small id="currentProjectTitle">Unsaved Draft<span class="dirty-indicator">*</span></small>
+            </h1>
+           
+            <div class="header-controls">
+                 <div class="input-control">
+                   <label for="fontSizeSlider" title="Adjust Text Size">Size:</label>
+                    <input type="range" id="fontSizeSlider" min="0.7" max="1.5" step="0.05" value="0.95" style="width: 80px;">
+                 </div>
+                  <div class="input-control">
+                     <label for="targetWordCount" title="Set a word count goal">Target:</label>
+                     <input type="number" id="targetWordCount" min="0" step="50" value="0">
+                 </div>
+
+                 <label class="theme-switch" for="themeToggleCheckbox" title="Toggle Dark/Light Mode">
+                    <span>☀️</span>
+                    <div class="switch">
+                        <input type="checkbox" id="themeToggleCheckbox">
+                        <span class="slider"></span>
+                    </div>
+                    <span>🌙</span>
+                </label>
+            </div>
+        </header>
+        
+         <section class="card project-manager">
+             <h2 class="column-title">Projects:</h2>
+              <div class="project-group">
+                  <select id="projectSelect" title="Select a saved project">
+                      <option value="">-- No Projects Saved --</option>
+                  </select>
+                   <div class="btn-group">
+                       <button id="loadProjectBtn" class="btn" title="Load selected project">Load</button>
+                       <button id="saveProjectBtn" class="btn btn-secondary" title="Save current project (Ctrl+S)">Save</button>
+                       <button id="deleteProjectBtn" class="btn btn-secondary btn-danger-hover" title="Delete selected project">Delete</button>
+                  </div>
+              </div>
+               <div class="project-controls">
+                   <input type="file" id="importFileElement" accept=".json" style="display: none;" aria-hidden="true">
+                    <button id="importProjectsBtn" class="btn btn-secondary" title="Import projects from JSON file">Import</button>
+                    <button id="exportProjectsBtn" class="btn btn-secondary" title="Export all projects to JSON file">Export All</button>
+                    <button id="clearAllProjectsBtn" class="btn btn-secondary btn-danger-hover" title="Delete ALL saved projects from local storage!">Clear All Saved</button>
+                </div>
+         </section>
+
+
+        <main class="workspace">
+            <div class="card">
+                 <div class="column-header">
+                    <div>
+                        <h2 class="column-title">Input Text</h2>
+                        <div id="inputStats" class="stats">0 words, 0 chars, 0 paras</div>
+                    </div>
+                </div>
+                <div class="controls-bar">
+                     <div class="options-group">
+                       <div class="options-row">
+                          <div class="input-control">
+                                <label for="separatorInput">Separator:</label>
+                                <input type="text" id="separatorInput" value="\\n\\n" title="Separator between paragraphs. Use \\n for a line break.">
+                            </div>
+                             <div class="input-control">
+                                <input type="checkbox" id="wrapPCheckbox" title="Wrap each paragraph in <p> tags">
+                                <label for="wrapPCheckbox">Wrap in <p> tags</label>
+                            </div>
+                             <div class="input-control">
+                                 <input type="checkbox" id="cleanSpacesCheckbox" title="Collapse multiple spaces into a single space." checked>
+                                 <label for="cleanSpacesCheckbox">Clean extra spaces</label>
+                             </div>
+                       </div>
+                    </div>
+                     <div class="control-group">
+                        <div class="btn-group" title="Change case of INPUT text">
+                             <button id="caseSentenceBtn" class="btn btn-secondary">Sentence</button>
+                             <button id="caseTitleBtn" class="btn btn-secondary">Title</button>
+                             <button id="caseLowerBtn" class="btn btn-secondary">lower</button>
+                             <button id="caseUpperBtn" class="btn btn-secondary">UPPER</button>
+                        </div>
+                         <button id="copyMarkdownBtn" class="btn btn-secondary" title="Copy input to clipboard as plain text Markdown">
+                            Copy Markdown
+                        </button>
+                        <button id="pasteBtn" class="btn" title="Paste text from clipboard">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-12Zm1 3.25A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 10.75Z"/></svg>
+                            Paste 
+                        </button>
+                        <button id="clearBtn" class="btn btn-secondary btn-danger-hover" title="Clear current draft content and reset settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 0 2 2h-10a2 2 0 0 0-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                           Clear Draft
+                       </button>
+                    </div>
+                </div>
+                
+                <div id="findReplaceBar" class="find-replace-bar hidden">
+                    <div class="find-replace-controls">
+                        <input type="text" id="findInput" placeholder="Find text...">
+                        <input type="text" id="replaceInput" placeholder="Replace with...">
+                        <span id="findCount" class="stats">0 found</span>
+                        <button id="replaceAllBtn" class="btn btn-secondary">Replace All</button>
+                        <button id="closeFindBtn" class="btn btn-secondary" title="Close Find/Replace (Esc)">X</button>
+                    </div>
+                    <div class="find-replace-options">
+                        <div class="input-control">
+                            <input type="checkbox" id="findCaseSensitive">
+                            <label for="findCaseSensitive">Case Sensitive</label>
+                        </div>
+                        <div class="input-control">
+                            <input type="checkbox" id="findWholeWord">
+                            <label for="findWholeWord">Whole Word</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div 
+                    id="inputDiv" 
+                    class="text-area" 
+                    contenteditable="true"
+                    spellcheck="false"
+                    role="textbox"
+                    aria-multiline="true"
+                    data-placeholder="Paste or type text here. Use **bold** / __bold__, *italic* / _italic_ and [text](url). Paragraphs are blocks separated by at least one BLANK line...">
+                </div>
+            </div>
+
+            <div class="card" id="outputCard"> 
+                <div class="column-header">
+                     <div>
+                        <h2 class="column-title">Formatted Output</h2>
+                        <div id="outputStats" class="stats">0 words, 0 characters</div>
+                    </div>
+                </div>
+                <div class="controls-bar">
+                     <div class="control-group">
+                         <button id="copyBtn" class="btn" title="Copy output as Rich Text (HTML) and Plain Text">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
+                             Copy Rich Text
+                        </button>
+                        <button id="downloadHtmlBtn" class="btn btn-secondary" title="Download formatted output as HTML file">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"> <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/> </svg>
+                             HTML
+                        </button>
+                        <button id="downloadTextBtn" class="btn btn-secondary" title="Download formatted output as plain text file">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"> <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/> </svg>
+                             Text
+                        </button>
+                    </div>
+                   <div></div>
+                </div>
+               
+                <div 
+                    id="outputDiv" 
+                    class="text-area" 
+                    contenteditable="false" 
+                    spellcheck="false"
+                    data-placeholder="Formatted rich text output will appear here...">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <aside id="side-slider" class="collapsed">
+         <button id="slider-toggle-btn" class="btn btn-primary" title="Toggle Tools Panel">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3.5c0-.69.56-1.25 1.25-1.25.69 0 1.25.56 1.25 1.25 0 .69-.56 1.25-1.25 1.25-.69 0-1.25-.56-1.25-1.25zM4.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 3.5c0-.69.56-1.25 1.25-1.25.69 0 1.25.56 1.25 1.25 0 .69-.56 1.25-1.25 1.25-.69 0-1.25-.56-1.25-1.25zM4.5 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1.5c0-.69.56-1.25 1.25-1.25.69 0 1.25.56 1.25 1.25 0 .69-.56 1.25-1.25 1.25-.69 0-1.25-.56-1.25-1.25zM11.5 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1.5c0-.69.56-1.25 1.25-1.25.69 0 1.25.56 1.25 1.25 0 .69-.56 1.25-1.25 1.25-.69 0-1.25-.56-1.25-1.25z"/></svg>
+        </button>
+        <div class="slider-content">
+            <div class="slider-group">
+                <button id="goToOutputBtn" class="btn btn-secondary">Go to Output</button>
+                <button id="findAndReplaceBtn" class="btn btn-secondary" title="Find & Replace (Ctrl+F)">Find & Replace</button>
+                <button id="scrollToTopBottomBtn" class="btn btn-secondary">Scroll to Bottom</button>
+            </div>
+             <div class="slider-group">
+                 <div class="stats-label">Readability</div>
+                 <div id="readability-stats" class="stats">Enter text...</div>
+             </div>
+            <div class="slider-group">
+                <button id="toggleSpellcheckBtn" class="btn btn-secondary">Spellcheck: Off</button>
+                <div class="input-control">
+                    <label for="fontSizeSliderSlider" title="Adjust Text Size">Text Size:</label>
+                    <input type="range" id="fontSizeSliderSlider" min="0.7" max="1.5" step="0.05" value="0.95" style="width: 100px;">
+                </div>
+                 <label class="theme-switch" for="themeToggleCheckboxSlider" title="Toggle Dark/Light Mode">
+                    <span>☀️</span>
+                    <div class="switch">
+                        <input type="checkbox" id="themeToggleCheckboxSlider">
+                        <span class="slider"></span>
+                    </div>
+                    <span>🌙</span>
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const inputDiv = document.getElementById('inputDiv');
+            const outputDiv = document.getElementById('outputDiv');
+            const separatorInput = document.getElementById('separatorInput');
+            const wrapPCheckbox = document.getElementById('wrapPCheckbox'); 
+            const cleanSpacesCheckbox = document.getElementById('cleanSpacesCheckbox'); 
+            const targetWordCountInput = document.getElementById('targetWordCount');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const currentProjectTitleEl = document.getElementById('currentProjectTitle');
+            const themeToggle = document.getElementById('themeToggleCheckbox');
+
+            const pasteBtn = document.getElementById('pasteBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const inputStats = document.getElementById('inputStats');
+            const outputStats = document.getElementById('outputStats');
+            const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+            const downloadTextBtn = document.getElementById('downloadTextBtn');
+            const caseSentenceBtn = document.getElementById('caseSentenceBtn');
+            const caseTitleBtn = document.getElementById('caseTitleBtn');
+            const caseLowerBtn = document.getElementById('caseLowerBtn');
+            const caseUpperBtn = document.getElementById('caseUpperBtn');
+            
+            const projectSelect = document.getElementById('projectSelect');
+            const loadProjectBtn = document.getElementById('loadProjectBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const deleteProjectBtn = document.getElementById('deleteProjectBtn');
+            const importProjectsBtn = document.getElementById('importProjectsBtn');
+            const exportProjectsBtn = document.getElementById('exportProjectsBtn');
+            const clearAllProjectsBtn = document.getElementById('clearAllProjectsBtn');
+            const importFileElement = document.getElementById('importFileElement');
+            
+            const outputCard = document.getElementById('outputCard');
+            const findReplaceBar = document.getElementById('findReplaceBar');
+            const findInput = document.getElementById('findInput');
+            const replaceInput = document.getElementById('replaceInput');
+            const findCount = document.getElementById('findCount');
+            const replaceAllBtn = document.getElementById('replaceAllBtn');
+            const closeFindBtn = document.getElementById('closeFindBtn');
+            const copyMarkdownBtn = document.getElementById('copyMarkdownBtn');
+            // NEW: Find options
+            const findCaseSensitive = document.getElementById('findCaseSensitive');
+            const findWholeWord = document.getElementById('findWholeWord');
+
+            // --- Side Slider and its controls ---
+            const sideSlider = document.getElementById('side-slider');
+            const sliderToggleBtn = document.getElementById('slider-toggle-btn');
+            const sliderBackdrop = document.getElementById('slider-backdrop');
+            const goToOutputBtn = document.getElementById('goToOutputBtn');
+            const findAndReplaceBtn = document.getElementById('findAndReplaceBtn');
+            const scrollToTopBottomBtn = document.getElementById('scrollToTopBottomBtn');
+            const toggleSpellcheckBtn = document.getElementById('toggleSpellcheckBtn');
+            const fontSizeSliderSlider = document.getElementById('fontSizeSliderSlider');
+            const themeToggleSlider = document.getElementById('themeToggleCheckboxSlider');
+            const readabilityStatsEl = document.getElementById('readability-stats');
+            const dirtyIndicator = document.querySelector('.dirty-indicator');
+
+            const outputButtons = [copyBtn, downloadHtmlBtn, downloadTextBtn, copyMarkdownBtn];
+            const projectActionButtons = [loadProjectBtn, deleteProjectBtn];
+
+            // --- CONSTANTS & STATE ---
+            const DEFAULT_SEPARATOR = '\\n\\n';
+            const SESSION_KEY_DRAFT = 'pfp_draftContentV2';
+            const SESSION_KEY_SETTINGS = 'pfp_draftSettingsV2';
+            const SESSION_KEY_CURRENT_PROJECT = 'pfp_currentProjectNameV2';
+            const STORAGE_KEY_PROJECTS = 'pfp_SavedProjectsV2';
+            const STORAGE_KEY_PREFS = 'pfp_PreferencesV2';
+
+            let PROJECT_STORE = {};
+            let currentProjectName = null;
+            let isDraftDirty = false;
+            let savedContentState = ''; // Holds the state of the content when it was last saved/loaded
+            let isScrolling = false;
+            let lastCursorPosition = null;
+
+            // --- Helper Functions ---
+            const debounce = (func, delay) => {
+                 let timeout;
+                 return function(...args) {
+                     clearTimeout(timeout);
+                     timeout = setTimeout(() => func.apply(this, args), delay);
+                 };
+            };
+            const escapeHTML = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            const escapeRegExp = (string) => String(string || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            
+            // --- NEW: Cursor position utilities ---
+            const saveCursorPosition = (context) => {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    const preSelectionRange = range.cloneRange();
+                    preSelectionRange.selectNodeContents(context);
+                    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                    return preSelectionRange.toString().length;
+                }
+                return 0;
+            };
+
+            const restoreCursorPosition = (context, position) => {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                let charCount = 0;
+                let found = false;
+
+                const findNodeAndOffset = (node) => {
+                    if (found) return;
+                    if (node.nodeType === 3) { // Text node
+                        const nextCharCount = charCount + node.length;
+                        if (!found && position >= charCount && position <= nextCharCount) {
+                            range.setStart(node, position - charCount);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                            found = true;
+                        }
+                        charCount = nextCharCount;
+                    } else if (node.nodeType === 1 && node.childNodes && !found) { // Element node
+                        for (let i = 0; i < node.childNodes.length; i++) {
+                            findNodeAndOffset(node.childNodes[i]);
+                            if (found) break;
+                        }
+                    }
+                };
+                findNodeAndOffset(context);
+            };
+
+            // --- Readability Calculation ---
+            const countSyllables = (word) => {
+                word = word.toLowerCase().trim();
+                if (word.length <= 3) return 1;
+                word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+                word = word.replace(/^y/, '');
+                const matches = word.match(/[aeiouy]{1,2}/g);
+                return matches ? matches.length : 0;
+            };
+
+            const calculateReadability = (text) => {
+                if (!text || text.trim() === '') {
+                    readabilityStatsEl.textContent = 'Enter text...';
+                    return;
+                }
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+                const words = text.match(/\S+/g) || [];
+                const sentenceCount = sentences.length > 0 ? sentences.length : 1;
+                const wordCount = words.length;
+                if (wordCount < 10) {
+                     readabilityStatsEl.textContent = 'Needs more text';
+                     return;
+                }
+                const syllableCount = words.reduce((acc, word) => acc + countSyllables(word), 0);
+                
+                const score = 206.835 - 1.015 * (wordCount / sentenceCount) - 84.6 * (syllableCount / wordCount);
+                
+                let interpretation = 'Very Easy';
+                if (score < 30) interpretation = 'Very Difficult';
+                else if (score < 50) interpretation = 'Difficult';
+                else if (score < 60) interpretation = 'Fairly Difficult';
+                else if (score < 70) interpretation = 'Standard';
+                else if (score < 80) interpretation = 'Fairly Easy';
+                else if (score < 90) interpretation = 'Easy';
+                
+                readabilityStatsEl.innerHTML = `<strong>${score.toFixed(1)}</strong> (${interpretation})`;
+            };
+
+            // --- Dirty State Management ---
+            const checkDirtyState = () => {
+                const currentContent = inputDiv.innerHTML;
+                isDraftDirty = (currentContent !== savedContentState);
+                updateProjectUI();
+            };
+            
+            // --- Core Processing Function ---
+            const processText = () => {
+                // Remove highlights before processing
+                removeHighlights();
+                const inputText = inputDiv.innerText;
+
+                checkDirtyState();
+                sessionStorage.setItem(SESSION_KEY_DRAFT, inputDiv.innerHTML);
+                saveDraftSettings(); 
+                
+                const rawSeparator = separatorInput.value;
+                const htmlSeparator = rawSeparator.replace(/\\n/g, '<br>\n');
+                const finalSeparator = wrapPCheckbox.checked ? '\n' : htmlSeparator;
+
+                const outputIsEmpty = !inputText || inputText.trim() === '';
+                outputButtons.forEach(btn => btn.disabled = outputIsEmpty);
+
+                if (outputIsEmpty) {
+                    outputDiv.innerHTML = '';
+                    updateStats();
+                    calculateReadability('');
+                    return;
+                }
+
+                const htmlParagraphs = inputText
+                    .split(/\n\s*\n+/g)
+                    .filter(p => p.trim() !== '')
+                    .map(p => {
+                         let processedP = p.trim();
+                         if(cleanSpacesCheckbox.checked) {
+                             processedP = processedP.replace(/\s{2,}/g, ' '); 
+                         }
+                         processedP = convertMarkdown(processedP);
+                         if(!cleanSpacesCheckbox.checked) {
+                               processedP = processedP.replace(/\n/g, '<br>\n');
+                         }
+                         return wrapPCheckbox.checked ? `<p>${processedP}</p>` : processedP;
+                    });
+                
+                outputDiv.innerHTML = htmlParagraphs.join(finalSeparator);
+                updateStats();
+                calculateReadability(outputDiv.innerText);
+                // Re-apply highlights if find bar is open
+                if (!findReplaceBar.classList.contains('hidden')) {
+                    highlightMatches();
+                }
+            };
+            const debouncedProcessText = debounce(processText, 250);
+
+            // --- Update Stats & Button State ---
+            const updateStats = () => {
+                const target = parseInt(targetWordCountInput.value, 10) || 0;
+                const inputText = inputDiv.innerText || '';
+                const inputCharCount = inputText.length;
+                const inputWordCount = inputText.match(/\S+/g)?.length || 0;
+                const inputParaCount = inputText.split(/\n\s*\n+/g).filter(p => p.trim() !== '').length || 0;
+                let inputStatText = `${inputWordCount} words, ${inputCharCount} chars, ${inputParaCount} paras`;
+
+                if (target > 0) {
+                    inputStatText = `${inputWordCount}/${target} words (${Math.round(inputWordCount/target*100)}%), ${inputCharCount} chars, ${inputParaCount} paras`;
+                    inputStats.classList.toggle('target-met', inputWordCount >= target);
+                } else {
+                     inputStats.classList.remove('target-met');
+                }
+                inputStats.textContent = inputStatText;
+
+                const outputText = outputDiv.innerText || ''; 
+                const outputCharCount = outputText.length;
+                const outputWordCount = outputText.match(/\S+/g)?.length || 0;
+                outputStats.textContent = `${outputWordCount} words, ${outputCharCount} characters`;
+
+                if (!findReplaceBar.classList.contains('hidden')) {
+                    updateFindCount();
+                }
+            };
+            const debouncedUpdateStats = debounce(updateStats, 200);
+            
+             // --- Find & Replace ---
+            const getFindRegex = () => {
+                const findTerm = findInput.value;
+                if (!findTerm) return null;
+                const flags = findCaseSensitive.checked ? 'g' : 'gi';
+                const pattern = findWholeWord.checked ? `\\b${escapeRegExp(findTerm)}\\b` : escapeRegExp(findTerm);
+                return new RegExp(pattern, flags);
+            };
+
+            const removeHighlights = () => {
+                const marks = inputDiv.querySelectorAll('mark');
+                if (marks.length === 0) return false;
+                
+                lastCursorPosition = saveCursorPosition(inputDiv);
+                
+                marks.forEach(mark => {
+                    const parent = mark.parentNode;
+                    while (mark.firstChild) {
+                        parent.insertBefore(mark.firstChild, mark);
+                    }
+                    parent.removeChild(mark);
+                    parent.normalize(); // Merges adjacent text nodes
+                });
+
+                restoreCursorPosition(inputDiv, lastCursorPosition);
+                return true;
+            };
+
+            const highlightMatches = () => {
+                removeHighlights();
+                const findRegex = getFindRegex();
+                if (!findRegex) {
+                    updateFindCount();
+                    return;
+                };
+
+                lastCursorPosition = saveCursorPosition(inputDiv);
+                
+                const walker = document.createTreeWalker(inputDiv, NodeFilter.SHOW_TEXT);
+                let node;
+                const nodesToProcess = [];
+                while(node = walker.nextNode()) {
+                    if (node.parentNode.nodeName !== 'MARK') {
+                        nodesToProcess.push(node);
+                    }
+                }
+
+                nodesToProcess.forEach(textNode => {
+                    const text = textNode.nodeValue;
+                    const matches = [...text.matchAll(findRegex)];
+                    if (matches.length > 0) {
+                        const fragment = document.createDocumentFragment();
+                        let lastIndex = 0;
+                        matches.forEach(match => {
+                            const foundText = match[0];
+                            // Add text before the match
+                            if (match.index > lastIndex) {
+                                fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+                            }
+                            // Add the highlighted match
+                            const mark = document.createElement('mark');
+                            mark.textContent = foundText;
+                            fragment.appendChild(mark);
+                            lastIndex = match.index + foundText.length;
+                        });
+                        // Add text after the last match
+                        if (lastIndex < text.length) {
+                            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+                        }
+                        textNode.parentNode.replaceChild(fragment, textNode);
+                    }
+                });
+
+                restoreCursorPosition(inputDiv, lastCursorPosition);
+                updateFindCount();
+            };
+            const debouncedHighlightMatches = debounce(highlightMatches, 200);
+
+            const updateFindCount = () => {
+                const findRegex = getFindRegex();
+                if (!findRegex) {
+                    findCount.textContent = '0 found';
+                    replaceAllBtn.disabled = true;
+                    return;
+                }
+                const matches = inputDiv.innerText.match(findRegex) || [];
+                findCount.textContent = `${matches.length} found`;
+                replaceAllBtn.disabled = matches.length === 0;
+            };
+            
+            const handleReplaceAll = () => {
+                const findRegex = getFindRegex();
+                const replaceValue = replaceInput.value;
+                if (!findRegex || typeof replaceValue === 'undefined') return;
+
+                removeHighlights();
+                lastCursorPosition = saveCursorPosition(inputDiv);
+
+                inputDiv.innerHTML = inputDiv.innerHTML.replace(findRegex, escapeHTML(replaceValue));
+                
+                restoreCursorPosition(inputDiv, lastCursorPosition);
+                debouncedProcessText();
+                showFeedback(replaceAllBtn, 'Replaced!', 'success', 1000);
+            };
+
+            // --- Case Conversion & Feedback ---
+            const applyCase = (caseFunc) => {
+                inputDiv.innerText = caseFunc(inputDiv.innerText);
+                debouncedProcessText();
+            }
+            const toSentenceCase = (text) => text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, char => char.toUpperCase());
+            const toTitleCase = (text) => text.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+            const showFeedback = (button, text, type = 'success', duration = 1500) => {
+                if (button.dataset.feedbackTimeoutId) clearTimeout(parseInt(button.dataset.feedbackTimeoutId));
+                if (!button.dataset.originalHTML && button.innerHTML !== text) button.dataset.originalHTML = button.innerHTML;
+                button.classList.remove('feedback-success', 'feedback-danger');
+                const feedbackClass = `feedback-${type}`;
+                button.classList.add(feedbackClass);
+                button.innerHTML = text;
+                const timeoutId = setTimeout(() => {
+                    button.classList.remove(feedbackClass);
+                    if (button.dataset.originalHTML) button.innerHTML = button.dataset.originalHTML;
+                    delete button.dataset.originalHTML;
+                    delete button.dataset.feedbackTimeoutId;
+                }, duration);
+                button.dataset.feedbackTimeoutId = timeoutId.toString();
+            };
+
+            // --- Preferences & UI Syncing ---
+             const savePreferences = () => {
+                 const prefs = {
+                     theme: themeToggle.checked ? 'dark' : 'light',
+                     fontSize: fontSizeSlider.value,
+                     target: targetWordCountInput.value,
+                 }
+                  localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(prefs));
+             }
+             const applyFontSize = (size) => {
+                 document.body.style.setProperty('--text-area-font-size', `${size}rem`);
+             }
+             const applyTheme = (isDark) => {
+                document.body.classList.toggle('dark-mode', isDark);
+            };
+            const syncThemeToggles = (isDark) => {
+                themeToggle.checked = isDark;
+                themeToggleSlider.checked = isDark;
+            };
+            const syncFontSliders = (size) => {
+                fontSizeSlider.value = size;
+                fontSizeSliderSlider.value = size;
+            };
+
+            const loadPreferences = () => {
+                 const prefsJSON = localStorage.getItem(STORAGE_KEY_PREFS);
+                 let theme = 'light';
+                 let fontSize = '0.95';
+                 let target = '0';
+                  if(prefsJSON) {
+                     try {
+                         const prefs = JSON.parse(prefsJSON);
+                         theme = prefs.theme ?? 'light';
+                         fontSize = prefs.fontSize ?? '0.95';
+                         target = prefs.target ?? '0';
+                     } catch(e) { console.error("Failed loading prefs", e); }
+                 }
+                 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                 const isDark = prefsJSON ? (theme === 'dark') : prefersDark;
+                 applyTheme(isDark);
+                 syncThemeToggles(isDark);
+                 applyFontSize(fontSize);
+                 syncFontSliders(fontSize);
+                 targetWordCountInput.value = target;
+            }
+
+            // --- Draft & Project Management ---
+            const getCurrentSettings = () => ({ separator: separatorInput.value, wrapP: wrapPCheckbox.checked, cleanSpaces: cleanSpacesCheckbox.checked });
+            const applySettings = (settings) => {
+                separatorInput.value = settings.separator ?? DEFAULT_SEPARATOR;
+                wrapPCheckbox.checked = settings.wrapP ?? false;
+                cleanSpacesCheckbox.checked = settings.cleanSpaces ?? true;
+            }
+            const saveDraftSettings = () => sessionStorage.setItem(SESSION_KEY_SETTINGS, JSON.stringify(getCurrentSettings()));
+            const loadDraftSettings = () => {
+                const settingsJSON = sessionStorage.getItem(SESSION_KEY_SETTINGS);
+                if (settingsJSON) {
+                    try { applySettings(JSON.parse(settingsJSON)); } catch (e) { applySettings({}); }
+                } else { applySettings({}); }
+            }
+            const clearDraft = (confirmClear = true) => {
+                if(confirmClear && !confirm("Are you sure you want to clear the current draft and reset all settings? This cannot be undone.")) return;
+                
+                sessionStorage.removeItem(SESSION_KEY_SETTINGS);
+                sessionStorage.removeItem(SESSION_KEY_DRAFT);
+                sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                currentProjectName = null;
+                inputDiv.innerHTML = '';
+                savedContentState = '';
+                isDraftDirty = false;
+                applySettings({});
+                processText();
+                updateProjectUI();
+                inputDiv.focus();
+            }
+            const loadAllProjectsFromStorage = () => {
+                try { PROJECT_STORE = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS) || '{}'); }
+                catch (e) { PROJECT_STORE = {}; }
+            };
+            const saveAllProjectsToStorage = () => localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(PROJECT_STORE));
+            const updateProjectUI = () => {
+                projectSelect.innerHTML = '';
+                const sortedNames = Object.keys(PROJECT_STORE).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+                const hasProjects = sortedNames.length > 0;
+                exportProjectsBtn.disabled = !hasProjects;
+                clearAllProjectsBtn.disabled = !hasProjects;
+                if (!hasProjects) {
+                    projectSelect.add(new Option("-- No Projects Saved --", "", true, true));
+                    projectSelect.disabled = true;
+                } else {
+                    projectSelect.disabled = false;
+                    projectSelect.add(new Option("-- Select Project --", "", !currentProjectName, !currentProjectName));
+                    sortedNames.forEach(name => projectSelect.add(new Option(name, name, false, name === currentProjectName)));
+                }
+                const projectSelected = projectSelect.value && projectSelect.value !== "-- Select Project --";
+                projectActionButtons.forEach(btn => btn.disabled = !hasProjects || !projectSelected);
+                currentProjectTitleEl.firstChild.textContent = (currentProjectName || 'Unsaved Draft') + ' ';
+                dirtyIndicator.style.display = isDraftDirty ? 'inline' : 'none';
+                saveProjectBtn.disabled = !isDraftDirty && !!currentProjectName;
+                if(!currentProjectName) {
+                    saveProjectBtn.disabled = inputDiv.innerText.trim().length === 0;
+                }
+            };
+            const handleSaveProject = () => {
+                if (inputDiv.innerText.trim() === '') return alert("Cannot save an empty draft.");
+                let name = currentProjectName;
+                if (!name) {
+                    name = prompt("Enter project name:", "");
+                    if (!name || name.trim() === "") return;
+                    name = name.trim();
+                    if (PROJECT_STORE[name] && !confirm(`Project "${name}" exists. Overwrite?`)) return;
+                }
+                const projectData = { content: inputDiv.innerHTML, settings: getCurrentSettings(), timestamp: Date.now() };
+                PROJECT_STORE[name] = projectData;
+                currentProjectName = name;
+                sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                saveAllProjectsToStorage();
+                
+                savedContentState = projectData.content;
+                isDraftDirty = false;
+
+                updateProjectUI();
+                showFeedback(saveProjectBtn, 'Saved!', 'success');
+            };
+            const handleLoadProject = () => {
+                const name = projectSelect.value;
+                if (!name || !PROJECT_STORE[name]) return alert("Please select a valid project.");
+                if (isDraftDirty && !confirm(`Load "${name}"? Unsaved changes will be lost.`)) {
+                    projectSelect.value = currentProjectName || "";
+                    return;
+                }
+                const project = PROJECT_STORE[name];
+                currentProjectName = name;
+                sessionStorage.setItem(SESSION_KEY_CURRENT_PROJECT, name);
+                
+                inputDiv.innerHTML = project.content || '';
+                savedContentState = project.content || '';
+                isDraftDirty = false;
+                
+                applySettings(project.settings || {});
+                saveDraftSettings();
+                sessionStorage.setItem(SESSION_KEY_DRAFT, inputDiv.innerHTML);
+
+                processText();
+                updateProjectUI();
+                showFeedback(loadProjectBtn, 'Loaded!', 'success');
+            };
+             const handleDeleteProject = () => {
+                const name = projectSelect.value;
+                if (!name || !PROJECT_STORE[name]) return alert("Please select a valid project to delete.");
+                if (confirm(`Are you sure you want to permanently delete the project "${name}"?`)) {
+                    delete PROJECT_STORE[name];
+                    saveAllProjectsToStorage();
+                    if(currentProjectName === name) {
+                        clearDraft(false); // don't ask for confirmation again
+                    }
+                    loadAllProjectsFromStorage();
+                    updateProjectUI();
+                    showFeedback(deleteProjectBtn, 'Deleted!', 'danger');
+                }
+             };
+             const handleExportProjects = () => { /* ... */ };
+             const handleImportProjects = () => { /* ... */ };
+             const handleClearAllProjects = () => { /* ... */ };
+
+
+            // --- Event Listeners ---
+
+            // Main text processing
+            inputDiv.addEventListener('input', () => {
+                debouncedProcessText();
+                debouncedUpdateStats();
+                checkDirtyState();
+            });
+            separatorInput.addEventListener('input', debouncedProcessText);
+            wrapPCheckbox.addEventListener('change', debouncedProcessText);
+            cleanSpacesCheckbox.addEventListener('change', debouncedProcessText);
+            
+            // Project Management
+            projectSelect.addEventListener('change', () => { updateProjectUI(); });
+            saveProjectBtn.addEventListener('click', handleSaveProject);
+            loadProjectBtn.addEventListener('click', handleLoadProject);
+            deleteProjectBtn.addEventListener('click', handleDeleteProject);
+
+            // Preferences
+            targetWordCountInput.addEventListener('input', () => { debouncedUpdateStats(); debounce(savePreferences, 500)(); });
+            
+            // Syncing Event Listeners for Header and Slider Controls
+            [themeToggle, themeToggleSlider].forEach(el => {
+                el.addEventListener('change', (e) => {
+                    const isDark = e.target.checked;
+                    applyTheme(isDark);
+                    syncThemeToggles(isDark);
+                    savePreferences();
+                });
+            });
+
+            [fontSizeSlider, fontSizeSliderSlider].forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const size = e.target.value;
+                    applyFontSize(size);
+                    syncFontSliders(size);
+                });
+                el.addEventListener('change', savePreferences); // Save only on release
+            });
+
+            // Paste & Clear & Copy
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.execCommand('insertText', false, text);
+                    showFeedback(pasteBtn, 'Pasted!', 'success');
+                } catch(err) {
+                    showFeedback(pasteBtn, 'Failed!', 'danger');
+                    console.error('Failed to read clipboard contents: ', err);
+                }
+            });
+            clearBtn.addEventListener('click', () => clearDraft(true));
+            
+            // NEW: Implemented Copy as Markdown
+            copyMarkdownBtn.addEventListener('click', async () => {
+                try {
+                    let markdown = inputDiv.innerHTML;
+                    // Convert basic HTML back to Markdown
+                    markdown = markdown.replace(/<br>/gi, '\n');
+                    markdown = markdown.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+                    markdown = markdown.replace(/<b>(.*?)<\/b>/gi, '**$1**');
+                    markdown = markdown.replace(/<strong>(.*?)<\/strong>/gi, '**$1**');
+                    markdown = markdown.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+                    markdown = markdown.replace(/<em>(.*?)<\/em>/gi, '*$1*');
+                    markdown = markdown.replace(/<a href="(.*?)">(.*?)<\/a>/gi, '[$2]($1)');
+                    // Strip any remaining HTML tags
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = markdown;
+                    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+                    await navigator.clipboard.writeText(plainText.trim());
+                    showFeedback(copyMarkdownBtn, 'Copied!', 'success');
+                } catch (err) {
+                    showFeedback(copyMarkdownBtn, 'Failed!', 'danger');
+                    console.error('Failed to copy markdown: ', err);
+                }
+            });
+
+
+            // --- Side Slider Event Listeners ---
+            const toggleSlider = (forceClose = false) => {
+                const isCollapsed = sideSlider.classList.contains('collapsed');
+                if (forceClose || !isCollapsed) {
+                    sideSlider.classList.add('collapsed');
+                    sliderBackdrop.classList.remove('visible');
+                } else {
+                    sideSlider.classList.remove('collapsed');
+                    if (window.innerWidth <= 768) {
+                        sliderBackdrop.classList.add('visible');
+                    }
+                }
+            };
+            sliderToggleBtn.addEventListener('click', () => toggleSlider());
+            sliderBackdrop.addEventListener('click', () => toggleSlider(true));
+            
+            goToOutputBtn.addEventListener('click', () => {
+                outputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                toggleSlider(true);
+            });
+
+            findAndReplaceBtn.addEventListener('click', () => {
+                findReplaceBar.classList.remove('hidden');
+                findInput.focus();
+                highlightMatches();
+                toggleSlider(true);
+            });
+            closeFindBtn.addEventListener('click', () => {
+                findReplaceBar.classList.add('hidden');
+                removeHighlights();
+            });
+
+            // Find & Replace Listeners
+            findInput.addEventListener('input', debouncedHighlightMatches);
+            findCaseSensitive.addEventListener('change', highlightMatches);
+            findWholeWord.addEventListener('change', highlightMatches);
+            replaceAllBtn.addEventListener('click', handleReplaceAll);
+
+            // Scroll button logic
+            const handleScroll = () => { /* ... as before ... */ };
+            window.addEventListener('scroll', debounce(handleScroll, 100));
+            handleScroll(); 
+            scrollToTopBottomBtn.addEventListener('click', () => { /* ... as before ... */ });
+
+            toggleSpellcheckBtn.addEventListener('click', () => {
+                const newState = !(inputDiv.getAttribute('spellcheck') === 'true');
+                inputDiv.setAttribute('spellcheck', newState);
+                toggleSpellcheckBtn.textContent = `Spellcheck: ${newState ? 'On' : 'Off'}`;
+                inputDiv.focus();
+            });
+
+
+            // Sync Scrolling
+            const syncScroll = (source, dest) => { /* ... as before ... */ };
+            inputDiv.addEventListener('scroll', () => syncScroll(inputDiv, outputDiv));
+            outputDiv.addEventListener('scroll', () => syncScroll(outputDiv, inputDiv));
+
+            // Confirm Before Unload
+            window.addEventListener('beforeunload', (e) => {
+                if (isDraftDirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+            
+            // --- NEW: Keyboard Shortcuts ---
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+F or Cmd+F
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    findAndReplaceBtn.click();
+                }
+                // Ctrl+S or Cmd+S
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (!saveProjectBtn.disabled) {
+                        handleSaveProject();
+                    }
+                }
+                // Escape key
+                if (e.key === 'Escape') {
+                    if (!findReplaceBar.classList.contains('hidden')) {
+                        closeFindBtn.click();
+                    }
+                    if (!sideSlider.classList.contains('collapsed')) {
+                        toggleSlider(true);
+                    }
+                }
+            });
+
+
+            // --- Initialization ---
+            const init = () => {
+                loadPreferences();
+                loadAllProjectsFromStorage();
+                currentProjectName = sessionStorage.getItem(SESSION_KEY_CURRENT_PROJECT);
+                
+                if (currentProjectName && !PROJECT_STORE[currentProjectName]) {
+                    currentProjectName = null;
+                    sessionStorage.removeItem(SESSION_KEY_CURRENT_PROJECT);
+                }
+
+                loadDraftSettings();
+                const savedInputHTML = sessionStorage.getItem(SESSION_KEY_DRAFT);
+                if (savedInputHTML) {
+                    inputDiv.innerHTML = savedInputHTML;
+                }
+                
+                // Determine initial saved state
+                if(currentProjectName && PROJECT_STORE[currentProjectName]) {
+                    savedContentState = PROJECT_STORE[currentProjectName].content;
+                } else {
+                    savedContentState = savedInputHTML || '';
+                }
+                
+                checkDirtyState();
+                updateProjectUI();
+                processText();
+            };
+
+            init();
+
+        });
+    </script>
+</body>
+</html>
