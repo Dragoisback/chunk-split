@@ -28,15 +28,30 @@
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
       --border-radius: 0.375rem;
+
+      /* New variables for sidebar */
+      --sidebar-width: 280px;
+      --sidebar-bg-color: var(--fg-color);
+      --sidebar-border-color: var(--border-color);
+      --sidebar-transition-speed: 0.3s;
     }
 
     body.dark-mode {
       --bg-color: #121212;
+      --sidebar-bg-color: var(--fg-color); /* Or a slightly different dark shade if preferred */
+      --sidebar-border-color: var(--border-color);
       --fg-color: #1e1e1e;
       --text-color: #e8eaed;
       --text-muted-color: #9aa0a6;
       --border-color: #444;
       --border-color-light: #2a2a2a;
+    }
+
+    html {
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
     }
 
     body {
@@ -45,43 +60,110 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       transition: background-color 0.3s, color 0.3s;
+      font-size: 16px; /* Base font size for mobile */
+      line-height: 1.6;
     }
-    
+
+    #main-content {
+      padding-top: 60px; /* Space for fixed header */
+      transition: margin-left var(--sidebar-transition-speed); /* For desktop sidebar */
+    }
+
     .main-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
+        display: flex; /* Changed to flex for mobile stacking */
+        flex-direction: column; /* Stack settings and output vertically */
+        gap: 1.5rem; /* Adjusted gap */
         padding: 1rem;
         max-width: 1600px;
         margin: 0 auto;
     }
 
-    @media (min-width: 1024px) {
+    #settings-column, #output-column {
+        width: 100%; /* Take full width on mobile */
+    }
+
+    @media (min-width: 768px) { /* Tablet and larger */
         .main-container {
-            grid-template-columns: minmax(450px, 1fr) 1.5fr;
+            /* Keep flex for potential sidebar adjustments, or switch to grid */
+        }
+    }
+
+    @media (min-width: 1024px) { /* Desktop */
+        #main-content {
+            /* margin-left: var(--sidebar-width); /* Example if sidebar is permanently open */
+        }
+        .main-container {
+            flex-direction: row; /* Side-by-side layout */
+            grid-template-columns: minmax(450px, 1fr) 1.5fr; /* Restore grid for desktop if preferred */
+            display: grid;
         }
         #output-column {
-             max-height: calc(100vh - 5rem);
+             max-height: calc(100vh - 5rem - 2rem); /* header height - main-content padding */
              overflow-y: auto;
              padding-right: 1rem;
         }
     }
 
-    /* --- Header --- */
+    /* --- App Header --- */
     .app-header {
-      grid-column: 1 / -1;
+      /* grid-column: 1 / -1; */ /* No longer needed with body > header structure */
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 0.5rem 1rem;
       background-color: var(--fg-color);
       border-bottom: 1px solid var(--border-color);
-      position: sticky; top: 0; z-index: 20;
+      position: fixed; /* Fixed header */
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000; /* High z-index for header */
+      height: 60px;
     }
-    .app-header h1 { margin: 0; font-size: 1.5rem; }
-    
-    .header-controls { display: flex; align-items: center; gap: 1rem; }
-    
+    #hamburger-menu {
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      display: block; /* Initially visible on mobile */
+    }
+    .app-header h1 { margin: 0; font-size: 1.25rem; flex-grow: 1; text-align: center; } /* Adjusted for mobile */
+
+    .header-controls { display: flex; align-items: center; gap: 0.5rem; } /* Reduced gap for mobile */
+
+    /* --- Sidebar --- */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--sidebar-bg-color);
+      border-right: 1px solid var(--sidebar-border-color);
+      padding: 1rem;
+      transform: translateX(-100%); /* Hidden off-screen by default */
+      transition: transform var(--sidebar-transition-speed) ease-in-out;
+      z-index: 1100; /* Higher than header for overlay, or adjust if pushing content */
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-top: 70px; /* Space for header */
+    }
+    #sidebar.sidebar-open {
+      transform: translateX(0);
+    }
+    #sidebar button { /* Style buttons in sidebar for vertical stacking */
+      width: 100%;
+      justify-content: flex-start;
+      padding: 0.75rem 1rem; /* Slightly larger padding for easier tapping */
+      margin-bottom: 0.5rem; /* Add some space between buttons */
+    }
+    #sidebar button:last-child {
+      margin-bottom: 0;
+    }
+
     /* --- General Elements --- */
     h3 { margin-top: 0; color: var(--primary-color); }
     p { font-size:0.9em; color: var(--text-muted-color); margin-top: 5px; line-height: 1.5; }
@@ -101,10 +183,11 @@
     }
     .fieldset-header {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 0.75rem 1rem; cursor: pointer; user-select: none;
+        padding: 0.65rem 1rem; /* Slightly adjusted padding for mobile tap target */
+        cursor: pointer; user-select: none;
         border-bottom: 1px solid var(--border-color-light);
     }
-    .fieldset-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-color); pointer-events: none; }
+    .fieldset-header h3 { margin: 0; font-size: 1.05rem; color: var(--text-color); pointer-events: none; } /* Slightly adjusted font size */
     .fieldset-content { padding: 1rem; border-top: 1px solid var(--border-color); display: block; }
     .collapsible-fieldset.collapsed .fieldset-content { display: none; }
     .collapsible-fieldset.collapsed .fieldset-header { border-bottom: none; }
@@ -114,29 +197,257 @@
 
     /* --- Mode Switcher --- */
     .mode-switcher { display: flex; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; }
-    .mode-switcher button { flex: 1; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: var(--text-muted-color); font-weight: bold; font-size: 0.9rem; }
+    .mode-switcher button { flex: 1; padding: 0.65rem 0.5rem; /* Increased padding for better tap height */ background: transparent; border: none; cursor: pointer; color: var(--text-muted-color); font-weight: bold; font-size: 0.9rem; text-align: center;}
     .mode-switcher button.active { background-color: var(--primary-color); color: white; }
 
     /* --- Inputs and Controls --- */
-    .input-container { margin-bottom: 1rem; }
-    .input-container label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-color); }
-    .input-container label.inline-label { display: inline; margin-left: 5px; font-weight: normal; }
+    .input-container {
+        margin-bottom: 1rem;
+        display: flex; /* Use flex for label-input alignment */
+        flex-direction: column; /* Stack label above input by default */
+        gap: 0.25rem; /* Space between label and input */
+    }
+    .input-container label {
+        /* display: block; */ /* No longer needed with flex-direction column */
+        margin-bottom: 0; /* Adjust as gap is now used */
+        font-weight: bold;
+        color: var(--text-color);
+    }
+    .input-container label.inline-label { /* For checkboxes etc. */
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-weight: normal;
+        margin-left: 0; /* Reset margin if previously set */
+    }
+    .input-container input[type="checkbox"].inline-label { /* specific for checkbox itself if it has class */
+        width: auto;
+        margin-right:0;
+    }
+    .input-container input[type="number"],
+    .input-container select {
+        padding: 10px 8px; /* Slightly larger padding for easier interaction */
+        font-size: 1rem; /* Ensure readable font size */
+    }
+    /* Adjustments for wider screens if label and input should be side-by-side */
+    @media (min-width: 500px) {
+        .input-container.can-be-row { /* Add this class to containers that can go row-wise */
+             flex-direction: row;
+             align-items: center;
+             gap: 0.75rem; /* Adjust gap for row layout */
+        }
+        .input-container.can-be-row label {
+             flex-basis: 180px; /* Give label a fixed width or percentage */
+             flex-shrink: 0; /* Prevent label from shrinking */
+        }
+        .input-container.can-be-row input,
+        .input-container.can-be-row select {
+            flex-grow: 1;
+        }
+    }
+
+
+    #plainTextInputArea { /* Specific styling for plain text input */
+        min-height: 200px; /* Good default mobile height */
+        height: 250px; /* Keep existing default height */
+    }
+    #plainTextInfo { /* Ensure it's visible and well-spaced */
+        display: block; /* Make it block to take its own space */
+        text-align: right;
+        margin-bottom: 0.5rem;
+    }
+
 
     .textarea-with-actions { position: relative; }
-    .textarea-actions { position: absolute; top: 4px; right: 5px; display: flex; gap: 4px; background-color: var(--fg-color); padding: 2px; border-radius: 4px; opacity: 0.8; }
-    .textarea-action-btn { background: var(--border-color-light); border: 1px solid var(--border-color); color: var(--text-muted-color); padding: 2px 6px; font-size: 11px; border-radius: 4px; cursor: pointer; }
-    .textarea-action-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-hover-color); }
+    .textarea-actions {
+        position: absolute;
+        top: 5px; /* Minor adjustment */
+        right: 5px;
+        display: flex;
+        gap: 5px; /* Slightly increased gap */
+        background-color: rgba(var(--bg-color-rgb), 0.85); /* Use RGB for opacity on bg */
+        padding: 4px; /* Increased padding */
+        border-radius: var(--border-radius);
+        opacity: 0.9;
+        z-index: 1; /* Ensure it's above the textarea */
+    }
+    .textarea-action-btn {
+        background: var(--border-color-light);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted-color);
+        padding: 5px 8px; /* Increased padding for better tap target */
+        font-size: 12px; /* Slightly larger font */
+        border-radius: var(--border-radius);
+        cursor: pointer;
+    }
+    .textarea-action-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-hover-color);
+        opacity: 1;
+    }
+    /* RGB versions of bg-color are defined in the main :root and body.dark-mode sections now */
+
+    /* Styling for file input containers and their labels */
+    .file-input-container { /* Inherits .input-container styles (flex column) */
+        margin-bottom: 1rem; /* Standard margin */
+    }
+    .file-input-container label { /* Standard label styling */
+        font-weight: bold;
+        color: var(--text-color);
+        margin-bottom: 0.25rem; /* Space between label and input */
+    }
+    .file-input-container label code {
+        font-size: 0.85em;
+        color: var(--text-muted-color);
+        background-color: var(--border-color-light);
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+    }
+    .input-container input[type="file"] { /* General styling for file inputs */
+        font-size: 0.9rem; /* Slightly smaller than other inputs if needed, or keep at 1rem */
+        padding: 6px; /* Adjust padding to align with visual height of other inputs */
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+    /* Attempt to style the button part of the file input, browser support varies */
+    .input-container input[type="file"]::file-selector-button {
+      padding: 0.4em 0.8em;
+      border: 1px solid var(--border-color);
+      background-color: var(--border-color-light);
+      color: var(--text-color);
+      border-radius: var(--border-radius);
+      margin-right: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .input-container input[type="file"]::file-selector-button:hover {
+      background-color: var(--border-color);
+    }
+    body.dark-mode .input-container input[type="file"]::file-selector-button {
+      background-color: var(--border-color); /* Darker button for dark mode */
+      border-color: var(--border-color-light);
+    }
+    body.dark-mode .input-container input[type="file"]::file-selector-button:hover {
+      background-color: var(--border-color-light);
+    }
 
     /* JSON Input Specifics */
-    .json-chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 8px; }
-    .json-chapter-header label { flex-grow: 1; font-weight: normal; }
-    .json-chapter-input-container { border: 1px dashed var(--border-color); padding: 10px; margin-bottom: 10px; border-radius: var(--border-radius); background-color: var(--bg-color); }
+    .json-chapter-header {
+        display: flex;
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px; /* Increased margin */
+        gap: 8px;
+    }
+    .json-chapter-header label {
+        flex-basis: 100%; /* Label takes full width initially */
+        font-weight: normal;
+        margin-bottom: 4px; /* Space below label when wrapped */
+    }
+    @media (min-width: 480px) { /* Adjust for slightly larger screens */
+        .json-chapter-header label {
+            flex-basis: auto; /* Allow label and buttons on same line */
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+    }
+    .json-chapter-header .button { /* Ensure buttons in header don't shrink too much */
+        flex-shrink: 0;
+    }
+    .json-chapter-input-container {
+        border: 1px dashed var(--border-color);
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: var(--border-radius);
+        background-color: var(--bg-color);
+    }
+    textarea.json-chapter-input {
+        min-height: 120px; /* Default height for JSON input textareas */
+        resize: vertical;
+    }
+
+    /* Container for Add/Clear JSON buttons and count */
+    .json-global-actions {
+        display: flex;
+        flex-wrap: wrap; /* Allow wrapping */
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        margin-bottom: 1rem; /* Add some space below */
+    }
+    .json-global-actions #jsonObjectsCount {
+        margin-left: auto; /* Keep count to the right if space allows */
+        white-space: nowrap;
+    }
+    /* On very small screens, let count be on its own line if needed */
+    @media (max-width: 400px) {
+      .json-global-actions #jsonObjectsCount {
+        margin-left: 0;
+        width: 100%;
+        text-align: left; /* Or center/right as preferred */
+        margin-top: 5px;
+      }
+    }
+
 
     /* Find & Replace Specifics */
-    #findReplacePairsContainer { max-height: 250px; overflow-y: auto; padding-right: 5px; }
-    .find-replace-pair { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
-    .find-replace-pair .arrow { flex-shrink: 0; }
-    
+    #findReplacePairsContainer {
+        max-height: 250px;
+        overflow-y: auto;
+        padding-right: 5px;
+        margin-bottom: 1rem; /* Add space below the pairs container */
+    }
+    .find-replace-pair {
+        display: flex;
+        flex-wrap: wrap; /* Allow wrapping for very narrow screens */
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+    .find-replace-pair input[type="text"] {
+        flex-grow: 1; /* Allow inputs to grow */
+        flex-basis: 100px; /* Minimum base width before growing/shrinking */
+        min-width: 80px; /* Prevent excessive shrinking */
+    }
+    .find-replace-pair .arrow {
+        flex-shrink: 0;
+        text-align: center;
+    }
+    .find-replace-pair .button { /* Ensure remove button is aligned */
+        flex-shrink: 0;
+    }
+
+    /* Checkbox controls for Find/Replace */
+    .find-replace-controls {
+        display: flex;
+        flex-wrap: wrap; /* Allow checkboxes to wrap */
+        gap: 15px;
+        margin-bottom: 10px;
+        align-items: center; /* Align items nicely */
+    }
+    .find-replace-controls label.inline-label { /* Ensure good tap targets for checkboxes */
+        display: inline-flex; /* Use flex to align checkbox and label text */
+        align-items: center;
+        gap: 0.35rem; /* Space between checkbox and its text */
+        padding: 0.25rem 0; /* Add some vertical padding */
+    }
+    .find-replace-controls input[type="checkbox"] {
+       width: auto; /* Override default 100% width for inputs */
+       margin-right: 0; /* Remove default margin if any, using gap instead */
+    }
+
+    /* Button group for adding new rule */
+    .find-replace-add-rule-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between button and status message */
+        margin-top: 10px;
+    }
+
     /* --- Buttons --- */
     button, .button {
       padding: 10px 15px; color: white; border: none; border-radius: var(--border-radius); cursor: pointer;
@@ -163,27 +474,111 @@
     body.dark-mode button:disabled { background-color: #555 !important; }
 
     /* --- Output Section --- */
-    #output-column { display: none; }
+    #output-column { display: none; } /* Initially hidden, shown by JS */
     #outputControls {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
-      padding: 10px; background-color: var(--fg-color); border-radius: var(--border-radius);
-      border: 1px solid var(--border-color); margin-bottom: 1rem; position: sticky; top: 60px; z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem; /* Adjusted gap */
+      padding: 0.75rem; /* Adjusted padding */
+      background-color: var(--fg-color);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      position: sticky;
+      top: 60px; /* Account for fixed header height */
+      z-index: 10; /* Below header and sidebar */
     }
-    #outputControls h4 { margin: 0; padding: 0; color: var(--primary-color); }
+    #outputControls h4 {
+        margin: 0;
+        padding: 0;
+        color: var(--primary-color);
+        font-size: 1.1rem; /* Ensure good readability */
+        margin-right: auto; /* Push buttons to the right if space allows */
+    }
+    #outputControls .button { /* Ensure buttons in this bar have good tap size */
+        padding: 8px 12px; /* Slightly larger than default .btn-sm */
+        font-size: 0.9rem;
+    }
 
     .chunk-container {
-      margin-bottom: 1rem; display: flex; align-items: flex-start; background-color: var(--fg-color);
-      padding: 1rem; border-radius: var(--border-radius); border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm); gap: 1rem; transition: background-color 0.3s, border-color 0.3s;
+      display: flex;
+      flex-direction: column; /* Stack vertically on mobile by default */
+      background-color: var(--fg-color);
+      padding: 0.75rem; /* Adjusted padding for mobile */
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      gap: 0.75rem; /* Adjusted gap for mobile */
+      margin-bottom: 1rem;
+      transition: background-color 0.3s, border-color 0.3s;
     }
-    .chunk-container.copied { border-color: var(--success-color); background-color: #1987541a; }
+    .chunk-container.copied {
+        border-color: var(--success-color);
+        background-color: #1987541a;
+    }
     .chunk-title {
-        font-weight: bold; min-width: 90px; padding-top: 8px; color: var(--primary-color);
-        flex-shrink: 0; font-size: 0.9em; text-align: right;
+        font-weight: bold;
+        color: var(--primary-color);
+        font-size: 1rem; /* Slightly larger for mobile */
+        text-align: left; /* Align left when stacked */
+        padding-top: 0; /* Remove specific padding-top */
+        margin-bottom: 0.25rem; /* Space below title */
     }
-    .chunk-textarea-wrapper textarea { background-color: var(--bg-color); }
-    .button-action-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
-    .copy-count-display { font-size: 0.8em; color: var(--text-muted-color); }
+    .chunk-textarea-wrapper {
+        width: 100%; /* Ensure it takes full width */
+    }
+    .chunk-textarea-wrapper textarea {
+        background-color: var(--bg-color);
+        min-height: 100px; /* Minimum visible area */
+        height: 150px; /* Default height */
+        width: 100%; /* Take full width of its wrapper */
+    }
+    .button-action-wrapper {
+        display: flex;
+        flex-direction: row; /* Keep button and count in a row */
+        align-items: center;
+        gap: 0.75rem; /* Space between button and count */
+        width: 100%; /* Take full width to align button to one side */
+        justify-content: flex-end; /* Align copy button to the right */
+    }
+    .button-action-wrapper .button { /* Ensure copy button is appropriately sized */
+       padding: 0.5rem 0.75rem; /* Adjust padding as needed */
+       font-size: 0.9rem;
+    }
+    .copy-count-display {
+        font-size: 0.85em;
+        color: var(--text-muted-color);
+    }
+
+    /* Desktop layout for .chunk-container */
+    @media (min-width: 768px) { /* Or your preferred breakpoint for side-by-side */
+        .chunk-container {
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .chunk-title {
+            min-width: 90px; /* Restore min-width */
+            padding-top: 8px; /* Restore padding */
+            text-align: right; /* Restore text-align */
+            font-size: 0.9em;
+            margin-bottom: 0;
+        }
+         .chunk-textarea-wrapper textarea {
+            height: auto; /* Allow JS to set or use default if needed */
+         }
+        .button-action-wrapper {
+            flex-direction: column; /* Stack button and count vertically again */
+            align-items: center;
+            gap: 5px;
+            width: auto; /* Reset width */
+            justify-content: center; /* Center items in the column */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+    }
+
 
     /* --- Status & Indicators --- */
      #loadingIndicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; background-color: rgba(0, 0, 0, 0.8); color: white; border-radius: 8px; z-index: 1000; font-size: 1.1em; box-shadow: var(--shadow-md); }
@@ -195,147 +590,182 @@
      #scrollToTopBtn { display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99; opacity: 0.7; }
      #scrollToTopBtn:hover { opacity: 1; }
      .info-counter { background-color: var(--border-color-light); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size:0.9em; }
-    
+
+    /* --- Responsive Adjustments --- */
+    @media (min-width: 1024px) { /* Desktop */
+      /* By default, sidebar is collapsible on desktop too. */
+      /* To make sidebar permanently visible on desktop: */
+      /*
+      #sidebar {
+        transform: translateX(0);
+        z-index: 100;
+      }
+      #main-content {
+        margin-left: var(--sidebar-width);
+      }
+      #hamburger-menu {
+        display: none;
+      }
+      #sidebar { padding-top: 70px; }
+      */
+    }
+
   </style>
 </head>
 
 <body>
-  
+
   <header class="app-header">
+    <button id="hamburger-menu" aria-label="Open sidebar">☰</button> <!-- style="display: block;" removed, CSS will handle -->
     <h1>Chunker Pro</h1>
     <div class="header-controls">
       <span id="mainStatus" class="status-message" style="display:none;"></span>
-      <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
-      <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
+      <!-- Theme toggle and Reset All moved to sidebar -->
     </div>
   </header>
 
-  <main class="main-container">
-    <div id="settings-column">
-      
-      <div class="collapsible-fieldset">
-        <div class="fieldset-header">
-          <h3>1. Input Mode & Source</h3>
-          <span class="toggle-icon">▼</span>
-        </div>
-        <div class="fieldset-content">
-          <div class="mode-switcher" id="modeSwitcher">
-            <button data-mode="json" class="active">JSON Objects</button>
-            <button data-mode="text">Plain Text</button>
-          </div>
-          <input type="hidden" id="splitModeSelect" value="json">
-        </div>
-      </div>
-      
-      <div id="jsonModeSections">
-        <div class="collapsible-fieldset">
-          <div class="fieldset-header"><h3>2. JSON Input Chapters</h3> <span class="toggle-icon">▼</span></div>
-          <div class="fieldset-content">
-            <p>Add one or more JSON array "chapters". Content from all valid inputs will be combined.</p>
-            <div id="jsonInputsContainer"></div>
-            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-              <button id="addJsonChapterButton" class="button btn-primary btn-sm">+ Add Input</button>
-              <button id="clearAllJsonButton" class="button btn-secondary btn-sm">Clear All</button>
-              <span id="jsonObjectsCount" class="info-counter" style="margin-left: auto;">Total Objects: 0</span>
-            </div>
-            <div class="input-container" style="margin-top: 1rem;">
-              <label for="jsonObjectsPerChunk">Combine objects per chunk:</label>
-              <select id="jsonObjectsPerChunk">
-                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="10">10</option><option value="20">20</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="collapsible-fieldset">
-          <div class="fieldset-header"><h3>3. Paired Find & Replace</h3><span class="toggle-icon">▼</span></div>
-          <div class="fieldset-content">
-            <p>Applied to <code>object.terms[any].translation</code> on a copy of the data during splitting.</p>
-            <div style="display:flex; gap: 15px; margin-bottom: 10px;">
-              <label class="inline-label"><input type="checkbox" id="applyRulesCheckbox"> Apply Rules</label>
-              <label class="inline-label"><input type="checkbox" id="caseInsensitiveCheckbox"> Case-insensitive</label>
-            </div>
-            <div id="findReplacePairsContainer"></div>
-            <div style="margin-top:10px;">
-              <button id="addFindReplacePairButton" class="button btn-success btn-sm">+ Add Rule</button>
-              <span id="glossaryReplaceStatus" class="status-message" style="margin-left: 10px; display: none;"></span>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div id="sidebar">
+    <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
+    <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
+  </div>
 
-      <div id="plainTextModeSections" style="display:none;">
+  <div id="main-content">
+    <main class="main-container">
+      <div id="settings-column">
+
         <div class="collapsible-fieldset">
-          <div class="fieldset-header"><h3>2. Plain Text Input</h3> <span class="toggle-icon">▼</span></div>
+          <div class="fieldset-header">
+            <h3>1. Input Mode & Source</h3>
+            <span class="toggle-icon">▼</span>
+          </div>
           <div class="fieldset-content">
-            <p>Text will be split by max characters, intelligently breaking at sentence or word boundaries.</p>
-            <div style="text-align: right; margin-bottom: 5px;">
-              <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
+            <div class="mode-switcher" id="modeSwitcher">
+              <button data-mode="json" class="active">JSON Objects</button>
+              <button data-mode="text">Plain Text</button>
             </div>
-            <textarea id="plainTextInputArea" placeholder="Paste plain text here..." style="height: 250px;"></textarea>
-            <span id="plainTextStatus" class="status-message"></span>
-            <div class="input-container">
-              <label for="formatSelect">Format text (before splitting):</label>
-              <select id="formatSelect">
-                  <option value="as-is">Show text as is</option>
-                  <option value="pretty">Pretty (trim lines, join with double newlines)</option>
-              </select>
-            </div>
-            <div class="input-container">
-              <label for="maxChars">Max characters per chunk:</label>
-              <input type="number" id="maxChars" value="1800" min="1">
-            </div>
+            <input type="hidden" id="splitModeSelect" value="json">
           </div>
         </div>
-      </div>
 
-      <div class="collapsible-fieldset">
-        <div class="fieldset-header">
-          <h3 id="commonSectionHeader">4. Chunk Header & Footer</h3>
-          <span class="toggle-icon">▼</span>
-        </div>
-        <div class="fieldset-content">
-          <p>Use <code>$X</code> for current part number and <code>$Y</code> for total parts.</p>
-          <div class="input-container">
-            <label for="addToTop">Add to top of each chunk:</label>
-            <div class="textarea-with-actions">
-              <div class="textarea-actions">
-                <button class="textarea-action-btn" onclick="copyFromTextarea('addToTop')">Copy</button>
-                <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToTop')">Paste</button>
-                <button class="textarea-action-btn" onclick="clearTextarea('addToTop')">Clear</button>
+        <div id="jsonModeSections">
+          <div class="collapsible-fieldset">
+            <div class="fieldset-header"><h3>2. JSON Input Chapters</h3> <span class="toggle-icon">▼</span></div>
+            <div class="fieldset-content">
+              <p>Add one or more JSON array "chapters". Content from all valid inputs will be combined.</p>
+              <div class="input-container file-input-container">
+                <label for="jsonFileInput">Upload JSON File(s) (<code>.json</code>):</label>
+                <input type="file" id="jsonFileInput" accept=".json" multiple>
               </div>
-              <textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea>
+              <div id="jsonInputsContainer"></div>
+            <div class="json-global-actions">
+                <button id="addJsonChapterButton" class="button btn-primary btn-sm">+ Add Input</button>
+                <button id="clearAllJsonButton" class="button btn-secondary btn-sm">Clear All</button>
+              <span id="jsonObjectsCount" class="info-counter">Total Objects: 0</span>
+              </div>
+              <div class="input-container" style="margin-top: 1rem;">
+                <label for="jsonObjectsPerChunk">Combine objects per chunk:</label>
+                <select id="jsonObjectsPerChunk">
+                  <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="10">10</option><option value="20">20</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="input-container">
-            <label for="addToBottom">Add to bottom of each chunk:</label>
-            <div class="textarea-with-actions">
-              <div class="textarea-actions">
-                <button class="textarea-action-btn" onclick="copyFromTextarea('addToBottom')">Copy</button>
-                <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToBottom')">Paste</button>
-                <button class="textarea-action-btn" onclick="clearTextarea('addToBottom')">Clear</button>
+          <div class="collapsible-fieldset">
+            <div class="fieldset-header"><h3>3. Paired Find & Replace</h3><span class="toggle-icon">▼</span></div>
+            <div class="fieldset-content">
+              <p>Applied to <code>object.terms[any].translation</code> on a copy of the data during splitting.</p>
+              <div class="find-replace-controls">
+                <label class="inline-label"><input type="checkbox" id="applyRulesCheckbox"> Apply Rules</label>
+                <label class="inline-label"><input type="checkbox" id="caseInsensitiveCheckbox"> Case-insensitive</label>
               </div>
-              <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
+              <div id="findReplacePairsContainer"></div>
+              <div class="find-replace-add-rule-group">
+                <button id="addFindReplacePairButton" class="button btn-success btn-sm">+ Add Rule</button>
+                <button id="saveRulesButton" class="button btn-secondary btn-sm">Save Rules</button>
+                <button id="loadRulesButton" class="button btn-secondary btn-sm">Load Rules</button>
+                <input type="file" id="loadRulesInput" accept=".json" style="display:none;">
+                <span id="glossaryReplaceStatus" class="status-message" style="display: none;"></span>
+              </div>
             </div>
           </div>
         </div>
+
+        <div id="plainTextModeSections" style="display:none;">
+          <div class="collapsible-fieldset">
+            <div class="fieldset-header"><h3>2. Plain Text Input</h3> <span class="toggle-icon">▼</span></div>
+            <div class="fieldset-content">
+              <p>Text will be split by max characters, intelligently breaking at sentence or word boundaries.</p>
+              <div class="input-container file-input-container">
+                <label for="textFileInput">Upload Text File (<code>.txt</code>):</label>
+                <input type="file" id="textFileInput" accept=".txt,.text">
+              </div>
+            <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
+            <textarea id="plainTextInputArea" placeholder="Paste plain text here..."></textarea> <!-- style="height: 250px;" removed -->
+              <span id="plainTextStatus" class="status-message"></span>
+            <div class="input-container can-be-row"> <!-- Added can-be-row for responsiveness -->
+                <label for="formatSelect">Format text (before splitting):</label>
+                <select id="formatSelect">
+                    <option value="as-is">Show text as is</option>
+                    <option value="pretty">Pretty (trim lines, join with double newlines)</option>
+                </select>
+              </div>
+            <div class="input-container can-be-row"> <!-- Added can-be-row for responsiveness -->
+                <label for="maxChars">Max characters per chunk:</label>
+                <input type="number" id="maxChars" value="1800" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible-fieldset">
+          <div class="fieldset-header">
+            <h3 id="commonSectionHeader">4. Chunk Header & Footer</h3>
+            <span class="toggle-icon">▼</span>
+          </div>
+          <div class="fieldset-content">
+            <p>Use <code>$X</code> for current part number and <code>$Y</code> for total parts.</p>
+            <div class="input-container">
+              <label for="addToTop">Add to top of each chunk:</label>
+              <div class="textarea-with-actions">
+                <div class="textarea-actions">
+                  <button class="textarea-action-btn" onclick="copyFromTextarea('addToTop')">Copy</button>
+                  <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToTop')">Paste</button>
+                  <button class="textarea-action-btn" onclick="clearTextarea('addToTop')">Clear</button>
+                </div>
+                <textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea>
+              </div>
+            </div>
+            <div class="input-container">
+              <label for="addToBottom">Add to bottom of each chunk:</label>
+              <div class="textarea-with-actions">
+                <div class="textarea-actions">
+                  <button class="textarea-action-btn" onclick="copyFromTextarea('addToBottom')">Copy</button>
+                  <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToBottom')">Paste</button>
+                  <button class="textarea-action-btn" onclick="clearTextarea('addToBottom')">Clear</button>
+                </div>
+                <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="mainSplitButton" class="button btn-success btn-block" style="font-size: 1.2rem; padding: 12px;">⚙️ Process & Split</button>
+        <span id="processStatus" class="status-message" style="display:none;"></span>
+
       </div>
 
-      <button id="mainSplitButton" class="button btn-success btn-block" style="font-size: 1.2rem; padding: 12px;">⚙️ Process & Split</button>
-      <span id="processStatus" class="status-message" style="display:none;"></span>
-
-    </div>
-
-    <div id="output-column">
-      <div id="outputControls" style="display:none;">
-        <h4 id="outputSummary">Output</h4>
-        <button id="copyNextButton" class="button btn-warning btn-sm">⭐ Copy NEXT Uncopied</button>
-        <button id="copyAllButton" class="button btn-info btn-sm">Copy ALL Chunks</button>
-        <button id="clearOutputButton" class="button btn-secondary btn-sm">Clear Output</button>
+      <div id="output-column">
+        <div id="outputControls" style="display:none;">
+          <h4 id="outputSummary">Output</h4>
+          <button id="copyNextButton" class="button btn-warning btn-sm">⭐ Copy NEXT Uncopied</button>
+          <button id="copyAllButton" class="button btn-info btn-sm">Copy ALL Chunks</button>
+          <button id="clearOutputButton" class="button btn-secondary btn-sm">Clear Output</button>
+        </div>
+        <div id="chunkedTextContainer"></div>
       </div>
-      <div id="chunkedTextContainer"></div>
-    </div>
-  </main>
-  
+    </main>
+  </div> <!-- end main-content -->
+
   <div id="loadingIndicator">Processing...</div>
   <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to top" class="button btn-primary">⬆️</button>
 
@@ -349,7 +779,7 @@
 
     const newDefaultAddToTopPreset = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis"
 
-1. Analyze raw Passage and Translation: 
+1. Analyze raw Passage and Translation:
    - FOR EACH line, summarize its meaning and compare it very thoroughly to the translation.
    - Note if the translation matches the original or deviates, explaining any ambiguities or potential errors.
    - Check if phrases are adapted naturally (e.g., idiomatic expressions retain flavor without literal awkwardness or being too formal and literal).
@@ -362,7 +792,7 @@
   - Language: Awkward or unnatural English or Overly condensed sentences.
   - Analyze every line thoroughly.
 
-3. Verify Errors: 
+3. Verify Errors:
    - Double-check all identified errors, ensuring each has clear evidence.
    - keep all the minor and major valid errors.
    - Verify if the tone matches the context (majestic for epic scenes, colloquial for dialogue).
@@ -375,7 +805,7 @@
   - Where necessary for comprehension, add brief, unobtrusive context or explanations for cultural terms or implied meanings. Avoid overly complex or literary phrasing if it sacrifices clarity
 
 5. Give only the Fixed human like English translation as output and not the Whole JSON format. and Separately mention when a glossary is wrong or have variations and is fixed in the output.`;
-	
+
     const defaultState = {
         theme: 'light',
         splitMode: 'json',
@@ -419,11 +849,11 @@
             }, timeout);
         }
     }
-    
+
     function showLoading() { document.getElementById('loadingIndicator').style.display = 'block'; }
     function hideLoading() {  document.getElementById('loadingIndicator').style.display = 'none'; }
     function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-    
+
     function copyFromTextarea(id) {
         const textarea = document.getElementById(id);
         if (textarea) navigator.clipboard.writeText(textarea.value).then(() => showStatus('mainStatus', 'Copied!', 'success', 2000));
@@ -464,11 +894,15 @@
             }
         }
     }
-    
+
     // --- Theme Management ---
     function applyTheme(theme) {
         document.body.classList.toggle('dark-mode', theme === 'dark');
-        document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌓';
+        // Ensure theme-toggle button exists before trying to set its textContent
+        const themeToggleButton = document.getElementById('theme-toggle');
+        if (themeToggleButton) {
+            themeToggleButton.textContent = theme === 'dark' ? '☀️' : '🌓';
+        }
     }
 
     function toggleTheme() {
@@ -516,7 +950,7 @@
            console.error("LocalStorage load failed:", e);
            currentAppState = {...defaultState};
         }
-        
+
         applyTheme(currentAppState.theme);
         document.getElementById('splitModeSelect').value = currentAppState.splitMode;
         document.getElementById('maxChars').value = currentAppState.maxChars;
@@ -527,14 +961,14 @@
         document.getElementById('plainTextInputArea').value = currentAppState.plainText;
         document.getElementById('applyRulesCheckbox').checked = !!currentAppState.applyRules;
         document.getElementById('caseInsensitiveCheckbox').checked = !!currentAppState.caseInsensitive;
-        
+
         if (currentAppState.collapsedSections) {
              document.querySelectorAll('.collapsible-fieldset').forEach(fs => {
                 const title = fs.querySelector('h3').textContent.trim();
                 fs.classList.toggle('collapsed', currentAppState.collapsedSections.includes(title));
              });
         }
-        
+
         document.getElementById('jsonInputsContainer').innerHTML = '';
         jsonChapterInputIdCounter = 0;
         if (currentAppState.jsonInputs && currentAppState.jsonInputs.length > 0) {
@@ -542,7 +976,7 @@
         } else {
              addJsonChapterInput('', false);
         }
-        
+
         document.getElementById('findReplacePairsContainer').innerHTML = '';
         if (currentAppState.findReplacePairs && currentAppState.findReplacePairs.length > 0) {
              currentAppState.findReplacePairs.forEach(pair => addFindReplacePair(pair.find, pair.replace, false));
@@ -550,14 +984,14 @@
              addFindReplacePair("","", false);
         }
    }
-   
+
     function resetAllToDefaults() {
          if(confirm("Are you sure you want to clear all inputs and settings? This will reload the page.")) {
             localStorage.removeItem(STATE_KEY);
             window.location.reload();
          }
      }
-    
+
     // --- UI Element Management ---
     function toggleInputSections() {
         const splitMode = document.getElementById('splitModeSelect').value;
@@ -566,12 +1000,12 @@
         document.getElementById('jsonModeSections').style.display = (splitMode === 'json' ? 'block' : 'none');
         document.getElementById('plainTextModeSections').style.display = (splitMode === 'text' ? 'block' : 'none');
         document.getElementById('commonSectionHeader').textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
-        
+
         clearOutput();
         if (splitMode === 'json') updateTotalJsonObjectCount(); else updatePlainTextInfo();
         debouncedSaveState();
     }
-    
+
     function addJsonChapterInput(content = '', save = true) {
         jsonChapterInputIdCounter++;
         const container = document.getElementById('jsonInputsContainer');
@@ -608,7 +1042,7 @@
         }
         debouncedSaveState();
     }
-    
+
     function clearAllJsonInputs() {
         document.getElementById('jsonInputsContainer').innerHTML = '';
         jsonChapterInputIdCounter = 0;
@@ -693,7 +1127,7 @@
        updatePlainTextInfo();
        debouncedSaveState();
     }
-    
+
     // --- Core Logic ---
     function processAndChunk() {
        clearOutput();
@@ -705,7 +1139,7 @@
           const addToBottom = document.getElementById('addToBottom').value;
           const container = document.getElementById('chunkedTextContainer');
           let chunkCount = 0;
-          
+
           if (splitMode === 'json') {
              const { data, success, allEmpty } = getAllCombinedJsonData();
              if (allEmpty) throw new Error("All JSON inputs are empty.");
@@ -766,7 +1200,7 @@
         }).filter(Boolean);
 
         if (rules.length === 0) return { data: jsonData, count: 0 };
-        
+
         const processedData = JSON.parse(JSON.stringify(jsonData));
         let totalInstancesReplaced = 0;
 
@@ -807,7 +1241,7 @@
         }
         return totalChunks;
     }
-    
+
     function smartSplit(text, maxLength) {
         if (text.length <= maxLength) return [text];
         const chunks = []; let currentText = text;
@@ -825,7 +1259,7 @@
         if (currentText) chunks.push(currentText);
         return chunks;
     }
-    
+
     function chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container) {
        let chunks = []; let currentChunk = "";
        text.split('\n').forEach(paragraph => {
@@ -853,7 +1287,7 @@
        });
        return totalChunks;
     }
-    
+
     // --- Output & Copying ---
     function displayChunk(content, title, container) {
         const chunkDiv = document.createElement('div');
@@ -871,21 +1305,21 @@
         const copyButton = chunkDiv.querySelector('.copy-button');
         copyButton.addEventListener('click', function () {
             copyToClipboard(
-                chunkDiv.querySelector('textarea').value, 
-                this, 
+                chunkDiv.querySelector('textarea').value,
+                this,
                 chunkDiv.querySelector('.copy-count-display')
             );
         });
         container.appendChild(chunkDiv);
     }
-    
+
     function clearOutput() {
         document.getElementById('chunkedTextContainer').innerHTML = '';
         document.getElementById('output-column').style.display = 'none';
         document.getElementById('outputControls').style.display = 'none';
         lastClickedButton = null;
     }
-    
+
     function updateCopyButtonState(button) {
       if (lastClickedButton && lastClickedButton !== button) {
          lastClickedButton.classList.remove('btn-success');
@@ -897,14 +1331,14 @@
       button.querySelector('.tick').style.display = 'inline-block';
       lastClickedButton = button;
     }
-    
+
     function copyToClipboard(text, buttonEl, countEl) {
        navigator.clipboard.writeText(text).then(() => {
             updateCopyButtonState(buttonEl);
             const container = buttonEl.closest('.chunk-container');
             container.dataset.copied = "true";
             container.classList.add('copied');
-            
+
             let count = parseInt(buttonEl.dataset.copyCount, 10) + 1;
             buttonEl.dataset.copyCount = count;
             countEl.textContent = `(${count})`;
@@ -914,7 +1348,7 @@
             }
         }).catch(err => { showStatus('processStatus', 'Failed to copy text.', 'error'); });
     }
-    
+
     function copyNextUncopied() {
         const nextContainer = document.querySelector('.chunk-container[data-copied="false"]');
         if(nextContainer) {
@@ -922,7 +1356,7 @@
             nextContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
         }
     }
-    
+
     function copyAllChunks() {
         const textareas = document.querySelectorAll('#chunkedTextContainer textarea');
         if (textareas.length === 0) return;
@@ -941,19 +1375,28 @@
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         loadState();
-        
+
         // --- Event Listeners ---
-        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-        document.getElementById('resetAllButton').addEventListener('click', resetAllToDefaults);
+        // Ensure these elements exist before adding event listeners
+        const themeToggleButton = document.getElementById('theme-toggle');
+        if (themeToggleButton) {
+            themeToggleButton.addEventListener('click', toggleTheme);
+        }
+
+        const resetAllButton = document.getElementById('resetAllButton');
+        if (resetAllButton) {
+            resetAllButton.addEventListener('click', resetAllToDefaults);
+        }
+
         document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
-        
+
         document.getElementById('modeSwitcher').addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') {
                 document.getElementById('splitModeSelect').value = e.target.dataset.mode;
                 toggleInputSections();
             }
         });
-        
+
         document.querySelectorAll('.collapsible-fieldset .fieldset-header').forEach(header => {
             header.addEventListener('click', () => {
                 header.parentElement.classList.toggle('collapsed');
@@ -969,6 +1412,76 @@
         document.getElementById('applyRulesCheckbox').addEventListener('change', debouncedSaveState);
         document.getElementById('caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
 
+        // Save/Load Find & Replace Rules Listeners
+        const saveRulesButton = document.getElementById('saveRulesButton');
+        if (saveRulesButton) {
+            saveRulesButton.addEventListener('click', () => {
+                const currentRules = Array.from(document.querySelectorAll('#findReplacePairsContainer .find-replace-pair')).map(p => ({
+                    find: p.querySelector('.find-text')?.value || "",
+                    replace: p.querySelector('.replace-text')?.value || ""
+                }));
+                if (currentRules.length === 0 || (currentRules.length === 1 && !currentRules[0].find && !currentRules[0].replace)) {
+                    showStatus('glossaryReplaceStatus', 'No rules to save.', 'info', 3000);
+                    return;
+                }
+                const jsonString = JSON.stringify(currentRules, null, 2);
+                const blob = new Blob([jsonString], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'find-replace-rules.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showStatus('glossaryReplaceStatus', 'Rules saved!', 'success', 3000);
+            });
+        }
+
+        const loadRulesButton = document.getElementById('loadRulesButton');
+        const loadRulesInput = document.getElementById('loadRulesInput');
+        if (loadRulesButton && loadRulesInput) {
+            loadRulesButton.addEventListener('click', () => {
+                loadRulesInput.click(); // Trigger hidden file input
+            });
+
+            loadRulesInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const content = e.target.result;
+                        const loadedRules = JSON.parse(content);
+
+                        if (Array.isArray(loadedRules) && loadedRules.every(rule => typeof rule === 'object' && 'find' in rule && 'replace' in rule)) {
+                            const container = document.getElementById('findReplacePairsContainer');
+                            container.innerHTML = ''; // Clear existing rules
+                            if (loadedRules.length === 0) { // Handle empty array case - add one empty pair
+                                addFindReplacePair("", "", false);
+                            } else {
+                                loadedRules.forEach(rule => {
+                                    addFindReplacePair(String(rule.find || ""), String(rule.replace || ""), false);
+                                });
+                            }
+                            debouncedSaveState(); // Save the newly loaded rules
+                            showStatus('glossaryReplaceStatus', `Loaded ${loadedRules.length} rules from ${file.name}`, 'success', 4000);
+                        } else {
+                            showStatus('glossaryReplaceStatus', 'Invalid rules file format.', 'error', 5000);
+                        }
+                    } catch (err) {
+                        showStatus('glossaryReplaceStatus', `Error reading ${file.name}: ${err.message}`, 'error', 5000);
+                    }
+                };
+                reader.onerror = () => {
+                    showStatus('glossaryReplaceStatus', `Error reading file ${file.name}.`, 'error', 5000);
+                };
+                reader.readAsText(file);
+                event.target.value = null; // Allow re-uploading
+            });
+        }
+
         // Plain Text Mode Listeners
         document.getElementById('plainTextInputArea').addEventListener('input', () => {
             currentAppState.plainText = document.getElementById('plainTextInputArea').value;
@@ -981,21 +1494,104 @@
         // Common Listeners
         document.getElementById('addToTop').addEventListener('input', debouncedSaveState);
         document.getElementById('addToBottom').addEventListener('input', debouncedSaveState);
-        
+
+        // File Input Listeners
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        if (jsonFileInput) {
+            jsonFileInput.addEventListener('change', (event) => {
+                const files = event.target.files;
+                if (!files.length) return;
+
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const content = e.target.result;
+                            const parsedJson = JSON.parse(content);
+                            if (Array.isArray(parsedJson)) {
+                                addJsonChapterInput(JSON.stringify(parsedJson, null, 2)); // Pretty print
+                                showStatus('mainStatus', `Loaded JSON from ${file.name}`, 'success');
+                            } else {
+                                showStatus('mainStatus', `Error: ${file.name} is not a valid JSON array.`, 'error', 5000);
+                            }
+                        } catch (err) {
+                            showStatus('mainStatus', `Error reading ${file.name}: ${err.message}`, 'error', 5000);
+                        }
+                    };
+                    reader.onerror = () => {
+                        showStatus('mainStatus', `Error reading file ${file.name}.`, 'error', 5000);
+                    };
+                    reader.readAsText(file);
+                });
+                event.target.value = null; // Allow re-uploading the same file(s)
+                // updateTotalJsonObjectCount and debouncedSaveState are called by addJsonChapterInput
+            });
+        }
+
+        const textFileInput = document.getElementById('textFileInput');
+        const plainTextInputArea = document.getElementById('plainTextInputArea');
+        if (textFileInput && plainTextInputArea) {
+            textFileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        plainTextInputArea.value = e.target.result;
+                        plainTextInputArea.dispatchEvent(new Event('input', { bubbles: true })); // Triggers updatePlainTextInfo & saveState
+                        showStatus('mainStatus', `Loaded text from ${file.name}`, 'success');
+                    } catch (err) {
+                        showStatus('mainStatus', `Error processing ${file.name}: ${err.message}`, 'error', 5000);
+                    }
+                };
+                reader.onerror = () => {
+                    showStatus('mainStatus', `Error reading file ${file.name}.`, 'error', 5000);
+                };
+                reader.readAsText(file);
+                event.target.value = null; // Allow re-uploading the same file
+            });
+        }
+
         // Output Listeners
         document.getElementById('clearOutputButton').addEventListener('click', clearOutput);
         document.getElementById('copyNextButton').addEventListener('click', copyNextUncopied);
         document.getElementById('copyAllButton').addEventListener('click', copyAllChunks);
-        
+
         window.onscroll = () => {
             const btn = document.getElementById("scrollToTopBtn");
-            const show = document.getElementById("output-column").style.display !== 'none' && document.documentElement.scrollTop > 200;
-            btn.style.display = show ? "block" : "none";
+            const outputCol = document.getElementById("output-column");
+            if (btn && outputCol) { // Ensure elements exist
+                const show = outputCol.style.display !== 'none' && document.documentElement.scrollTop > 200;
+                btn.style.display = show ? "block" : "none";
+            }
         };
 
         // --- Final UI Setup ---
         toggleInputSections();
         clearOutput();
+
+        // Hamburger menu functionality
+        const hamburger = document.getElementById('hamburger-menu');
+        const sidebar = document.getElementById('sidebar');
+        if(hamburger && sidebar) {
+          hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+          });
+        }
+        // Optional: Close sidebar when clicking on main content (for mobile)
+        const mainContent = document.getElementById('main-content');
+        if (mainContent && sidebar) {
+            mainContent.addEventListener('click', () => {
+                if (sidebar.classList.contains('sidebar-open')) {
+                    // Only close if sidebar is open and screen is narrow (mobile)
+                    if (window.innerWidth < 1024) { // Or your desktop breakpoint
+                        sidebar.classList.remove('sidebar-open');
+                    }
+                }
+            });
+        }
+
         showStatus('mainStatus', 'Ready!', 'success', 2500);
     });
 
