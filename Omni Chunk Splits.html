@@ -20,6 +20,7 @@
       --danger-color: #dc3545;
       --danger-hover-color: #bb2d3b;
       --warning-color: #ffc107;
+      --warning-color-rgb: 255, 193, 7; /* Added RGB for rgba() */
       --info-color: #0dcaf0;
       --secondary-color: #6c757d;
       --secondary-hover-color: #5c636a;
@@ -34,13 +35,22 @@
       --sidebar-bg-color: var(--fg-color);
       --sidebar-border-color: var(--border-color);
       --sidebar-transition-speed: 0.3s;
+
+      /* New accent colors for modern UI */
+      --accent-color: #6a11cb; /* A vibrant purple */
+      --accent-hover-color: #9345dd;
+      --info-btn-bg-color: #2196F3; /* Sky blue for info buttons */
+      --info-popup-bg-color: var(--fg-color);
+      --info-popup-text-color: var(--text-color);
     }
 
     body.dark-mode {
       --bg-color: #121212;
-      --sidebar-bg-color: var(--fg-color); /* Or a slightly different dark shade if preferred */
-      --sidebar-border-color: var(--border-color);
+      /* --sidebar-bg-color: var(--fg-color); /* Or a slightly different dark shade if preferred */
+      /* --sidebar-border-color: var(--border-color); */
       --fg-color: #1e1e1e;
+      --info-popup-bg-color: #2a2a2a; /* Slightly lighter than main dark background for popups */
+      --info-popup-text-color: var(--text-color);
       --text-color: #e8eaed;
       --text-muted-color: #9aa0a6;
       --border-color: #444;
@@ -119,49 +129,187 @@
       z-index: 1000; /* High z-index for header */
       height: 60px;
     }
-    #hamburger-menu {
-      font-size: 1.8rem;
-      background: none;
-      border: none;
-      color: var(--text-color);
-      cursor: pointer;
-      padding: 0.5rem;
-      margin-right: 0.5rem;
-      display: block; /* Initially visible on mobile */
-    }
+    /* #hamburger-menu styling removed as element is deleted */
     .app-header h1 { margin: 0; font-size: 1.25rem; flex-grow: 1; text-align: center; } /* Adjusted for mobile */
 
     .header-controls { display: flex; align-items: center; gap: 0.5rem; } /* Reduced gap for mobile */
 
-    /* --- Sidebar --- */
-    #sidebar {
+    /* --- Old #sidebar styling removed --- */
+
+    /* --- New Hovering Sidebar --- */
+    #hovering-sidebar {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: var(--sidebar-width);
-      height: 100vh;
-      background-color: var(--sidebar-bg-color);
-      border-right: 1px solid var(--sidebar-border-color);
-      padding: 1rem;
-      transform: translateX(-100%); /* Hidden off-screen by default */
-      transition: transform var(--sidebar-transition-speed) ease-in-out;
-      z-index: 1100; /* Higher than header for overlay, or adjust if pushing content */
+      bottom: 20px;
+      right: 20px;
+      z-index: 1200; /* Above most other elements */
+      transition: all 0.3s ease-in-out;
+    }
+
+    #hover-sidebar-toggle-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem; /* Icon size */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    #hover-sidebar-toggle-btn:hover {
+      background-color: var(--accent-hover-color);
+      transform: scale(1.1);
+    }
+
+    #expanded-sidebar-content {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      background-color: var(--fg-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 350px; /* Max width for the modal */
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 1199; /* Just below the toggle button if it overlaps, or manage visibility */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      padding-top: 70px; /* Space for header */
+      gap: 0.75rem; /* Space between items in the expanded sidebar */
     }
-    #sidebar.sidebar-open {
-      transform: translateX(0);
+
+    #hovering-sidebar.expanded #expanded-sidebar-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
     }
-    #sidebar button { /* Style buttons in sidebar for vertical stacking */
+
+    #hovering-sidebar.expanded #hover-sidebar-toggle-btn {
+      /* Optional: style toggle btn differently when sidebar is open */
+      /* background-color: var(--secondary-color); */
+    }
+
+    /* Styling for buttons within the expanded sidebar */
+    #expanded-sidebar-content .button,
+    #expanded-sidebar-content .mode-switcher button {
       width: 100%;
-      justify-content: flex-start;
-      padding: 0.75rem 1rem; /* Slightly larger padding for easier tapping */
-      margin-bottom: 0.5rem; /* Add some space between buttons */
+      padding: 0.6rem 1rem; /* Consistent padding */
+      font-size: 0.95rem; /* Consistent font size */
+      /* Icons are already part of button text, or could be separate spans */
     }
-    #sidebar button:last-child {
-      margin-bottom: 0;
+    #expanded-sidebar-content .mode-switcher {
+        margin-bottom: 0.5rem; /* Space below mode switcher if needed */
+    }
+     #expanded-sidebar-content #theme-toggle,
+     #expanded-sidebar-content #resetAllButton {
+        /* Using existing button classes is fine, ensure they fit well */
+     }
+     #expanded-sidebar-content #sidebarScrollToTopBtn,
+     #expanded-sidebar-content #goToFirstChunkBtn,
+     #expanded-sidebar-content #goToLastChunkBtn {
+        background-color: var(--secondary-color);
+     }
+     #expanded-sidebar-content #sidebarScrollToTopBtn:hover,
+     #expanded-sidebar-content #goToFirstChunkBtn:hover,
+     #expanded-sidebar-content #goToLastChunkBtn:hover {
+        background-color: var(--secondary-hover-color);
+     }
+
+
+    /* --- Info Buttons and Popups --- */
+    .info-btn-wrapper {
+        position: relative; /* For positioning info button and popup */
+        display: flex; /* Align item and info button */
+        align-items: center;
+        gap: 8px; /* Space between item and info button */
+        margin-bottom: 0.5rem; /* Add some space below items with info buttons */
+    }
+    .info-btn-wrapper > *:first-child {
+        flex-grow: 1; /* Allow the main control (e.g. button) to take available space */
+    }
+
+    .info-btn {
+      background-color: var(--info-btn-bg-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 0.8rem; /* 'i' character size */
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.2s ease;
+      flex-shrink: 0; /* Prevent info button from shrinking */
+    }
+    .info-btn:hover {
+      background-color: #1976D2; /* Darker blue on hover */
+    }
+
+    .info-popup {
+      display: none; /* Hidden by default, shown by JS */
+      position: absolute;
+      top: 100%; /* Position below the info button wrapper */
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% + 20px); /* Slightly wider than the wrapper */
+      max-width: 300px;
+      background-color: var(--info-popup-bg-color);
+      color: var(--info-popup-text-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 10px;
+      font-size: 0.85rem;
+      z-index: 1300; /* Above sidebar content */
+      box-shadow: var(--shadow-md);
+      margin-top: 8px; /* Space between button and popup */
+    }
+    .info-popup::before { /* Arrow pointing to the button */
+        content: '';
+        position: absolute;
+        bottom: 100%; /* At the top of the popup */
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent transparent var(--border-color) transparent;
+    }
+    body.dark-mode .info-popup::before {
+        border-color: transparent transparent var(--border-color) transparent;
+    }
+
+    /* --- QoL Highlight & Messages --- */
+    .chunk-highlighted {
+      background-color: rgba(var(--warning-color-rgb), 0.2); /* Using warning color for highlight */
+      border-left: 3px solid var(--warning-color);
+      transition: background-color 0.3s ease-out, border-left 0.3s ease-out;
+    }
+    body.dark-mode .chunk-highlighted {
+      background-color: rgba(var(--warning-color-rgb), 0.3); /* Dark mode highlight */
+    }
+
+    .empty-output-message {
+        text-align: center;
+        color: var(--text-muted-color);
+        font-style: italic;
+        padding: 2rem;
+        border: 2px dashed var(--border-color-light);
+        border-radius: var(--border-radius);
+        margin-top: 1rem;
     }
 
     /* --- General Elements --- */
@@ -614,20 +762,40 @@
 </head>
 
 <body>
+  <div id="hovering-sidebar" class="hover-sidebar-collapsed"> <!-- Class 'expanded' will be toggled by JS -->
+      <button id="hover-sidebar-toggle-btn" title="Open Settings">⚙️</button>
+      <div id="expanded-sidebar-content"> <!-- style="display: none;" removed, CSS handles visibility -->
+          <div class="info-btn-wrapper">
+            <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
+            <button class="info-btn" data-info-target="theme-toggle-info">i</button>
+            <div id="theme-toggle-info" class="info-popup">Switches between light and dark themes. Preference is saved. Shortcut: Ctrl+S / Cmd+S to toggle settings panel.</div>
+          </div>
+          <div class="info-btn-wrapper">
+            <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
+            <button class="info-btn" data-info-target="reset-all-info">i</button>
+            <div id="reset-all-info" class="info-popup">Clears all your current inputs, settings, and output. The page will reload to its default state. This cannot be undone.</div>
+          </div>
+          <div class="info-btn-wrapper">
+            <div class="mode-switcher" id="modeSwitcher">
+              <button data-mode="json" class="active">JSON Objects</button>
+              <button data-mode="text">Plain Text</button>
+            </div>
+            <button class="info-btn" data-info-target="mode-switcher-info">i</button>
+            <div id="mode-switcher-info" class="info-popup">Choose your input mode: "JSON Objects" for structured JSON data, or "Plain Text" for simple text.</div>
+          </div>
+          <button id="sidebarScrollToTopBtn" title="Scroll to Top" class="button">⬆️ Top</button>
+          <button id="goToFirstChunkBtn" title="Go to First Chunk" class="button">⏬ First Chunk</button>
+          <button id="goToLastChunkBtn" title="Go to Last Chunk" class="button">⏫ Last Chunk</button>
+      </div>
+  </div>
 
   <header class="app-header">
-    <button id="hamburger-menu" aria-label="Open sidebar">☰</button> <!-- style="display: block;" removed, CSS will handle -->
     <h1>Chunker Pro</h1>
     <div class="header-controls">
       <span id="mainStatus" class="status-message" style="display:none;"></span>
-      <!-- Theme toggle and Reset All moved to sidebar -->
+      <!-- Theme toggle and Reset All moved to new sidebar -->
     </div>
   </header>
-
-  <div id="sidebar">
-    <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
-    <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
-  </div>
 
   <div id="main-content">
     <main class="main-container">
@@ -639,10 +807,7 @@
             <span class="toggle-icon">▼</span>
           </div>
           <div class="fieldset-content">
-            <div class="mode-switcher" id="modeSwitcher">
-              <button data-mode="json" class="active">JSON Objects</button>
-              <button data-mode="text">Plain Text</button>
-            </div>
+            <!-- Mode Switcher was moved to the new hovering sidebar -->
             <input type="hidden" id="splitModeSelect" value="json">
           </div>
         </div>
@@ -1160,15 +1325,24 @@
                 document.getElementById('copyNextButton').disabled = false;
                 document.getElementById('copyAllButton').disabled = false;
                 showStatus('processStatus', `Success: Generated ${chunkCount} chunks.`, 'success');
+            updateChunkNavButtonsState(true);
            } else {
                 throw new Error("No chunks were generated from the input.");
            }
         } catch (error) {
            showStatus('processStatus', error.message, 'error', 8000);
+           updateChunkNavButtonsState(false); // Disable if error or no chunks
         } finally {
           hideLoading();
         }
       }, 50);
+    }
+
+    function updateChunkNavButtonsState(enabled) {
+        const firstChunkBtn = document.getElementById('goToFirstChunkBtn');
+        const lastChunkBtn = document.getElementById('goToLastChunkBtn');
+        if (firstChunkBtn) firstChunkBtn.disabled = !enabled;
+        if (lastChunkBtn) lastChunkBtn.disabled = !enabled;
     }
 
     function getAllCombinedJsonData() {
@@ -1314,10 +1488,12 @@
     }
 
     function clearOutput() {
-        document.getElementById('chunkedTextContainer').innerHTML = '';
-        document.getElementById('output-column').style.display = 'none';
-        document.getElementById('outputControls').style.display = 'none';
+        const chunkContainer = document.getElementById('chunkedTextContainer');
+        chunkContainer.innerHTML = `<p class="empty-output-message">Output will appear here once processed. Click 'Process & Split' (Ctrl+Enter) to generate chunks.</p>`;
+        document.getElementById('output-column').style.display = 'block'; // Ensure column is visible for the message
+        document.getElementById('outputControls').style.display = 'none'; // Hide controls like copy all/next
         lastClickedButton = null;
+        updateChunkNavButtonsState(false); // No chunks, disable nav buttons
     }
 
     function updateCopyButtonState(button) {
@@ -1378,21 +1554,52 @@
 
         // --- Event Listeners ---
         // Ensure these elements exist before adding event listeners
-        const themeToggleButton = document.getElementById('theme-toggle');
-        if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', toggleTheme);
-        }
+        // const themeToggleButton = document.getElementById('theme-toggle'); // Now in new sidebar
+        // if (themeToggleButton) {
+        //     themeToggleButton.addEventListener('click', toggleTheme);
+        // }
 
-        const resetAllButton = document.getElementById('resetAllButton');
-        if (resetAllButton) {
-            resetAllButton.addEventListener('click', resetAllToDefaults);
-        }
+        // const resetAllButton = document.getElementById('resetAllButton'); // Now in new sidebar
+        // if (resetAllButton) {
+        //     resetAllButton.addEventListener('click', resetAllToDefaults);
+        // }
 
         document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
 
-        document.getElementById('modeSwitcher').addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') {
-                document.getElementById('splitModeSelect').value = e.target.dataset.mode;
+        // Listener for the new sidebar's theme toggle
+        const newThemeToggleButton = document.querySelector('#expanded-sidebar-content #theme-toggle');
+        if (newThemeToggleButton) {
+            newThemeToggleButton.addEventListener('click', toggleTheme);
+        }
+
+        // Listener for the new sidebar's reset all button
+        const newResetAllButton = document.querySelector('#expanded-sidebar-content #resetAllButton');
+        if (newResetAllButton) {
+            newResetAllButton.addEventListener('click', resetAllToDefaults);
+        }
+
+        // Listener for the new sidebar's mode switcher
+        const newModeSwitcher = document.querySelector('#expanded-sidebar-content #modeSwitcher');
+        if (newModeSwitcher) {
+            newModeSwitcher.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    document.getElementById('splitModeSelect').value = e.target.dataset.mode;
+                    toggleInputSections();
+                }
+            });
+        }
+
+        // Listener for the original mode switcher (which is now empty but the div might exist if not careful)
+        // Let's ensure we are targeting the correct one or that the old one is properly handled.
+        // For now, the above selector for newModeSwitcher should handle the moved one.
+        // If an old #modeSwitcher element (not in the sidebar) still exists and has listeners, it might cause issues.
+        // The diff removes the content of the old fieldset's mode switcher, so this should be fine.
+
+        // Original listener for mode switcher in settings column - this element is MOVED.
+        // The listener should be attached to the NEW location of modeSwitcher.
+        // document.getElementById('modeSwitcher').addEventListener('click', (e) => {
+        //     if (e.target.tagName === 'BUTTON') {
+        //         document.getElementById('splitModeSelect').value = e.target.dataset.mode;
                 toggleInputSections();
             }
         });
@@ -1571,26 +1778,131 @@
         toggleInputSections();
         clearOutput();
 
-        // Hamburger menu functionality
-        const hamburger = document.getElementById('hamburger-menu');
-        const sidebar = document.getElementById('sidebar');
-        if(hamburger && sidebar) {
-          hamburger.addEventListener('click', () => {
-            sidebar.classList.toggle('sidebar-open');
-          });
-        }
-        // Optional: Close sidebar when clicking on main content (for mobile)
-        const mainContent = document.getElementById('main-content');
-        if (mainContent && sidebar) {
-            mainContent.addEventListener('click', () => {
-                if (sidebar.classList.contains('sidebar-open')) {
-                    // Only close if sidebar is open and screen is narrow (mobile)
-                    if (window.innerWidth < 1024) { // Or your desktop breakpoint
-                        sidebar.classList.remove('sidebar-open');
+        // Hamburger menu functionality (REMOVED)
+        // const hamburger = document.getElementById('hamburger-menu');
+        // const sidebar = document.getElementById('sidebar');
+        // if(hamburger && sidebar) {
+        //   hamburger.addEventListener('click', () => {
+        //     sidebar.classList.toggle('sidebar-open');
+        //   });
+        // }
+        // Optional: Close sidebar when clicking on main content (for mobile) (OLD LOGIC)
+        // const mainContent = document.getElementById('main-content');
+        // }
+
+        // New Hovering Sidebar JS
+        const hoveringSidebar = document.getElementById('hovering-sidebar');
+        const hoverSidebarToggleBtn = document.getElementById('hover-sidebar-toggle-btn');
+        const expandedSidebarContent = document.getElementById('expanded-sidebar-content');
+
+        if (hoverSidebarToggleBtn && hoveringSidebar && expandedSidebarContent) {
+            hoverSidebarToggleBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from bubbling to document listener
+                const isExpanded = hoveringSidebar.classList.toggle('expanded');
+                hoverSidebarToggleBtn.textContent = isExpanded ? '❌' : '⚙️';
+                if (isExpanded) {
+                    // Focus on the first focusable element in the sidebar
+                    const firstFocusable = expandedSidebarContent.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusable) {
+                        setTimeout(() => firstFocusable.focus(), 50); // Timeout helps ensure element is visible before focus
                     }
                 }
             });
+
+            // Close sidebar if clicked outside
+            document.addEventListener('click', (event) => {
+                if (hoveringSidebar.classList.contains('expanded') &&
+                    !expandedSidebarContent.contains(event.target) &&
+                    event.target !== hoverSidebarToggleBtn) {
+                    hoveringSidebar.classList.remove('expanded');
+                    hoverSidebarToggleBtn.textContent = '⚙️';
+                }
+            });
+            expandedSidebarContent.addEventListener('click', (event) => {
+                 event.stopPropagation(); // Prevent click inside from closing
+            });
         }
+
+        // New Sidebar Buttons Functionality
+        const sidebarScrollToTopBtn = document.getElementById('sidebarScrollToTopBtn');
+        if (sidebarScrollToTopBtn) {
+            sidebarScrollToTopBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+        }
+
+        const goToFirstChunkBtn = document.getElementById('goToFirstChunkBtn');
+        if (goToFirstChunkBtn) {
+            goToFirstChunkBtn.addEventListener('click', () => {
+                const firstChunk = document.querySelector('#chunkedTextContainer .chunk-container');
+                if (firstChunk) {
+                    firstChunk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstChunk.classList.add('chunk-highlighted');
+                    setTimeout(() => firstChunk.classList.remove('chunk-highlighted'), 1500);
+                }
+            });
+        }
+
+        const goToLastChunkBtn = document.getElementById('goToLastChunkBtn');
+        if (goToLastChunkBtn) {
+            goToLastChunkBtn.addEventListener('click', () => {
+                const chunks = document.querySelectorAll('#chunkedTextContainer .chunk-container');
+                if (chunks.length > 0) {
+                    const lastChunk = chunks[chunks.length - 1];
+                    lastChunk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    lastChunk.classList.add('chunk-highlighted');
+                    setTimeout(() => lastChunk.classList.remove('chunk-highlighted'), 1500);
+                }
+            });
+        }
+        updateChunkNavButtonsState(false); // Initially disabled
+
+        // Keyboard Shortcuts Listener
+        document.addEventListener('keydown', (event) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const ctrlKey = isMac ? event.metaKey : event.ctrlKey;
+
+            if (ctrlKey && event.key === 's') { // Ctrl+S or Cmd+S
+                event.preventDefault();
+                if (hoverSidebarToggleBtn) hoverSidebarToggleBtn.click(); // Ensure button exists
+                showStatus('mainStatus', 'Settings Toggled (Ctrl+S)', 'info', 1500);
+            } else if (ctrlKey && event.key === 'Enter') { // Ctrl+Enter or Cmd+Enter
+                event.preventDefault();
+                const mainSplitButton = document.getElementById('mainSplitButton');
+                if (mainSplitButton) mainSplitButton.click(); // Ensure button exists
+                 // showStatus is handled by processAndChunk
+            } else if (ctrlKey && event.key === '.') { // Ctrl+. or Cmd+.
+                event.preventDefault();
+                const copyNextBtn = document.getElementById('copyNextButton');
+                if (copyNextBtn && !copyNextBtn.disabled) { // Ensure button exists and is enabled
+                    copyNextUncopied();
+                     // showStatus is handled by copyNextUncopied/copyToClipboard
+                } else {
+                    showStatus('mainStatus', 'No uncopied chunks to copy or button not available.', 'info', 2000);
+                }
+            }
+        });
+
+        // Info Buttons JS
+        document.querySelectorAll('.info-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const targetId = button.dataset.infoTarget;
+                const popup = document.getElementById(targetId);
+                if (!popup) return;
+
+                const isVisible = popup.style.display === 'block';
+                // Hide all other popups
+                document.querySelectorAll('.info-popup').forEach(p => p.style.display = 'none');
+                // Toggle current popup
+                popup.style.display = isVisible ? 'none' : 'block';
+            });
+        });
+        // Close info popups if clicked outside
+         document.addEventListener('click', (event) => {
+            if (!event.target.closest('.info-btn-wrapper') && !event.target.closest('.info-popup')) {
+                 document.querySelectorAll('.info-popup').forEach(p => p.style.display = 'none');
+            }
+        });
+
 
         showStatus('mainStatus', 'Ready!', 'success', 2500);
     });
