@@ -1,1912 +1,1089 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text/JSON Chunker Pro</title>
-  <style>
-    :root {
-      --bg-color: #f8f9fa;
-      --fg-color: #ffffff;
-      --text-color: #212529;
-      --text-muted-color: #6c757d;
-      --border-color: #dee2e6;
-      --border-color-light: #e9ecef;
-      --primary-color: #0d6efd;
-      --primary-hover-color: #0b5ed7;
-      --success-color: #198754;
-      --success-hover-color: #157347;
-      --danger-color: #dc3545;
-      --danger-hover-color: #bb2d3b;
-      --warning-color: #ffc107;
-      --warning-color-rgb: 255, 193, 7; /* Added RGB for rgba() */
-      --info-color: #0dcaf0;
-      --secondary-color: #6c757d;
-      --secondary-hover-color: #5c636a;
-      --font-sans-serif: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      --font-monospace: 'Courier New', Courier, monospace;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-      --border-radius: 0.375rem;
-
-      /* New variables for sidebar */
-      --sidebar-width: 280px;
-      --sidebar-bg-color: var(--fg-color);
-      --sidebar-border-color: var(--border-color);
-      --sidebar-transition-speed: 0.3s;
-
-      /* New accent colors for modern UI */
-      --accent-color: #6a11cb; /* A vibrant purple */
-      --accent-hover-color: #9345dd;
-      --info-btn-bg-color: #2196F3; /* Sky blue for info buttons */
-      --info-popup-bg-color: var(--fg-color);
-      --info-popup-text-color: var(--text-color);
-    }
-
-    body.dark-mode {
-      --bg-color: #121212;
-      /* --sidebar-bg-color: var(--fg-color); /* Or a slightly different dark shade if preferred */
-      /* --sidebar-border-color: var(--border-color); */
-      --fg-color: #1e1e1e;
-      --info-popup-bg-color: #2a2a2a; /* Slightly lighter than main dark background for popups */
-      --info-popup-text-color: var(--text-color);
-      --text-color: #e8eaed;
-      --text-muted-color: #9aa0a6;
-      --border-color: #444;
-      --border-color-light: #2a2a2a;
-    }
-
-    html {
-      box-sizing: border-box;
-    }
-    *, *:before, *:after {
-      box-sizing: inherit;
-    }
-
-    body {
-      font-family: var(--font-sans-serif);
-      margin: 0;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
-      font-size: 16px; /* Base font size for mobile */
-      line-height: 1.6;
-    }
-
-    #main-content {
-      padding-top: 60px; /* Space for fixed header */
-      transition: margin-left var(--sidebar-transition-speed); /* For desktop sidebar */
-    }
-
-    .main-container {
-        display: flex; /* Changed to flex for mobile stacking */
-        flex-direction: column; /* Stack settings and output vertically */
-        gap: 1.5rem; /* Adjusted gap */
-        padding: 1rem;
-        max-width: 1600px;
-        margin: 0 auto;
-    }
-
-    #settings-column, #output-column {
-        width: 100%; /* Take full width on mobile */
-    }
-
-    @media (min-width: 768px) { /* Tablet and larger */
-        .main-container {
-            /* Keep flex for potential sidebar adjustments, or switch to grid */
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith Term Processor v5.4</title> <!-- Version Bump -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #f0f4f8; 
+            --bg-panel: #ffffff;
+            --primary-500: #3b82f6; 
+            --primary-600: #2563eb; 
+            --primary-700: #1d4ed8; 
+            --secondary-500: #8b5cf6; 
+            --secondary-600: #7c3aed; 
+            --success-500: #10b981; 
+            --danger-500: #ef4444;  
+            --danger-600: #dc2626;  
+            --warning-500: #f59e0b; 
+            --warning-700: #b45309; 
+            --neutral-800: #1f2937; 
+            --neutral-700: #374151; 
+            --neutral-500: #6b7280; 
+            --neutral-300: #d1d5db; 
+            --neutral-200: #e5e7eb; 
+            --neutral-100: #f3f4f6; 
+            --font-sans: 'Inter', sans-serif;
+            --radius-md: 0.375rem; 
+            --radius-lg: 0.5rem;   
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-    }
 
-    @media (min-width: 1024px) { /* Desktop */
-        #main-content {
-            /* margin-left: var(--sidebar-width); /* Example if sidebar is permanently open */
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: var(--neutral-300); }
+        html { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;}
+        body { margin: 0; background-color: var(--bg-main); color: var(--neutral-700); padding: 1.5rem; }
+
+        .app-container { max-width: 1400px; margin-left: auto; margin-right: auto; }
+
+        .app-title-bar {
+            margin-bottom: 2rem; text-align: center; padding: 1.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+            color: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
         }
-        .main-container {
-            flex-direction: row; /* Side-by-side layout */
-            grid-template-columns: minmax(450px, 1fr) 1.5fr; /* Restore grid for desktop if preferred */
+        .app-title-bar h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.025em;}
+        .app-title-bar p { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
+
+        .grid-layout { display: grid; gap: 1.5rem; }
+        @media (min-width: 1024px) { 
+            .grid-layout { grid-template-columns: repeat(3, 1fr); }
+            .grid-layout .col-span-1 { grid-column: span 1 / span 1; }
+            .grid-layout .col-span-2 { grid-column: span 2 / span 2; }
+            .grid-layout .col-span-3 { grid-column: span 3 / span 3; }
+        }
+         @media (min-width: 768px) and (max-width: 1023px) { 
+            .grid-layout { grid-template-columns: repeat(2, 1fr); }
+            .grid-layout .md-col-span-1 { grid-column: span 1 / span 1; }
+            .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
+        }
+
+        .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.5rem; }
+        .panel-title { display: flex; align-items: center; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--neutral-200); color: var(--neutral-800); }
+        .panel-title i { margin-right: 0.75rem; color: var(--primary-500); font-size:1.2em; }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--neutral-500); }
+        
+        input[type="text"], textarea, .file-input-wrapper {
+            width: 100%; padding: 0.625rem 0.875rem; border-radius: var(--radius-md);
+            font-size: 0.875rem; background-color: white; border: 1px solid var(--neutral-300);
+            transition: var(--transition-base); color: var(--neutral-700);
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: 2px solid transparent; outline-offset: 2px;
+            border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(59,130,246,0.3); 
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        #pastedDedupeList { min-height: 120px; } /* Specific height for dedupe list */
+
+
+        .file-input-wrapper { position: relative; display: block; }
+        .file-input-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-input-wrapper .file-display-text { color: var(--neutral-500); }
+        .file-input-wrapper .file-display-text.has-file { color: var(--neutral-700); font-weight: 500; }
+        .file-input-wrapper i { color: var(--secondary-500); margin-right: 0.5rem; }
+        
+        .btn-group { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-top: 0.75rem; }
+        .btn {
+            padding: 0.6rem 1.1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500;
+            transition: var(--transition-base); display: inline-flex; align-items: center; justify-content: center;
+            gap: 0.4rem; cursor: pointer; line-height: 1.25rem; text-decoration: none;
+            box-shadow: var(--shadow-sm); border: 1px solid transparent;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(59,130,246,0.4); }
+        .btn i { font-size:0.9em; }
+
+        .btn-primary { background-color: var(--primary-500); color: white; }
+        .btn-primary:hover { background-color: var(--primary-600); }
+        .btn-secondary { background-color: var(--secondary-500); color: white; }
+        .btn-secondary:hover { background-color: var(--secondary-600); }
+        .btn-success { background-color: var(--success-500); color: white; }
+        .btn-success:hover { background-color: #059669; /* Emerald 600 */ }
+        .btn-danger { background-color: var(--danger-500); color: white; }
+        .btn-danger:hover { background-color: var(--danger-600); }
+        .btn-outline { background-color: transparent; border-color: var(--neutral-300); color: var(--neutral-500); }
+        .btn-outline:hover { background-color: var(--neutral-100); border-color: var(--neutral-500); color:var(--neutral-700); }
+        .btn-outline.btn-danger { color: var(--danger-500); border-color: var(--danger-500); }
+        .btn-outline.btn-danger:hover { background-color: var(--danger-500); color:white; }
+
+
+        .btn-icon { padding: 0.5rem; }
+        .btn-main-action { 
+            padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        }
+        .btn-main-action:hover {
+             background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+        }
+        .btn-main-action .spinner { display: none; width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; border-top-color: white; animation: spin 0.7s linear infinite; margin-right: 0.5rem;}
+        .btn-main-action.loading .spinner { display: inline-block; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #chapterInputsContainer {
+            scrollbar-width: thin; 
+            scrollbar-color: var(--neutral-300) var(--neutral-100); 
+        }
+        #chapterInputsContainer::-webkit-scrollbar { width: 8px; }
+        #chapterInputsContainer::-webkit-scrollbar-track { background: var(--neutral-100); border-radius: 4px;}
+        #chapterInputsContainer::-webkit-scrollbar-thumb { background-color: var(--neutral-300); border-radius: 4px; border: 2px solid var(--neutral-100); }
+        #chapterInputsContainer::-webkit-scrollbar-thumb:hover { background-color: var(--neutral-500); }
+
+
+        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: rgba(243,244,246,0.5); } 
+        .chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .chapter-label { font-weight: 500; font-size:0.9rem; color: var(--secondary-500);}
+
+        .status-message {
+            margin-top: 0.75rem; padding: 0.85rem 1.1rem; border-radius: var(--radius-md); font-size: 0.875rem;
+            display: flex; align-items: center; gap: 0.6rem; border: 1px solid;
+        }
+        .status-message i { font-size: 1.2em; }
+        .status-success { background-color: #e0f2f1; color: #00796b; border-color: #a7d8c8; } 
+        .status-warning { background-color: #fff8e1; color: var(--warning-700); border-color: #ffecb3; } 
+        .status-danger  { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; } 
+        .status-info    { background-color: #e3f2fd; color: #1565c0; border-color: #bbdefb; } 
+
+        .storage-actions-group {
+            margin-top:1rem; padding-top: 1rem; border-top: 1px solid var(--neutral-200);
+        }
+        .storage-actions-group .form-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--neutral-500); margin-bottom: 0.5rem;}
+
+        #processingLog { border: 1px solid var(--neutral-200); background-color: var(--neutral-100); }
+        #processingLog strong { color: var(--neutral-700); }
+        #processingLog ul { list-style: none; padding: 0; margin:0.5rem 0 0 0; max-height: 150px; overflow-y: auto; font-size: 0.8rem; color:var(--neutral-500);}
+        #processingLog li { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--neutral-200);}
+        #processingLog li:last-child { border-bottom: none;}
+        #processingLog li i { font-size: 0.9em; margin-right: 0.5rem; opacity: 0.8;}
+
+        .output-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-bottom: 0.75rem; }
+
+        .modal-overlay { position: fixed; inset: 0; background-color: rgba(17, 24, 39, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(5px); }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background-color: var(--bg-panel); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 90%; max-width: 500px; text-align: center; }
+        .modal-title { font-size: 1.375rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--neutral-800);}
+        .modal-body { font-size: 0.9rem; color: var(--neutral-500); margin-bottom: 1.75rem; line-height: 1.6;}
+        .modal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltip-text {
+            visibility: hidden; background-color: var(--neutral-800); color: white; text-align: center;
+            border-radius: var(--radius-md); padding: 0.375rem 0.75rem; position: absolute; z-index: 1;
+            bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s;
+            font-size: 0.75rem; white-space: nowrap; box-shadow: var(--shadow-md);
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+        .session-config-grid-internal {
             display: grid;
-        }
-        #output-column {
-             max-height: calc(100vh - 5rem - 2rem); /* header height - main-content padding */
-             overflow-y: auto;
-             padding-right: 1rem;
-        }
-    }
-
-    /* --- App Header --- */
-    .app-header {
-      /* grid-column: 1 / -1; */ /* No longer needed with body > header structure */
-      display: flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      background-color: var(--fg-color);
-      border-bottom: 1px solid var(--border-color);
-      position: fixed; /* Fixed header */
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000; /* High z-index for header */
-      height: 60px;
-    }
-    /* #hamburger-menu styling removed as element is deleted */
-    .app-header h1 { margin: 0; font-size: 1.25rem; flex-grow: 1; text-align: center; } /* Adjusted for mobile */
-
-    .header-controls { display: flex; align-items: center; gap: 0.5rem; } /* Reduced gap for mobile */
-
-    /* --- Old #sidebar styling removed --- */
-
-    /* --- New Hovering Sidebar --- */
-    #hovering-sidebar {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1200; /* Above most other elements */
-      transition: all 0.3s ease-in-out;
-    }
-
-    #hover-sidebar-toggle-btn {
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.5rem; /* Icon size */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: var(--shadow-md);
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
-    #hover-sidebar-toggle-btn:hover {
-      background-color: var(--accent-hover-color);
-      transform: scale(1.1);
-    }
-
-    #expanded-sidebar-content {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.95);
-      background-color: var(--fg-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-      padding: 1.5rem;
-      width: 90%;
-      max-width: 350px; /* Max width for the modal */
-      max-height: 80vh;
-      overflow-y: auto;
-      z-index: 1199; /* Just below the toggle button if it overlaps, or manage visibility */
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem; /* Space between items in the expanded sidebar */
-    }
-
-    #hovering-sidebar.expanded #expanded-sidebar-content {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    #hovering-sidebar.expanded #hover-sidebar-toggle-btn {
-      /* Optional: style toggle btn differently when sidebar is open */
-      /* background-color: var(--secondary-color); */
-    }
-
-    /* Styling for buttons within the expanded sidebar */
-    #expanded-sidebar-content .button,
-    #expanded-sidebar-content .mode-switcher button {
-      width: 100%;
-      padding: 0.6rem 1rem; /* Consistent padding */
-      font-size: 0.95rem; /* Consistent font size */
-      /* Icons are already part of button text, or could be separate spans */
-    }
-    #expanded-sidebar-content .mode-switcher {
-        margin-bottom: 0.5rem; /* Space below mode switcher if needed */
-    }
-     #expanded-sidebar-content #theme-toggle,
-     #expanded-sidebar-content #resetAllButton {
-        /* Using existing button classes is fine, ensure they fit well */
-     }
-     #expanded-sidebar-content #sidebarScrollToTopBtn,
-     #expanded-sidebar-content #goToFirstChunkBtn,
-     #expanded-sidebar-content #goToLastChunkBtn {
-        background-color: var(--secondary-color);
-     }
-     #expanded-sidebar-content #sidebarScrollToTopBtn:hover,
-     #expanded-sidebar-content #goToFirstChunkBtn:hover,
-     #expanded-sidebar-content #goToLastChunkBtn:hover {
-        background-color: var(--secondary-hover-color);
-     }
-
-
-    /* --- Info Buttons and Popups --- */
-    .info-btn-wrapper {
-        position: relative; /* For positioning info button and popup */
-        display: flex; /* Align item and info button */
-        align-items: center;
-        gap: 8px; /* Space between item and info button */
-        margin-bottom: 0.5rem; /* Add some space below items with info buttons */
-    }
-    .info-btn-wrapper > *:first-child {
-        flex-grow: 1; /* Allow the main control (e.g. button) to take available space */
-    }
-
-    .info-btn {
-      background-color: var(--info-btn-bg-color);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 0.8rem; /* 'i' character size */
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      box-shadow: var(--shadow-sm);
-      transition: background-color 0.2s ease;
-      flex-shrink: 0; /* Prevent info button from shrinking */
-    }
-    .info-btn:hover {
-      background-color: #1976D2; /* Darker blue on hover */
-    }
-
-    .info-popup {
-      display: none; /* Hidden by default, shown by JS */
-      position: absolute;
-      top: 100%; /* Position below the info button wrapper */
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% + 20px); /* Slightly wider than the wrapper */
-      max-width: 300px;
-      background-color: var(--info-popup-bg-color);
-      color: var(--info-popup-text-color);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 10px;
-      font-size: 0.85rem;
-      z-index: 1300; /* Above sidebar content */
-      box-shadow: var(--shadow-md);
-      margin-top: 8px; /* Space between button and popup */
-    }
-    .info-popup::before { /* Arrow pointing to the button */
-        content: '';
-        position: absolute;
-        bottom: 100%; /* At the top of the popup */
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: transparent transparent var(--border-color) transparent;
-    }
-    body.dark-mode .info-popup::before {
-        border-color: transparent transparent var(--border-color) transparent;
-    }
-
-    /* --- QoL Highlight & Messages --- */
-    .chunk-highlighted {
-      background-color: rgba(var(--warning-color-rgb), 0.2); /* Using warning color for highlight */
-      border-left: 3px solid var(--warning-color);
-      transition: background-color 0.3s ease-out, border-left 0.3s ease-out;
-    }
-    body.dark-mode .chunk-highlighted {
-      background-color: rgba(var(--warning-color-rgb), 0.3); /* Dark mode highlight */
-    }
-
-    .empty-output-message {
-        text-align: center;
-        color: var(--text-muted-color);
-        font-style: italic;
-        padding: 2rem;
-        border: 2px dashed var(--border-color-light);
-        border-radius: var(--border-radius);
-        margin-top: 1rem;
-    }
-
-    /* --- General Elements --- */
-    h3 { margin-top: 0; color: var(--primary-color); }
-    p { font-size:0.9em; color: var(--text-muted-color); margin-top: 5px; line-height: 1.5; }
-    textarea, input, select {
-        width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid var(--border-color);
-        border-radius: var(--border-radius); background-color: var(--bg-color); color: var(--text-color);
-        font-family: var(--font-monospace);
-        margin-bottom: 5px; font-size: 14px;
-    }
-    textarea { resize: vertical; }
-
-    /* --- Collapsible Fieldset Styling --- */
-    .collapsible-fieldset {
-        border: 1px solid var(--border-color); border-radius: var(--border-radius);
-        background-color: var(--fg-color); box-shadow: var(--shadow-sm);
-        margin-bottom: 1.5rem;
-    }
-    .fieldset-header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 0.65rem 1rem; /* Slightly adjusted padding for mobile tap target */
-        cursor: pointer; user-select: none;
-        border-bottom: 1px solid var(--border-color-light);
-    }
-    .fieldset-header h3 { margin: 0; font-size: 1.05rem; color: var(--text-color); pointer-events: none; } /* Slightly adjusted font size */
-    .fieldset-content { padding: 1rem; border-top: 1px solid var(--border-color); display: block; }
-    .collapsible-fieldset.collapsed .fieldset-content { display: none; }
-    .collapsible-fieldset.collapsed .fieldset-header { border-bottom: none; }
-    .toggle-icon { transition: transform 0.2s; pointer-events: none; }
-    .collapsible-fieldset.collapsed .toggle-icon { transform: rotate(-90deg); }
-
-
-    /* --- Mode Switcher --- */
-    .mode-switcher { display: flex; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; }
-    .mode-switcher button { flex: 1; padding: 0.65rem 0.5rem; /* Increased padding for better tap height */ background: transparent; border: none; cursor: pointer; color: var(--text-muted-color); font-weight: bold; font-size: 0.9rem; text-align: center;}
-    .mode-switcher button.active { background-color: var(--primary-color); color: white; }
-
-    /* --- Inputs and Controls --- */
-    .input-container {
-        margin-bottom: 1rem;
-        display: flex; /* Use flex for label-input alignment */
-        flex-direction: column; /* Stack label above input by default */
-        gap: 0.25rem; /* Space between label and input */
-    }
-    .input-container label {
-        /* display: block; */ /* No longer needed with flex-direction column */
-        margin-bottom: 0; /* Adjust as gap is now used */
-        font-weight: bold;
-        color: var(--text-color);
-    }
-    .input-container label.inline-label { /* For checkboxes etc. */
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        font-weight: normal;
-        margin-left: 0; /* Reset margin if previously set */
-    }
-    .input-container input[type="checkbox"].inline-label { /* specific for checkbox itself if it has class */
-        width: auto;
-        margin-right:0;
-    }
-    .input-container input[type="number"],
-    .input-container select {
-        padding: 10px 8px; /* Slightly larger padding for easier interaction */
-        font-size: 1rem; /* Ensure readable font size */
-    }
-    /* Adjustments for wider screens if label and input should be side-by-side */
-    @media (min-width: 500px) {
-        .input-container.can-be-row { /* Add this class to containers that can go row-wise */
-             flex-direction: row;
-             align-items: center;
-             gap: 0.75rem; /* Adjust gap for row layout */
-        }
-        .input-container.can-be-row label {
-             flex-basis: 180px; /* Give label a fixed width or percentage */
-             flex-shrink: 0; /* Prevent label from shrinking */
-        }
-        .input-container.can-be-row input,
-        .input-container.can-be-row select {
-            flex-grow: 1;
-        }
-    }
-
-
-    #plainTextInputArea { /* Specific styling for plain text input */
-        min-height: 200px; /* Good default mobile height */
-        height: 250px; /* Keep existing default height */
-    }
-    #plainTextInfo { /* Ensure it's visible and well-spaced */
-        display: block; /* Make it block to take its own space */
-        text-align: right;
-        margin-bottom: 0.5rem;
-    }
-
-
-    .textarea-with-actions { position: relative; }
-    .textarea-actions {
-        position: absolute;
-        top: 5px; /* Minor adjustment */
-        right: 5px;
-        display: flex;
-        gap: 5px; /* Slightly increased gap */
-        background-color: rgba(var(--bg-color-rgb), 0.85); /* Use RGB for opacity on bg */
-        padding: 4px; /* Increased padding */
-        border-radius: var(--border-radius);
-        opacity: 0.9;
-        z-index: 1; /* Ensure it's above the textarea */
-    }
-    .textarea-action-btn {
-        background: var(--border-color-light);
-        border: 1px solid var(--border-color);
-        color: var(--text-muted-color);
-        padding: 5px 8px; /* Increased padding for better tap target */
-        font-size: 12px; /* Slightly larger font */
-        border-radius: var(--border-radius);
-        cursor: pointer;
-    }
-    .textarea-action-btn:hover {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-hover-color);
-        opacity: 1;
-    }
-    /* RGB versions of bg-color are defined in the main :root and body.dark-mode sections now */
-
-    /* Styling for file input containers and their labels */
-    .file-input-container { /* Inherits .input-container styles (flex column) */
-        margin-bottom: 1rem; /* Standard margin */
-    }
-    .file-input-container label { /* Standard label styling */
-        font-weight: bold;
-        color: var(--text-color);
-        margin-bottom: 0.25rem; /* Space between label and input */
-    }
-    .file-input-container label code {
-        font-size: 0.85em;
-        color: var(--text-muted-color);
-        background-color: var(--border-color-light);
-        padding: 0.1em 0.3em;
-        border-radius: 3px;
-    }
-    .input-container input[type="file"] { /* General styling for file inputs */
-        font-size: 0.9rem; /* Slightly smaller than other inputs if needed, or keep at 1rem */
-        padding: 6px; /* Adjust padding to align with visual height of other inputs */
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        background-color: var(--bg-color);
-        color: var(--text-color);
-    }
-    /* Attempt to style the button part of the file input, browser support varies */
-    .input-container input[type="file"]::file-selector-button {
-      padding: 0.4em 0.8em;
-      border: 1px solid var(--border-color);
-      background-color: var(--border-color-light);
-      color: var(--text-color);
-      border-radius: var(--border-radius);
-      margin-right: 10px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .input-container input[type="file"]::file-selector-button:hover {
-      background-color: var(--border-color);
-    }
-    body.dark-mode .input-container input[type="file"]::file-selector-button {
-      background-color: var(--border-color); /* Darker button for dark mode */
-      border-color: var(--border-color-light);
-    }
-    body.dark-mode .input-container input[type="file"]::file-selector-button:hover {
-      background-color: var(--border-color-light);
-    }
-
-    /* JSON Input Specifics */
-    .json-chapter-header {
-        display: flex;
-        flex-wrap: wrap; /* Allow wrapping on small screens */
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px; /* Increased margin */
-        gap: 8px;
-    }
-    .json-chapter-header label {
-        flex-basis: 100%; /* Label takes full width initially */
-        font-weight: normal;
-        margin-bottom: 4px; /* Space below label when wrapped */
-    }
-    @media (min-width: 480px) { /* Adjust for slightly larger screens */
-        .json-chapter-header label {
-            flex-basis: auto; /* Allow label and buttons on same line */
-            flex-grow: 1;
-            margin-bottom: 0;
-        }
-    }
-    .json-chapter-header .button { /* Ensure buttons in header don't shrink too much */
-        flex-shrink: 0;
-    }
-    .json-chapter-input-container {
-        border: 1px dashed var(--border-color);
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: var(--border-radius);
-        background-color: var(--bg-color);
-    }
-    textarea.json-chapter-input {
-        min-height: 120px; /* Default height for JSON input textareas */
-        resize: vertical;
-    }
-
-    /* Container for Add/Clear JSON buttons and count */
-    .json-global-actions {
-        display: flex;
-        flex-wrap: wrap; /* Allow wrapping */
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-        margin-bottom: 1rem; /* Add some space below */
-    }
-    .json-global-actions #jsonObjectsCount {
-        margin-left: auto; /* Keep count to the right if space allows */
-        white-space: nowrap;
-    }
-    /* On very small screens, let count be on its own line if needed */
-    @media (max-width: 400px) {
-      .json-global-actions #jsonObjectsCount {
-        margin-left: 0;
-        width: 100%;
-        text-align: left; /* Or center/right as preferred */
-        margin-top: 5px;
-      }
-    }
-
-
-    /* Find & Replace Specifics */
-    #findReplacePairsContainer {
-        max-height: 250px;
-        overflow-y: auto;
-        padding-right: 5px;
-        margin-bottom: 1rem; /* Add space below the pairs container */
-    }
-    .find-replace-pair {
-        display: flex;
-        flex-wrap: wrap; /* Allow wrapping for very narrow screens */
-        align-items: center;
-        margin-bottom: 8px;
-        gap: 8px;
-    }
-    .find-replace-pair input[type="text"] {
-        flex-grow: 1; /* Allow inputs to grow */
-        flex-basis: 100px; /* Minimum base width before growing/shrinking */
-        min-width: 80px; /* Prevent excessive shrinking */
-    }
-    .find-replace-pair .arrow {
-        flex-shrink: 0;
-        text-align: center;
-    }
-    .find-replace-pair .button { /* Ensure remove button is aligned */
-        flex-shrink: 0;
-    }
-
-    /* Checkbox controls for Find/Replace */
-    .find-replace-controls {
-        display: flex;
-        flex-wrap: wrap; /* Allow checkboxes to wrap */
-        gap: 15px;
-        margin-bottom: 10px;
-        align-items: center; /* Align items nicely */
-    }
-    .find-replace-controls label.inline-label { /* Ensure good tap targets for checkboxes */
-        display: inline-flex; /* Use flex to align checkbox and label text */
-        align-items: center;
-        gap: 0.35rem; /* Space between checkbox and its text */
-        padding: 0.25rem 0; /* Add some vertical padding */
-    }
-    .find-replace-controls input[type="checkbox"] {
-       width: auto; /* Override default 100% width for inputs */
-       margin-right: 0; /* Remove default margin if any, using gap instead */
-    }
-
-    /* Button group for adding new rule */
-    .find-replace-add-rule-group {
-        display: flex;
-        align-items: center;
-        gap: 10px; /* Space between button and status message */
-        margin-top: 10px;
-    }
-
-    /* --- Buttons --- */
-    button, .button {
-      padding: 10px 15px; color: white; border: none; border-radius: var(--border-radius); cursor: pointer;
-      font-size: 16px; transition: background-color 0.2s ease, transform 0.1s ease; white-space: nowrap;
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-    }
-    button:active, .button:active { transform: scale(0.98); }
-    .btn-primary { background-color: var(--primary-color); }
-    .btn-primary:hover { background-color: var(--primary-hover-color); }
-    .btn-success { background-color: var(--success-color); }
-    .btn-success:hover { background-color: var(--success-hover-color); }
-    .btn-secondary { background-color: var(--secondary-color); color: white; }
-    .btn-secondary:hover { background-color: var(--secondary-hover-color); }
-    .btn-danger { background-color: var(--danger-color); }
-    .btn-danger:hover { background-color: var(--danger-hover-color); }
-    .btn-warning { background-color: var(--warning-color); color: #333; }
-    .btn-warning:hover { background-color: #e0a800; }
-    .btn-info { background-color: var(--info-color); color: white; }
-    .btn-info:hover { background-color: #0aa3bf; }
-    .btn-sm { padding: 5px 10px; font-size: 12px; }
-    .btn-icon { padding: 0.5rem; }
-    .btn-block { width: 100%; display: block; }
-    button:disabled { background-color: #ccc !important; cursor: not-allowed; }
-    body.dark-mode button:disabled { background-color: #555 !important; }
-
-    /* --- Output Section --- */
-    #output-column { display: none; } /* Initially hidden, shown by JS */
-    #outputControls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem; /* Adjusted gap */
-      padding: 0.75rem; /* Adjusted padding */
-      background-color: var(--fg-color);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 1rem;
-      position: sticky;
-      top: 60px; /* Account for fixed header height */
-      z-index: 10; /* Below header and sidebar */
-    }
-    #outputControls h4 {
-        margin: 0;
-        padding: 0;
-        color: var(--primary-color);
-        font-size: 1.1rem; /* Ensure good readability */
-        margin-right: auto; /* Push buttons to the right if space allows */
-    }
-    #outputControls .button { /* Ensure buttons in this bar have good tap size */
-        padding: 8px 12px; /* Slightly larger than default .btn-sm */
-        font-size: 0.9rem;
-    }
-
-    .chunk-container {
-      display: flex;
-      flex-direction: column; /* Stack vertically on mobile by default */
-      background-color: var(--fg-color);
-      padding: 0.75rem; /* Adjusted padding for mobile */
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      gap: 0.75rem; /* Adjusted gap for mobile */
-      margin-bottom: 1rem;
-      transition: background-color 0.3s, border-color 0.3s;
-    }
-    .chunk-container.copied {
-        border-color: var(--success-color);
-        background-color: #1987541a;
-    }
-    .chunk-title {
-        font-weight: bold;
-        color: var(--primary-color);
-        font-size: 1rem; /* Slightly larger for mobile */
-        text-align: left; /* Align left when stacked */
-        padding-top: 0; /* Remove specific padding-top */
-        margin-bottom: 0.25rem; /* Space below title */
-    }
-    .chunk-textarea-wrapper {
-        width: 100%; /* Ensure it takes full width */
-    }
-    .chunk-textarea-wrapper textarea {
-        background-color: var(--bg-color);
-        min-height: 100px; /* Minimum visible area */
-        height: 150px; /* Default height */
-        width: 100%; /* Take full width of its wrapper */
-    }
-    .button-action-wrapper {
-        display: flex;
-        flex-direction: row; /* Keep button and count in a row */
-        align-items: center;
-        gap: 0.75rem; /* Space between button and count */
-        width: 100%; /* Take full width to align button to one side */
-        justify-content: flex-end; /* Align copy button to the right */
-    }
-    .button-action-wrapper .button { /* Ensure copy button is appropriately sized */
-       padding: 0.5rem 0.75rem; /* Adjust padding as needed */
-       font-size: 0.9rem;
-    }
-    .copy-count-display {
-        font-size: 0.85em;
-        color: var(--text-muted-color);
-    }
-
-    /* Desktop layout for .chunk-container */
-    @media (min-width: 768px) { /* Or your preferred breakpoint for side-by-side */
-        .chunk-container {
-            flex-direction: row;
-            align-items: flex-start;
             gap: 1rem;
-            padding: 1rem;
+            grid-template-columns: 1fr; 
         }
-        .chunk-title {
-            min-width: 90px; /* Restore min-width */
-            padding-top: 8px; /* Restore padding */
-            text-align: right; /* Restore text-align */
-            font-size: 0.9em;
-            margin-bottom: 0;
+        @media (min-width: 500px) { 
+            .session-config-grid-internal {
+                grid-template-columns: 1fr 1fr;
+            }
         }
-         .chunk-textarea-wrapper textarea {
-            height: auto; /* Allow JS to set or use default if needed */
-         }
-        .button-action-wrapper {
-            flex-direction: column; /* Stack button and count vertically again */
-            align-items: center;
-            gap: 5px;
-            width: auto; /* Reset width */
-            justify-content: center; /* Center items in the column */
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-    }
+        .dedupe-list-actions .btn { flex-grow: 1; } /* Make buttons in dedupe list actions take full width in group */
 
-
-    /* --- Status & Indicators --- */
-     #loadingIndicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; background-color: rgba(0, 0, 0, 0.8); color: white; border-radius: 8px; z-index: 1000; font-size: 1.1em; box-shadow: var(--shadow-md); }
-     .status-message { font-size: 0.85em; margin-top: 4px; display: inline-block; padding: 5px 8px; border-radius: 4px; border: 1px solid transparent;}
-     .status-success { color: #0f5132; background-color: #d1e7dd; border-color: #badbcc;}
-     .status-error   { color: #842029; background-color: #f8d7da; border-color: #f5c2c7;}
-     body.dark-mode .status-success { background-color: #032d18; color: #75b798; border-color: #198754; }
-     body.dark-mode .status-error   { background-color: #381114; color: #f1aeb5; border-color: #842029; }
-     #scrollToTopBtn { display: none; position: fixed; bottom: 20px; right: 30px; z-index: 99; opacity: 0.7; }
-     #scrollToTopBtn:hover { opacity: 1; }
-     .info-counter { background-color: var(--border-color-light); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 8px; font-size:0.9em; }
-
-    /* --- Responsive Adjustments --- */
-    @media (min-width: 1024px) { /* Desktop */
-      /* By default, sidebar is collapsible on desktop too. */
-      /* To make sidebar permanently visible on desktop: */
-      /*
-      #sidebar {
-        transform: translateX(0);
-        z-index: 100;
-      }
-      #main-content {
-        margin-left: var(--sidebar-width);
-      }
-      #hamburger-menu {
-        display: none;
-      }
-      #sidebar { padding-top: 70px; }
-      */
-    }
-
-  </style>
+    </style>
 </head>
-
 <body>
-  <div id="hovering-sidebar" class="hover-sidebar-collapsed"> <!-- Class 'expanded' will be toggled by JS -->
-      <button id="hover-sidebar-toggle-btn" title="Open Settings">⚙️</button>
-      <div id="expanded-sidebar-content"> <!-- style="display: none;" removed, CSS handles visibility -->
-          <div class="info-btn-wrapper">
-            <button id="theme-toggle" class="button btn-secondary btn-sm btn-icon" title="Toggle Dark/Light Theme">🌓</button>
-            <button class="info-btn" data-info-target="theme-toggle-info">i</button>
-            <div id="theme-toggle-info" class="info-popup">Switches between light and dark themes. Preference is saved. Shortcut: Ctrl+S / Cmd+S to toggle settings panel.</div>
-          </div>
-          <div class="info-btn-wrapper">
-            <button id="resetAllButton" class="button btn-danger btn-sm" title="Clear all settings and inputs, reload page">Reset All</button>
-            <button class="info-btn" data-info-target="reset-all-info">i</button>
-            <div id="reset-all-info" class="info-popup">Clears all your current inputs, settings, and output. The page will reload to its default state. This cannot be undone.</div>
-          </div>
-          <div class="info-btn-wrapper">
-            <div class="mode-switcher" id="modeSwitcher">
-              <button data-mode="json" class="active">JSON Objects</button>
-              <button data-mode="text">Plain Text</button>
-            </div>
-            <button class="info-btn" data-info-target="mode-switcher-info">i</button>
-            <div id="mode-switcher-info" class="info-popup">Choose your input mode: "JSON Objects" for structured JSON data, or "Plain Text" for simple text.</div>
-          </div>
-          <button id="sidebarScrollToTopBtn" title="Scroll to Top" class="button">⬆️ Top</button>
-          <button id="goToFirstChunkBtn" title="Go to First Chunk" class="button">⏬ First Chunk</button>
-          <button id="goToLastChunkBtn" title="Go to Last Chunk" class="button">⏫ Last Chunk</button>
-      </div>
-  </div>
+    <div class="app-container">
+        <header class="app-title-bar">
+            <h1><i class="fas fa-microchip"></i> Zenith Term Processor v5.4</h1>
+            <p>Intelligent Term Extraction with Centralized Project Deduplication</p>
+        </header>
 
-  <header class="app-header">
-    <h1>Chunker Pro</h1>
-    <div class="header-controls">
-      <span id="mainStatus" class="status-message" style="display:none;"></span>
-      <!-- Theme toggle and Reset All moved to new sidebar -->
+        <div class="grid-layout">
+            <!-- Project Setup Panel -->
+            <div class="panel col-span-1 md-col-span-1">
+                <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Control</h2>
+                <div class="form-group">
+                    <label for="novelNameInput" class="form-label">Novel/Project Name:</label>
+                    <input type="text" id="novelNameInput" placeholder="E.g., My Awesome Novel">
+                    <small class="form-label" style="margin-top:4px;font-size:0.75rem;">Used for loading/saving the deduplication list below.</small>
+                </div>
+                <div id="storedTermsInfo" class="status-message status-info" style="display:none; font-size:0.8rem; flex-direction: column; align-items: flex-start;">
+                    <!-- Info about stored terms count and size warning appears here -->
+                </div>
+                
+                <div class="storage-actions-group">
+                    <h3 class="form-label">External Storage Actions</h3>
+                     <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
+                        <button id="exportStoredBtn" onclick="exportPersistentDedupe()" class="btn btn-outline" style="width:100%;">
+                            <i class="fas fa-file-export"></i>Export Dedupe List for Project
+                        </button>
+                        <div class="file-input-wrapper" style="width:100%;">
+                            <input type="file" id="importDedupeFile" accept=".json,.txt,.csv" onchange="handleImportDedupeFile(this)">
+                            <div class="btn btn-outline file-display-text" id="fileDisplayText_importDedupe" style="width:100%; text-align:left; justify-content: flex-start;">
+                                <i class="fas fa-file-import"></i>Import Dedupe List to Textbox...
+                            </div>
+                        </div>
+                        <button id="clearStoredBtn" onclick="confirmClearStorage()" class="btn btn-outline btn-danger" style="width:100%; margin-top: 0.25rem;">
+                            <i class="fas fa-trash-alt"></i>Clear Project's Stored Dedupe List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter Input Panel -->
+            <div class="panel col-span-1 md-col-span-1">
+                <h2 class="panel-title"><i class="fas fa-book-reader"></i>Chapter JSON Input</h2>
+                <div id="chapterInputsContainer" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Chapter input boxes dynamically added here -->
+                </div>
+                <div class="btn-group" style="margin-top:1rem;">
+                    <button onclick="addChapterInputUI()" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i>Add Chapter Box
+                    </button>
+                </div>
+                <div id="jsonStatus" class="status-message" style="display:none; margin-top: 1rem;"></div>
+            </div>
+
+            <!-- Deduplication List & Header Panel -->
+            <div class="panel col-span-1 md-col-span-2"> 
+                <h2 class="panel-title"><i class="fas fa-filter"></i>Deduplication List & Output Header</h2>
+                <div class="session-config-grid-internal">
+                    <div> <!-- Dedupe Column -->
+                        <div class="form-group">
+                            <label for="pastedDedupeList" class="form-label">Project Deduplication List (Active & Editable):</label>
+                            <textarea id="pastedDedupeList" rows="7" placeholder="Load or paste: term_translation (one per line) OR raw,term_translation[,gender]..."></textarea>
+                            <div id="dedupeListStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
+                            <div class="btn-group dedupe-list-actions" style="margin-top:0.75rem; gap:0.5rem;">
+                                <button id="loadStoredBtn" onclick="loadPersistentDedupeToList()" class="btn btn-outline">
+                                    <i class="fas fa-cloud-download-alt"></i>Load from Project Storage
+                                </button>
+                                <button id="saveListToStoredBtn" onclick="saveDedupeListToPersistentStorage()" class="btn btn-success">
+                                    <i class="fas fa-save"></i>Save List to Project Storage
+                                </button>
+                            </div>
+                             <div class="btn-group" style="margin-top:0.5rem;">
+                                <div class="tooltip" style="flex-grow:1;">
+                                    <button onclick="copyToClipboard('pastedDedupeList', 'dedupeTooltip')" class="btn btn-outline btn-icon" style="width:100%;">
+                                        <i class="fas fa-copy"></i> Copy Full List
+                                    </button>
+                                    <span class="tooltip-text" id="dedupeTooltip">Copy List</span>
+                                </div>
+                                 <button onclick="clearDedupeListTextarea()" class="btn btn-outline btn-danger" style="flex-grow:1;"><i class="fas fa-times"></i>Clear Textbox</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div> <!-- Header Column -->
+                        <div class="form-group">
+                            <div style="display:flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="includeCustomHeaderCheckbox" onchange="toggleCustomHeaderInputUI(this.checked)" style="width:auto; height:auto; accent-color: var(--primary-500); transform: scale(1.1);">
+                                <label for="includeCustomHeaderCheckbox" class="form-label" style="margin-bottom:0;">Include Custom Output Header</label>
+                            </div>
+                            <div id="customHeaderInputArea" style="display:none;">
+                                <textarea id="editablePresetTextarea" rows="5" placeholder="Enter custom header text..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extraction Actions & Results Panel -->
+            <div class="panel col-span-3 md-col-span-2">
+                <h2 class="panel-title"><i class="fas fa-magic-wand-sparkles"></i>Extraction Actions & Results</h2>
+                <div style="text-align:center; margin-bottom: 1.5rem;">
+                    <button id="mainExtractBtn" onclick="processAllData()" class="btn btn-primary btn-main-action">
+                        <span class="spinner"></span>
+                        <i class="fas fa-cogs"></i>Extract Terms
+                    </button>
+                </div>
+                <div id="processingLog" class="status-message status-info" style="display:none; margin-bottom:1rem; flex-direction:column; align-items: flex-start;">
+                    <strong>Processing Log:</strong>
+                    <ul style="width:100%;"></ul>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border-color: var(--neutral-200);">
+                
+                <div class="output-actions">
+                     <div class="tooltip">
+                        <button id="moveExtractedBtn" onclick="moveExtractedToDedupeList()" class="btn btn-secondary"> <!-- Changed behavior -->
+                            <i class="fas fa-share-square"></i>Move Extracted to Dedupe List
+                        </button>
+                        <span class="tooltip-text" id="moveExtractedTooltip">Add to list above</span>
+                    </div>
+                    <div class="tooltip">
+                         <button onclick="copyOutput('withHeader')" class="btn btn-outline">
+                            <i class="fas fa-file-alt"></i>Copy Output with Header
+                        </button>
+                        <span class="tooltip-text" id="copyHeaderTooltip">Copy with header</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="outputTextarea" class="form-label">Extracted Terms (New & Unique for this session):</label>
+                    <textarea id="outputTextarea" rows="8" readonly placeholder="Extracted terms will appear here..."></textarea>
+                </div>
+                <div id="outputSummary" class="status-message" style="display:none;"></div>
+                <!-- saveToStorageBtnContainer is removed as per new workflow -->
+            </div>
+        </div>
     </div>
-  </header>
 
-  <div id="main-content">
-    <main class="main-container">
-      <div id="settings-column">
-
-        <div class="collapsible-fieldset">
-          <div class="fieldset-header">
-            <h3>1. Input Mode & Source</h3>
-            <span class="toggle-icon">▼</span>
-          </div>
-          <div class="fieldset-content">
-            <!-- Mode Switcher was moved to the new hovering sidebar -->
-            <input type="hidden" id="splitModeSelect" value="json">
-          </div>
-        </div>
-
-        <div id="jsonModeSections">
-          <div class="collapsible-fieldset">
-            <div class="fieldset-header"><h3>2. JSON Input Chapters</h3> <span class="toggle-icon">▼</span></div>
-            <div class="fieldset-content">
-              <p>Add one or more JSON array "chapters". Content from all valid inputs will be combined.</p>
-              <div class="input-container file-input-container">
-                <label for="jsonFileInput">Upload JSON File(s) (<code>.json</code>):</label>
-                <input type="file" id="jsonFileInput" accept=".json" multiple>
-              </div>
-              <div id="jsonInputsContainer"></div>
-            <div class="json-global-actions">
-                <button id="addJsonChapterButton" class="button btn-primary btn-sm">+ Add Input</button>
-                <button id="clearAllJsonButton" class="button btn-secondary btn-sm">Clear All</button>
-              <span id="jsonObjectsCount" class="info-counter">Total Objects: 0</span>
-              </div>
-              <div class="input-container" style="margin-top: 1rem;">
-                <label for="jsonObjectsPerChunk">Combine objects per chunk:</label>
-                <select id="jsonObjectsPerChunk">
-                  <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="10">10</option><option value="20">20</option>
-                </select>
-              </div>
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+            <p class="modal-body" id="modalMessageText">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                 <button class="btn btn-outline" id="modalCancelBtnGeneric">Cancel</button>
+                 <button class="btn btn-danger" id="modalConfirmBtnGeneric">Confirm</button>
             </div>
-          </div>
-          <div class="collapsible-fieldset">
-            <div class="fieldset-header"><h3>3. Paired Find & Replace</h3><span class="toggle-icon">▼</span></div>
-            <div class="fieldset-content">
-              <p>Applied to <code>object.terms[any].translation</code> on a copy of the data during splitting.</p>
-              <div class="find-replace-controls">
-                <label class="inline-label"><input type="checkbox" id="applyRulesCheckbox"> Apply Rules</label>
-                <label class="inline-label"><input type="checkbox" id="caseInsensitiveCheckbox"> Case-insensitive</label>
-              </div>
-              <div id="findReplacePairsContainer"></div>
-              <div class="find-replace-add-rule-group">
-                <button id="addFindReplacePairButton" class="button btn-success btn-sm">+ Add Rule</button>
-                <button id="saveRulesButton" class="button btn-secondary btn-sm">Save Rules</button>
-                <button id="loadRulesButton" class="button btn-secondary btn-sm">Load Rules</button>
-                <input type="file" id="loadRulesInput" accept=".json" style="display:none;">
-                <span id="glossaryReplaceStatus" class="status-message" style="display: none;"></span>
-              </div>
-            </div>
-          </div>
         </div>
+    </div>
 
-        <div id="plainTextModeSections" style="display:none;">
-          <div class="collapsible-fieldset">
-            <div class="fieldset-header"><h3>2. Plain Text Input</h3> <span class="toggle-icon">▼</span></div>
-            <div class="fieldset-content">
-              <p>Text will be split by max characters, intelligently breaking at sentence or word boundaries.</p>
-              <div class="input-container file-input-container">
-                <label for="textFileInput">Upload Text File (<code>.txt</code>):</label>
-                <input type="file" id="textFileInput" accept=".txt,.text">
-              </div>
-            <span id="plainTextInfo" class="info-counter">Chars: 0 / Approx. Chunks: 0</span>
-            <textarea id="plainTextInputArea" placeholder="Paste plain text here..."></textarea> <!-- style="height: 250px;" removed -->
-              <span id="plainTextStatus" class="status-message"></span>
-            <div class="input-container can-be-row"> <!-- Added can-be-row for responsiveness -->
-                <label for="formatSelect">Format text (before splitting):</label>
-                <select id="formatSelect">
-                    <option value="as-is">Show text as is</option>
-                    <option value="pretty">Pretty (trim lines, join with double newlines)</option>
-                </select>
-              </div>
-            <div class="input-container can-be-row"> <!-- Added can-be-row for responsiveness -->
-                <label for="maxChars">Max characters per chunk:</label>
-                <input type="number" id="maxChars" value="1800" min="1">
-              </div>
-            </div>
-          </div>
-        </div>
+    <footer style="text-align:center; padding: 2rem; color: var(--neutral-500); font-size: 0.875rem; margin-top:1.5rem;">
+        <p>© 2024 Zenith Term Processor. Elevating Your Lexical Workflow.</p>
+    </footer>
 
-        <div class="collapsible-fieldset">
-          <div class="fieldset-header">
-            <h3 id="commonSectionHeader">4. Chunk Header & Footer</h3>
-            <span class="toggle-icon">▼</span>
-          </div>
-          <div class="fieldset-content">
-            <p>Use <code>$X</code> for current part number and <code>$Y</code> for total parts.</p>
-            <div class="input-container">
-              <label for="addToTop">Add to top of each chunk:</label>
-              <div class="textarea-with-actions">
-                <div class="textarea-actions">
-                  <button class="textarea-action-btn" onclick="copyFromTextarea('addToTop')">Copy</button>
-                  <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToTop')">Paste</button>
-                  <button class="textarea-action-btn" onclick="clearTextarea('addToTop')">Clear</button>
-                </div>
-                <textarea id="addToTop" placeholder="Text to add to the top..." style="height:120px;"></textarea>
-              </div>
-            </div>
-            <div class="input-container">
-              <label for="addToBottom">Add to bottom of each chunk:</label>
-              <div class="textarea-with-actions">
-                <div class="textarea-actions">
-                  <button class="textarea-action-btn" onclick="copyFromTextarea('addToBottom')">Copy</button>
-                  <button class="textarea-action-btn" onclick="pasteIntoTextarea('addToBottom')">Paste</button>
-                  <button class="textarea-action-btn" onclick="clearTextarea('addToBottom')">Clear</button>
-                </div>
-                <textarea id="addToBottom" placeholder="Text to add to the bottom..." style="height:80px;"></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
+    <script>
+    (function() { // IIFE Start
+        // --- Global State & Constants ---
+        // persistentDedupeTranslations is no longer used as a global set.
+        // The pastedDedupeList textarea becomes the primary source for current dedupe data.
+        let chapterInputCounter = 0;
+        let lastExtractedPureTerms = []; 
+        const LS_NOVEL_NAME_KEY = 'zenithTermExtractor_lastNovelName';
+        const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_'; // Stores array of full lines
+        const LS_SIZE_WARNING_PREFIX = 'zenithTermExtractor_sizeWarning_';
+        const STORAGE_WARNING_THRESHOLD_BYTES = 3.5 * 1024 * 1024; 
 
-        <button id="mainSplitButton" class="button btn-success btn-block" style="font-size: 1.2rem; padding: 12px;">⚙️ Process & Split</button>
-        <span id="processStatus" class="status-message" style="display:none;"></span>
+        const DEFAULT_HEADER_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."\n Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`;
 
-      </div>
-
-      <div id="output-column">
-        <div id="outputControls" style="display:none;">
-          <h4 id="outputSummary">Output</h4>
-          <button id="copyNextButton" class="button btn-warning btn-sm">⭐ Copy NEXT Uncopied</button>
-          <button id="copyAllButton" class="button btn-info btn-sm">Copy ALL Chunks</button>
-          <button id="clearOutputButton" class="button btn-secondary btn-sm">Clear Output</button>
-        </div>
-        <div id="chunkedTextContainer"></div>
-      </div>
-    </main>
-  </div> <!-- end main-content -->
-
-  <div id="loadingIndicator">Processing...</div>
-  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to top" class="button btn-primary">⬆️</button>
+        // --- DOM Elements ---
+        const novelNameInput = document.getElementById('novelNameInput');
+        const editablePresetTextarea = document.getElementById('editablePresetTextarea');
+        const outputTextarea = document.getElementById('outputTextarea');
+        const pastedDedupeListTextarea = document.getElementById('pastedDedupeList');
+        const modalOverlay = document.getElementById('confirmationModal');
+        const modalTitleEl = document.getElementById('modalTitle');
+        const modalMessageEl = document.getElementById('modalMessageText');
+        const modalActionsContainer = modalOverlay.querySelector('.modal-actions');
+        let generalConfirmCallback = null;
+        let generalCancelCallback = null;
 
 
-  <script>
-    // --- State & Config ---
-    let lastClickedButton = null;
-    let jsonChapterInputIdCounter = 0;
-    const STATE_KEY = 'chunkerAppState_V3';
-    const statusTimeouts = {};
-
-    const newDefaultAddToTopPreset = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis"
-
-1. Analyze raw Passage and Translation:
-   - FOR EACH line, summarize its meaning and compare it very thoroughly to the translation.
-   - Note if the translation matches the original or deviates, explaining any ambiguities or potential errors.
-   - Check if phrases are adapted naturally (e.g., idiomatic expressions retain flavor without literal awkwardness or being too formal and literal).
-
-2. Identify Errors:
-  - Spot issues related to:
-     - Accuracy: Missing, Overly condensed sentences or lines, added, or incorrect glossary terms
-        * Note : Only ignore glossary if certain it's wrong, if certain its not appropriately conveying the meaning or have grammatical error
-  - Logic: Pronoun mistakes, wrong speaker, or mixed-up character names.
-  - Language: Awkward or unnatural English or Overly condensed sentences.
-  - Analyze every line thoroughly.
-
-3. Verify Errors:
-   - Double-check all identified errors, ensuring each has clear evidence.
-   - keep all the minor and major valid errors.
-   - Verify if the tone matches the context (majestic for epic scenes, colloquial for dialogue).
-
-4. Fix the Translation :
-  - Correct the verified errors and use English major level proficiency to make the prose flows smoothly with Rich descriptive and faithful rendering of key dialogue
-  - Don't use Only colon and bullet points in your translation and while during their removal make sure the English is natural and idiomatic.
-  - "DO NOT transliterate the honorifics unless the glossary says so. For example, you should use 'Senior Brother X' instead of 'X-shixiong'."
-  - Do not over condense the sentence and dialogue while making sure the English is natural and idiomatic.
-  - Where necessary for comprehension, add brief, unobtrusive context or explanations for cultural terms or implied meanings. Avoid overly complex or literary phrasing if it sacrifices clarity
-
-5. Give only the Fixed human like English translation as output and not the Whole JSON format. and Separately mention when a glossary is wrong or have variations and is fixed in the output.`;
-
-    const defaultState = {
-        theme: 'light',
-        splitMode: 'json',
-        maxChars: '1800',
-        addToTop: newDefaultAddToTopPreset,
-        addToBottom: '---\nEnd of Part $X of $Y',
-        formatSelect: 'pretty',
-        jsonObjectsPerChunk: '1',
-        plainText: '',
-        jsonInputs: [''],
-        findReplacePairs: [{find:"", replace:""}],
-        applyRules: false,
-        caseInsensitive: false,
-        collapsedSections: [],
-    };
-    let currentAppState = {...defaultState};
-
-    // --- Helpers & Utilities ---
-    function debounce(func, delay) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-    const debouncedSaveState = debounce(saveState, 500);
-    const debouncedUpdateTotalJsonObjectCount = debounce(updateTotalJsonObjectCount, 400);
-    const debouncedUpdatePlainTextInfo = debounce(updatePlainTextInfo, 400);
-
-    function showStatus(elementId, message, type = 'success', timeout = 4000) {
-        const element = document.getElementById(elementId);
-        if (!element) return;
-        if(statusTimeouts[elementId]) clearTimeout(statusTimeouts[elementId]);
-        element.innerHTML = message;
-        element.className = `status-message status-${type}`;
-        element.style.display = 'inline-block';
-        if (timeout > 0) {
-            statusTimeouts[elementId] = setTimeout(() => {
-                if(element) element.style.display = 'none';
-                delete statusTimeouts[elementId];
-            }, timeout);
+        // --- Utility Functions ---
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
         }
-    }
 
-    function showLoading() { document.getElementById('loadingIndicator').style.display = 'block'; }
-    function hideLoading() {  document.getElementById('loadingIndicator').style.display = 'none'; }
-    function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
-    function copyFromTextarea(id) {
-        const textarea = document.getElementById(id);
-        if (textarea) navigator.clipboard.writeText(textarea.value).then(() => showStatus('mainStatus', 'Copied!', 'success', 2000));
-    }
-
-    async function pasteIntoTextarea(id) {
-        const textarea = document.getElementById(id);
-        if (textarea) {
-            try {
-                textarea.value = await navigator.clipboard.readText();
-                textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                showStatus('mainStatus', 'Pasted!', 'success', 2000);
-            } catch (err) {
-                showStatus('mainStatus', 'Paste failed.', 'error', 3000);
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            addChapterInputUI(); 
+            editablePresetTextarea.value = DEFAULT_HEADER_TEXT;
+            const lastNovel = localStorage.getItem(LS_NOVEL_NAME_KEY);
+            if (lastNovel) {
+                novelNameInput.value = lastNovel;
             }
-        }
-    }
+            updateDynamicButtonLabelsAndInfo(); 
 
-    function clearTextarea(id) {
-        const textarea = document.getElementById(id);
-        if (textarea) {
-            textarea.value = '';
-            textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    async function pasteIntoJsonInput(button) {
-        const textarea = button.closest('.json-chapter-input-container')?.querySelector('.json-chapter-input');
-        if (textarea) {
-            try {
-                textarea.value = await navigator.clipboard.readText();
-                textarea.dispatchEvent(new Event('input', { bubbles: true }));
-                button.textContent = 'Pasted!';
-                setTimeout(() => { button.textContent = 'Paste'; }, 1500);
-            } catch (err) {
-                button.textContent = 'Failed!';
-                setTimeout(() => { button.textContent = 'Paste'; }, 1500);
+            // Set "Include Custom Output Header" to be ON by default
+            const includeCustomHeaderCheckbox = document.getElementById('includeCustomHeaderCheckbox');
+            if (includeCustomHeaderCheckbox) {
+                includeCustomHeaderCheckbox.checked = true;
+                // Ensure the UI (textarea visibility) matches the checkbox state
+                toggleCustomHeaderInputUI(includeCustomHeaderCheckbox.checked); 
             }
-        }
-    }
 
-    // --- Theme Management ---
-    function applyTheme(theme) {
-        document.body.classList.toggle('dark-mode', theme === 'dark');
-        // Ensure theme-toggle button exists before trying to set its textContent
-        const themeToggleButton = document.getElementById('theme-toggle');
-        if (themeToggleButton) {
-            themeToggleButton.textContent = theme === 'dark' ? '☀️' : '🌓';
-        }
-    }
+            novelNameInput.addEventListener('keyup', debounce(updateDynamicButtonLabelsAndInfo, 350));
 
-    function toggleTheme() {
-        currentAppState.theme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-        applyTheme(currentAppState.theme);
-        saveState();
-    }
-
-    // --- State Management ---
-    function saveState() {
-       currentAppState.splitMode = document.getElementById('splitModeSelect').value;
-       currentAppState.maxChars = document.getElementById('maxChars').value;
-       currentAppState.addToTop = document.getElementById('addToTop').value;
-       currentAppState.addToBottom = document.getElementById('addToBottom').value;
-       currentAppState.formatSelect = document.getElementById('formatSelect').value;
-       currentAppState.jsonObjectsPerChunk = document.getElementById('jsonObjectsPerChunk').value;
-       currentAppState.plainText = document.getElementById('plainTextInputArea').value;
-       currentAppState.applyRules = document.getElementById('applyRulesCheckbox').checked;
-       currentAppState.caseInsensitive = document.getElementById('caseInsensitiveCheckbox').checked;
-       currentAppState.jsonInputs = Array.from(document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input')).map(t => t.value);
-       currentAppState.findReplacePairs = Array.from(document.querySelectorAll('#findReplacePairsContainer .find-replace-pair')).map(p => ({
-           find: p.querySelector('.find-text')?.value || "",
-           replace: p.querySelector('.replace-text')?.value || ""
-       })).filter(p => p.find || p.replace);
-       currentAppState.collapsedSections = Array.from(document.querySelectorAll('.collapsible-fieldset.collapsed')).map(fs => fs.querySelector('h3').textContent.trim());
-
-       try {
-           localStorage.setItem(STATE_KEY, JSON.stringify(currentAppState));
-       } catch (e) {
-           console.error("LocalStorage save failed:", e);
-           showStatus('mainStatus', 'Error saving settings.', 'error', 10000);
-       }
-    }
-
-   function loadState() {
-       try {
-          const savedStateJSON = localStorage.getItem(STATE_KEY);
-           if (savedStateJSON) {
-              const savedState = JSON.parse(savedStateJSON);
-              currentAppState = { ...defaultState, ...savedState };
-           } else {
-              currentAppState = {...defaultState};
-           }
-        } catch (e) {
-           console.error("LocalStorage load failed:", e);
-           currentAppState = {...defaultState};
-        }
-
-        applyTheme(currentAppState.theme);
-        document.getElementById('splitModeSelect').value = currentAppState.splitMode;
-        document.getElementById('maxChars').value = currentAppState.maxChars;
-        document.getElementById('addToTop').value = currentAppState.addToTop;
-        document.getElementById('addToBottom').value = currentAppState.addToBottom;
-        document.getElementById('formatSelect').value = currentAppState.formatSelect;
-        document.getElementById('jsonObjectsPerChunk').value = currentAppState.jsonObjectsPerChunk;
-        document.getElementById('plainTextInputArea').value = currentAppState.plainText;
-        document.getElementById('applyRulesCheckbox').checked = !!currentAppState.applyRules;
-        document.getElementById('caseInsensitiveCheckbox').checked = !!currentAppState.caseInsensitive;
-
-        if (currentAppState.collapsedSections) {
-             document.querySelectorAll('.collapsible-fieldset').forEach(fs => {
-                const title = fs.querySelector('h3').textContent.trim();
-                fs.classList.toggle('collapsed', currentAppState.collapsedSections.includes(title));
-             });
-        }
-
-        document.getElementById('jsonInputsContainer').innerHTML = '';
-        jsonChapterInputIdCounter = 0;
-        if (currentAppState.jsonInputs && currentAppState.jsonInputs.length > 0) {
-             currentAppState.jsonInputs.forEach(content => addJsonChapterInput(content, false));
-        } else {
-             addJsonChapterInput('', false);
-        }
-
-        document.getElementById('findReplacePairsContainer').innerHTML = '';
-        if (currentAppState.findReplacePairs && currentAppState.findReplacePairs.length > 0) {
-             currentAppState.findReplacePairs.forEach(pair => addFindReplacePair(pair.find, pair.replace, false));
-        } else {
-             addFindReplacePair("","", false);
-        }
-   }
-
-    function resetAllToDefaults() {
-         if(confirm("Are you sure you want to clear all inputs and settings? This will reload the page.")) {
-            localStorage.removeItem(STATE_KEY);
-            window.location.reload();
-         }
-     }
-
-    // --- UI Element Management ---
-    function toggleInputSections() {
-        const splitMode = document.getElementById('splitModeSelect').value;
-
-        document.querySelectorAll('.mode-switcher button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === splitMode));
-        document.getElementById('jsonModeSections').style.display = (splitMode === 'json' ? 'block' : 'none');
-        document.getElementById('plainTextModeSections').style.display = (splitMode === 'text' ? 'block' : 'none');
-        document.getElementById('commonSectionHeader').textContent = (splitMode === 'json' ? '4. Chunk Header & Footer' : '3. Chunk Header & Footer');
-
-        clearOutput();
-        if (splitMode === 'json') updateTotalJsonObjectCount(); else updatePlainTextInfo();
-        debouncedSaveState();
-    }
-
-    function addJsonChapterInput(content = '', save = true) {
-        jsonChapterInputIdCounter++;
-        const container = document.getElementById('jsonInputsContainer');
-        const chapterDiv = document.createElement('div');
-        chapterDiv.className = 'json-chapter-input-container';
-        chapterDiv.innerHTML = `
-         <div class="json-chapter-header">
-            <label>JSON Input ${jsonChapterInputIdCounter}</label>
-            <span class="json-chapter-status status-message">Objects: 0</span>
-            <button type="button" class="button btn-secondary btn-sm" onclick="pasteIntoJsonInput(this)">Paste</button>
-            <button type="button" class="button btn-danger btn-sm" onclick="removeJsonChapterInput(this)">Remove</button>
-         </div>
-         <textarea class="json-chapter-input" placeholder='[ { "id":1, ... } ]'>${content}</textarea>`;
-        const textarea = chapterDiv.querySelector('textarea');
-        const statusSpan = chapterDiv.querySelector('.json-chapter-status');
-        textarea.addEventListener('input', () => {
-            updateIndividualJsonCount(textarea, statusSpan);
-            debouncedUpdateTotalJsonObjectCount();
-            debouncedSaveState();
-        });
-        container.appendChild(chapterDiv);
-        updateIndividualJsonCount(textarea, statusSpan);
-        if (save) {
-            updateTotalJsonObjectCount();
-            debouncedSaveState();
-        }
-    }
-
-    function removeJsonChapterInput(buttonElement) {
-        buttonElement.closest('.json-chapter-input-container')?.remove();
-        updateTotalJsonObjectCount();
-        if (document.querySelectorAll('#jsonInputsContainer .json-chapter-input-container').length === 0) {
-            addJsonChapterInput('', false);
-        }
-        debouncedSaveState();
-    }
-
-    function clearAllJsonInputs() {
-        document.getElementById('jsonInputsContainer').innerHTML = '';
-        jsonChapterInputIdCounter = 0;
-        addJsonChapterInput('', false);
-        updateTotalJsonObjectCount();
-        debouncedSaveState();
-    }
-
-    function updateIndividualJsonCount(textarea, statusSpan) {
-        const jsonString = textarea.value.trim();
-        statusSpan.className = 'json-chapter-status status-message';
-        if (!jsonString) { statusSpan.textContent = 'Objects: 0'; return 0; }
-        try {
-            if (!jsonString.startsWith('[')) throw new Error("Not Array");
-            const jsonData = JSON.parse(jsonString);
-            if (!Array.isArray(jsonData)) throw new Error("Not Array");
-            statusSpan.textContent = `Objects: ${jsonData.length}`;
-            statusSpan.classList.add('status-success');
-        } catch (e) {
-            statusSpan.textContent = e.message === "Not Array" ? 'Error: Must be an Array []' : 'Error: Invalid JSON';
-            statusSpan.classList.add('status-error');
-        }
-    }
-
-    function updateTotalJsonObjectCount() {
-        let totalObjects = 0;
-        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
-             const jsonString = textarea.value.trim();
-             try {
-                 if (jsonString.startsWith('[') && jsonString.endsWith(']')) {
-                    const jsonData = JSON.parse(jsonString);
-                    if (Array.isArray(jsonData)) totalObjects += jsonData.length;
-                 }
-             } catch (e) { /* ignore invalid json */ }
-        });
-        document.getElementById('jsonObjectsCount').textContent = `Total Objects: ${totalObjects}`;
-    }
-
-    function addFindReplacePair(findVal = "", replaceVal = "", save=true) {
-        const container = document.getElementById('findReplacePairsContainer');
-        const pairDiv = document.createElement('div');
-        pairDiv.className = 'find-replace-pair';
-        pairDiv.innerHTML = `
-            <input type="text" class="find-text" placeholder="Find" value="${findVal}">
-            <span class="arrow">➔</span>
-            <input type="text" class="replace-text" placeholder="Replace" value="${replaceVal}">
-            <button type="button" class="button btn-danger btn-sm" onclick="removeFindReplacePair(this)">－</button>`;
-        pairDiv.querySelectorAll('input').forEach(input => input.addEventListener('input', debouncedSaveState));
-        container.appendChild(pairDiv);
-        if(save) debouncedSaveState();
-    }
-
-    function removeFindReplacePair(button) {
-        button.parentElement.remove();
-        if (document.querySelectorAll('#findReplacePairsContainer .find-replace-pair').length === 0) {
-             addFindReplacePair("","", false);
-        }
-        debouncedSaveState();
-    }
-
-    function updatePlainTextInfo() {
-        const text = document.getElementById('plainTextInputArea').value;
-        const maxChars = parseInt(document.getElementById('maxChars').value, 10);
-        const charCount = text.length;
-        let chunks = (charCount > 0 && maxChars > 0) ? Math.ceil(charCount / maxChars) : (charCount > 0 ? 1 : 0);
-        document.getElementById('plainTextInfo').textContent = `Chars: ${charCount} / Approx. Chunks: ${chunks}`;
-        if (isNaN(maxChars) || maxChars <= 0) {
-            showStatus('plainTextStatus', "Max characters must be > 0", 'error');
-        } else {
-            showStatus('plainTextStatus', "", 'success', 1);
-        }
-    }
-
-    function formatPlainText() {
-      const formatSelect = document.getElementById('formatSelect').value;
-      const textArea = document.getElementById('plainTextInputArea');
-      if (formatSelect === 'pretty') {
-         textArea.value = currentAppState.plainText.split('\n').map(p => p.trim()).filter(p => p).join('\n\n');
-      } else {
-         textArea.value = currentAppState.plainText;
-      }
-       updatePlainTextInfo();
-       debouncedSaveState();
-    }
-
-    // --- Core Logic ---
-    function processAndChunk() {
-       clearOutput();
-       showLoading();
-       setTimeout(() => {
-        try {
-          const splitMode = document.getElementById('splitModeSelect').value;
-          const addToTop = document.getElementById('addToTop').value;
-          const addToBottom = document.getElementById('addToBottom').value;
-          const container = document.getElementById('chunkedTextContainer');
-          let chunkCount = 0;
-
-          if (splitMode === 'json') {
-             const { data, success, allEmpty } = getAllCombinedJsonData();
-             if (allEmpty) throw new Error("All JSON inputs are empty.");
-             if (!success) throw new Error("Invalid JSON found. See errors on input boxes.");
-             const { data: processedJsonData } = applyGlossaryRules(data);
-             chunkCount = chunkJsonInput(processedJsonData, addToTop, addToBottom, container);
-          } else {
-             const text = document.getElementById('plainTextInputArea').value;
-             const maxChars = parseInt(document.getElementById('maxChars').value);
-             if (!text.trim()) throw new Error("Plain text input is empty.");
-             if (isNaN(maxChars) || maxChars <= 0) throw new Error("Max characters must be > 0.");
-             chunkCount = chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container);
-          }
-           if (chunkCount > 0) {
-                document.getElementById('output-column').style.display = 'block';
-                document.getElementById('outputControls').style.display = 'flex';
-                document.getElementById('outputSummary').textContent = `Output: ${chunkCount} Chunk${chunkCount === 1 ? '' : 's'}`;
-                document.getElementById('copyNextButton').disabled = false;
-                document.getElementById('copyAllButton').disabled = false;
-                showStatus('processStatus', `Success: Generated ${chunkCount} chunks.`, 'success');
-            updateChunkNavButtonsState(true);
-           } else {
-                throw new Error("No chunks were generated from the input.");
-           }
-        } catch (error) {
-           showStatus('processStatus', error.message, 'error', 8000);
-           updateChunkNavButtonsState(false); // Disable if error or no chunks
-        } finally {
-          hideLoading();
-        }
-      }, 50);
-    }
-
-    function updateChunkNavButtonsState(enabled) {
-        const firstChunkBtn = document.getElementById('goToFirstChunkBtn');
-        const lastChunkBtn = document.getElementById('goToLastChunkBtn');
-        if (firstChunkBtn) firstChunkBtn.disabled = !enabled;
-        if (lastChunkBtn) lastChunkBtn.disabled = !enabled;
-    }
-
-    function getAllCombinedJsonData() {
-        let combinedData = [], allInputsValid = true, allEmpty = true;
-        document.querySelectorAll('#jsonInputsContainer textarea.json-chapter-input').forEach(textarea => {
-            const jsonString = textarea.value.trim();
-            if (!jsonString) return;
-            allEmpty = false;
-            try {
-                if (!jsonString.startsWith('[')) throw new Error();
-                const jsonData = JSON.parse(jsonString);
-                if (Array.isArray(jsonData)) {
-                    combinedData = combinedData.concat(jsonData);
-                } else { throw new Error(); }
-            } catch (e) { allInputsValid = false; }
-        });
-        return { data: combinedData, success: allInputsValid, allEmpty };
-    }
-
-    function applyGlossaryRules(jsonData) {
-        if (!document.getElementById('applyRulesCheckbox').checked || !jsonData || jsonData.length === 0) {
-            return { data: jsonData, count: 0 };
-        }
-        const flags = document.getElementById('caseInsensitiveCheckbox').checked ? 'gi' : 'g';
-        const rules = currentAppState.findReplacePairs.map(p => {
-             if (!p.find) return null;
-             try { return { findRegExp: new RegExp(escapeRegExp(p.find), flags), replace: p.replace }; }
-             catch (e) { return null; }
-        }).filter(Boolean);
-
-        if (rules.length === 0) return { data: jsonData, count: 0 };
-
-        const processedData = JSON.parse(JSON.stringify(jsonData));
-        let totalInstancesReplaced = 0;
-
-        processedData.forEach(obj => {
-            if (obj && Array.isArray(obj.terms)) {
-                obj.terms.forEach(term => {
-                    if (term && typeof term.translation === 'string') {
-                        rules.forEach(rule => {
-                            const matches = term.translation.match(rule.findRegExp);
-                            if(matches) {
-                                totalInstancesReplaced += matches.length;
-                                term.translation = term.translation.replace(rule.findRegExp, rule.replace);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-        if (totalInstancesReplaced > 0) {
-            showStatus('glossaryReplaceStatus', `Applied ${totalInstancesReplaced} replacements.`, 'success');
-        } else {
-            showStatus('glossaryReplaceStatus', 'No matching terms found to replace.', 'info');
-        }
-        return { data: processedData, count: totalInstancesReplaced };
-    }
-
-    function chunkJsonInput(jsonData, addToTop, addToBottom, container) {
-        const objectsToGroup = parseInt(document.getElementById('jsonObjectsPerChunk').value, 10) || 1;
-        const totalChunks = Math.ceil(jsonData.length / objectsToGroup);
-        for (let i = 0; i < jsonData.length; i += objectsToGroup) {
-            const group = jsonData.slice(i, i + objectsToGroup);
-            const partNum = (i / objectsToGroup) + 1;
-            const title = `Seg ${partNum}/${totalChunks}\n(Items ${i + 1}-${i + group.length})`;
-            const content = JSON.stringify(objectsToGroup === 1 && group.length === 1 ? group[0] : group, null, 2);
-            const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-            const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-            displayChunk([top, content, bottom].filter(Boolean).join('\n\n'), title, container);
-        }
-        return totalChunks;
-    }
-
-    function smartSplit(text, maxLength) {
-        if (text.length <= maxLength) return [text];
-        const chunks = []; let currentText = text;
-        const breakChars = ['. ', '! ', '? ', '\n', ' ', ','];
-        while (currentText.length > maxLength) {
-            let breakPoint = -1;
-            for(const char of breakChars) {
-                const index = currentText.lastIndexOf(char, maxLength);
-                if(index !== -1) { breakPoint = index + (char.trim() ? char.length : 0); break; }
-            }
-            if (breakPoint === -1) breakPoint = maxLength;
-            chunks.push(currentText.substring(0, breakPoint).trim());
-            currentText = currentText.substring(breakPoint).trim();
-        }
-        if (currentText) chunks.push(currentText);
-        return chunks;
-    }
-
-    function chunkPlainTextInput(text, maxChars, addToTop, addToBottom, container) {
-       let chunks = []; let currentChunk = "";
-       text.split('\n').forEach(paragraph => {
-           if (paragraph.length > maxChars) {
-               if (currentChunk) chunks.push(currentChunk);
-               chunks.push(...smartSplit(paragraph, maxChars));
-               currentChunk = "";
-               return;
-           }
-           if (currentChunk && (currentChunk.length + paragraph.length + 1 > maxChars)) {
-                chunks.push(currentChunk);
-                currentChunk = paragraph;
-           } else {
-               currentChunk = currentChunk ? `${currentChunk}\n${paragraph}` : paragraph;
-           }
-       });
-       if (currentChunk) chunks.push(currentChunk);
-       chunks = chunks.map(c => c.trim()).filter(Boolean);
-       const totalChunks = chunks.length;
-       chunks.forEach((chunk, index) => {
-         const partNum = index + 1;
-         const top = addToTop.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-         const bottom = addToBottom.replace(/\$X/g, partNum).replace(/\$Y/g, totalChunks);
-         displayChunk([top, chunk, bottom].filter(Boolean).join('\n\n'), `Part ${partNum}/${totalChunks}`, container);
-       });
-       return totalChunks;
-    }
-
-    // --- Output & Copying ---
-    function displayChunk(content, title, container) {
-        const chunkDiv = document.createElement('div');
-        chunkDiv.className = 'chunk-container';
-        chunkDiv.dataset.copied = "false";
-        chunkDiv.innerHTML = `
-         <div class="chunk-title">${title.replace(/\n/g, '<br>')}</div>
-         <div class="chunk-textarea-wrapper">
-             <textarea readonly>${content}</textarea>
-         </div>
-         <div class="button-action-wrapper">
-            <button class="button btn-primary copy-button" data-copy-count="0">Copy<span class="tick" style="display:none;"> ✔️</span></button>
-            <span class="copy-count-display">(0)</span>
-         </div>`;
-        const copyButton = chunkDiv.querySelector('.copy-button');
-        copyButton.addEventListener('click', function () {
-            copyToClipboard(
-                chunkDiv.querySelector('textarea').value,
-                this,
-                chunkDiv.querySelector('.copy-count-display')
-            );
-        });
-        container.appendChild(chunkDiv);
-    }
-
-    function clearOutput() {
-        const chunkContainer = document.getElementById('chunkedTextContainer');
-        chunkContainer.innerHTML = `<p class="empty-output-message">Output will appear here once processed. Click 'Process & Split' (Ctrl+Enter) to generate chunks.</p>`;
-        document.getElementById('output-column').style.display = 'block'; // Ensure column is visible for the message
-        document.getElementById('outputControls').style.display = 'none'; // Hide controls like copy all/next
-        lastClickedButton = null;
-        updateChunkNavButtonsState(false); // No chunks, disable nav buttons
-    }
-
-    function updateCopyButtonState(button) {
-      if (lastClickedButton && lastClickedButton !== button) {
-         lastClickedButton.classList.remove('btn-success');
-         lastClickedButton.classList.add('btn-primary');
-         lastClickedButton.querySelector('.tick').style.display = 'none';
-      }
-      button.classList.remove('btn-primary');
-      button.classList.add('btn-success');
-      button.querySelector('.tick').style.display = 'inline-block';
-      lastClickedButton = button;
-    }
-
-    function copyToClipboard(text, buttonEl, countEl) {
-       navigator.clipboard.writeText(text).then(() => {
-            updateCopyButtonState(buttonEl);
-            const container = buttonEl.closest('.chunk-container');
-            container.dataset.copied = "true";
-            container.classList.add('copied');
-
-            let count = parseInt(buttonEl.dataset.copyCount, 10) + 1;
-            buttonEl.dataset.copyCount = count;
-            countEl.textContent = `(${count})`;
-
-            if (!document.querySelector('.chunk-container[data-copied="false"]')) {
-                document.getElementById('copyNextButton').disabled = true;
-            }
-        }).catch(err => { showStatus('processStatus', 'Failed to copy text.', 'error'); });
-    }
-
-    function copyNextUncopied() {
-        const nextContainer = document.querySelector('.chunk-container[data-copied="false"]');
-        if(nextContainer) {
-            nextContainer.querySelector('.copy-button').click();
-            nextContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
-        }
-    }
-
-    function copyAllChunks() {
-        const textareas = document.querySelectorAll('#chunkedTextContainer textarea');
-        if (textareas.length === 0) return;
-        const separator = "\n\n" + "-".repeat(30) + "\n\n";
-        const allText = Array.from(textareas).map(ta => ta.value).join(separator);
-        navigator.clipboard.writeText(allText).then(() => {
-            showStatus('processStatus', `Copied all ${textareas.length} chunks!`, 'success');
-            document.querySelectorAll('.chunk-container').forEach(div => {
-                div.dataset.copied = "true";
-                div.classList.add('copied');
+            document.getElementById('modalCancelBtnGeneric').addEventListener('click', () => {
+                if(typeof generalCancelCallback === 'function') generalCancelCallback();
+                hideGenericModal();
             });
-            document.getElementById('copyNextButton').disabled = true;
-        });
-    }
-
-    // --- Initialization ---
-    document.addEventListener('DOMContentLoaded', () => {
-        loadState();
-
-        // --- Event Listeners ---
-        // Ensure these elements exist before adding event listeners
-        // const themeToggleButton = document.getElementById('theme-toggle'); // Now in new sidebar
-        // if (themeToggleButton) {
-        //     themeToggleButton.addEventListener('click', toggleTheme);
-        // }
-
-        // const resetAllButton = document.getElementById('resetAllButton'); // Now in new sidebar
-        // if (resetAllButton) {
-        //     resetAllButton.addEventListener('click', resetAllToDefaults);
-        // }
-
-        document.getElementById('mainSplitButton').addEventListener('click', processAndChunk);
-
-        // Listener for the new sidebar's theme toggle
-        const newThemeToggleButton = document.querySelector('#expanded-sidebar-content #theme-toggle');
-        if (newThemeToggleButton) {
-            newThemeToggleButton.addEventListener('click', toggleTheme);
-        }
-
-        // Listener for the new sidebar's reset all button
-        const newResetAllButton = document.querySelector('#expanded-sidebar-content #resetAllButton');
-        if (newResetAllButton) {
-            newResetAllButton.addEventListener('click', resetAllToDefaults);
-        }
-
-        // Listener for the new sidebar's mode switcher
-        const newModeSwitcher = document.querySelector('#expanded-sidebar-content #modeSwitcher');
-        if (newModeSwitcher) {
-            newModeSwitcher.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    document.getElementById('splitModeSelect').value = e.target.dataset.mode;
-                    toggleInputSections();
-                }
-            });
-        }
-
-        // Listener for the original mode switcher (which is now empty but the div might exist if not careful)
-        // Let's ensure we are targeting the correct one or that the old one is properly handled.
-        // For now, the above selector for newModeSwitcher should handle the moved one.
-        // If an old #modeSwitcher element (not in the sidebar) still exists and has listeners, it might cause issues.
-        // The diff removes the content of the old fieldset's mode switcher, so this should be fine.
-
-        // Original listener for mode switcher in settings column - this element is MOVED.
-        // The listener should be attached to the NEW location of modeSwitcher.
-        // document.getElementById('modeSwitcher').addEventListener('click', (e) => {
-        //     if (e.target.tagName === 'BUTTON') {
-        //         document.getElementById('splitModeSelect').value = e.target.dataset.mode;
-                toggleInputSections();
-            }
-        });
-
-        document.querySelectorAll('.collapsible-fieldset .fieldset-header').forEach(header => {
-            header.addEventListener('click', () => {
-                header.parentElement.classList.toggle('collapsed');
-                debouncedSaveState();
+            document.getElementById('modalConfirmBtnGeneric').addEventListener('click', () => {
+                if(typeof generalConfirmCallback === 'function') generalConfirmCallback();
+                hideGenericModal();
             });
         });
-
-        // JSON Mode Listeners
-        document.getElementById('addJsonChapterButton').addEventListener('click', () => addJsonChapterInput());
-        document.getElementById('clearAllJsonButton').addEventListener('click', clearAllJsonInputs);
-        document.getElementById('addFindReplacePairButton').addEventListener('click', () => addFindReplacePair());
-        document.getElementById('jsonObjectsPerChunk').addEventListener('change', debouncedSaveState);
-        document.getElementById('applyRulesCheckbox').addEventListener('change', debouncedSaveState);
-        document.getElementById('caseInsensitiveCheckbox').addEventListener('change', debouncedSaveState);
-
-        // Save/Load Find & Replace Rules Listeners
-        const saveRulesButton = document.getElementById('saveRulesButton');
-        if (saveRulesButton) {
-            saveRulesButton.addEventListener('click', () => {
-                const currentRules = Array.from(document.querySelectorAll('#findReplacePairsContainer .find-replace-pair')).map(p => ({
-                    find: p.querySelector('.find-text')?.value || "",
-                    replace: p.querySelector('.replace-text')?.value || ""
-                }));
-                if (currentRules.length === 0 || (currentRules.length === 1 && !currentRules[0].find && !currentRules[0].replace)) {
-                    showStatus('glossaryReplaceStatus', 'No rules to save.', 'info', 3000);
-                    return;
-                }
-                const jsonString = JSON.stringify(currentRules, null, 2);
-                const blob = new Blob([jsonString], {type: 'application/json'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'find-replace-rules.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showStatus('glossaryReplaceStatus', 'Rules saved!', 'success', 3000);
-            });
+        
+        function updateDynamicButtonLabelsAndInfo() {
+            updateDynamicButtonLabels();
+            updateStoredTermsInfo(); 
         }
 
-        const loadRulesButton = document.getElementById('loadRulesButton');
-        const loadRulesInput = document.getElementById('loadRulesInput');
-        if (loadRulesButton && loadRulesInput) {
-            loadRulesButton.addEventListener('click', () => {
-                loadRulesInput.click(); // Trigger hidden file input
-            });
 
-            loadRulesInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
+        // --- UI Update Functions ---
+        function addChapterInputUI() {
+            chapterInputCounter++;
+            const container = document.getElementById('chapterInputsContainer');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'chapter-input-group';
+            itemDiv.id = `chapterGroup_${chapterInputCounter}`;
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'chapter-header';
+            const label = document.createElement('span');
+            label.className = 'chapter-label';
+            label.textContent = `Chapter ${chapterInputCounter} JSON`;
+            headerDiv.appendChild(label);
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'chapter-action-buttons'; // Added for potential styling of the group
+            buttonGroup.style.display = 'flex'; // Simple styling for horizontal layout
+            buttonGroup.style.gap = '0.5rem'; // Space between buttons
+
+            // Paste button (always added)
+            const pasteBtn = document.createElement('button');
+            pasteBtn.innerHTML = '<i class="fas fa-paste"></i>';
+            pasteBtn.className = 'btn btn-icon btn-outline btn-secondary'; // Using btn-secondary for neutral color
+            pasteBtn.title = 'Paste from clipboard';
+            pasteBtn.style.padding = '0.3rem 0.5rem'; // Consistent padding
+
+            pasteBtn.onclick = async () => {
+                const associatedTextarea = itemDiv.querySelector('textarea');
+                if (associatedTextarea) {
                     try {
-                        const content = e.target.result;
-                        const loadedRules = JSON.parse(content);
-
-                        if (Array.isArray(loadedRules) && loadedRules.every(rule => typeof rule === 'object' && 'find' in rule && 'replace' in rule)) {
-                            const container = document.getElementById('findReplacePairsContainer');
-                            container.innerHTML = ''; // Clear existing rules
-                            if (loadedRules.length === 0) { // Handle empty array case - add one empty pair
-                                addFindReplacePair("", "", false);
-                            } else {
-                                loadedRules.forEach(rule => {
-                                    addFindReplacePair(String(rule.find || ""), String(rule.replace || ""), false);
-                                });
-                            }
-                            debouncedSaveState(); // Save the newly loaded rules
-                            showStatus('glossaryReplaceStatus', `Loaded ${loadedRules.length} rules from ${file.name}`, 'success', 4000);
-                        } else {
-                            showStatus('glossaryReplaceStatus', 'Invalid rules file format.', 'error', 5000);
-                        }
+                        const text = await navigator.clipboard.readText();
+                        associatedTextarea.value = text;
+                        // Optionally, add a small visual feedback if displayStatus can be targeted
+                        // For now, no explicit success message to keep it simple as per instructions for non-error cases
                     } catch (err) {
-                        showStatus('glossaryReplaceStatus', `Error reading ${file.name}: ${err.message}`, 'error', 5000);
+                        console.error('Failed to read clipboard contents: ', err);
+                        alert('Failed to paste from clipboard. Please ensure you have granted clipboard permission to this site and are using a compatible browser (e.g., Chrome, Edge, Firefox). The operation might have been blocked by your browser or an extension.');
                     }
-                };
-                reader.onerror = () => {
-                    showStatus('glossaryReplaceStatus', `Error reading file ${file.name}.`, 'error', 5000);
-                };
-                reader.readAsText(file);
-                event.target.value = null; // Allow re-uploading
-            });
-        }
+                }
+            };
+            buttonGroup.appendChild(pasteBtn);
 
-        // Plain Text Mode Listeners
-        document.getElementById('plainTextInputArea').addEventListener('input', () => {
-            currentAppState.plainText = document.getElementById('plainTextInputArea').value;
-            debouncedUpdatePlainTextInfo();
-            debouncedSaveState();
-        });
-        document.getElementById('maxChars').addEventListener('input', debouncedUpdatePlainTextInfo);
-        document.getElementById('formatSelect').addEventListener('change', formatPlainText);
+            // Clear button (always added)
+            const clearBtn = document.createElement('button');
+            clearBtn.innerHTML = '<i class="fas fa-times"></i>'; // Using fa-times as suggested
+            clearBtn.className = 'btn btn-icon btn-outline btn-danger btn-clear-chapter'; // Specific class
+            clearBtn.title = 'Clear this chapter box';
+            clearBtn.style.padding = '0.3rem 0.5rem'; // Matching remove button style
+            clearBtn.onclick = () => {
+                const associatedTextarea = itemDiv.querySelector('textarea');
+                if (associatedTextarea) {
+                    associatedTextarea.value = '';
+                }
+            };
+            buttonGroup.appendChild(clearBtn);
 
-        // Common Listeners
-        document.getElementById('addToTop').addEventListener('input', debouncedSaveState);
-        document.getElementById('addToBottom').addEventListener('input', debouncedSaveState);
-
-        // File Input Listeners
-        const jsonFileInput = document.getElementById('jsonFileInput');
-        if (jsonFileInput) {
-            jsonFileInput.addEventListener('change', (event) => {
-                const files = event.target.files;
-                if (!files.length) return;
-
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const content = e.target.result;
-                            const parsedJson = JSON.parse(content);
-                            if (Array.isArray(parsedJson)) {
-                                addJsonChapterInput(JSON.stringify(parsedJson, null, 2)); // Pretty print
-                                showStatus('mainStatus', `Loaded JSON from ${file.name}`, 'success');
-                            } else {
-                                showStatus('mainStatus', `Error: ${file.name} is not a valid JSON array.`, 'error', 5000);
-                            }
-                        } catch (err) {
-                            showStatus('mainStatus', `Error reading ${file.name}: ${err.message}`, 'error', 5000);
-                        }
-                    };
-                    reader.onerror = () => {
-                        showStatus('mainStatus', `Error reading file ${file.name}.`, 'error', 5000);
-                    };
-                    reader.readAsText(file);
-                });
-                event.target.value = null; // Allow re-uploading the same file(s)
-                // updateTotalJsonObjectCount and debouncedSaveState are called by addJsonChapterInput
-            });
-        }
-
-        const textFileInput = document.getElementById('textFileInput');
-        const plainTextInputArea = document.getElementById('plainTextInputArea');
-        if (textFileInput && plainTextInputArea) {
-            textFileInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        plainTextInputArea.value = e.target.result;
-                        plainTextInputArea.dispatchEvent(new Event('input', { bubbles: true })); // Triggers updatePlainTextInfo & saveState
-                        showStatus('mainStatus', `Loaded text from ${file.name}`, 'success');
-                    } catch (err) {
-                        showStatus('mainStatus', `Error processing ${file.name}: ${err.message}`, 'error', 5000);
-                    }
-                };
-                reader.onerror = () => {
-                    showStatus('mainStatus', `Error reading file ${file.name}.`, 'error', 5000);
-                };
-                reader.readAsText(file);
-                event.target.value = null; // Allow re-uploading the same file
-            });
-        }
-
-        // Output Listeners
-        document.getElementById('clearOutputButton').addEventListener('click', clearOutput);
-        document.getElementById('copyNextButton').addEventListener('click', copyNextUncopied);
-        document.getElementById('copyAllButton').addEventListener('click', copyAllChunks);
-
-        window.onscroll = () => {
-            const btn = document.getElementById("scrollToTopBtn");
-            const outputCol = document.getElementById("output-column");
-            if (btn && outputCol) { // Ensure elements exist
-                const show = outputCol.style.display !== 'none' && document.documentElement.scrollTop > 200;
-                btn.style.display = show ? "block" : "none";
+            if (chapterInputCounter > 1) { 
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="fas fa-minus-circle"></i>';
+                removeBtn.className = 'btn btn-icon btn-outline btn-danger';
+                removeBtn.style.padding = '0.3rem 0.5rem'; 
+                removeBtn.title = 'Remove this chapter box';
+                removeBtn.onclick = () => { itemDiv.remove(); };
+                buttonGroup.appendChild(removeBtn); // Add to group
             }
-        };
+            headerDiv.appendChild(buttonGroup); // Add group to header
+            itemDiv.appendChild(headerDiv);
 
-        // --- Final UI Setup ---
-        toggleInputSections();
-        clearOutput();
+            const textarea = document.createElement('textarea');
+            textarea.rows = 4;
+            textarea.placeholder = `Paste JSON for Chapter ${chapterInputCounter}...`;
+            textarea.id = `chapterJson_${chapterInputCounter}`; 
+            itemDiv.appendChild(textarea);
+            container.appendChild(itemDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        window.addChapterInputUI = addChapterInputUI;
 
-        // Hamburger menu functionality (REMOVED)
-        // const hamburger = document.getElementById('hamburger-menu');
-        // const sidebar = document.getElementById('sidebar');
-        // if(hamburger && sidebar) {
-        //   hamburger.addEventListener('click', () => {
-        //     sidebar.classList.toggle('sidebar-open');
-        //   });
-        // }
-        // Optional: Close sidebar when clicking on main content (for mobile) (OLD LOGIC)
-        // const mainContent = document.getElementById('main-content');
-        // }
+        function toggleCustomHeaderInputUI(isChecked) {
+            document.getElementById('customHeaderInputArea').style.display = isChecked ? 'block' : 'none';
+        }
+        window.toggleCustomHeaderInputUI = toggleCustomHeaderInputUI;
 
-        // New Hovering Sidebar JS
-        const hoveringSidebar = document.getElementById('hovering-sidebar');
-        const hoverSidebarToggleBtn = document.getElementById('hover-sidebar-toggle-btn');
-        const expandedSidebarContent = document.getElementById('expanded-sidebar-content');
+        function updateDynamicButtonLabels() {
+            const novelName = novelNameInput.value.trim() || "Project";
+            const isProjectNamed = novelName !== "Project" && novelNameInput.value.trim();
 
-        if (hoverSidebarToggleBtn && hoveringSidebar && expandedSidebarContent) {
-            hoverSidebarToggleBtn.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent click from bubbling to document listener
-                const isExpanded = hoveringSidebar.classList.toggle('expanded');
-                hoverSidebarToggleBtn.textContent = isExpanded ? '❌' : '⚙️';
-                if (isExpanded) {
-                    // Focus on the first focusable element in the sidebar
-                    const firstFocusable = expandedSidebarContent.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                    if (firstFocusable) {
-                        setTimeout(() => firstFocusable.focus(), 50); // Timeout helps ensure element is visible before focus
+            document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load from '${novelName}' Storage`;
+            document.getElementById('saveListToStoredBtn').innerHTML = `<i class="fas fa-save"></i>Save List to '${novelName}' Storage`;
+            document.getElementById('exportStoredBtn').innerHTML = `<i class="fas fa-file-export"></i>Export List for '${novelName}'`;
+            document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear '${novelName}' Stored List`;
+            
+            document.getElementById('loadStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('saveListToStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('exportStoredBtn').disabled = !isProjectNamed;
+            document.getElementById('clearStoredBtn').disabled = !isProjectNamed;
+
+            const importFileInput = document.getElementById('importDedupeFile');
+            const importFileDisplayButton = document.getElementById('fileDisplayText_importDedupe');
+            
+            if (!isProjectNamed) { // Allow import to textbox even without project name, but other project actions disabled
+                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
+            } else {
+                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
+            }
+             // Import is always to the textbox, so it's generally enabled.
+            importFileInput.disabled = false;
+            importFileDisplayButton.style.cursor = "pointer";
+            importFileDisplayButton.classList.remove('disabled');
+
+
+            if (isProjectNamed) {
+                localStorage.setItem(LS_NOVEL_NAME_KEY, novelNameInput.value.trim());
+            }
+        }
+        
+        function updateStoredTermsInfo() {
+            const novelName = novelNameInput.value.trim();
+            const storedInfoDiv = document.getElementById('storedTermsInfo');
+            if (!novelName || novelName === "Project") {
+                storedInfoDiv.style.display = 'none';
+                return;
+            }
+            const key = LS_DEDUPE_PREFIX + novelName;
+            const storedLinesArray = JSON.parse(localStorage.getItem(key) || '[]');
+            let mainInfo = `<div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-database"></i> ${storedLinesArray.length} lines stored for '${novelName}'.</div>`;
+            
+            const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
+            if (localStorage.getItem(warningKey) === 'true') {
+                mainInfo += `<div class="status-message status-warning" style="margin-top:0.5rem; padding:0.5rem 0.75rem; font-size:0.8em;">
+                                <i class="fas fa-hdd"></i><strong>Storage Alert:</strong> Project data is large.
+                                Please <strong>export regularly</strong> and consider managing list size.
+                             </div>`;
+                storedInfoDiv.classList.remove('status-info', 'status-success'); 
+                storedInfoDiv.classList.add('status-warning'); 
+            } else {
+                 storedInfoDiv.classList.remove('status-warning');
+                 storedInfoDiv.classList.add('status-info'); // Default or if no specific status
+            }
+
+            storedInfoDiv.innerHTML = mainInfo;
+            storedInfoDiv.style.display = 'flex';
+        }
+
+
+        function displayStatus(elementId, message, type = 'info', icon = null) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let iconHtml = '';
+            if (icon) iconHtml = `<i class="fas ${icon}"></i>`;
+            else { 
+                if(type === 'success') iconHtml = '<i class="fas fa-check-circle"></i>';
+                else if(type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
+                else if(type === 'danger') iconHtml = '<i class="fas fa-times-circle"></i>';
+                else iconHtml = '<i class="fas fa-info-circle"></i>';
+            }
+            el.innerHTML = `${iconHtml} ${message}`;
+            el.className = `status-message status-${type}`; 
+            el.style.display = 'flex';
+             // Auto-hide info/success messages after a few seconds
+            if (type === 'info' || type === 'success') {
+                setTimeout(() => {
+                    if (el.innerHTML.includes(message)) { // Check if message is still the same
+                        hideStatus(elementId);
                     }
-                }
-            });
-
-            // Close sidebar if clicked outside
-            document.addEventListener('click', (event) => {
-                if (hoveringSidebar.classList.contains('expanded') &&
-                    !expandedSidebarContent.contains(event.target) &&
-                    event.target !== hoverSidebarToggleBtn) {
-                    hoveringSidebar.classList.remove('expanded');
-                    hoverSidebarToggleBtn.textContent = '⚙️';
-                }
-            });
-            expandedSidebarContent.addEventListener('click', (event) => {
-                 event.stopPropagation(); // Prevent click inside from closing
-            });
+                }, 4000);
+            }
+        }
+        function hideStatus(elementId) { 
+            const el = document.getElementById(elementId);
+            if (el) el.style.display = 'none'; 
         }
 
-        // New Sidebar Buttons Functionality
-        const sidebarScrollToTopBtn = document.getElementById('sidebarScrollToTopBtn');
-        if (sidebarScrollToTopBtn) {
-            sidebarScrollToTopBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
-        }
+        function updateFileDisplay(input, displayId) {
+            const display = document.getElementById(displayId); 
+            if (!display) return;
+            const novelName = novelNameInput.value.trim() || "Project";
 
-        const goToFirstChunkBtn = document.getElementById('goToFirstChunkBtn');
-        if (goToFirstChunkBtn) {
-            goToFirstChunkBtn.addEventListener('click', () => {
-                const firstChunk = document.querySelector('#chunkedTextContainer .chunk-container');
-                if (firstChunk) {
-                    firstChunk.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstChunk.classList.add('chunk-highlighted');
-                    setTimeout(() => firstChunk.classList.remove('chunk-highlighted'), 1500);
-                }
-            });
-        }
-
-        const goToLastChunkBtn = document.getElementById('goToLastChunkBtn');
-        if (goToLastChunkBtn) {
-            goToLastChunkBtn.addEventListener('click', () => {
-                const chunks = document.querySelectorAll('#chunkedTextContainer .chunk-container');
-                if (chunks.length > 0) {
-                    const lastChunk = chunks[chunks.length - 1];
-                    lastChunk.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    lastChunk.classList.add('chunk-highlighted');
-                    setTimeout(() => lastChunk.classList.remove('chunk-highlighted'), 1500);
-                }
-            });
-        }
-        updateChunkNavButtonsState(false); // Initially disabled
-
-        // Keyboard Shortcuts Listener
-        document.addEventListener('keydown', (event) => {
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const ctrlKey = isMac ? event.metaKey : event.ctrlKey;
-
-            if (ctrlKey && event.key === 's') { // Ctrl+S or Cmd+S
-                event.preventDefault();
-                if (hoverSidebarToggleBtn) hoverSidebarToggleBtn.click(); // Ensure button exists
-                showStatus('mainStatus', 'Settings Toggled (Ctrl+S)', 'info', 1500);
-            } else if (ctrlKey && event.key === 'Enter') { // Ctrl+Enter or Cmd+Enter
-                event.preventDefault();
-                const mainSplitButton = document.getElementById('mainSplitButton');
-                if (mainSplitButton) mainSplitButton.click(); // Ensure button exists
-                 // showStatus is handled by processAndChunk
-            } else if (ctrlKey && event.key === '.') { // Ctrl+. or Cmd+.
-                event.preventDefault();
-                const copyNextBtn = document.getElementById('copyNextButton');
-                if (copyNextBtn && !copyNextBtn.disabled) { // Ensure button exists and is enabled
-                    copyNextUncopied();
-                     // showStatus is handled by copyNextUncopied/copyToClipboard
+            if (input.files && input.files.length > 0) {
+                const baseIcon = 'fa-file-import'; // Only one type of import now
+                display.innerHTML = `<i class="fas ${baseIcon}"></i> ${input.files[0].name}`;
+                display.classList.add('has-file');
+            } else {
+                // Text for import button
+                if (novelName === "Project" || !novelNameInput.value.trim()) {
+                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
                 } else {
-                    showStatus('mainStatus', 'No uncopied chunks to copy or button not available.', 'info', 2000);
+                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
+                }
+                display.classList.remove('has-file');
+            }
+        }
+        window.updateFileDisplay = updateFileDisplay; 
+        
+        function addProcessingLogStep(message, type = 'info') {
+            const logUl = document.querySelector('#processingLog ul');
+            if(!logUl) return;
+            document.getElementById('processingLog').style.display = 'flex'; 
+            const li = document.createElement('li');
+            let iconClass = 'fa-info-circle'; 
+            let iconColor = 'var(--neutral-500)';
+
+            if (type === 'success') { iconClass = 'fa-check-circle'; iconColor = 'var(--success-500)';}
+            else if (type === 'danger') { iconClass = 'fa-times-circle'; iconColor = 'var(--danger-500)';}
+            else if (type === 'warning') { iconClass = 'fa-exclamation-triangle'; iconColor = 'var(--warning-500)';}
+            
+            li.innerHTML = `<i class="fas ${iconClass}" style="color:${iconColor};"></i> ${message}`;
+            logUl.appendChild(li);
+            logUl.scrollTop = logUl.scrollHeight;
+        }
+        function clearProcessingLog() { 
+            const logUl = document.querySelector('#processingLog ul');
+            if (logUl) logUl.innerHTML = '';
+            document.getElementById('processingLog').style.display = 'none';
+        }
+
+        // --- LocalStorage Interaction (Stores array of full lines) ---
+        function getPersistentDedupeLines(novelName) {
+            if (!novelName) return [];
+            const key = LS_DEDUPE_PREFIX + novelName;
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+
+        function savePersistentDedupeLines(novelName, linesArray) {
+            if (!novelName || novelName === "Project") {
+                displayStatus('dedupeListStatus', "Project Name is required to save the list.", 'danger');
+                return false;
+            }
+            const key = LS_DEDUPE_PREFIX + novelName;
+            const dataStr = JSON.stringify(linesArray);
+            
+            const sizeInBytes = new TextEncoder().encode(dataStr).length;
+            const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
+            if (sizeInBytes > STORAGE_WARNING_THRESHOLD_BYTES) {
+                localStorage.setItem(warningKey, 'true');
+            } else {
+                localStorage.removeItem(warningKey); 
+            }
+            localStorage.setItem(key, dataStr);
+            updateStoredTermsInfo(); 
+            return true;
+        }
+        
+        // Renamed from loadPersistentDedupe
+        function loadPersistentDedupeToList() {
+            const novelName = novelNameInput.value.trim();
+            if (!novelName || novelName === "Project") {
+                displayStatus('dedupeListStatus', "Please enter a valid Project Name first.", 'warning');
+                return;
+            }
+            const storedLines = getPersistentDedupeLines(novelName);
+            pastedDedupeListTextarea.value = storedLines.join('\n');
+            displayStatus('dedupeListStatus', `Loaded ${storedLines.length} lines from '${novelName}' storage into the textbox.`, 'success');
+            updateStoredTermsInfo(); 
+        }
+        window.loadPersistentDedupeToList = loadPersistentDedupeToList;
+
+        function saveDedupeListToPersistentStorage() {
+            try {
+                const novelName = novelNameInput.value.trim();
+                if (!novelName || novelName === "Project") {
+                    displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
+                return;
+            }
+
+            const linesToSaveFromTextarea = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+            const isTextareaEmpty = linesToSaveFromTextarea.length === 0;
+            
+            const currentlyStoredLines = getPersistentDedupeLines(novelName);
+            const isStoredListNonEmpty = currentlyStoredLines.length > 0;
+
+            const performSave = () => {
+                // savePersistentDedupeLines handles the actual stringify and setItem, and its own success/failure display for novel name
+                // It also calls updateStoredTermsInfo() internally after successful save or if storage size warning changes.
+                if (savePersistentDedupeLines(novelName, linesToSaveFromTextarea)) { 
+                    displayStatus('dedupeListStatus', `Saved ${linesToSaveFromTextarea.length} lines to '${novelName}' project storage.`, 'success');
+                }
+                // updateStoredTermsInfo() is called by savePersistentDedupeLines, so not strictly needed here again,
+                // but calling it ensures UI consistency if savePersistentDedupeLines's internal call is missed or conditional.
+                updateStoredTermsInfo(); 
+            };
+
+            if (isTextareaEmpty && isStoredListNonEmpty) {
+                showGenericModal(
+                    `Overwrite Project List for '${novelName}'?`,
+                    `The deduplication list textarea is empty. Saving now will replace the currently stored list for project '<strong>${novelName}</strong>' (which contains <strong>${currentlyStoredLines.length} items</strong>) with an empty list. <br><br>Are you sure you want to proceed and overwrite the stored list?`,
+                    () => { // onConfirm
+                        performSave(); 
+                    },
+                    () => { // onCancel
+                        displayStatus('dedupeListStatus', 'Save operation cancelled by user.', 'info');
+                    }
+                );
+            } else {
+                // Textarea is not empty, OR (textarea is empty AND storage is also empty). Safe to save directly.
+                performSave();
+            }
+        } catch (e) {
+            console.error("Critical error in saveDedupeListToPersistentStorage:", e);
+            alert("A critical error occurred in the 'Save Deduplication List' function. Please check the browser console for more details.");
+        }
+    }
+        window.saveDedupeListToPersistentStorage = saveDedupeListToPersistentStorage;
+        
+        function confirmClearStorage() {
+            const novelName = novelNameInput.value.trim();
+            if (!novelName || novelName === "Project") {
+                 displayStatus('storedTermsInfo', "Please enter a valid Project Name to clear its storage.", 'warning'); 
+                return;
+            }
+            showGenericModal(
+                `Clear Stored Dedupe List for '${novelName}'?`,
+                `This will permanently delete all <strong>${getPersistentDedupeLines(novelName).length} stored lines</strong> for this project. This action cannot be undone. The content in the textbox will NOT be cleared.`,
+                () => { 
+                    localStorage.removeItem(LS_DEDUPE_PREFIX + novelName);
+                    localStorage.removeItem(LS_SIZE_WARNING_PREFIX + novelName); 
+                    displayStatus('storedTermsInfo', `Stored list for '${novelName}' cleared.`, 'success');
+                    updateStoredTermsInfo();
+                }
+            );
+        }
+        window.confirmClearStorage = confirmClearStorage;
+
+        function exportPersistentDedupe() {
+            const novelName = novelNameInput.value.trim();
+            if (!novelName || novelName === "Project") {
+                displayStatus('storedTermsInfo', "Project Name required to export.", 'warning');
+                return;
+            }
+            const dedupeLines = getPersistentDedupeLines(novelName);
+            if (dedupeLines.length === 0) {
+                displayStatus('storedTermsInfo', `No lines stored for '${novelName}' to export.`, 'info');
+                return;
+            }
+
+            const dataStr = JSON.stringify(dedupeLines, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_')}_dedupe_list.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', url);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            document.body.appendChild(linkElement);
+            linkElement.click();
+            document.body.removeChild(linkElement);
+            URL.revokeObjectURL(url);
+            displayStatus('storedTermsInfo', `Exported ${dedupeLines.length} lines for '${novelName}'.`, 'success');
+        }
+        window.exportPersistentDedupe = exportPersistentDedupe;
+
+        function handleImportDedupeFile(fileInput) {
+            // Imports directly into the pastedDedupeListTextarea
+            const importDisplayId = 'fileDisplayText_importDedupe';
+
+            if (fileInput.files.length === 0) {
+                updateFileDisplay(fileInput, importDisplayId); return;
+            }
+            const file = fileInput.files[0];
+            updateFileDisplay(fileInput, importDisplayId);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    let importedLines = [];
+                    if (file.name.toLowerCase().endsWith('.json')) {
+                        const parsedJson = JSON.parse(event.target.result);
+                        if (!Array.isArray(parsedJson) || !parsedJson.every(item => typeof item === 'string')) {
+                            throw new Error('Invalid JSON file. Expected an array of strings.');
+                        }
+                        importedLines = parsedJson;
+                    } else { // Assume .txt or .csv is line-by-line
+                        importedLines = event.target.result.split('\n').map(l => l.trim()).filter(l => l);
+                    }
+
+                    const currentText = pastedDedupeListTextarea.value.trim();
+                    const currentLines = currentText ? currentText.split('\n') : [];
+
+                    showImportOptionsModalToTextarea(importedLines, currentLines.length, (action) => {
+                        if (action === 'replace') {
+                            pastedDedupeListTextarea.value = importedLines.join('\n');
+                            displayStatus('dedupeListStatus', `Replaced textbox with ${importedLines.length} imported lines. Remember to SAVE to project storage if needed.`, 'info');
+                        } else if (action === 'merge') {
+                            const newText = (currentText ? currentText + '\n' : '') + importedLines.join('\n');
+                            pastedDedupeListTextarea.value = newText;
+                             displayStatus('dedupeListStatus', `Appended ${importedLines.length} imported lines to textbox. Remember to SAVE to project storage if needed.`, 'info');
+                        }
+                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                    });
+
+                } catch (e) {
+                    displayStatus('dedupeListStatus', `Error processing import file: ${e.message}`, 'danger');
+                    fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                }
+            };
+            reader.onerror = function() {
+                displayStatus('dedupeListStatus', 'Error reading import file.', 'danger');
+                fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+            };
+            reader.readAsText(file);
+        }
+        window.handleImportDedupeFile = handleImportDedupeFile;
+
+        function clearDedupeListTextarea() {
+            pastedDedupeListTextarea.value = '';
+            hideStatus('dedupeListStatus');
+        }
+        window.clearDedupeListTextarea = clearDedupeListTextarea;
+
+
+        // --- Main Extraction Logic ---
+        async function processAllData() {
+            const extractBtn = document.getElementById('mainExtractBtn');
+            extractBtn.classList.add('loading');
+            extractBtn.disabled = true;
+            clearProcessingLog();
+            hideStatus('jsonStatus'); hideStatus('outputSummary');
+            // document.getElementById('saveToStorageBtnContainer').innerHTML = ''; // Removed this container
+            addProcessingLogStep('Extraction process initiated...', 'info');
+            
+            lastExtractedPureTerms = []; // This will store new `raw,translation,gender` lines
+            const chapterTextareas = document.querySelectorAll('#chapterInputsContainer textarea');
+            if (chapterTextareas.length === 0 || Array.from(chapterTextareas).every(ta => !ta.value.trim())) {
+                displayStatus('jsonStatus', "No chapter JSON provided.", 'warning');
+                addProcessingLogStep('No chapter JSON data. Aborted.', 'danger');
+                finalizeExtractionUI(extractBtn); return;
+            }
+            
+            // Build deduplication set for THIS RUN from the pastedDedupeListTextarea
+            const currentDedupeListContent = pastedDedupeListTextarea.value;
+            const dedupeLinesForRun = currentDedupeListContent.split('\n').map(line => line.trim()).filter(line => line);
+            const translationsToDeduplicateThisRun = new Set();
+            dedupeLinesForRun.forEach(line => {
+                const parts = line.split(',').map(part => part.trim());
+                // Use translation part (parts[1]) if available, otherwise the whole line if it's a single term
+                const translationKey = (parts.length >= 2 && parts[1]) ? parts[1].toLowerCase() : ((parts.length === 1 && parts[0]) ? parts[0].toLowerCase() : null);
+                if (translationKey) {
+                    translationsToDeduplicateThisRun.add(translationKey);
+                }
+            });
+            addProcessingLogStep(`Using ${translationsToDeduplicateThisRun.size} unique translations from the Deduplication List for current extraction.`, 'info');
+
+            let allChunks = [];
+            let chaptersParsedCount = 0;
+            for (let i = 0; i < chapterTextareas.length; i++) {
+                const chapterJsonStr = chapterTextareas[i].value;
+                const chapterGroup = chapterTextareas[i].closest('.chapter-input-group');
+                const boxNumber = chapterGroup ? chapterGroup.id.split('_')[1] : i + 1; 
+                
+                if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${boxNumber} empty. Skipping.`, 'info'); continue; }
+                addProcessingLogStep(`Parsing Chapter from Box ${boxNumber}...`, 'info');
+                await new Promise(r => setTimeout(r, 10)); 
+                try {
+                    const parsedChapter = JSON.parse(chapterJsonStr);
+                    // Basic structure validation (can be expanded)
+                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !('terms' in parsedChapter[0]) || !Array.isArray(parsedChapter[0].terms)))) {
+                         addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON structure. Expected array of objects with a 'terms' array. Skipped.`, 'warning'); continue;
+                    }
+
+                    allChunks.push(...parsedChapter);
+                    chaptersParsedCount++;
+                    addProcessingLogStep(`Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, 'success');
+                } catch (e) { 
+                    addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON. Error: "${e.message}". Skipped.`, 'danger'); 
                 }
             }
-        });
 
-        // Info Buttons JS
-        document.querySelectorAll('.info-btn').forEach(button => {
-            button.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const targetId = button.dataset.infoTarget;
-                const popup = document.getElementById(targetId);
-                if (!popup) return;
-
-                const isVisible = popup.style.display === 'block';
-                // Hide all other popups
-                document.querySelectorAll('.info-popup').forEach(p => p.style.display = 'none');
-                // Toggle current popup
-                popup.style.display = isVisible ? 'none' : 'block';
-            });
-        });
-        // Close info popups if clicked outside
-         document.addEventListener('click', (event) => {
-            if (!event.target.closest('.info-btn-wrapper') && !event.target.closest('.info-popup')) {
-                 document.querySelectorAll('.info-popup').forEach(p => p.style.display = 'none');
+            if (chaptersParsedCount === 0) {
+                displayStatus('jsonStatus', 'No chapters successfully parsed. Check JSON and Processing Log.', 'danger');
+                addProcessingLogStep('Failed to parse any chapter data. Aborted.', 'danger');
+                finalizeExtractionUI(extractBtn); return;
             }
-        });
+            addProcessingLogStep(`${chaptersParsedCount} chapters parsed. Extracting terms...`, 'info');
+
+            const seenThisRunTranslations = new Set(); // To avoid duplicates within the same extraction run output
+            allChunks.forEach(chunk => {
+                if (chunk && Array.isArray(chunk.terms)) {
+                    chunk.terms.forEach(term => {
+                        const raw = term.raw, translation = term.translation;
+                        if (raw && translation) {
+                            const translationKey = String(translation).toLowerCase(); 
+                            if (!translationsToDeduplicateThisRun.has(translationKey) && !seenThisRunTranslations.has(translationKey)) {
+                                seenThisRunTranslations.add(translationKey);
+                                let gender = "Neuter"; 
+                                if (term.tags && Array.isArray(term.tags)) {
+                                    if (term.tags.includes("#male")) gender = "Male";
+                                    else if (term.tags.includes("#female")) gender = "Female";
+                                }
+                                lastExtractedPureTerms.push(`${raw},${translation},${gender}`); // Store full line
+                            }
+                        }
+                    });
+                }
+            });
+
+            addProcessingLogStep(`Found ${lastExtractedPureTerms.length} new unique terms for this session.`, 'success');
+            
+            let finalOutputText = "";
+            const includeHeader = document.getElementById('includeCustomHeaderCheckbox').checked;
+            const headerText = editablePresetTextarea.value.trim();
+            if (includeHeader && headerText) {
+                finalOutputText += headerText + "\n\n";
+            }
+            finalOutputText += lastExtractedPureTerms.join('\n');
+            outputTextarea.value = finalOutputText;
+
+            if (lastExtractedPureTerms.length > 0) {
+                 displayStatus('outputSummary', `Extraction complete: ${lastExtractedPureTerms.length} new unique terms found. Use 'Move Extracted' to add them to the Dedupe List.`, 'success');
+            } else {
+                 displayStatus('outputSummary', 'Extraction complete. No new unique terms found based on current Deduplication List.', 'info');
+            }
+            finalizeExtractionUI(extractBtn);
+        }
+        window.processAllData = processAllData;
+
+        function finalizeExtractionUI(button) {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+
+        // --- Output Handling ---
+        function moveExtractedToDedupeList() {
+            if (lastExtractedPureTerms.length === 0) {
+                showTooltipMessage('moveExtractedTooltip', "No terms to move!");
+                return;
+            }
+            const currentDedupeText = pastedDedupeListTextarea.value.trim();
+            const newTermsText = lastExtractedPureTerms.join('\n');
+            
+            pastedDedupeListTextarea.value = (currentDedupeText ? currentDedupeText + '\n' : '') + newTermsText;
+            
+            displayStatus('dedupeListStatus', `${lastExtractedPureTerms.length} extracted terms added to the Deduplication List textbox. Remember to SAVE to project storage if desired.`, 'info');
+            showTooltipMessage('moveExtractedTooltip', "Moved!");
+            lastExtractedPureTerms = []; // Clear after moving
+            outputTextarea.value = document.getElementById('includeCustomHeaderCheckbox').checked ? editablePresetTextarea.value.trim() + "\n\n" : ""; // Clear output or reset to header
+            hideStatus('outputSummary');
+        }
+        window.moveExtractedToDedupeList = moveExtractedToDedupeList;
+
+        function copyOutput(mode) { // Only 'withHeader' mode effectively remains for direct copy
+            let textToCopy = outputTextarea.value; // This now includes header if checked, and only new terms
+            let tooltipId = 'copyHeaderTooltip';
+            
+            if (!textToCopy.trim()) { 
+                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
+            }
+            performCopy(textToCopy, tooltipId);
+        }
+        window.copyOutput = copyOutput;
+        
+        function copyToClipboard(elementId, tooltipId) { 
+            const el = document.getElementById(elementId);
+            if (!el.value || !el.value.trim()) {
+                showTooltipMessage(tooltipId, "Nothing to copy!"); return;
+            }
+            performCopy(el.value, tooltipId);
+        }
+        window.copyToClipboard = copyToClipboard;
+
+        function performCopy(text, tooltipId) {
+            navigator.clipboard.writeText(text).then(() => {
+                showTooltipMessage(tooltipId, "Copied!");
+            }).catch(err => {
+                console.error('Clipboard copy failed:', err);
+                showTooltipMessage(tooltipId, "Copy Failed!");
+            });
+        }
+
+        function showTooltipMessage(tooltipId, message) {
+            const tooltip = document.getElementById(tooltipId);
+            if (!tooltip) return;
+            const originalText = tooltip.dataset.originalText || tooltip.textContent; 
+            if (!tooltip.dataset.originalText) tooltip.dataset.originalText = originalText;
+
+            tooltip.textContent = message;
+            tooltip.style.visibility = 'visible'; 
+            tooltip.style.opacity = '1';
+
+            setTimeout(() => { 
+                tooltip.textContent = tooltip.dataset.originalText;
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+            }, 1500);
+        }
+
+        // --- Modal Logic ---
+        function showGenericModal(title, message, onConfirm, onCancel = null) {
+            modalTitleEl.textContent = title;
+            modalMessageEl.innerHTML = message; 
+            
+            modalActionsContainer.innerHTML = ''; 
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'btn btn-danger'; // Default to danger for generic confirm
+            confirmBtn.textContent = 'Confirm';
+            confirmBtn.onclick = () => { if(onConfirm) onConfirm(); hideGenericModal(); };
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn btn-outline';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = () => { if(onCancel) onCancel(); hideGenericModal(); };
+
+            modalActionsContainer.appendChild(cancelBtn);
+            modalActionsContainer.appendChild(confirmBtn);
+            
+            modalOverlay.classList.add('active');
+        }
+
+        function hideGenericModal() {
+            modalOverlay.classList.remove('active');
+            generalConfirmCallback = null; // Clear them
+            generalCancelCallback = null;
+        }
+
+        function showImportOptionsModalToTextarea(importedLines, currentLineCountInTextarea, callbackOnAction) {
+            modalTitleEl.textContent = `Import Lines to Dedupe List Textbox`;
+            const importCount = importedLines.length;
+            
+            const combinedLines = (pastedDedupeListTextarea.value.trim() ? pastedDedupeListTextarea.value.trim().split('\n') : []).concat(importedLines);
+            const uniqueCombinedLines = Array.from(new Set(combinedLines)); // Simple uniqueness for display
+            const mergedCount = uniqueCombinedLines.length;
+            const newLinesInMerge = mergedCount - currentLineCountInTextarea;
 
 
-        showStatus('mainStatus', 'Ready!', 'success', 2500);
-    });
+            modalMessageEl.innerHTML = `
+                You are importing <strong>${importCount} lines</strong>.
+                The textbox currently has <strong>${currentLineCountInTextarea} lines</strong>.
+                <br><br>Choose an action for the textbox content:
+            `;
+            
+            modalActionsContainer.innerHTML = ''; 
 
-  </script>
+            const replaceBtn = document.createElement('button');
+            replaceBtn.className = 'btn btn-warning'; // Use warning for replace
+            replaceBtn.innerHTML = `<i class="fas fa-exchange-alt"></i> Replace Textbox (${importCount} total)`;
+            replaceBtn.onclick = () => {
+                if(callbackOnAction) callbackOnAction('replace');
+                hideGenericModal();
+            };
+
+            const mergeBtn = document.createElement('button');
+            mergeBtn.className = 'btn btn-primary';
+            mergeBtn.innerHTML = `<i class="fas fa- Mearge"></i> Append to Textbox (+${importCount} lines)`;
+            mergeBtn.onclick = () => {
+                 if(callbackOnAction) callbackOnAction('merge');
+                hideGenericModal();
+            };
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn btn-outline';
+            cancelBtn.textContent = 'Cancel Import';
+            cancelBtn.onclick = () => { 
+                if(callbackOnAction) callbackOnAction('cancel'); // Allow callback to know it was cancelled
+                hideGenericModal(); 
+            };
+            
+            modalActionsContainer.appendChild(cancelBtn);
+            modalActionsContainer.appendChild(mergeBtn);
+            modalActionsContainer.appendChild(replaceBtn);
+            
+            modalOverlay.classList.add('active');
+        }
+        
+    })(); // IIFE End
+    </script>
 </body>
 </html>
