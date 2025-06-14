@@ -393,6 +393,14 @@
             }
             updateDynamicButtonLabelsAndInfo(); 
 
+            // Set "Include Custom Output Header" to be ON by default
+            const includeCustomHeaderCheckbox = document.getElementById('includeCustomHeaderCheckbox');
+            if (includeCustomHeaderCheckbox) {
+                includeCustomHeaderCheckbox.checked = true;
+                // Ensure the UI (textarea visibility) matches the checkbox state
+                toggleCustomHeaderInputUI(includeCustomHeaderCheckbox.checked);
+            }
+
             novelNameInput.addEventListener('keyup', debounce(updateDynamicButtonLabelsAndInfo, 350));
 
             document.getElementById('modalCancelBtnGeneric').addEventListener('click', () => {
@@ -426,6 +434,48 @@
             label.textContent = `Chapter ${chapterInputCounter} JSON`;
             headerDiv.appendChild(label);
 
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'chapter-action-buttons'; // Added for potential styling of the group
+            buttonGroup.style.display = 'flex'; // Simple styling for horizontal layout
+            buttonGroup.style.gap = '0.5rem'; // Space between buttons
+
+            // Paste button (always added)
+            const pasteBtn = document.createElement('button');
+            pasteBtn.innerHTML = '<i class="fas fa-paste"></i>';
+            pasteBtn.className = 'btn btn-icon btn-outline btn-secondary'; // Using btn-secondary for neutral color
+            pasteBtn.title = 'Paste from clipboard';
+            pasteBtn.style.padding = '0.3rem 0.5rem'; // Consistent padding
+
+            pasteBtn.onclick = async () => {
+                const associatedTextarea = itemDiv.querySelector('textarea');
+                if (associatedTextarea) {
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        associatedTextarea.value = text;
+                        // Optionally, add a small visual feedback if displayStatus can be targeted
+                        // For now, no explicit success message to keep it simple as per instructions for non-error cases
+                    } catch (err) {
+                        console.error('Failed to read clipboard contents: ', err);
+                        alert('Failed to paste from clipboard. Please ensure you have granted clipboard permission to this site and are using a compatible browser (e.g., Chrome, Edge, Firefox). The operation might have been blocked by your browser or an extension.');
+                    }
+                }
+            };
+            buttonGroup.appendChild(pasteBtn);
+
+            // Clear button (always added)
+            const clearBtn = document.createElement('button');
+            clearBtn.innerHTML = '<i class="fas fa-times"></i>'; // Using fa-times as suggested
+            clearBtn.className = 'btn btn-icon btn-outline btn-danger btn-clear-chapter'; // Specific class
+            clearBtn.title = 'Clear this chapter box';
+            clearBtn.style.padding = '0.3rem 0.5rem'; // Matching remove button style
+            clearBtn.onclick = () => {
+                const associatedTextarea = itemDiv.querySelector('textarea');
+                if (associatedTextarea) {
+                    associatedTextarea.value = '';
+                }
+            };
+            buttonGroup.appendChild(clearBtn);
+
             if (chapterInputCounter > 1) { 
                 const removeBtn = document.createElement('button');
                 removeBtn.innerHTML = '<i class="fas fa-minus-circle"></i>';
@@ -433,8 +483,9 @@
                 removeBtn.style.padding = '0.3rem 0.5rem'; 
                 removeBtn.title = 'Remove this chapter box';
                 removeBtn.onclick = () => { itemDiv.remove(); };
-                headerDiv.appendChild(removeBtn);
+                buttonGroup.appendChild(removeBtn); // Add to group
             }
+            headerDiv.appendChild(buttonGroup); // Add group to header
             itemDiv.appendChild(headerDiv);
 
             const textarea = document.createElement('textarea');
@@ -632,11 +683,38 @@
                 displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
                 return;
             }
-            const linesToSave = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
-            if (savePersistentDedupeLines(novelName, linesToSave)) {
-                displayStatus('dedupeListStatus', `Saved ${linesToSave.length} lines to '${novelName}' project storage.`, 'success');
+
+            const linesToSaveFromTextarea = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+            const isTextareaEmpty = linesToSaveFromTextarea.length === 0;
+
+            const currentlyStoredLines = getPersistentDedupeLines(novelName);
+            const isStoredListNonEmpty = currentlyStoredLines.length > 0;
+
+            const performSave = () => {
+                // savePersistentDedupeLines handles the actual stringify and setItem, and its own success/failure display for novel name
+                // It also calls updateStoredTermsInfo() internally after successful save or if storage size warning changes.
+                if (savePersistentDedupeLines(novelName, linesToSaveFromTextarea)) {
+                    displayStatus('dedupeListStatus', `Saved ${linesToSaveFromTextarea.length} lines to '${novelName}' project storage.`, 'success');
+                }
+                // updateStoredTermsInfo() is called by savePersistentDedupeLines, so not strictly needed here again,
+                // but calling it ensures UI consistency if savePersistentDedupeLines's internal call is missed or conditional.
+                updateStoredTermsInfo();
+            };
+
+            if (isTextareaEmpty && isStoredListNonEmpty) {
+                showGenericModal(
+                    `Overwrite Project List for '${novelName}'?`,
+                    `The deduplication list textarea is empty. Saving now will replace the currently stored list for project '<strong>${novelName}</strong>' (which contains <strong>${currentlyStoredLines.length} items</strong>) with an empty list. <br><br>Are you sure you want to proceed and overwrite the stored list?`,
+                    () => { // onConfirm
+                        performSave();
+                    },
+                    () => { // onCancel
+                        displayStatus('dedupeListStatus', 'Save operation cancelled by user.', 'info');
+                    }
+                );
             } else {
-                // savePersistentDedupeLines will show its own error if novelName is missing
+                // Textarea is not empty, OR (textarea is empty AND storage is also empty). Safe to save directly.
+                performSave();
             }
         }
         window.saveDedupeListToPersistentStorage = saveDedupeListToPersistentStorage;
