@@ -192,6 +192,304 @@
         }
         .dedupe-list-actions .btn { flex-grow: 1; } /* Make buttons in dedupe list actions take full width in group */
 
+        .side-toggle-btn {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            padding: 0.8rem 1rem; /* Rectangular shape */
+            background-color: var(--primary-500);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md); 
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .side-toggle-btn:hover {
+            background-color: var(--primary-600);
+            transform: translateY(-50%) scale(1.05); /* Slight hover effect */
+        }
+
+        .side-toggle-btn i {
+            font-size: 1.2rem; /* Adjust icon size */
+            display: block; /* Helps if button is not flex-centered */
+        }
+
+        .side-modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            inset: 0;
+            background-color: rgba(17, 24, 39, 0.7); /* Using a color from existing modal for consistency */
+            /* display: flex; */ /* Changed: This will be set by .active class */
+            align-items: center;
+            justify-content: center;
+            z-index: 1050; 
+            backdrop-filter: blur(3px); /* Optional: blur background */
+        }
+
+        .side-modal-overlay.active { /* Class to show the modal */
+            display: flex;
+        }
+
+        .side-modal-content {
+            background-color: var(--bg-panel);
+            padding: 1.5rem 2rem; /* Adjusted padding */
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 35%; /* Approx 1/3rd */
+            max-width: 480px; 
+            min-width: 320px; 
+            max-height: 80vh; /* More flexible height */
+            overflow-y: auto;
+            position: relative;
+            color: var(--neutral-700); /* Ensure text color is appropriate */
+        }
+        .side-modal-content h2 { /* Basic styling for potential title */
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: var(--neutral-800);
+            border-bottom: 1px solid var(--neutral-200);
+            padding-bottom: 0.75rem;
+        }
+
+        .side-modal-close-btn {
+            position: absolute;
+            top: 0.75rem; /* Adjusted for padding */
+            right: 1rem;  /* Adjusted for padding */
+            background: transparent;
+            border: none;
+            font-size: 2rem; /* Larger for easier clicking */
+            font-weight: 300;
+            color: var(--neutral-400);
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.25rem; /* Small padding for click area */
+        }
+        .side-modal-close-btn:hover {
+            color: var(--neutral-600);
+        }
+
+        /* Dark Theme Variables and Overrides */
+        html[data-theme="dark"] {
+            --bg-main: #111827; /* Very Dark Blue/Gray */
+            --bg-panel: #1f2937; /* Dark Blue/Gray */
+            
+            --primary-400: #60a5fa; /* Lighter primary for dark mode if needed, for example, for some text */
+
+            --neutral-800: #f3f4f6; /* Light Gray (for headings) */
+            --neutral-700: #d1d5db; /* Medium-Light Gray (for primary text, dark inputs bg) */
+            --neutral-600: #4b5563; /* Mid-Dark Gray (dark input bg) */
+            --neutral-500: #9ca3af; /* Medium Gray (for secondary text, dark input borders) */
+            --neutral-400: #9ca3af; /* Alias for 500 or slightly lighter for labels if needed */
+            --neutral-300: #4b5563; /* Darker Gray (for borders) */
+            --neutral-200: #374151; /* Dark Gray (for lighter borders/bg accents in dark) */
+            --neutral-100: #f3f4f6; /* Light Gray (dark input text color) */
+
+            /* Component specific vars for dark theme */
+            --input-bg: var(--neutral-600);
+            --input-text: var(--neutral-100);
+            --input-border: var(--neutral-500);
+
+            --btn-outline-text: var(--neutral-200);
+            --btn-outline-border: var(--neutral-500);
+            --btn-outline-hover-bg: var(--neutral-700);
+            --btn-outline-hover-text: var(--neutral-100);
+            --btn-outline-hover-border: var(--neutral-400);
+
+            --danger-400: #f87171; /* Lighter red for dark mode text/borders */
+        }
+
+        html[data-theme="dark"] body {
+            background-color: var(--bg-main);
+            color: var(--neutral-300); /* Default body text color for dark mode */
+        }
+
+        html[data-theme="dark"] .panel {
+            background-color: var(--bg-panel);
+            border-color: var(--neutral-700); /* Panel border if any, or for consistency */
+        }
+
+        html[data-theme="dark"] input[type="text"],
+        html[data-theme="dark"] textarea {
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border-color: var(--input-border);
+        }
+        html[data-theme="dark"] input[type="text"]:focus,
+        html[data-theme="dark"] textarea:focus {
+            border-color: var(--primary-400); 
+            box-shadow: 0 0 0 3px rgba(96,165,250,0.3); /* primary-400 color with alpha */
+        }
+
+        html[data-theme="dark"] .btn-outline {
+            border-color: var(--btn-outline-border);
+            color: var(--btn-outline-text);
+        }
+        html[data-theme="dark"] .btn-outline:hover {
+            background-color: var(--btn-outline-hover-bg);
+            border-color: var(--btn-outline-hover-border);
+            color: var(--btn-outline-hover-text);
+        }
+        html[data-theme="dark"] .btn-outline.btn-danger {
+            color: var(--danger-400);
+            border-color: var(--danger-400);
+        }
+        html[data-theme="dark"] .btn-outline.btn-danger:hover {
+            background-color: var(--danger-500);
+            color: white;
+        }
+        /* Ensure specific outline buttons like chapter clear/paste also use these */
+        html[data-theme="dark"] .btn-clear-chapter,
+        html[data-theme="dark"] .btn-icon.btn-outline.btn-secondary { /* For paste button */
+             border-color: var(--btn-outline-border);
+             color: var(--btn-outline-text);
+        }
+         html[data-theme="dark"] .btn-clear-chapter:hover,
+         html[data-theme="dark"] .btn-icon.btn-outline.btn-secondary:hover {
+            background-color: var(--btn-outline-hover-bg);
+            border-color: var(--btn-outline-hover-border);
+            color: var(--btn-outline-hover-text);
+        }
+
+
+        html[data-theme="dark"] #chapterInputsContainer {
+            scrollbar-color: var(--neutral-500) var(--neutral-700); 
+        }
+        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-track { background: var(--neutral-700); }
+        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-thumb { background-color: var(--neutral-500); border-color: var(--neutral-700); }
+        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-thumb:hover { background-color: var(--neutral-400); }
+
+        html[data-theme="dark"] #processingLog { 
+            border-color: var(--neutral-700); 
+            background-color: var(--neutral-800);
+        }
+        html[data-theme="dark"] #processingLog strong { 
+            color: var(--neutral-100); 
+        }
+        html[data-theme="dark"] #processingLog ul { 
+            color:var(--neutral-300);
+        }
+        html[data-theme="dark"] #processingLog li { 
+            border-bottom-color: var(--neutral-700);
+        }
+
+        html[data-theme="dark"] .panel-title {
+            border-bottom-color: var(--neutral-700); 
+            color: var(--neutral-100); 
+        }
+        html[data-theme="dark"] .panel-title i {
+            color: var(--primary-400); 
+        }
+        html[data-theme="dark"] .form-label {
+            color: var(--neutral-400); 
+        }
+        
+        html[data-theme="dark"] .file-input-wrapper .file-display-text { 
+            color: var(--neutral-400);
+            border-color: var(--btn-outline-border); /* Match other outline buttons */
+        }
+        html[data-theme="dark"] .file-input-wrapper .file-display-text.has-file { 
+            color: var(--neutral-200); 
+        }
+         html[data-theme="dark"] .file-input-wrapper .file-display-text:hover {
+            background-color: var(--btn-outline-hover-bg);
+            border-color: var(--btn-outline-hover-border);
+            color: var(--btn-outline-hover-text);
+        }
+
+
+        html[data-theme="dark"] .side-modal-content {
+            background-color: var(--bg-panel); 
+            color: var(--neutral-300); 
+        }
+        html[data-theme="dark"] .side-modal-content h2 {
+            color: var(--neutral-100);
+            border-bottom-color: var(--neutral-700);
+        }
+        html[data-theme="dark"] .side-modal-close-btn {
+            color: var(--neutral-400);
+        }
+        html[data-theme="dark"] .side-modal-close-btn:hover {
+            color: var(--neutral-200);
+        }
+
+        /* Status messages in dark theme - simple inversion or desaturation if needed */
+        /* Example: make them slightly less intense or ensure text contrast */
+        html[data-theme="dark"] .status-success { background-color: #103c30; color: #a7d8c8; border-color: #205c40; } 
+        html[data-theme="dark"] .status-warning { background-color: #453209; color: #ffecb3; border-color: #60420f; } 
+        html[data-theme="dark"] .status-danger  { background-color: #4d120f; color: #ffcdd2; border-color: #70201f; } 
+        html[data-theme="dark"] .status-info    { background-color: #0d2c4f; color: #bbdefb; border-color: #1c3c6f; } 
+        html[data-theme="dark"] .status-message i { opacity: 0.85; }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 991px) { /* Tablets and below */
+            .side-modal-content {
+                width: 60vw;
+            }
+        }
+
+        @media (max-width: 767px) { /* Mobile devices */
+            body { 
+                padding: 0.75rem; 
+            }
+            .panel { 
+                padding: 0.75rem; 
+            }
+            .panel-title { 
+                margin-bottom: 0.75rem; 
+                padding-bottom: 0.5rem; 
+                font-size: 1.1rem; /* Slightly smaller panel titles */
+            }
+            .form-group { 
+                margin-bottom: 0.75rem; 
+            }
+            
+            .grid-layout {
+                grid-template-columns: 1fr; /* Stack columns on mobile */
+            }
+            .grid-layout .col-span-1,
+            .grid-layout .col-span-2,
+            .grid-layout .col-span-3,
+            .grid-layout .md-col-span-1,
+            .grid-layout .md-col-span-2 {
+                grid-column: span 1 / span 1; /* Override multi-column spans */
+            }
+
+            .chapter-action-buttons .btn-icon {
+                padding: 0.5rem; /* Increase padding for better touch area */
+                font-size: 1rem; /* Ensure icon itself is not too small */
+            }
+            .side-modal-close-btn {
+                padding: 0.5rem; /* Increase padding for click area */
+            }
+            .side-modal-content {
+                width: 90vw; /* More width on small screens */
+                padding: 1rem 1.25rem; /* Adjust padding for smaller modal */
+            }
+            .side-modal-content h2 {
+                font-size: 1.15rem; /* Adjust title in smaller modal */
+            }
+
+            .app-title-bar h1 { font-size: 1.5rem; } /* Smaller main title */
+            .app-title-bar p { font-size: 0.8rem; }
+
+            /* Make main action button full width on mobile for easier tapping */
+            .btn-main-action {
+                 width: 100%;
+                 padding: 0.75rem 1rem; /* Slightly adjust padding */
+            }
+            .output-actions {
+                flex-direction: column; /* Stack output action buttons */
+            }
+            .output-actions .btn {
+                width: 100%; /* Make them full width */
+            }
+        }
     </style>
 </head>
 <body>
@@ -252,6 +550,16 @@
                 <h2 class="panel-title"><i class="fas fa-filter"></i>Deduplication List & Output Header</h2>
                 <div class="session-config-grid-internal">
                     <div> <!-- Dedupe Column -->
+                        <div class="form-group" id="dedupeSearchGroup" style="margin-bottom: 0.5rem;">
+                            <label for="dedupeSearchInput" class="form-label" style="font-size: 0.8rem;">Search/Filter List:</label>
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <input type="text" id="dedupeSearchInput" placeholder="Type to filter..." style="flex-grow: 1;">
+                                <button id="clearDedupeSearchBtn" class="btn btn-icon btn-outline" title="Clear Search"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div id="dedupeFilteredResults" class="dedupe-filtered-results-area" style="display: none; max-height: 150px; overflow-y: auto; background-color: var(--neutral-100); border: 1px solid var(--neutral-300); border-radius: var(--radius-md); padding: 0.5rem; font-size: 0.8em;">
+                                <!-- Filtered results will appear here -->
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="pastedDedupeList" class="form-label">Project Deduplication List (Active & Editable):</label>
                             <textarea id="pastedDedupeList" rows="7" placeholder="Load or paste: term_translation (one per line) OR raw,term_translation[,gender]..."></textarea>
@@ -345,6 +653,32 @@
         <p>© 2024 Zenith Term Processor. Elevating Your Lexical Workflow.</p>
     </footer>
 
+    <button id="sideToggleButton" class="side-toggle-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="sideToggleModalOverlay" class="side-modal-overlay">
+        <div class="side-modal-content">
+            <button id="closeSideModalBtn" class="side-modal-close-btn">&times;</button>
+            <h2>Quick Access Panel</h2>
+            
+            <button id="themeToggleBtn" class="btn btn-outline" style="width:100%; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-moon" style="margin-right: 0.5rem;"></i> <span>Toggle Theme</span>
+            </button>
+
+            <button id="autoSaveToggleBtn" class="btn btn-outline" style="width:100%; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-sync-alt" style="margin-right: 0.5rem;"></i> <span>Auto-Save: Enabled</span>
+            </button>
+
+            <button id="sortDedupeBtn" class="btn btn-outline" style="width:100%; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-sort-alpha-down" style="margin-right: 0.5rem;"></i> <span>Sort Dedupe List</span>
+            </button>
+
+            <p style="font-size:0.85rem; text-align:center; opacity:0.7;">More controls will be added here soon.</p>
+            <!-- Icons and controls will be added later -->
+        </div>
+    </div>
+
     <script>
     (function() { // IIFE Start
         // --- Global State & Constants ---
@@ -397,9 +731,34 @@
             const includeCustomHeaderCheckbox = document.getElementById('includeCustomHeaderCheckbox');
             if (includeCustomHeaderCheckbox) {
                 includeCustomHeaderCheckbox.checked = true;
-                // Ensure the UI (textarea visibility) matches the checkbox state
-                toggleCustomHeaderInputUI(includeCustomHeaderCheckbox.checked);
+                toggleCustomHeaderInputUI(includeCustomHeaderCheckbox.checked); 
             }
+
+            // --- Auto-Save Initialization ---
+            const autoSaveToggleBtnElem = document.getElementById('autoSaveToggleBtn');
+            // pastedDedupeListTextarea is already a global const in this IIFE
+
+            const savedAutoSavePref = localStorage.getItem(LS_AUTOSAVE_ENABLED_KEY);
+            isAutoSaveEnabled = savedAutoSavePref === null ? true : (savedAutoSavePref === 'true'); // Default to true
+            updateAutoSaveButtonUI(); // Initialize button UI
+
+            if (pastedDedupeListTextarea) { // Check if element exists
+                pastedDedupeListTextarea.addEventListener('input', debouncedAutoSave);
+            }
+
+            if (autoSaveToggleBtnElem) {
+                autoSaveToggleBtnElem.addEventListener('click', () => {
+                    isAutoSaveEnabled = !isAutoSaveEnabled;
+                    localStorage.setItem(LS_AUTOSAVE_ENABLED_KEY, isAutoSaveEnabled);
+                    updateAutoSaveButtonUI();
+                    if (isAutoSaveEnabled) {
+                        if (pastedDedupeListTextarea && pastedDedupeListTextarea.value.trim()) {
+                             autoSaveDedupeList(); // Trigger save if enabling with content
+                        }
+                    }
+                });
+            }
+            // End of Auto-Save Initialization
 
             novelNameInput.addEventListener('keyup', debounce(updateDynamicButtonLabelsAndInfo, 350));
 
@@ -678,27 +1037,28 @@
         window.loadPersistentDedupeToList = loadPersistentDedupeToList;
 
         function saveDedupeListToPersistentStorage() {
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
+            try {
+                const novelName = novelNameInput.value.trim();
+                if (!novelName || novelName === "Project") {
+                    displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
                 return;
             }
 
             const linesToSaveFromTextarea = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
             const isTextareaEmpty = linesToSaveFromTextarea.length === 0;
-
+            
             const currentlyStoredLines = getPersistentDedupeLines(novelName);
             const isStoredListNonEmpty = currentlyStoredLines.length > 0;
 
             const performSave = () => {
                 // savePersistentDedupeLines handles the actual stringify and setItem, and its own success/failure display for novel name
                 // It also calls updateStoredTermsInfo() internally after successful save or if storage size warning changes.
-                if (savePersistentDedupeLines(novelName, linesToSaveFromTextarea)) {
+                if (savePersistentDedupeLines(novelName, linesToSaveFromTextarea)) { 
                     displayStatus('dedupeListStatus', `Saved ${linesToSaveFromTextarea.length} lines to '${novelName}' project storage.`, 'success');
                 }
                 // updateStoredTermsInfo() is called by savePersistentDedupeLines, so not strictly needed here again,
                 // but calling it ensures UI consistency if savePersistentDedupeLines's internal call is missed or conditional.
-                updateStoredTermsInfo();
+                updateStoredTermsInfo(); 
             };
 
             if (isTextareaEmpty && isStoredListNonEmpty) {
@@ -706,7 +1066,7 @@
                     `Overwrite Project List for '${novelName}'?`,
                     `The deduplication list textarea is empty. Saving now will replace the currently stored list for project '<strong>${novelName}</strong>' (which contains <strong>${currentlyStoredLines.length} items</strong>) with an empty list. <br><br>Are you sure you want to proceed and overwrite the stored list?`,
                     () => { // onConfirm
-                        performSave();
+                        performSave(); 
                     },
                     () => { // onCancel
                         displayStatus('dedupeListStatus', 'Save operation cancelled by user.', 'info');
@@ -716,7 +1076,11 @@
                 // Textarea is not empty, OR (textarea is empty AND storage is also empty). Safe to save directly.
                 performSave();
             }
+        } catch (e) {
+            console.error("Critical error in saveDedupeListToPersistentStorage:", e);
+            alert("A critical error occurred in the 'Save Deduplication List' function. Please check the browser console for more details.");
         }
+    }
         window.saveDedupeListToPersistentStorage = saveDedupeListToPersistentStorage;
         
         function confirmClearStorage() {
@@ -1078,6 +1442,184 @@
             modalOverlay.classList.add('active');
         }
         
+        // --- Side Toggle Modal Logic ---
+        const sideToggleButton = document.getElementById('sideToggleButton');
+        const sideToggleModalOverlay = document.getElementById('sideToggleModalOverlay');
+        const closeSideModalBtn = document.getElementById('closeSideModalBtn');
+
+        if (sideToggleButton && sideToggleModalOverlay && closeSideModalBtn) {
+            sideToggleButton.addEventListener('click', () => {
+                sideToggleModalOverlay.classList.toggle('active');
+            });
+
+            closeSideModalBtn.addEventListener('click', () => {
+                sideToggleModalOverlay.classList.remove('active');
+            });
+
+            sideToggleModalOverlay.addEventListener('click', (event) => {
+                if (event.target === sideToggleModalOverlay) { 
+                    sideToggleModalOverlay.classList.remove('active');
+                }
+            });
+        }
+
+        // --- Auto-Save Dedupe List Logic ---
+        let isAutoSaveEnabled = true; 
+        const LS_AUTOSAVE_ENABLED_KEY = 'zenithTermExtractor_autoSaveEnabled';
+        // novelNameInput and pastedDedupeListTextarea are already defined globally in the IIFE
+
+        function updateAutoSaveButtonUI() {
+            const autoSaveToggleBtn = document.getElementById('autoSaveToggleBtn'); // Get fresh reference in case DOM re-renders (though unlikely for this button)
+            if (!autoSaveToggleBtn) return;
+            const icon = autoSaveToggleBtn.querySelector('i');
+            const text = autoSaveToggleBtn.querySelector('span');
+
+            if (isAutoSaveEnabled) {
+                if (icon) icon.className = 'fas fa-sync-alt';
+                if (text) text.textContent = ' Auto-Save: Enabled';
+                autoSaveToggleBtn.classList.remove('btn-danger'); // In case it was set
+                autoSaveToggleBtn.classList.add('btn-success');   // Use success class to indicate active
+            } else {
+                if (icon) icon.className = 'fas fa-ban';
+                if (text) text.textContent = ' Auto-Save: Disabled';
+                autoSaveToggleBtn.classList.remove('btn-success');
+                autoSaveToggleBtn.classList.add('btn-danger');    // Use danger class to indicate inactive
+            }
+        }
+
+        function autoSaveDedupeList() {
+            if (!isAutoSaveEnabled) {
+                // console.log("Auto-save is disabled."); // Optional: for debugging
+                return;
+            }
+
+            const novelName = novelNameInput.value.trim();
+            if (!novelName || novelName === "Project") {
+                // console.log("Auto-save: Project Name required."); // Optional: for debugging
+                // displayStatus('dedupeListStatus', "Auto-save: Project Name required.", 'warning', 'fa-ban'); // Could be too noisy
+                return;
+            }
+            
+            const linesToSave = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+            
+            if (savePersistentDedupeLines(novelName, linesToSave)) {
+                // Use a unique icon for auto-save to differentiate from manual save status
+                displayStatus('dedupeListStatus', 'Dedupe list auto-saved.', 'info', 'fa-history'); 
+            } else {
+                // savePersistentDedupeLines usually handles its own error display if novelName is missing,
+                // but if it returned false for other reasons, a generic message might be needed.
+                // For now, assuming savePersistentDedupeLines is sufficient for error states.
+            }
+        }
+
+        const debouncedAutoSave = debounce(autoSaveDedupeList, 2500);
+
+        function displayFilteredDedupeResults() {
+            const searchInput = document.getElementById('dedupeSearchInput');
+            const resultsArea = document.getElementById('dedupeFilteredResults');
+            // pastedDedupeListTextarea is already a global const
+
+            if (!searchInput || !resultsArea || !pastedDedupeListTextarea) return;
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            resultsArea.innerHTML = ''; // Clear previous results
+
+            if (!searchTerm) {
+                resultsArea.style.display = 'none';
+                return;
+            }
+
+            const allLines = pastedDedupeListTextarea.value.split('\n');
+            const filteredLines = allLines.filter(line => line.trim() !== '' && line.toLowerCase().includes(searchTerm));
+
+            if (filteredLines.length > 0) {
+                filteredLines.forEach(line => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.textContent = line;
+                    // Optional: Add styling or click handlers to individual result lines later if needed
+                    resultsArea.appendChild(lineDiv);
+                });
+                resultsArea.style.display = 'block';
+            } else {
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.textContent = 'No matching lines found.';
+                noResultsDiv.style.fontStyle = 'italic';
+                resultsArea.appendChild(noResultsDiv);
+                resultsArea.style.display = 'block';
+            }
+        }
+
+        function sortDedupeList() {
+            // pastedDedupeListTextarea is a global const within this IIFE
+            if (!pastedDedupeListTextarea) return;
+
+            const lines = pastedDedupeListTextarea.value.split('\n').filter(line => line.trim() !== ''); 
+            
+            if (lines.length <= 1) { 
+                displayStatus('dedupeListStatus', 'List has too few items to sort.', 'info');
+                return;
+            }
+
+            lines.sort(); // Default alphabetical sort
+
+            pastedDedupeListTextarea.value = lines.join('\n');
+            // Add a trailing newline if there was content, for consistent formatting
+            if (lines.length > 0) {
+                pastedDedupeListTextarea.value += '\n';
+            }
+            displayStatus('dedupeListStatus', `Deduplication list sorted alphabetically (${lines.length} items).`, 'success', 'fa-sort-alpha-down');
+            
+            // Trigger auto-save after sorting if it's enabled
+            if(isAutoSaveEnabled) {
+                debouncedAutoSave();
+            }
+        }
+
+        // --- Theme Toggle Logic ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const defaultTheme = 'light'; // Default to light theme
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (themeToggleBtn) {
+                const icon = themeToggleBtn.querySelector('i');
+                const text = themeToggleBtn.querySelector('span');
+                if (icon) {
+                    if (theme === 'dark') {
+                        icon.className = 'fas fa-sun';
+                        if(text) text.textContent = ' Light Mode';
+                    } else {
+                        icon.className = 'fas fa-moon';
+                        if(text) text.textContent = ' Dark Mode';
+                    }
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || defaultTheme;
+            if (currentTheme === 'dark') {
+                applyTheme('light');
+            } else {
+                applyTheme('dark');
+            }
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleTheme);
+        }
+
+        // Apply saved theme on initial load (this should be within DOMContentLoaded or after elements are defined)
+        // Moved theme init to DOMContentLoaded for safety, though global consts for buttons are fine.
+        // const savedTheme = localStorage.getItem('theme'); // This is now inside DOMContentLoaded in the original code
+        // if (savedTheme) {
+        //     applyTheme(savedTheme);
+        // } else {
+        //     applyTheme(defaultTheme); 
+        // }
+
+
     })(); // IIFE End
     </script>
 </body>
