@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find and Replace</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        .quill-editor-container { height: 150px; margin-bottom: 10px; }
+        button { padding: 10px 15px; margin-right: 10px; cursor: pointer; }
+        #downloadArea a { display: block; margin-top: 20px; }
+        #findReplacePairs { margin-top: 20px; }
+        .pair-entry { border: 1px solid #eee; padding: 10px; margin-bottom: 10px; position: relative; }
+        .removePairBtn { position: absolute; top: 5px; right: 5px; background-color: #ffdddd; border: 1px solid #ffaaaa; border-radius: 50%; width: 25px; height: 25px; text-align: center; line-height: 20px; cursor: pointer; font-weight: bold; }
+        .ql-toolbar { border: 1px solid #ccc; }
+        .ql-container { border: 1px solid #ccc; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Find and Replace Tool</h1>
+        <p id="instructions" style="font-size: 0.9em; color: #555;">1. Upload file. 2. Define find/replace pairs. 3. Click 'Process and Download'. Note .docx formatting limitations (see README).</p>
+        <div id="statusArea" style="margin-top: 10px; margin-bottom: 10px; padding: 10px; border-radius: 5px; font-weight: bold; min-height: 1.2em;"></div>
+
+        <div class="input-group">
+            <label for="fileUpload">Upload .txt or .docx file:</label>
+            <input type="file" id="fileUpload" accept=".txt,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        </div>
+        <div id="findReplacePairs">
+            <div class="pair-entry" id="pair-entry-1">
+                <div class="input-group">
+                    <label for="findTerm-1">Find:</label>
+                    <input type="text" id="findTerm-1" class="find-term-input" placeholder="Text to find">
+                </div>
+                <div class="input-group">
+                    <label for="replaceTerm-1">Replace with (Rich Text):</label>
+                    <div id="replaceTerm-1" class="quill-editor-container"></div>
+                </div>
+            </div>
+        </div>
+        <button id="addPairBtn">Add another Find/Replace pair</button>
+        <hr style="margin-top: 20px; margin-bottom: 20px;">
+        <button id="processBtn">Process and Download</button>
+        <div id="downloadArea"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusArea = document.getElementById('statusArea');
+            const addPairBtn = document.getElementById('addPairBtn');
+            const findReplacePairs = document.getElementById('findReplacePairs');
+            const processBtn = document.getElementById('processBtn');
+            const fileUpload = document.getElementById('fileUpload');
+            const downloadArea = document.getElementById('downloadArea');
+
+            let pairCount = 1;
+            let uploadedFile = null;
+            let quillInstances = {};
+            const defaultToolbarOptions = [
+                [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }],
+                ['link'], ['clean']
+            ];
+
+            function setStatus(message, type = 'info') {
+                statusArea.textContent = message;
+                if (type === 'error') statusArea.style.color = 'red';
+                else if (type === 'success') statusArea.style.color = 'green';
+                else { statusArea.style.color = '#555'; } // Default/info color
+            }
+
+            function initializeQuill(containerId) {
+                const editor = new Quill('#' + containerId, {
+                    theme: 'snow',
+                    modules: { toolbar: defaultToolbarOptions }
+                });
+                quillInstances[containerId] = editor;
+            }
+            initializeQuill('replaceTerm-1');
+
+            fileUpload.addEventListener('change', (event) => {
+                uploadedFile = event.target.files[0];
+                downloadArea.innerHTML = '';
+                setStatus('');
+                if (uploadedFile) {
+                    console.log("File selected:", uploadedFile.name, "Type:", uploadedFile.type);
+                }
+            });
+
+            addPairBtn.addEventListener('click', () => {
+                pairCount++;
+                const newPairEntry = document.createElement('div');
+                newPairEntry.classList.add('pair-entry');
+                newPairEntry.id = `pair-entry-${pairCount}`;
+                const editorId = `replaceTerm-${pairCount}`;
+                newPairEntry.innerHTML = `
+                    <div class="input-group"><label for="findTerm-${pairCount}">Find:</label><input type="text" id="findTerm-${pairCount}" class="find-term-input" placeholder="Text to find"></div>
+                    <div class="input-group"><label for="${editorId}">Replace with (Rich Text):</label><div id="${editorId}" class="quill-editor-container"></div></div>
+                    <button type="button" class="removePairBtn" data-pair-id="${pairCount}" title="Remove this pair">X</button>
+                `;
+                findReplacePairs.appendChild(newPairEntry);
+                initializeQuill(editorId);
+            });
+
+            findReplacePairs.addEventListener('click', function(event) {
+                 if (event.target && event.target.classList.contains('removePairBtn')) {
+                    const currentPairId = event.target.dataset.pairId;
+                    const pairElementToRemove = document.getElementById(`pair-entry-${currentPairId}`);
+                    const editorIdToRemove = `replaceTerm-${currentPairId}`;
+                    if (quillInstances[editorIdToRemove]) { delete quillInstances[editorIdToRemove]; }
+                    if (pairElementToRemove) { pairElementToRemove.remove(); }
+                }
+            });
+
+            processBtn.addEventListener('click', () => {
+                if (!uploadedFile) {
+                    setStatus("Please upload a file first.", "error");
+                    return;
+                }
+                downloadArea.innerHTML = '';
+                setStatus("Processing...", "info");
+
+                const pairData = [];
+                document.querySelectorAll('.pair-entry').forEach(pair => {
+                    const findInput = pair.querySelector('.find-term-input');
+                    const editorDiv = pair.querySelector('.quill-editor-container');
+                    if (findInput && editorDiv) {
+                        const findText = findInput.value;
+                        const quill = quillInstances[editorDiv.id];
+                        if (quill && findText) { // Only add if findText is not empty
+                            pairData.push({
+                                find: findText,
+                                replacePlain: quill.getText().replace(/\n$/, ''),
+                                replaceHtml: quill.root.innerHTML
+                            });
+                        }
+                    }
+                });
+
+                if (pairData.length === 0) {
+                    setStatus("No valid find/replace pairs defined (make sure 'Find' text is not empty).", "error");
+                    return;
+                }
+
+                if (uploadedFile.type === "text/plain") {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        let content = e.target.result;
+                        pairData.forEach(pd => {
+                            content = content.split(pd.find).join(pd.replacePlain);
+                        });
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        const originalFileName = uploadedFile.name.replace(/\.[^/.]+$/, "");
+                        a.download = `${originalFileName}_modified.txt`;
+                        a.textContent = `Download ${a.download}`;
+                        downloadArea.appendChild(a);
+                        setStatus("TXT processing complete. Download ready.", "success");
+                    };
+                    reader.onerror = () => { setStatus("Error reading .txt file.", "error"); };
+                    reader.readAsText(uploadedFile);
+                } else if (uploadedFile.name.endsWith(".docx") || uploadedFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const arrayBuffer = e.target.result;
+                        mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                            .then(result => {
+                                const rawText = result.value;
+                                const originalParagraphTexts = rawText.split('\n');
+                                const newDocumentChildren = [];
+                                let richReplacementsAttempted = 0;
+                                let plainTextFallbackUsedCount = 0;
+
+                                originalParagraphTexts.forEach(pText => {
+                                    let currentParagraphText = pText; // Text of current paragraph being processed
+                                    let paragraphFullyReplacedByRichImport = false;
+
+                                    for (const pd of pairData) {
+                                        if (currentParagraphText.includes(pd.find)) {
+                                            // Attempt rich text replacement only if there's HTML content beyond an empty paragraph
+                                            if (pd.replaceHtml && pd.replaceHtml.toLowerCase().trim() !== '<p><br></p>' && pd.replaceHtml.trim() !== '') {
+                                                try {
+                                                    const importedElements = docx.HtmlImporter.importHtml(pd.replaceHtml);
+                                                    richReplacementsAttempted++;
+                                                    if (Array.isArray(importedElements)) {
+                                                        newDocumentChildren.push(...importedElements);
+                                                    } else if (importedElements) { // Should be an array from HtmlImporter
+                                                        newDocumentChildren.push(importedElements);
+                                                    }
+                                                    paragraphFullyReplacedByRichImport = true;
+                                                    break; // This paragraph is replaced, move to next original paragraph
+                                                } catch (importError) {
+                                                    console.error("HtmlImporter error for find:'", pd.find, "', HTML:'", pd.replaceHtml, "':", importError);
+                                                    // Fallback: perform plain text replacement on currentParagraphText for this find term
+                                                    currentParagraphText = currentParagraphText.split(pd.find).join(pd.replacePlain);
+                                                    plainTextFallbackUsedCount++;
+                                                    // Continue to check other find/replace pairs for this (now modified) currentParagraphText
+                                                }
+                                            } else { // Empty or effectively empty HTML, treat as plain text empty replacement
+                                                currentParagraphText = currentParagraphText.split(pd.find).join(pd.replacePlain); // Usually an empty string
+                                            }
+                                        }
+                                    }
+
+                                    if (!paragraphFullyReplacedByRichImport) {
+                                        newDocumentChildren.push(new docx.Paragraph({ children: [new docx.TextRun(currentParagraphText)] }));
+                                    }
+                                });
+
+                                const doc = new docx.Document({
+                                    sections: [{ children: newDocumentChildren }]
+                                });
+
+                                docx.Packer.toBlob(doc).then(blob => {
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    const originalFileName = uploadedFile.name.replace(/\.[^/.]+$/, "");
+                                    a.download = `${originalFileName}_modified.docx`;
+                                    a.textContent = `Download ${a.download}`;
+                                    downloadArea.appendChild(a);
+                                    let successMsg = `DOCX processing complete. Download ready.`;
+                                    if (richReplacementsAttempted > 0) successMsg += ` ${richReplacementsAttempted} rich replacement(s) attempted.`;
+                                    if (plainTextFallbackUsedCount > 0) successMsg += ` ${plainTextFallbackUsedCount} fallback(s) to plain text replacement due to import error.`;
+                                    setStatus(successMsg, "success");
+                                }).catch(err => {
+                                    console.error("Docx.js Packer error:", err);
+                                    setStatus("Error generating .docx file: " + err.message, "error");
+                                });
+                            })
+                            .catch(err => {
+                                console.error("Mammoth.js error:", err);
+                                setStatus("Error processing .docx (Mammoth): " + err.message, "error");
+                            });
+                    };
+                    reader.onerror = () => { setStatus("Error reading .docx file for processing.", "error"); };
+                    reader.readAsArrayBuffer(uploadedFile);
+                } else {
+                    setStatus(`Unsupported file type: ${uploadedFile.type || 'unknown'}. Please upload a .txt or .docx file.`, "error");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
