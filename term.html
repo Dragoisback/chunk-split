@@ -1,1214 +1,1125 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" data-theme="light"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenith Term Processor v5.4</title> <!-- Version Bump -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Zenith Term Processor v6.1</title> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --bg-main: #f0f4f8; 
+            --bg-main: #f0f4f8;
             --bg-panel: #ffffff;
-            --primary-500: #3b82f6; 
-            --primary-600: #2563eb; 
-            --primary-700: #1d4ed8; 
-            --secondary-500: #8b5cf6; 
-            --secondary-600: #7c3aed; 
-            --success-500: #10b981; 
-            --danger-500: #ef4444;  
-            --danger-600: #dc2626;  
-            --warning-500: #f59e0b; 
-            --warning-700: #b45309; 
-            --neutral-800: #1f2937; 
-            --neutral-700: #374151; 
-            --neutral-500: #6b7280; 
-            --neutral-300: #d1d5db; 
-            --neutral-200: #e5e7eb; 
-            --neutral-100: #f3f4f6; 
-            --font-sans: 'Inter', sans-serif;
-            --radius-md: 0.375rem; 
-            --radius-lg: 0.5rem;   
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-input: #ffffff;
+            --bg-input-hover: #f9fafb;
+             --bg-log: #f3f4f6;
+            --primary-500: #3b82f6; --primary-600: #2563eb; --primary-700: #1d4ed8;
+            --secondary-500: #8b5cf6; --secondary-600: #7c3aed;
+            --success-500: #10b981; --success-600: #059669;
+            --danger-500: #ef4444;  --danger-600: #dc2626;
+            --warning-500: #f59e0b; --warning-700: #b45309;
+            --text-main: #374151; --text-light: #6b7280; --text-heading: #1f2937;
+            --border-color: #d1d5db; --border-light: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --modal-backdrop: rgba(17, 24, 39, 0.7);
+             --status-info-bg: #e0f2fe; --status-info-text: #0369a1; --status-info-border: #7dd3fc;
+             --status-success-bg: #d1fae5; --status-success-text: #047857; --status-success-border: #6ee7b7;
+             --status-warning-bg: #fef3c7; --status-warning-text: #d97706; --status-warning-border: #fcd34d;
+             --status-danger-bg: #fee2e2; --status-danger-text: #b91c1c; --status-danger-border: #fca5a5;
+             --active-glow: rgba(59, 130, 246, 0.3);
+             --header-gradient: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+             --btn-gradient: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+             --btn-gradient-hover: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+        }
+        
+        /* CHANGE: DARK MODE */
+         [data-theme="dark"] :root {
+            --bg-main: #111827;
+            --bg-panel: #1f2937;
+            --bg-input: #374151;
+            --bg-input-hover: #4b5563;
+            --bg-log: #374151;
+            --text-main: #d1d5db; --text-light: #9ca3af; --text-heading: #f3f4f6;
+            --border-color: #4b5563; --border-light: #374151;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --modal-backdrop: rgba(3, 7, 18, 0.85);
+            --status-info-bg: #0c4a6e; --status-info-text: #bae6fd; --status-info-border: #38bdf8;
+            --status-success-bg: #064e3b; --status-success-text: #a7f3d0; --status-success-border: #34d399;
+            --status-warning-bg: #78350f; --status-warning-text: #fde68a; --status-warning-border: #fbbf24;
+            --status-danger-bg: #7f1d1d; --status-danger-text: #fecaca; --status-danger-border: #f87171;
+             --active-glow: rgba(99, 102, 241, 0.4); /* Indigo for dark mode */
+             --header-gradient: linear-gradient(135deg, #4f46e5, #7c3aed); /* Indigo/Violet */
+              --btn-gradient: linear-gradient(135deg, #6366f1, #4f46e5);
+             --btn-gradient-hover: linear-gradient(135deg, #4f46e5, #4338ca);
         }
 
-        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: var(--neutral-300); }
-        html { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;}
-        body { margin: 0; background-color: var(--bg-main); color: var(--neutral-700); padding: 1.5rem; }
+        :root {
+           --font-sans: 'Inter', sans-serif;
+           --radius-md: 0.375rem; --radius-lg: 0.5rem;
+           --shadow-sm: 0 1px 2px 0 var(--shadow-color);
+           --shadow-md: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+           --shadow-lg: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+           --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .app-container { max-width: 1400px; margin-left: auto; margin-right: auto; }
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: var(--border-color); }
+        html { font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth;}
+        body { margin: 0; background-color: var(--bg-main); color: var(--text-main); padding: 1rem; transition: background-color 0.3s, color 0.3s; }
+        h1,h2,h3,p { margin-top:0; margin-bottom: 0.5rem;}
+
+        .app-container { max-width: 1440px; margin: 1rem auto; position: relative; } /* CHANGE: Added position relative for theme toggle */
+
+         /* CHANGE: Theme Toggle */
+        .theme-toggle-btn {
+            position: absolute; top: 1rem; right: 1rem; z-index: 10;
+             background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%;
+             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-base);
+        }
+         .theme-toggle-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+         [data-theme="dark"] .theme-toggle-btn { background: rgba(255,255,255,0.1); color: var(--text-heading);}
+          [data-theme="dark"] .theme-toggle-btn:hover { background: rgba(255,255,255,0.2);}
+         .theme-toggle-btn .fa-moon { display: block; }
+         .theme-toggle-btn .fa-sun { display: none; }
+         [data-theme="dark"] .theme-toggle-btn .fa-moon { display: none; }
+         [data-theme="dark"] .theme-toggle-btn .fa-sun { display: block; color: #facc15}
+
 
         .app-title-bar {
-            margin-bottom: 2rem; text-align: center; padding: 1.5rem 1rem;
-            background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+            margin-bottom: 1.5rem; text-align: center; padding: 1.75rem 1rem;
+            background: var(--header-gradient);
             color: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+             position: relative; /* CHANGE: for theme toggle */
         }
-        .app-title-bar h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.025em;}
+        .app-title-bar h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.025em;}
         .app-title-bar p { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
 
-        .grid-layout { display: grid; gap: 1.5rem; }
-        @media (min-width: 1024px) { 
-            .grid-layout { grid-template-columns: repeat(3, 1fr); }
-            .grid-layout .col-span-1 { grid-column: span 1 / span 1; }
-            .grid-layout .col-span-2 { grid-column: span 2 / span 2; }
-            .grid-layout .col-span-3 { grid-column: span 3 / span 3; }
+        .grid-layout { display: grid; gap: 1rem; grid-template-columns: 1fr; } /* CHANGE: Mobile first */
+        @media (min-width: 768px) {
+           .grid-layout { grid-template-columns: repeat(2, 1fr); gap: 1.25rem;}
+           .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
         }
-         @media (min-width: 768px) and (max-width: 1023px) { 
-            .grid-layout { grid-template-columns: repeat(2, 1fr); }
-            .grid-layout .md-col-span-1 { grid-column: span 1 / span 1; }
-            .grid-layout .md-col-span-2 { grid-column: span 2 / span 2; }
+         @media (min-width: 1024px) {
+            .grid-layout { grid-template-columns: repeat(12, 1fr); gap: 1.5rem;} /* CHANGE: 12-col grid */
+            /* CHANGE: Refined Spans */
+            .grid-layout .lg-span-3 { grid-column: span 3 / span 3; } /* Project */
+            .grid-layout .lg-span-4 { grid-column: span 4 / span 4; } /* Chapter */
+            .grid-layout .lg-span-5 { grid-column: span 5 / span 5; } /* Dedupe */
+            .grid-layout .lg-span-12 { grid-column: span 12 / span 12; } /* Results */
+             .grid-layout .md-col-span-2 { grid-column: auto; } /* Reset medium */
         }
 
-        .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.5rem; }
-        .panel-title { display: flex; align-items: center; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--neutral-200); color: var(--neutral-800); }
+        .panel { background-color: var(--bg-panel); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1.25rem; overflow: hidden; transition: background-color 0.3s, box-shadow 0.3s; }
+        .panel-title { display: flex; align-items: center; font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); color: var(--text-heading); }
         .panel-title i { margin-right: 0.75rem; color: var(--primary-500); font-size:1.2em; }
-        
-        .form-group { margin-bottom: 1.25rem; }
-        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--neutral-500); }
-        
-        input[type="text"], textarea, .file-input-wrapper {
+         .panel.active-list {
+             border: 1px solid var(--primary-500);
+             box-shadow: 0 0 0 3px var(--active-glow), var(--shadow-md);
+         }
+
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-light); }
+        .form-label-small { font-size:0.75rem; margin-top: 0.25rem; display: block;} /* CHANGE: replace inline style */
+
+        input[type="text"], textarea, .file-input-wrapper-btn {
             width: 100%; padding: 0.625rem 0.875rem; border-radius: var(--radius-md);
-            font-size: 0.875rem; background-color: white; border: 1px solid var(--neutral-300);
-            transition: var(--transition-base); color: var(--neutral-700);
+            font-size: 0.875rem; background-color: var(--bg-input); border: 1px solid var(--border-color);
+            transition: var(--transition-base); color: var(--text-main); font-family: var(--font-sans);
         }
+         textarea[readonly] { background-color: var(--bg-log);}
         input[type="text"]:focus, textarea:focus {
             outline: 2px solid transparent; outline-offset: 2px;
-            border-color: var(--primary-500); box-shadow: 0 0 0 3px rgba(59,130,246,0.3); 
+            border-color: var(--primary-500); box-shadow: 0 0 0 3px var(--active-glow);
         }
         textarea { resize: vertical; min-height: 80px; }
-        #pastedDedupeList { min-height: 120px; } /* Specific height for dedupe list */
+        #pastedDedupeList { min-height: 150px; }
+        #editablePresetTextarea { min-height: 100px;}
+        #outputTextarea { min-height: 180px; }
+
+       /* CHANGE: Refined file input */
+        .file-input-container { position: relative; width: 100%;}
+        .file-input-container input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;}
+        .file-input-wrapper-btn { /* This is just a styled div/button */
+             position: relative; z-index: 1; text-align: left; justify-content: flex-start; width: 100%;
+             background-color: var(--bg-input-hover);
+        }
+         .file-input-wrapper-btn.has-file { color: var(--text-heading); font-weight: 500; background-color: var(--bg-input); }
+         .file-input-wrapper-btn i { color: var(--secondary-500); }
 
 
-        .file-input-wrapper { position: relative; display: block; }
-        .file-input-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-input-wrapper .file-display-text { color: var(--neutral-500); }
-        .file-input-wrapper .file-display-text.has-file { color: var(--neutral-700); font-weight: 500; }
-        .file-input-wrapper i { color: var(--secondary-500); margin-right: 0.5rem; }
-        
-        .btn-group { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-top: 0.75rem; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem; }
+        .btn-group-col { flex-direction: column; } /* CHANGE: Column layout */
+        .btn-group-fill .btn { flex-grow: 1;} /* CHANGE: Fill space */
         .btn {
             padding: 0.6rem 1.1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500;
             transition: var(--transition-base); display: inline-flex; align-items: center; justify-content: center;
-            gap: 0.4rem; cursor: pointer; line-height: 1.25rem; text-decoration: none;
-            box-shadow: var(--shadow-sm); border: 1px solid transparent;
+            gap: 0.5rem; cursor: pointer; line-height: 1.25rem; text-decoration: none;
+            box-shadow: var(--shadow-sm); border: 1px solid transparent; user-select: none;
         }
-        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(59,130,246,0.4); }
-        .btn i { font-size:0.9em; }
+        .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn:focus-visible { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px var(--active-glow); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none;}
+        .btn i { font-size:0.95em; }
+        .btn span { display: inline-block; } /* CHANGE: For textContent */
 
         .btn-primary { background-color: var(--primary-500); color: white; }
-        .btn-primary:hover { background-color: var(--primary-600); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-600); }
         .btn-secondary { background-color: var(--secondary-500); color: white; }
-        .btn-secondary:hover { background-color: var(--secondary-600); }
+        .btn-secondary:hover:not(:disabled) { background-color: var(--secondary-600); }
         .btn-success { background-color: var(--success-500); color: white; }
-        .btn-success:hover { background-color: #059669; /* Emerald 600 */ }
+        .btn-success:hover:not(:disabled) { background-color: var(--success-600); }
+         .btn-warning { background-color: var(--warning-500); color: white; }
+         .btn-warning:hover:not(:disabled) { background-color: #d97706;}
         .btn-danger { background-color: var(--danger-500); color: white; }
-        .btn-danger:hover { background-color: var(--danger-600); }
-        .btn-outline { background-color: transparent; border-color: var(--neutral-300); color: var(--neutral-500); }
-        .btn-outline:hover { background-color: var(--neutral-100); border-color: var(--neutral-500); color:var(--neutral-700); }
+        .btn-danger:hover:not(:disabled) { background-color: var(--danger-600); }
+        .btn-outline { background-color: transparent; border-color: var(--border-color); color: var(--text-light); }
+        .btn-outline:hover:not(:disabled) { background-color: var(--bg-input-hover); border-color: var(--text-light); color:var(--text-main); }
         .btn-outline.btn-danger { color: var(--danger-500); border-color: var(--danger-500); }
-        .btn-outline.btn-danger:hover { background-color: var(--danger-500); color:white; }
+        .btn-outline.btn-danger:hover:not(:disabled) { background-color: var(--danger-500); color:white; }
+        .btn-outline.btn-success { color: var(--success-500); border-color: var(--success-500); }
+        .btn-outline.btn-success:hover:not(:disabled) { background-color: var(--success-500); color:white; }
 
 
-        .btn-icon { padding: 0.5rem; }
-        .btn-main-action { 
-            padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600;
-            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        .btn-icon { padding: 0.5rem; min-width: 2.2rem; aspect-ratio: 1/1;}
+        .btn-main-action {
+            padding: 0.85rem 2rem; font-size: 1.1rem; font-weight: 600;
+            background: var(--btn-gradient); color: white;
         }
-        .btn-main-action:hover {
-             background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+        .btn-main-action:hover:not(:disabled) {
+             background: var(--btn-gradient-hover);
         }
         .btn-main-action .spinner { display: none; width: 1.125rem; height: 1.125rem; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; border-top-color: white; animation: spin 0.7s linear infinite; margin-right: 0.5rem;}
+        .btn-main-action.loading { cursor: wait;}
         .btn-main-action.loading .spinner { display: inline-block; }
+        .btn-main-action.loading i { display: none; } /* Hide icon when loading */
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #chapterInputsContainer {
-            scrollbar-width: thin; 
-            scrollbar-color: var(--neutral-300) var(--neutral-100); 
-        }
-        #chapterInputsContainer::-webkit-scrollbar { width: 8px; }
-        #chapterInputsContainer::-webkit-scrollbar-track { background: var(--neutral-100); border-radius: 4px;}
-        #chapterInputsContainer::-webkit-scrollbar-thumb { background-color: var(--neutral-300); border-radius: 4px; border: 2px solid var(--neutral-100); }
-        #chapterInputsContainer::-webkit-scrollbar-thumb:hover { background-color: var(--neutral-500); }
+        /* CHANGE: Scrollbar styles moved here */
+         .scrollable {
+             scrollbar-width: thin;
+             scrollbar-color: var(--border-color) var(--bg-input-hover);
+             overflow-y: auto;
+             padding-right: 5px;
+         }
+        .scrollable::-webkit-scrollbar { width: 8px; }
+        .scrollable::-webkit-scrollbar-track { background: var(--bg-input-hover); border-radius: 4px;}
+        .scrollable::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; border: 2px solid var(--bg-input-hover); }
+        .scrollable::-webkit-scrollbar-thumb:hover { background-color: var(--text-light); }
+         #chapterInputsContainer { max-height: 450px; }
+          #processingLog ul { max-height: 200px; }
 
 
-        .chapter-input-group { margin-bottom: 1rem; padding: 1rem; border: 1px dashed var(--neutral-300); border-radius: var(--radius-md); background-color: rgba(243,244,246,0.5); } 
+        .chapter-input-group { margin-bottom: 0.8rem; padding: 0.8rem; border: 1px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-input-hover); }
         .chapter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-        .chapter-label { font-weight: 500; font-size:0.9rem; color: var(--secondary-500);}
+        .chapter-label { font-weight: 600; font-size:0.9rem; color: var(--secondary-500);}
 
         .status-message {
-            margin-top: 0.75rem; padding: 0.85rem 1.1rem; border-radius: var(--radius-md); font-size: 0.875rem;
-            display: flex; align-items: center; gap: 0.6rem; border: 1px solid;
+            margin-top: 0.75rem; padding: 0.7rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem;
+            display: none; /* CHANGE: Hidden by default */
+            align-items: center; gap: 0.6rem; border: 1px solid;
         }
-        .status-message i { font-size: 1.2em; }
-        .status-success { background-color: #e0f2f1; color: #00796b; border-color: #a7d8c8; } 
-        .status-warning { background-color: #fff8e1; color: var(--warning-700); border-color: #ffecb3; } 
-        .status-danger  { background-color: #ffebee; color: #c62828; border-color: #ffcdd2; } 
-        .status-info    { background-color: #e3f2fd; color: #1565c0; border-color: #bbdefb; } 
+         .status-message.visible { display: flex;} /* CHANGE: Visibility class */
+         .status-message-col { flex-direction: column; align-items: flex-start; font-size: 0.8rem;} /* CHANGE: Column variant */
 
-        .storage-actions-group {
-            margin-top:1rem; padding-top: 1rem; border-top: 1px solid var(--neutral-200);
-        }
-        .storage-actions-group .form-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--neutral-500); margin-bottom: 0.5rem;}
+        .status-success { background-color: var(--status-success-bg); color: var(--status-success-text); border-color: var(--status-success-border); }
+        .status-warning { background-color: var(--status-warning-bg); color: var(--status-warning-text); border-color: var(--status-warning-border); }
+        .status-danger  { background-color: var(--status-danger-bg); color: var(--status-danger-text); border-color: var(--status-danger-border); }
+        .status-info    { background-color: var(--status-info-bg); color: var(--status-info-text); border-color: var(--status-info-border); }
+        .status-message i { font-size: 1.2em; flex-shrink: 0; }
 
-        #processingLog { border: 1px solid var(--neutral-200); background-color: var(--neutral-100); }
-        #processingLog strong { color: var(--neutral-700); }
-        #processingLog ul { list-style: none; padding: 0; margin:0.5rem 0 0 0; max-height: 150px; overflow-y: auto; font-size: 0.8rem; color:var(--neutral-500);}
-        #processingLog li { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--neutral-200);}
-        #processingLog li:last-child { border-bottom: none;}
-        #processingLog li i { font-size: 0.9em; margin-right: 0.5rem; opacity: 0.8;}
+        .storage-actions-group { margin-top:1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+        .storage-actions-group .form-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 0.75rem;}
 
-        .output-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-bottom: 0.75rem; }
+        /* CHANGE: Log styling */
+        #processingLog { border: 1px solid var(--border-light); background-color: var(--bg-log); color: var(--text-main); margin-bottom: 1rem; display: none; flex-direction:column; align-items: flex-start; }
+        #processingLog.visible { display: flex; }
+        #processingLog strong { color: var(--text-heading); }
+        #processingLog ul { list-style: none; padding: 0; margin:0.5rem 0 0 0; font-size: 0.8rem; color:var(--text-light); width: 100%;}
+        #processingLog li { padding: 0.3rem 0.2rem; display: flex; align-items: center; gap: 0.5rem;}
+        #processingLog li:nth-child(even) { background-color: rgba(0,0,0,0.03); }
+         [data-theme="dark"] #processingLog li:nth-child(even) { background-color: rgba(255,255,255,0.04); }
+        #processingLog li i { font-size: 0.9em; opacity: 0.9; flex-shrink: 0;}
+        #processingLog .log-text { flex-grow: 1; word-break: break-word;} /* CHANGE: for textContent */
 
-        .modal-overlay { position: fixed; inset: 0; background-color: rgba(17, 24, 39, 0.7); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(5px); }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background-color: var(--bg-panel); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 90%; max-width: 500px; text-align: center; }
-        .modal-title { font-size: 1.375rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--neutral-800);}
-        .modal-body { font-size: 0.9rem; color: var(--neutral-500); margin-bottom: 1.75rem; line-height: 1.6;}
+        .output-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);}
+        .panel-divider { margin: 1.25rem 0; border-color: var(--border-light); border-top-width: 1px;}
+
+        .modal-overlay { position: fixed; inset: 0; background-color: var(--modal-backdrop); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); padding: 1rem; opacity: 0; transition: opacity 0.2s ease-out; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background-color: var(--bg-panel); padding: 1.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 550px; text-align: center; transform: translateY(20px); transition: transform 0.2s ease-out;}
+         .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-heading);}
+        .modal-body { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.6; text-align: left;}
+         .modal-body strong { color: var(--text-main); }
         .modal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
 
-        .tooltip { position: relative; display: inline-block; }
+        .tooltip { position: relative; display: inline-flex; /* CHANGE: inline-flex */ }
         .tooltip .tooltip-text {
-            visibility: hidden; background-color: var(--neutral-800); color: white; text-align: center;
-            border-radius: var(--radius-md); padding: 0.375rem 0.75rem; position: absolute; z-index: 1;
-            bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s;
+            visibility: hidden; background-color: var(--text-heading); color: var(--bg-panel); text-align: center;
+            border-radius: var(--radius-md); padding: 0.3rem 0.7rem; position: absolute; z-index: 10;
+            bottom: 120%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s, visibility 0.2s, bottom 0.2s;
             font-size: 0.75rem; white-space: nowrap; box-shadow: var(--shadow-md);
         }
-        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+         .tooltip .tooltip-text::after { /* Arrow */
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: var(--text-heading) transparent transparent transparent;
+         }
+        .tooltip:hover .tooltip-text:not(.force-visible) { visibility: visible; opacity: 1; bottom: 125%; } /* CHANGE: allow force-visible */
+        .tooltip .tooltip-text.force-visible {visibility: visible; opacity: 1; bottom: 125%; } /* CHANGE: For JS messages */
 
-        .session-config-grid-internal {
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: 1fr; 
-        }
-        @media (min-width: 500px) { 
-            .session-config-grid-internal {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        .dedupe-list-actions .btn { flex-grow: 1; } /* Make buttons in dedupe list actions take full width in group */
+         /* CHANGE: Checkbox styling */
+        .checkbox-group { display:flex; align-items: center; gap: 0.7rem; margin-bottom: 0.5rem;}
+        .checkbox-group input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--primary-500); margin: 0; cursor: pointer;}
+         .checkbox-group .form-label { margin-bottom: 0; cursor: pointer; user-select: none;}
+         .header-input-area { margin-top: 0.5rem; display: none;}
+         .header-input-area.visible { display: block;}
 
-        .side-toggle-btn {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1000;
-            padding: 0.8rem 1rem; /* Rectangular shape */
-            background-color: var(--primary-500);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md); 
-            box-shadow: var(--shadow-lg);
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-        }
+        .footer { text-align:center; padding: 2rem 1rem; color: var(--text-light); font-size: 0.85rem; margin-top:1.5rem;}
+        .dedupe-actions-row { justify-content: space-between; align-items: center;}
+        .dedupe-actions-row .btn-group { margin-top: 0;}
+        .width-full { width: 100%;} /* CHANGE: replace inline style */
 
-        .side-toggle-btn:hover {
-            background-color: var(--primary-600);
-            transform: translateY(-50%) scale(1.05); /* Slight hover effect */
-        }
-
-        .side-toggle-btn i {
-            font-size: 1.2rem; /* Adjust icon size */
-            display: block; /* Helps if button is not flex-centered */
-        }
-
-        .side-modal-overlay {
-            display: none; /* Hidden by default */
-            position: fixed;
-            inset: 0;
-            background-color: rgba(17, 24, 39, 0.7); /* Using a color from existing modal for consistency */
-            /* display: flex; */ /* Changed: This will be set by .active class */
-            align-items: center;
-            justify-content: center;
-            z-index: 1050; 
-            backdrop-filter: blur(3px); /* Optional: blur background */
-        }
-
-        .side-modal-overlay.active { /* Class to show the modal */
-            display: flex;
-        }
-
-        .side-modal-content {
-            background-color: var(--bg-panel);
-            padding: 1.5rem 2rem; /* Adjusted padding */
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            width: 35%; /* Approx 1/3rd */
-            max-width: 480px; 
-            min-width: 320px; 
-            max-height: 80vh; /* More flexible height */
-            overflow-y: auto;
-            position: relative;
-            color: var(--neutral-700); /* Ensure text color is appropriate */
-        }
-        .side-modal-content h2 { /* Basic styling for potential title */
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-            color: var(--neutral-800);
-            border-bottom: 1px solid var(--neutral-200);
-            padding-bottom: 0.75rem;
-        }
-
-        .side-modal-close-btn {
-            position: absolute;
-            top: 0.75rem; /* Adjusted for padding */
-            right: 1rem;  /* Adjusted for padding */
-            background: transparent;
-            border: none;
-            font-size: 2rem; /* Larger for easier clicking */
-            font-weight: 300;
-            color: var(--neutral-400);
-            cursor: pointer;
-            line-height: 1;
-            padding: 0.25rem; /* Small padding for click area */
-        }
-        .side-modal-close-btn:hover {
-            color: var(--neutral-600);
-        }
-
-        /* Dark Theme Variables and Overrides */
-        html[data-theme="dark"] {
-            --bg-main: #111827; /* Very Dark Blue/Gray */
-            --bg-panel: #1f2937; /* Dark Blue/Gray */
-            
-            --primary-400: #60a5fa; /* Lighter primary for dark mode if needed, for example, for some text */
-
-            --neutral-800: #f3f4f6; /* Light Gray (for headings) */
-            --neutral-700: #d1d5db; /* Medium-Light Gray (for primary text, dark inputs bg) */
-            --neutral-600: #4b5563; /* Mid-Dark Gray (dark input bg) */
-            --neutral-500: #9ca3af; /* Medium Gray (for secondary text, dark input borders) */
-            --neutral-400: #9ca3af; /* Alias for 500 or slightly lighter for labels if needed */
-            --neutral-300: #4b5563; /* Darker Gray (for borders) */
-            --neutral-200: #374151; /* Dark Gray (for lighter borders/bg accents in dark) */
-            --neutral-100: #f3f4f6; /* Light Gray (dark input text color) */
-
-            /* Component specific vars for dark theme */
-            --input-bg: var(--neutral-600);
-            --input-text: var(--neutral-100);
-            --input-border: var(--neutral-500);
-
-            --btn-outline-text: var(--neutral-200);
-            --btn-outline-border: var(--neutral-500);
-            --btn-outline-hover-bg: var(--neutral-700);
-            --btn-outline-hover-text: var(--neutral-100);
-            --btn-outline-hover-border: var(--neutral-400);
-
-            --danger-400: #f87171; /* Lighter red for dark mode text/borders */
-        }
-
-        html[data-theme="dark"] body {
-            background-color: var(--bg-main);
-            color: var(--neutral-300); /* Default body text color for dark mode */
-        }
-
-        html[data-theme="dark"] .panel {
-            background-color: var(--bg-panel);
-            border-color: var(--neutral-700); /* Panel border if any, or for consistency */
-        }
-
-        html[data-theme="dark"] input[type="text"],
-        html[data-theme="dark"] textarea {
-            background-color: var(--input-bg);
-            color: var(--input-text);
-            border-color: var(--input-border);
-        }
-        html[data-theme="dark"] input[type="text"]:focus,
-        html[data-theme="dark"] textarea:focus {
-            border-color: var(--primary-400); 
-            box-shadow: 0 0 0 3px rgba(96,165,250,0.3); /* primary-400 color with alpha */
-        }
-
-        html[data-theme="dark"] .btn-outline {
-            border-color: var(--btn-outline-border);
-            color: var(--btn-outline-text);
-        }
-        html[data-theme="dark"] .btn-outline:hover {
-            background-color: var(--btn-outline-hover-bg);
-            border-color: var(--btn-outline-hover-border);
-            color: var(--btn-outline-hover-text);
-        }
-        html[data-theme="dark"] .btn-outline.btn-danger {
-            color: var(--danger-400);
-            border-color: var(--danger-400);
-        }
-        html[data-theme="dark"] .btn-outline.btn-danger:hover {
-            background-color: var(--danger-500);
-            color: white;
-        }
-        /* Ensure specific outline buttons like chapter clear/paste also use these */
-        html[data-theme="dark"] .btn-clear-chapter,
-        html[data-theme="dark"] .btn-icon.btn-outline.btn-secondary { /* For paste button */
-             border-color: var(--btn-outline-border);
-             color: var(--btn-outline-text);
-        }
-         html[data-theme="dark"] .btn-clear-chapter:hover,
-         html[data-theme="dark"] .btn-icon.btn-outline.btn-secondary:hover {
-            background-color: var(--btn-outline-hover-bg);
-            border-color: var(--btn-outline-hover-border);
-            color: var(--btn-outline-hover-text);
-        }
-
-
-        html[data-theme="dark"] #chapterInputsContainer {
-            scrollbar-color: var(--neutral-500) var(--neutral-700); 
-        }
-        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-track { background: var(--neutral-700); }
-        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-thumb { background-color: var(--neutral-500); border-color: var(--neutral-700); }
-        html[data-theme="dark"] #chapterInputsContainer::-webkit-scrollbar-thumb:hover { background-color: var(--neutral-400); }
-
-        html[data-theme="dark"] #processingLog { 
-            border-color: var(--neutral-700); 
-            background-color: var(--neutral-800);
-        }
-        html[data-theme="dark"] #processingLog strong { 
-            color: var(--neutral-100); 
-        }
-        html[data-theme="dark"] #processingLog ul { 
-            color:var(--neutral-300);
-        }
-        html[data-theme="dark"] #processingLog li { 
-            border-bottom-color: var(--neutral-700);
-        }
-
-        html[data-theme="dark"] .panel-title {
-            border-bottom-color: var(--neutral-700); 
-            color: var(--neutral-100); 
-        }
-        html[data-theme="dark"] .panel-title i {
-            color: var(--primary-400); 
-        }
-        html[data-theme="dark"] .form-label {
-            color: var(--neutral-400); 
-        }
-        
-        html[data-theme="dark"] .file-input-wrapper .file-display-text { 
-            color: var(--neutral-400);
-            border-color: var(--btn-outline-border); /* Match other outline buttons */
-        }
-        html[data-theme="dark"] .file-input-wrapper .file-display-text.has-file { 
-            color: var(--neutral-200); 
-        }
-         html[data-theme="dark"] .file-input-wrapper .file-display-text:hover {
-            background-color: var(--btn-outline-hover-bg);
-            border-color: var(--btn-outline-hover-border);
-            color: var(--btn-outline-hover-text);
-        }
-
-
-        html[data-theme="dark"] .side-modal-content {
-            background-color: var(--bg-panel); 
-            color: var(--neutral-300); 
-        }
-        html[data-theme="dark"] .side-modal-content h2 {
-            color: var(--neutral-100);
-            border-bottom-color: var(--neutral-700);
-        }
-        html[data-theme="dark"] .side-modal-close-btn {
-            color: var(--neutral-400);
-        }
-        html[data-theme="dark"] .side-modal-close-btn:hover {
-            color: var(--neutral-200);
-        }
-
-        /* Status messages in dark theme - simple inversion or desaturation if needed */
-        /* Example: make them slightly less intense or ensure text contrast */
-        html[data-theme="dark"] .status-success { background-color: #103c30; color: #a7d8c8; border-color: #205c40; } 
-        html[data-theme="dark"] .status-warning { background-color: #453209; color: #ffecb3; border-color: #60420f; } 
-        html[data-theme="dark"] .status-danger  { background-color: #4d120f; color: #ffcdd2; border-color: #70201f; } 
-        html[data-theme="dark"] .status-info    { background-color: #0d2c4f; color: #bbdefb; border-color: #1c3c6f; } 
-        html[data-theme="dark"] .status-message i { opacity: 0.85; }
-
-
-        /* Responsive Adjustments */
-        @media (max-width: 991px) { /* Tablets and below */
-            .side-modal-content {
-                width: 60vw;
-            }
-        }
-
-        @media (max-width: 767px) { /* Mobile devices */
-            body { 
-                padding: 0.75rem; 
-            }
-            .panel { 
-                padding: 0.75rem; 
-            }
-            .panel-title { 
-                margin-bottom: 0.75rem; 
-                padding-bottom: 0.5rem; 
-                font-size: 1.1rem; /* Slightly smaller panel titles */
-            }
-            .form-group { 
-                margin-bottom: 0.75rem; 
-            }
-            
-            .grid-layout {
-                grid-template-columns: 1fr; /* Stack columns on mobile */
-            }
-            .grid-layout .col-span-1,
-            .grid-layout .col-span-2,
-            .grid-layout .col-span-3,
-            .grid-layout .md-col-span-1,
-            .grid-layout .md-col-span-2 {
-                grid-column: span 1 / span 1; /* Override multi-column spans */
-            }
-
-            .chapter-action-buttons .btn-icon {
-                padding: 0.5rem; /* Increase padding for better touch area */
-                font-size: 1rem; /* Ensure icon itself is not too small */
-            }
-            .side-modal-close-btn {
-                padding: 0.5rem; /* Increase padding for click area */
-            }
-            .side-modal-content {
-                width: 90vw; /* More width on small screens */
-                padding: 1rem 1.25rem; /* Adjust padding for smaller modal */
-            }
-            .side-modal-content h2 {
-                font-size: 1.15rem; /* Adjust title in smaller modal */
-            }
-
-            .app-title-bar h1 { font-size: 1.5rem; } /* Smaller main title */
-            .app-title-bar p { font-size: 0.8rem; }
-
-            /* Make main action button full width on mobile for easier tapping */
-            .btn-main-action {
-                 width: 100%;
-                 padding: 0.75rem 1rem; /* Slightly adjust padding */
-            }
-            .output-actions {
-                flex-direction: column; /* Stack output action buttons */
-            }
-            .output-actions .btn {
-                width: 100%; /* Make them full width */
-            }
-        }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <header class="app-title-bar">
-            <h1><i class="fas fa-microchip"></i> Zenith Term Processor v5.4</h1>
+             <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                 <i class="fas fa-moon"></i>
+                 <i class="fas fa-sun"></i>
+            </button>
+            <h1><i class="fas fa-microchip"></i> Zenith Term Processor v6.1</h1>
             <p>Intelligent Term Extraction with Centralized Project Deduplication</p>
         </header>
 
         <div class="grid-layout">
-            <!-- Project Setup Panel -->
-            <div class="panel col-span-1 md-col-span-1">
+            <div class="panel lg-span-3">
                 <h2 class="panel-title"><i class="fas fa-folder-tree"></i>Project Control</h2>
                 <div class="form-group">
                     <label for="novelNameInput" class="form-label">Novel/Project Name:</label>
                     <input type="text" id="novelNameInput" placeholder="E.g., My Awesome Novel">
-                    <small class="form-label" style="margin-top:4px;font-size:0.75rem;">Used for loading/saving the deduplication list below.</small>
+                    <small class="form-label form-label-small">Used for loading/saving list & header.</small>
                 </div>
-                <div id="storedTermsInfo" class="status-message status-info" style="display:none; font-size:0.8rem; flex-direction: column; align-items: flex-start;">
-                    <!-- Info about stored terms count and size warning appears here -->
-                </div>
-                
+                 <div id="storedTermsInfo" class="status-message status-message-col status-info"></div>
+
                 <div class="storage-actions-group">
                     <h3 class="form-label">External Storage Actions</h3>
-                     <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
-                        <button id="exportStoredBtn" onclick="exportPersistentDedupe()" class="btn btn-outline" style="width:100%;">
-                            <i class="fas fa-file-export"></i>Export Dedupe List for Project
+                     <div class="btn-group btn-group-col width-full">
+                        <button id="exportStoredBtn" class="btn btn-outline width-full">
+                            <i class="fas fa-file-export"></i><span>Export List for Project</span>
                         </button>
-                        <div class="file-input-wrapper" style="width:100%;">
-                            <input type="file" id="importDedupeFile" accept=".json,.txt,.csv" onchange="handleImportDedupeFile(this)">
-                            <div class="btn btn-outline file-display-text" id="fileDisplayText_importDedupe" style="width:100%; text-align:left; justify-content: flex-start;">
-                                <i class="fas fa-file-import"></i>Import Dedupe List to Textbox...
-                            </div>
+                         <div class="file-input-container">
+                             <input type="file" id="importDedupeFile" accept=".json,.txt,.csv" aria-label="Import Deduplication List File">
+                              <div class="btn btn-outline file-input-wrapper-btn" id="fileDisplayText_importDedupe" tabindex="-1">
+                                   <i class="fas fa-file-import"></i><span>Import List to Textbox...</span>
+                              </div>
                         </div>
-                        <button id="clearStoredBtn" onclick="confirmClearStorage()" class="btn btn-outline btn-danger" style="width:100%; margin-top: 0.25rem;">
-                            <i class="fas fa-trash-alt"></i>Clear Project's Stored Dedupe List
+                        <button id="clearStoredBtn" class="btn btn-outline btn-danger width-full">
+                            <i class="fas fa-trash-alt"></i><span>Clear Project's Stored List</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Chapter Input Panel -->
-            <div class="panel col-span-1 md-col-span-1">
+            <div class="panel lg-span-4">
                 <h2 class="panel-title"><i class="fas fa-book-reader"></i>Chapter JSON Input</h2>
-                <div id="chapterInputsContainer" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
-                    <!-- Chapter input boxes dynamically added here -->
-                </div>
-                <div class="btn-group" style="margin-top:1rem;">
-                    <button onclick="addChapterInputUI()" class="btn btn-secondary">
-                        <i class="fas fa-plus"></i>Add Chapter Box
+                 <div id="chapterInputsContainer" class="scrollable">
+                    </div>
+                <div class="btn-group">
+                     <button id="addChapterBtn" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i><span>Add Chapter Box</span>
                     </button>
                 </div>
-                <div id="jsonStatus" class="status-message" style="display:none; margin-top: 1rem;"></div>
+                 <div id="jsonStatus" class="status-message"></div>
             </div>
 
-            <!-- Deduplication List & Header Panel -->
-            <div class="panel col-span-1 md-col-span-2"> 
-                <h2 class="panel-title"><i class="fas fa-filter"></i>Deduplication List & Output Header</h2>
-                <div class="session-config-grid-internal">
-                    <div> <!-- Dedupe Column -->
-                        <div class="form-group" id="dedupeSearchGroup" style="margin-bottom: 0.5rem;">
-                            <label for="dedupeSearchInput" class="form-label" style="font-size: 0.8rem;">Search/Filter List:</label>
-                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <input type="text" id="dedupeSearchInput" placeholder="Type to filter..." style="flex-grow: 1;">
-                                <button id="clearDedupeSearchBtn" class="btn btn-icon btn-outline" title="Clear Search"><i class="fas fa-times"></i></button>
-                            </div>
-                            <div id="dedupeFilteredResults" class="dedupe-filtered-results-area" style="display: none; max-height: 150px; overflow-y: auto; background-color: var(--neutral-100); border: 1px solid var(--neutral-300); border-radius: var(--radius-md); padding: 0.5rem; font-size: 0.8em;">
-                                <!-- Filtered results will appear here -->
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="pastedDedupeList" class="form-label">Project Deduplication List (Active & Editable):</label>
-                            <textarea id="pastedDedupeList" rows="7" placeholder="Load or paste: term_translation (one per line) OR raw,term_translation[,gender]..."></textarea>
-                            <div id="dedupeListStatus" class="status-message" style="display:none; margin-top: 0.5rem;"></div>
-                            <div class="btn-group dedupe-list-actions" style="margin-top:0.75rem; gap:0.5rem;">
-                                <button id="loadStoredBtn" onclick="loadPersistentDedupeToList()" class="btn btn-outline">
-                                    <i class="fas fa-cloud-download-alt"></i>Load from Project Storage
+            <div class="panel lg-span-5 md-col-span-2 active-list">
+                <h2 class="panel-title"><i class="fas fa-filter"></i>Active Deduplication List & Header</h2>
+                 <div class="form-group">
+                    <label for="pastedDedupeList" class="form-label">Project Deduplication List (Source of Truth):</label>
+                     <div class="btn-group btn-group-fill dedupe-actions-row" >
+                         <div class="btn-group">
+                             <button id="loadStoredBtn" class="btn btn-outline">
+                                <i class="fas fa-cloud-download-alt"></i><span>Load</span>
+                            </button>
+                             <button id="saveListToStoredBtn" class="btn btn-outline btn-success">
+                                <i class="fas fa-save"></i><span>Save</span>
+                             </button>
+                         </div>
+                          <div class="btn-group">
+                             <button id="cleanListBtn" class="btn btn-outline" title="Sort and remove duplicates based on raw, translation, and gender.">
+                                <i class="fas fa-broom"></i><span>Clean List</span>
+                            </button>
+                            <div class="tooltip">
+                                <button id="copyDedupeBtn" class="btn btn-outline btn-icon" aria-label="Copy Deduplication List">
+                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <button id="saveListToStoredBtn" onclick="saveDedupeListToPersistentStorage()" class="btn btn-success">
-                                    <i class="fas fa-save"></i>Save List to Project Storage
-                                </button>
-                            </div>
-                             <div class="btn-group" style="margin-top:0.5rem;">
-                                <div class="tooltip" style="flex-grow:1;">
-                                    <button onclick="copyToClipboard('pastedDedupeList', 'dedupeTooltip')" class="btn btn-outline btn-icon" style="width:100%;">
-                                        <i class="fas fa-copy"></i> Copy Full List
-                                    </button>
-                                    <span class="tooltip-text" id="dedupeTooltip">Copy List</span>
-                                </div>
-                                 <button onclick="clearDedupeListTextarea()" class="btn btn-outline btn-danger" style="flex-grow:1;"><i class="fas fa-times"></i>Clear Textbox</button>
-                            </div>
-                        </div>
+                                <span class="tooltip-text" id="dedupeTooltip">Copy List</span>
+                             </div>
+                             <button id="clearDedupeTextBtn" class="btn btn-outline btn-danger btn-icon" aria-label="Clear Textbox">
+                                <i class="fas fa-times"></i>
+                             </button>
+                          </div>
+                     </div>
+                    <textarea id="pastedDedupeList" rows="7" placeholder="Load, paste or import: term_translation OR raw,term_translation[,gender]... This is the active list used for extraction."></textarea>
+                     <div id="dedupeListStatus" class="status-message"></div>
+                 </div>
+
+                 <hr class="panel-divider"> <div class="form-group">
+                     <div class="checkbox-group">
+                        <input type="checkbox" id="includeCustomHeaderCheckbox">
+                        <label for="includeCustomHeaderCheckbox" class="form-label">Include Custom Output Header</label>
                     </div>
-                    <div> <!-- Header Column -->
-                        <div class="form-group">
-                            <div style="display:flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <input type="checkbox" id="includeCustomHeaderCheckbox" onchange="toggleCustomHeaderInputUI(this.checked)" style="width:auto; height:auto; accent-color: var(--primary-500); transform: scale(1.1);">
-                                <label for="includeCustomHeaderCheckbox" class="form-label" style="margin-bottom:0;">Include Custom Output Header</label>
-                            </div>
-                            <div id="customHeaderInputArea" style="display:none;">
-                                <textarea id="editablePresetTextarea" rows="5" placeholder="Enter custom header text..."></textarea>
-                            </div>
-                        </div>
+                     <div id="customHeaderInputArea" class="header-input-area">
+                         <label for="editablePresetTextarea" class="form-label form-label-small">Header Text (Saved with Project):</label>
+                        <textarea id="editablePresetTextarea" rows="4" placeholder="Enter custom header text..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Extraction Actions & Results Panel -->
-            <div class="panel col-span-3 md-col-span-2">
-                <h2 class="panel-title"><i class="fas fa-magic-wand-sparkles"></i>Extraction Actions & Results</h2>
-                <div style="text-align:center; margin-bottom: 1.5rem;">
-                    <button id="mainExtractBtn" onclick="processAllData()" class="btn btn-primary btn-main-action">
+            <div class="panel lg-span-12 md-col-span-2">
+                <h2 class="panel-title"><i class="fas fa-wand-magic-sparkles"></i>Extraction Actions & Results</h2>
+                 <div style="text-align:center; margin-bottom: 1.5rem;">
+                     <button id="mainExtractBtn" class="btn btn-primary btn-main-action">
                         <span class="spinner"></span>
-                        <i class="fas fa-cogs"></i>Extract Terms
+                        <i class="fas fa-cogs"></i><span>Extract New Terms</span>
                     </button>
                 </div>
-                <div id="processingLog" class="status-message status-info" style="display:none; margin-bottom:1rem; flex-direction:column; align-items: flex-start;">
+                <div id="processingLog" class="status-message status-info">
                     <strong>Processing Log:</strong>
-                    <ul style="width:100%;"></ul>
+                    <ul class="scrollable"></ul>
                 </div>
 
-                <hr style="margin: 1.5rem 0; border-color: var(--neutral-200);">
-                
                 <div class="output-actions">
                      <div class="tooltip">
-                        <button id="moveExtractedBtn" onclick="moveExtractedToDedupeList()" class="btn btn-secondary"> <!-- Changed behavior -->
-                            <i class="fas fa-share-square"></i>Move Extracted to Dedupe List
+                         <button id="moveAndSaveBtn" class="btn btn-success">
+                            <i class="fas fa-file-import"></i><i class="fas fa-save" style="font-size:0.7em; margin-left:-0.2em"></i> <span>Move & Save</span>
                         </button>
-                        <span class="tooltip-text" id="moveExtractedTooltip">Add to list above</span>
+                        <span class="tooltip-text" id="moveSaveTooltip">Move to list, Clean, & Save to storage</span>
                     </div>
                     <div class="tooltip">
-                         <button onclick="copyOutput('withHeader')" class="btn btn-outline">
-                            <i class="fas fa-file-alt"></i>Copy Output with Header
+                         <button id="moveExtractedBtn" class="btn btn-secondary">
+                            <i class="fas fa-share-square"></i><span>Move Extracted</span>
                         </button>
-                        <span class="tooltip-text" id="copyHeaderTooltip">Copy with header</span>
+                        <span class="tooltip-text" id="moveExtractedTooltip">Add to list & Clean (No Save)</span>
+                    </div>
+                     <div class="tooltip">
+                         <button id="copyOutputBtn" class="btn btn-outline">
+                            <i class="fas fa-copy"></i><span>Copy Output</span>
+                        </button>
+                        <span class="tooltip-text" id="copyHeaderTooltip">Copy output with header (if checked)</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="outputTextarea" class="form-label">Extracted Terms (New & Unique for this session):</label>
+                    <label for="outputTextarea" class="form-label">Extracted Terms Output (New & Unique for this session):</label>
                     <textarea id="outputTextarea" rows="8" readonly placeholder="Extracted terms will appear here..."></textarea>
                 </div>
-                <div id="outputSummary" class="status-message" style="display:none;"></div>
-                <!-- saveToStorageBtnContainer is removed as per new workflow -->
+                 <div id="outputSummary" class="status-message"></div>
             </div>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div class="modal-overlay" id="confirmationModal">
         <div class="modal-content">
             <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
             <p class="modal-body" id="modalMessageText">Are you sure you want to proceed?</p>
-            <div class="modal-actions">
-                 <button class="btn btn-outline" id="modalCancelBtnGeneric">Cancel</button>
-                 <button class="btn btn-danger" id="modalConfirmBtnGeneric">Confirm</button>
-            </div>
+            <div class="modal-actions" id="modalActions">
+                  </div>
         </div>
     </div>
 
-    <footer style="text-align:center; padding: 2rem; color: var(--neutral-500); font-size: 0.875rem; margin-top:1.5rem;">
+    <footer class="footer">
         <p>© 2024 Zenith Term Processor. Elevating Your Lexical Workflow.</p>
     </footer>
 
-    <button id="sideToggleButton" class="side-toggle-btn">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div id="sideToggleModalOverlay" class="side-modal-overlay">
-        <div class="side-modal-content">
-            <button id="closeSideModalBtn" class="side-modal-close-btn">&times;</button>
-            <h2>Quick Access Panel</h2>
-            
-            <button id="themeToggleBtn" class="btn btn-outline" style="width:100%; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-moon" style="margin-right: 0.5rem;"></i> <span>Toggle Theme</span>
-            </button>
-
-            <button id="autoSaveToggleBtn" class="btn btn-outline" style="width:100%; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-sync-alt" style="margin-right: 0.5rem;"></i> <span>Auto-Save: Enabled</span>
-            </button>
-
-            <button id="sortDedupeBtn" class="btn btn-outline" style="width:100%; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-sort-alpha-down" style="margin-right: 0.5rem;"></i> <span>Sort Dedupe List</span>
-            </button>
-
-            <p style="font-size:0.85rem; text-align:center; opacity:0.7;">More controls will be added here soon.</p>
-            <!-- Icons and controls will be added later -->
-        </div>
-    </div>
-
     <script>
     (function() { // IIFE Start
-        // --- Global State & Constants ---
-        // persistentDedupeTranslations is no longer used as a global set.
-        // The pastedDedupeList textarea becomes the primary source for current dedupe data.
+        // --- CHANGE: Constants ---
+        const CONST = {
+             LS_NOVEL_NAME_KEY: 'zenithTermExtractor_lastNovelName',
+             LS_DEDUPE_PREFIX: 'zenithTermExtractor_dedupe_',
+             LS_HEADER_PREFIX: 'zenithTermExtractor_header_', // CHANGE: Header persistence
+             LS_SIZE_WARNING_PREFIX: 'zenithTermExtractor_sizeWarning_',
+             LS_THEME_KEY: 'zenithTermExtractor_theme', // CHANGE: Theme
+             STORAGE_WARNING_THRESHOLD_BYTES: 3.5 * 1024 * 1024,
+             DEFAULT_HEADER_TEXT: `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."\n Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`,
+             STATUS: { INFO: 'info', SUCCESS: 'success', WARNING: 'warning', DANGER: 'danger'},
+             MODAL: { REPLACE: 'replace', MERGE: 'merge', CANCEL: 'cancel'},
+             LOG_TYPE: { INFO: 'info', SUCCESS: 'success', WARNING: 'warning', DANGER: 'danger', START: 'start', END: 'end'},
+             VISIBLE_CLASS: 'visible',
+        };
+        const ICONS = { // CHANGE: Icon map
+             [CONST.STATUS.SUCCESS]: 'fa-check-circle', [CONST.STATUS.WARNING]: 'fa-exclamation-triangle',
+             [CONST.STATUS.DANGER]: 'fa-times-circle', [CONST.STATUS.INFO]: 'fa-info-circle',
+             [CONST.LOG_TYPE.START]: 'fa-play-circle', [CONST.LOG_TYPE.END]: 'fa-flag-checkered',
+        };
+         const LOG_COLORS = { // CHANGE: Log color map
+              [CONST.LOG_TYPE.SUCCESS]: 'var(--success-500)', [CONST.LOG_TYPE.DANGER]: 'var(--danger-500)',
+              [CONST.LOG_TYPE.WARNING]: 'var(--warning-500)', [CONST.LOG_TYPE.INFO]: 'var(--text-light)',
+              [CONST.LOG_TYPE.START]: 'var(--primary-500)', [CONST.LOG_TYPE.END]: 'var(--secondary-500)',
+         };
+
+        // --- State ---
         let chapterInputCounter = 0;
-        let lastExtractedPureTerms = []; 
-        const LS_NOVEL_NAME_KEY = 'zenithTermExtractor_lastNovelName';
-        const LS_DEDUPE_PREFIX = 'zenithTermExtractor_dedupe_'; // Stores array of full lines
-        const LS_SIZE_WARNING_PREFIX = 'zenithTermExtractor_sizeWarning_';
-        const STORAGE_WARNING_THRESHOLD_BYTES = 3.5 * 1024 * 1024; 
+        let lastExtractedPureTerms = [];
+        const statusTimeouts = {}; // CHANGE: Store timeout IDs
+        const tooltipTimeouts = {}; // CHANGE: Store timeout IDs
 
-        const DEFAULT_HEADER_TEXT = `"Before replying YOU must think. From now onwards, in your thinking process/thought process/strategizing instead of YOU doing regular thinking, it is imperative that YOU MUST open and activate "Super-Duper-Hyper Thinking Mode". In this mode, you are obligated to: 1) engage in extreme exceptionally extreme thinking 2) engage in extreme exceptionally extreme extensivity 3) extreme exceptionally extreme extensity analysis."\n Go through the whole chat and check what have you translated these in your translation. add pinyin, where and its description and gender about it too. Mention if the  term is not present or cut in half. compare to my translation and let me know the difference reason.`;
-
-        // --- DOM Elements ---
-        const novelNameInput = document.getElementById('novelNameInput');
-        const editablePresetTextarea = document.getElementById('editablePresetTextarea');
-        const outputTextarea = document.getElementById('outputTextarea');
-        const pastedDedupeListTextarea = document.getElementById('pastedDedupeList');
-        const modalOverlay = document.getElementById('confirmationModal');
-        const modalTitleEl = document.getElementById('modalTitle');
-        const modalMessageEl = document.getElementById('modalMessageText');
-        const modalActionsContainer = modalOverlay.querySelector('.modal-actions');
-        let generalConfirmCallback = null;
-        let generalCancelCallback = null;
-
+        // --- CHANGE: Cache DOM Elements ---
+        const EL = {
+             novelNameInput: document.getElementById('novelNameInput'),
+             editablePresetTextarea: document.getElementById('editablePresetTextarea'),
+             includeCustomHeaderCheckbox: document.getElementById('includeCustomHeaderCheckbox'),
+             customHeaderInputArea: document.getElementById('customHeaderInputArea'),
+             outputTextarea: document.getElementById('outputTextarea'),
+             pastedDedupeListTextarea: document.getElementById('pastedDedupeList'),
+             modalOverlay: document.getElementById('confirmationModal'),
+             modalTitleEl: document.getElementById('modalTitle'),
+             modalMessageEl: document.getElementById('modalMessageText'),
+             modalActionsContainer: document.getElementById('modalActions'),
+             chapterInputsContainer : document.getElementById('chapterInputsContainer'),
+             storedTermsInfo: document.getElementById('storedTermsInfo'),
+             jsonStatus: document.getElementById('jsonStatus'),
+             dedupeListStatus: document.getElementById('dedupeListStatus'),
+             outputSummary: document.getElementById('outputSummary'),
+             processingLog: document.getElementById('processingLog'),
+             logUl: document.querySelector('#processingLog ul'),
+             // Buttons
+             themeToggleBtn: document.getElementById('themeToggleBtn'),
+             exportStoredBtn: document.getElementById('exportStoredBtn'),
+             importDedupeFile: document.getElementById('importDedupeFile'),
+             fileDisplayText_importDedupe: document.getElementById('fileDisplayText_importDedupe'),
+             clearStoredBtn: document.getElementById('clearStoredBtn'),
+             addChapterBtn: document.getElementById('addChapterBtn'),
+             loadStoredBtn: document.getElementById('loadStoredBtn'),
+             saveListToStoredBtn: document.getElementById('saveListToStoredBtn'),
+             cleanListBtn: document.getElementById('cleanListBtn'), // New
+             copyDedupeBtn: document.getElementById('copyDedupeBtn'), // New
+             clearDedupeTextBtn: document.getElementById('clearDedupeTextBtn'),
+             mainExtractBtn: document.getElementById('mainExtractBtn'),
+             moveExtractedBtn: document.getElementById('moveExtractedBtn'),
+             moveAndSaveBtn: document.getElementById('moveAndSaveBtn'), // New
+             copyOutputBtn: document.getElementById('copyOutputBtn'),
+             // Tooltips
+             dedupeTooltip: document.getElementById('dedupeTooltip'),
+             moveExtractedTooltip: document.getElementById('moveExtractedTooltip'),
+             moveSaveTooltip: document.getElementById('moveSaveTooltip'), // New
+             copyHeaderTooltip: document.getElementById('copyHeaderTooltip'),
+        };
 
         // --- Utility Functions ---
         function debounce(func, delay) {
             let timeoutId;
             return function(...args) {
                 clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    func.apply(this, args);
-                }, delay);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
             };
         }
+        // CHANGE: Safer element content
+        function setElementContent(el, iconClass, text) {
+             if(!el) return;
+             el.innerHTML = ''; // Clear
+             if(iconClass) {
+                const i = document.createElement('i');
+                i.className = `fas ${iconClass}`;
+                el.appendChild(i);
+             }
+             if(text) {
+                const span = document.createElement('span'); // use span for button text
+                span.textContent = ' ' + text; // Safe
+                el.appendChild(span);
+             }
+        }
+         // CHANGE: Create safe element for log / status
+         function createIconTextNode(iconClass, text, color = null) {
+             const fragment = document.createDocumentFragment();
+             const icon = document.createElement('i');
+             icon.className = `fas ${iconClass}`;
+             if(color) icon.style.color = color;
+             fragment.appendChild(icon);
+             const textSpan = document.createElement('span');
+             textSpan.className = 'log-text';
+             textSpan.textContent = text; // SAFE
+             fragment.appendChild(textSpan);
+             return fragment;
+         }
+         // CHANGE: Safer Modal Body (allows basic HTML like <strong> but requires care)
+         // Basic sanitiser - only use if <strong> etc is essential and source is trusted-ish
+          function createSafeHTML(htmlString) {
+             const parser = new DOMParser();
+             const doc = parser.parseFromString(htmlString, 'text/html');
+             // Further sanitisation could be added here (remove scripts, onXXX attributes)
+             return doc.body.innerHTML; // Still use with caution
+          }
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            addChapterInputUI(); 
-            editablePresetTextarea.value = DEFAULT_HEADER_TEXT;
-            const lastNovel = localStorage.getItem(LS_NOVEL_NAME_KEY);
+
+         // --- CHANGE: LocalStorage Wrappers (Robustness) ---
+         function safeSetItem(key, value) {
+            try { localStorage.setItem(key, value); return true; }
+            catch (e) {
+               console.error("LocalStorage Set Error:", key, e);
+               displayStatus(EL.storedTermsInfo.id, `Storage Error: Could not save data (Quota full or storage disabled?). ${e.name}`, CONST.STATUS.DANGER, null, 10000);
+               return false;
+            }
+         }
+          function safeGetItem(key) {
+            try { return localStorage.getItem(key); }
+            catch (e) { console.error("LocalStorage Get Error:", key, e); return null; }
+         }
+          function safeRemoveItem(key) {
+            try { localStorage.removeItem(key); return true; }
+             catch (e) { console.error("LocalStorage Remove Error:", key, e); return false; }
+         }
+
+        // --- Initialization & Event Listeners ---
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+             // Theme
+             const savedTheme = safeGetItem(CONST.LS_THEME_KEY) || 'light';
+             applyTheme(savedTheme);
+             EL.themeToggleBtn.addEventListener('click', toggleTheme);
+
+            addChapterInputUI();
+            const lastNovel = safeGetItem(CONST.LS_NOVEL_NAME_KEY);
             if (lastNovel) {
-                novelNameInput.value = lastNovel;
+                EL.novelNameInput.value = lastNovel;
             }
-            updateDynamicButtonLabelsAndInfo(); 
+            // Load header state *after* novel name is set
+            loadProjectHeaderState(EL.novelNameInput.value.trim());
+            updateDynamicButtonLabelsAndInfo();
 
-            // Set "Include Custom Output Header" to be ON by default
-            const includeCustomHeaderCheckbox = document.getElementById('includeCustomHeaderCheckbox');
-            if (includeCustomHeaderCheckbox) {
-                includeCustomHeaderCheckbox.checked = true;
-                toggleCustomHeaderInputUI(includeCustomHeaderCheckbox.checked); 
-            }
+            // CHANGE: Debounce and Save Header
+            const debouncedUpdate = debounce( () => {
+                 updateDynamicButtonLabelsAndInfo();
+                 loadProjectHeaderState(EL.novelNameInput.value.trim()); // Reload header when name changes
+            }, 400);
+            const debouncedSaveHeader = debounce( () => {
+                 saveProjectHeaderState(EL.novelNameInput.value.trim());
+            }, 500);
 
-            // --- Auto-Save Initialization ---
-            const autoSaveToggleBtnElem = document.getElementById('autoSaveToggleBtn');
-            // pastedDedupeListTextarea is already a global const in this IIFE
-
-            const savedAutoSavePref = localStorage.getItem(LS_AUTOSAVE_ENABLED_KEY);
-            isAutoSaveEnabled = savedAutoSavePref === null ? true : (savedAutoSavePref === 'true'); // Default to true
-            updateAutoSaveButtonUI(); // Initialize button UI
-
-            if (pastedDedupeListTextarea) { // Check if element exists
-                pastedDedupeListTextarea.addEventListener('input', debouncedAutoSave);
-            }
-
-            if (autoSaveToggleBtnElem) {
-                autoSaveToggleBtnElem.addEventListener('click', () => {
-                    isAutoSaveEnabled = !isAutoSaveEnabled;
-                    localStorage.setItem(LS_AUTOSAVE_ENABLED_KEY, isAutoSaveEnabled);
-                    updateAutoSaveButtonUI();
-                    if (isAutoSaveEnabled) {
-                        if (pastedDedupeListTextarea && pastedDedupeListTextarea.value.trim()) {
-                             autoSaveDedupeList(); // Trigger save if enabling with content
-                        }
-                    }
-                });
-            }
-            // End of Auto-Save Initialization
-
-            novelNameInput.addEventListener('keyup', debounce(updateDynamicButtonLabelsAndInfo, 350));
-
-            document.getElementById('modalCancelBtnGeneric').addEventListener('click', () => {
-                if(typeof generalCancelCallback === 'function') generalCancelCallback();
-                hideGenericModal();
+            EL.novelNameInput.addEventListener('keyup', debouncedUpdate);
+            EL.editablePresetTextarea.addEventListener('keyup', debouncedSaveHeader);
+            EL.includeCustomHeaderCheckbox.addEventListener('change', (event) => {
+                 toggleCustomHeaderInputUI(event.target.checked)
+                 debouncedSaveHeader(); // Save checkbox state change immediately
             });
-            document.getElementById('modalConfirmBtnGeneric').addEventListener('click', () => {
-                if(typeof generalConfirmCallback === 'function') generalConfirmCallback();
-                hideGenericModal();
-            });
-        });
-        
-        function updateDynamicButtonLabelsAndInfo() {
-            updateDynamicButtonLabels();
-            updateStoredTermsInfo(); 
+             // CHANGE: Add all Event Listeners
+             EL.addChapterBtn.addEventListener('click', addChapterInputUI);
+             EL.exportStoredBtn.addEventListener('click', exportPersistentDedupe);
+             EL.importDedupeFile.addEventListener('change', (e) => handleImportDedupeFile(e.target));
+             EL.clearStoredBtn.addEventListener('click', confirmClearStorage);
+             EL.loadStoredBtn.addEventListener('click', loadPersistentDedupeToList);
+             EL.saveListToStoredBtn.addEventListener('click', saveDedupeListToPersistentStorage);
+             EL.cleanListBtn.addEventListener('click', cleanDedupeListTextarea); // New
+             EL.clearDedupeTextBtn.addEventListener('click', clearDedupeListTextarea);
+             EL.mainExtractBtn.addEventListener('click', processAllData);
+             EL.moveExtractedBtn.addEventListener('click', () => moveExtractedToDedupeList(false)); // Pass save flag
+             EL.moveAndSaveBtn.addEventListener('click', () => moveExtractedToDedupeList(true)); // New: Pass save flag
+             EL.copyOutputBtn.addEventListener('click', () => copyOutput());
+             EL.copyDedupeBtn.addEventListener('click', () => copyToClipboard(EL.pastedDedupeListTextarea, EL.dedupeTooltip.id));
+             // Allow clicking the button label to trigger file input
+             EL.fileDisplayText_importDedupe.addEventListener('click', () => EL.importDedupeFile.click());
+             // Close modal on backdrop click
+             EL.modalOverlay.addEventListener('click', (e) => {
+                 if(e.target === EL.modalOverlay) hideGenericModal();
+             });
         }
 
+         // CHANGE: Theme Management
+         function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); }
+         function toggleTheme() {
+             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+             applyTheme(newTheme);
+             safeSetItem(CONST.LS_THEME_KEY, newTheme);
+         }
+
+
+        function updateDynamicButtonLabelsAndInfo() {
+            updateDynamicButtonLabels();
+            updateStoredTermsInfo();
+        }
 
         // --- UI Update Functions ---
+         // CHANGE: Chapter re-indexing and button creation
         function addChapterInputUI() {
             chapterInputCounter++;
-            const container = document.getElementById('chapterInputsContainer');
             const itemDiv = document.createElement('div');
             itemDiv.className = 'chapter-input-group';
-            itemDiv.id = `chapterGroup_${chapterInputCounter}`;
+            // itemDiv.id = `chapterGroup_${chapterInputCounter}`; // ID not strictly needed now
 
             const headerDiv = document.createElement('div');
             headerDiv.className = 'chapter-header';
             const label = document.createElement('span');
             label.className = 'chapter-label';
-            label.textContent = `Chapter ${chapterInputCounter} JSON`;
+             // label.textContent = `Chapter ${chapterInputCounter} JSON`; // Set in reindex
             headerDiv.appendChild(label);
 
-            const buttonGroup = document.createElement('div');
-            buttonGroup.className = 'chapter-action-buttons'; // Added for potential styling of the group
-            buttonGroup.style.display = 'flex'; // Simple styling for horizontal layout
-            buttonGroup.style.gap = '0.5rem'; // Space between buttons
+             // Always create remove button, reindex controls visibility
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-icon btn-outline btn-danger remove-chapter-btn';
+            removeBtn.setAttribute('aria-label', 'Remove this chapter box'); // A11y
+            const icon = document.createElement('i'); icon.className = 'fas fa-minus-circle';
+            removeBtn.appendChild(icon);
+            removeBtn.addEventListener('click', () => { // CHANGE: Use addEventListener
+                 itemDiv.remove();
+                 reindexChapterLabels(); // CHANGE: Reindex on remove
+            });
+            headerDiv.appendChild(removeBtn);
 
-            // Paste button (always added)
-            const pasteBtn = document.createElement('button');
-            pasteBtn.innerHTML = '<i class="fas fa-paste"></i>';
-            pasteBtn.className = 'btn btn-icon btn-outline btn-secondary'; // Using btn-secondary for neutral color
-            pasteBtn.title = 'Paste from clipboard';
-            pasteBtn.style.padding = '0.3rem 0.5rem'; // Consistent padding
-
-            pasteBtn.onclick = async () => {
-                const associatedTextarea = itemDiv.querySelector('textarea');
-                if (associatedTextarea) {
-                    try {
-                        const text = await navigator.clipboard.readText();
-                        associatedTextarea.value = text;
-                        // Optionally, add a small visual feedback if displayStatus can be targeted
-                        // For now, no explicit success message to keep it simple as per instructions for non-error cases
-                    } catch (err) {
-                        console.error('Failed to read clipboard contents: ', err);
-                        alert('Failed to paste from clipboard. Please ensure you have granted clipboard permission to this site and are using a compatible browser (e.g., Chrome, Edge, Firefox). The operation might have been blocked by your browser or an extension.');
-                    }
-                }
-            };
-            buttonGroup.appendChild(pasteBtn);
-
-            // Clear button (always added)
-            const clearBtn = document.createElement('button');
-            clearBtn.innerHTML = '<i class="fas fa-times"></i>'; // Using fa-times as suggested
-            clearBtn.className = 'btn btn-icon btn-outline btn-danger btn-clear-chapter'; // Specific class
-            clearBtn.title = 'Clear this chapter box';
-            clearBtn.style.padding = '0.3rem 0.5rem'; // Matching remove button style
-            clearBtn.onclick = () => {
-                const associatedTextarea = itemDiv.querySelector('textarea');
-                if (associatedTextarea) {
-                    associatedTextarea.value = '';
-                }
-            };
-            buttonGroup.appendChild(clearBtn);
-
-            if (chapterInputCounter > 1) { 
-                const removeBtn = document.createElement('button');
-                removeBtn.innerHTML = '<i class="fas fa-minus-circle"></i>';
-                removeBtn.className = 'btn btn-icon btn-outline btn-danger';
-                removeBtn.style.padding = '0.3rem 0.5rem'; 
-                removeBtn.title = 'Remove this chapter box';
-                removeBtn.onclick = () => { itemDiv.remove(); };
-                buttonGroup.appendChild(removeBtn); // Add to group
-            }
-            headerDiv.appendChild(buttonGroup); // Add group to header
             itemDiv.appendChild(headerDiv);
-
             const textarea = document.createElement('textarea');
-            textarea.rows = 4;
-            textarea.placeholder = `Paste JSON for Chapter ${chapterInputCounter}...`;
-            textarea.id = `chapterJson_${chapterInputCounter}`; 
+            textarea.rows = 3;
+            // textarea.placeholder = `Paste JSON for Chapter ${chapterInputCounter}...`; // Set in reindex
+            textarea.id = `chapterJson_${chapterInputCounter}`; // Keep ID just in case
             itemDiv.appendChild(textarea);
-            container.appendChild(itemDiv);
-            container.scrollTop = container.scrollHeight;
+            EL.chapterInputsContainer.appendChild(itemDiv);
+            EL.chapterInputsContainer.scrollTop = EL.chapterInputsContainer.scrollHeight;
+             reindexChapterLabels(); // CHANGE: Reindex on add
         }
-        window.addChapterInputUI = addChapterInputUI;
+
+         // CHANGE: New function to re-number chapter boxes
+         function reindexChapterLabels() {
+             const groups = EL.chapterInputsContainer.querySelectorAll('.chapter-input-group');
+              groups.forEach((group, index) => {
+                  const label = group.querySelector('.chapter-label');
+                  const textarea = group.querySelector('textarea');
+                  const removeBtn = group.querySelector('.remove-chapter-btn');
+                  const newIndex = index + 1;
+                  if(label) label.textContent = `Chapter ${newIndex} JSON`;
+                  if(textarea) textarea.placeholder = `Paste JSON for Chapter ${newIndex}...`;
+                   if(removeBtn) {
+                       // Hide remove button if only one box exists
+                      removeBtn.style.display = groups.length > 1 ? 'inline-flex': 'none';
+                   }
+              });
+         }
 
         function toggleCustomHeaderInputUI(isChecked) {
-            document.getElementById('customHeaderInputArea').style.display = isChecked ? 'block' : 'none';
+             // CHANGE: Use class for visibility
+            EL.customHeaderInputArea.classList.toggle(CONST.VISIBLE_CLASS, isChecked);
         }
-        window.toggleCustomHeaderInputUI = toggleCustomHeaderInputUI;
 
+         // CHANGE: Use textContent for safety (XSS)
         function updateDynamicButtonLabels() {
-            const novelName = novelNameInput.value.trim() || "Project";
-            const isProjectNamed = novelName !== "Project" && novelNameInput.value.trim();
+            const novelName = EL.novelNameInput.value.trim();
+            const displayName = novelName || "Project";
+            const isProjectNamed = !!novelName; // Boolean check
 
-            document.getElementById('loadStoredBtn').innerHTML = `<i class="fas fa-cloud-download-alt"></i>Load from '${novelName}' Storage`;
-            document.getElementById('saveListToStoredBtn').innerHTML = `<i class="fas fa-save"></i>Save List to '${novelName}' Storage`;
-            document.getElementById('exportStoredBtn').innerHTML = `<i class="fas fa-file-export"></i>Export List for '${novelName}'`;
-            document.getElementById('clearStoredBtn').innerHTML = `<i class="fas fa-trash-alt"></i>Clear '${novelName}' Stored List`;
-            
-            document.getElementById('loadStoredBtn').disabled = !isProjectNamed;
-            document.getElementById('saveListToStoredBtn').disabled = !isProjectNamed;
-            document.getElementById('exportStoredBtn').disabled = !isProjectNamed;
-            document.getElementById('clearStoredBtn').disabled = !isProjectNamed;
+            setElementContent(EL.loadStoredBtn, 'fa-cloud-download-alt', `Load from '${displayName}'`);
+            setElementContent(EL.saveListToStoredBtn, 'fa-save', `Save to '${displayName}'`);
+            setElementContent(EL.exportStoredBtn, 'fa-file-export',`Export List for '${displayName}'`);
+            setElementContent(EL.clearStoredBtn, 'fa-trash-alt', `Clear '${displayName}' Stored List`);
 
-            const importFileInput = document.getElementById('importDedupeFile');
-            const importFileDisplayButton = document.getElementById('fileDisplayText_importDedupe');
-            
-            if (!isProjectNamed) { // Allow import to textbox even without project name, but other project actions disabled
-                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
-            } else {
-                importFileDisplayButton.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
-            }
-             // Import is always to the textbox, so it's generally enabled.
-            importFileInput.disabled = false;
-            importFileDisplayButton.style.cursor = "pointer";
-            importFileDisplayButton.classList.remove('disabled');
+            EL.loadStoredBtn.disabled = !isProjectNamed;
+            EL.saveListToStoredBtn.disabled = !isProjectNamed;
+            EL.exportStoredBtn.disabled = !isProjectNamed;
+            EL.clearStoredBtn.disabled = !isProjectNamed;
+            EL.moveAndSaveBtn.disabled = !isProjectNamed; // New button
 
+            updateFileDisplay(EL.importDedupeFile, EL.fileDisplayText_importDedupe.id); // Update import text
 
             if (isProjectNamed) {
-                localStorage.setItem(LS_NOVEL_NAME_KEY, novelNameInput.value.trim());
+                safeSetItem(CONST.LS_NOVEL_NAME_KEY, novelName);
+            } else {
+                 safeRemoveItem(CONST.LS_NOVEL_NAME_KEY); // Clear if name is empty
             }
         }
-        
+
+         // CHANGE: Use textContent / element creation (XSS)
         function updateStoredTermsInfo() {
-            const novelName = novelNameInput.value.trim();
-            const storedInfoDiv = document.getElementById('storedTermsInfo');
-            if (!novelName || novelName === "Project") {
-                storedInfoDiv.style.display = 'none';
+            const novelName = EL.novelNameInput.value.trim();
+            EL.storedTermsInfo.innerHTML = ''; // Clear safely
+            if (!novelName) {
+                EL.storedTermsInfo.classList.remove(CONST.VISIBLE_CLASS);
                 return;
             }
-            const key = LS_DEDUPE_PREFIX + novelName;
-            const storedLinesArray = JSON.parse(localStorage.getItem(key) || '[]');
-            let mainInfo = `<div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-database"></i> ${storedLinesArray.length} lines stored for '${novelName}'.</div>`;
-            
-            const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
-            if (localStorage.getItem(warningKey) === 'true') {
-                mainInfo += `<div class="status-message status-warning" style="margin-top:0.5rem; padding:0.5rem 0.75rem; font-size:0.8em;">
-                                <i class="fas fa-hdd"></i><strong>Storage Alert:</strong> Project data is large.
-                                Please <strong>export regularly</strong> and consider managing list size.
-                             </div>`;
-                storedInfoDiv.classList.remove('status-info', 'status-success'); 
-                storedInfoDiv.classList.add('status-warning'); 
-            } else {
-                 storedInfoDiv.classList.remove('status-warning');
-                 storedInfoDiv.classList.add('status-info'); // Default or if no specific status
-            }
+            const key = CONST.LS_DEDUPE_PREFIX + novelName;
+            const storedData = safeGetItem(key);
+            const storedLinesArray = JSON.parse(storedData || '[]');
+            let count = storedLinesArray.length;
 
-            storedInfoDiv.innerHTML = mainInfo;
-            storedInfoDiv.style.display = 'flex';
+            const mainInfo = document.createElement('div');
+            mainInfo.style.cssText = "display:flex; align-items:center; gap:0.5rem;";
+            mainInfo.appendChild(createIconTextNode('fa-database', `${count} lines stored for '${novelName}'.`));
+            EL.storedTermsInfo.appendChild(mainInfo);
+
+            const warningKey = CONST.LS_SIZE_WARNING_PREFIX + novelName;
+             EL.storedTermsInfo.classList.remove('status-warning', 'status-info'); // Reset
+            if (safeGetItem(warningKey) === 'true') {
+                 const warnDiv = document.createElement('div');
+                 warnDiv.className = "status-message status-warning visible"; // Add visible
+                 warnDiv.style.cssText ="margin-top:0.5rem; padding:0.5rem 0.75rem; font-size:0.9em;";
+                 const strong = document.createElement('strong'); strong.textContent = " Storage Alert:";
+                 warnDiv.appendChild(createIconTextNode('fa-hard-drive',''));
+                 warnDiv.appendChild(strong);
+                 warnDiv.appendChild(document.createTextNode(' Project data is large. Export regularly and manage list size.'));
+                 EL.storedTermsInfo.appendChild(warnDiv);
+                 EL.storedTermsInfo.classList.add('status-warning');
+            } else {
+                 EL.storedTermsInfo.classList.add('status-info');
+            }
+            EL.storedTermsInfo.classList.add(CONST.VISIBLE_CLASS);
         }
 
-
-        function displayStatus(elementId, message, type = 'info', icon = null) {
+        // CHANGE: Timeout clearing, element creation, class toggle
+        function displayStatus(elementId, message, type = CONST.STATUS.INFO, icon = null, timeoutMs = 4000) {
             const el = document.getElementById(elementId);
             if (!el) return;
-            let iconHtml = '';
-            if (icon) iconHtml = `<i class="fas ${icon}"></i>`;
-            else { 
-                if(type === 'success') iconHtml = '<i class="fas fa-check-circle"></i>';
-                else if(type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
-                else if(type === 'danger') iconHtml = '<i class="fas fa-times-circle"></i>';
-                else iconHtml = '<i class="fas fa-info-circle"></i>';
+
+             // Clear previous timeout for this element
+            if(statusTimeouts[elementId]) {
+                 clearTimeout(statusTimeouts[elementId]);
+                 delete statusTimeouts[elementId];
             }
-            el.innerHTML = `${iconHtml} ${message}`;
-            el.className = `status-message status-${type}`; 
-            el.style.display = 'flex';
-             // Auto-hide info/success messages after a few seconds
-            if (type === 'info' || type === 'success') {
-                setTimeout(() => {
-                    if (el.innerHTML.includes(message)) { // Check if message is still the same
-                        hideStatus(elementId);
+
+            const iconClass = icon || ICONS[type] || ICONS[CONST.STATUS.INFO];
+            el.innerHTML = ''; // Clear safely
+            el.appendChild(createIconTextNode(iconClass, message));
+            el.className = `status-message status-${type} ${CONST.VISIBLE_CLASS}`; // Set class + visible
+
+            if ((type === CONST.STATUS.INFO || type === CONST.STATUS.SUCCESS) && timeoutMs > 0 ) {
+               statusTimeouts[elementId] = setTimeout(() => {
+                     // Check if message content is still the same before hiding
+                    const textSpan = el.querySelector('.log-text');
+                    if (el.classList.contains(CONST.VISIBLE_CLASS) && textSpan && textSpan.textContent === message) {
+                       hideStatus(elementId);
                     }
-                }, 4000);
+                     delete statusTimeouts[elementId]; // clean up
+                }, timeoutMs);
             }
         }
-        function hideStatus(elementId) { 
+        function hideStatus(elementId) {
             const el = document.getElementById(elementId);
-            if (el) el.style.display = 'none'; 
+            if (el) {
+                 el.classList.remove(CONST.VISIBLE_CLASS);
+                  if(statusTimeouts[elementId]) { // Also clear timeout if hidden manually
+                    clearTimeout(statusTimeouts[elementId]);
+                    delete statusTimeouts[elementId];
+                 }
+             }
         }
 
+         // CHANGE: Use textContent
         function updateFileDisplay(input, displayId) {
-            const display = document.getElementById(displayId); 
+            const display = document.getElementById(displayId);
             if (!display) return;
-            const novelName = novelNameInput.value.trim() || "Project";
+            const novelName = EL.novelNameInput.value.trim() || "Project";
 
             if (input.files && input.files.length > 0) {
-                const baseIcon = 'fa-file-import'; // Only one type of import now
-                display.innerHTML = `<i class="fas ${baseIcon}"></i> ${input.files[0].name}`;
+                setElementContent(display, 'fa-file-import', input.files[0].name); // SAFE
                 display.classList.add('has-file');
             } else {
-                // Text for import button
-                if (novelName === "Project" || !novelNameInput.value.trim()) {
-                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox...`;
-                } else {
-                    display.innerHTML = `<i class="fas fa-file-import"></i>Import List to Textbox for '${novelName}'...`;
-                }
+                const text = !EL.novelNameInput.value.trim()
+                     ? `Import List to Textbox...`
+                     : `Import List to Textbox for '${novelName}'...`;
+                 setElementContent(display, 'fa-file-import', text); // SAFE
                 display.classList.remove('has-file');
             }
         }
-        window.updateFileDisplay = updateFileDisplay; 
-        
-        function addProcessingLogStep(message, type = 'info') {
-            const logUl = document.querySelector('#processingLog ul');
-            if(!logUl) return;
-            document.getElementById('processingLog').style.display = 'flex'; 
+
+        // CHANGE: Use element creation (XSS)
+        function addProcessingLogStep(message, type = CONST.LOG_TYPE.INFO) {
+            if(!EL.logUl) return;
+            EL.processingLog.classList.add(CONST.VISIBLE_CLASS);
             const li = document.createElement('li');
-            let iconClass = 'fa-info-circle'; 
-            let iconColor = 'var(--neutral-500)';
-
-            if (type === 'success') { iconClass = 'fa-check-circle'; iconColor = 'var(--success-500)';}
-            else if (type === 'danger') { iconClass = 'fa-times-circle'; iconColor = 'var(--danger-500)';}
-            else if (type === 'warning') { iconClass = 'fa-exclamation-triangle'; iconColor = 'var(--warning-500)';}
-            
-            li.innerHTML = `<i class="fas ${iconClass}" style="color:${iconColor};"></i> ${message}`;
-            logUl.appendChild(li);
-            logUl.scrollTop = logUl.scrollHeight;
+            const iconClass = ICONS[type] || 'fa-info-circle';
+            const iconColor = LOG_COLORS[type] || LOG_COLORS[CONST.LOG_TYPE.INFO];
+            li.appendChild(createIconTextNode(iconClass, message, iconColor));
+            EL.logUl.appendChild(li);
+            EL.logUl.scrollTop = EL.logUl.scrollHeight; // Scroll to bottom
         }
-        function clearProcessingLog() { 
-            const logUl = document.querySelector('#processingLog ul');
-            if (logUl) logUl.innerHTML = '';
-            document.getElementById('processingLog').style.display = 'none';
+        function clearProcessingLog() {
+            if (EL.logUl) EL.logUl.innerHTML = '';
+            EL.processingLog.classList.remove(CONST.VISIBLE_CLASS);
         }
 
-        // --- LocalStorage Interaction (Stores array of full lines) ---
+        // --- LocalStorage Interaction ---
+         // CHANGE: QoL - Header Persistence
+         function saveProjectHeaderState(novelName) {
+             if (!novelName) return;
+             const headerData = {
+                 enabled: EL.includeCustomHeaderCheckbox.checked,
+                 text: EL.editablePresetTextarea.value
+             };
+              safeSetItem(CONST.LS_HEADER_PREFIX + novelName, JSON.stringify(headerData));
+         }
+
+        // MODIFIED FUNCTION: Makes header active by default for new projects
+        function loadProjectHeaderState(novelName) {
+            let headerData = null;
+            if(novelName) {
+               const stored = safeGetItem(CONST.LS_HEADER_PREFIX + novelName);
+               if(stored) {
+                   try { headerData = JSON.parse(stored); } catch(e) { console.error("Could not parse header data", e); }
+                }
+            }
+            // Apply state or defaults
+            // If headerData is null OR headerData.enabled is not defined, default to true. Otherwise, use saved value.
+            EL.includeCustomHeaderCheckbox.checked = headerData?.enabled ?? true;
+            EL.editablePresetTextarea.value = (headerData && headerData.text) ? headerData.text : CONST.DEFAULT_HEADER_TEXT;
+            toggleCustomHeaderInputUI(EL.includeCustomHeaderCheckbox.checked);
+       }
+
+
         function getPersistentDedupeLines(novelName) {
             if (!novelName) return [];
-            const key = LS_DEDUPE_PREFIX + novelName;
-            return JSON.parse(localStorage.getItem(key) || '[]');
+            const key = CONST.LS_DEDUPE_PREFIX + novelName;
+            const data = safeGetItem(key);
+            try {
+                 return JSON.parse(data || '[]');
+            } catch(e) {
+                 displayStatus(EL.storedTermsInfo.id, `Error reading stored data for ${novelName}. Data might be corrupt.`, CONST.STATUS.DANGER);
+                 return [];
+            }
         }
 
         function savePersistentDedupeLines(novelName, linesArray) {
-            if (!novelName || novelName === "Project") {
-                displayStatus('dedupeListStatus', "Project Name is required to save the list.", 'danger');
+            if (!novelName) {
+                displayStatus(EL.dedupeListStatus.id, "Project Name is required to save the list.", CONST.STATUS.DANGER);
                 return false;
             }
-            const key = LS_DEDUPE_PREFIX + novelName;
+            const key = CONST.LS_DEDUPE_PREFIX + novelName;
             const dataStr = JSON.stringify(linesArray);
-            
-            const sizeInBytes = new TextEncoder().encode(dataStr).length;
-            const warningKey = LS_SIZE_WARNING_PREFIX + novelName;
-            if (sizeInBytes > STORAGE_WARNING_THRESHOLD_BYTES) {
-                localStorage.setItem(warningKey, 'true');
+
+            const sizeInBytes = new Blob([dataStr]).size; // More accurate than TextEncoder for LS
+            const warningKey = CONST.LS_SIZE_WARNING_PREFIX + novelName;
+            if (sizeInBytes > CONST.STORAGE_WARNING_THRESHOLD_BYTES) {
+                safeSetItem(warningKey, 'true');
             } else {
-                localStorage.removeItem(warningKey); 
+                safeRemoveItem(warningKey);
             }
-            localStorage.setItem(key, dataStr);
-            updateStoredTermsInfo(); 
-            return true;
+            // CHANGE: Use safeSetItem
+            if(safeSetItem(key, dataStr)){
+                 updateStoredTermsInfo();
+                 return true;
+            }
+             // safeSetItem shows its own error, but we update info anyway in case warning key changed
+             updateStoredTermsInfo();
+            return false;
         }
-        
-        // Renamed from loadPersistentDedupe
+
         function loadPersistentDedupeToList() {
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                displayStatus('dedupeListStatus', "Please enter a valid Project Name first.", 'warning');
+            const novelName = EL.novelNameInput.value.trim();
+            if (!novelName) {
+                displayStatus(EL.dedupeListStatus.id, "Please enter a valid Project Name first.", CONST.STATUS.WARNING);
                 return;
             }
             const storedLines = getPersistentDedupeLines(novelName);
-            pastedDedupeListTextarea.value = storedLines.join('\n');
-            displayStatus('dedupeListStatus', `Loaded ${storedLines.length} lines from '${novelName}' storage into the textbox.`, 'success');
-            updateStoredTermsInfo(); 
+            EL.pastedDedupeListTextarea.value = storedLines.join('\n');
+             // CHANGE: Clean after load
+             cleanDedupeListTextarea(false); // Clean but don't show status
+            displayStatus(EL.dedupeListStatus.id, `Loaded ${storedLines.length} lines from '${novelName}' into the textbox.`, CONST.STATUS.SUCCESS);
+            updateStoredTermsInfo();
         }
-        window.loadPersistentDedupeToList = loadPersistentDedupeToList;
 
         function saveDedupeListToPersistentStorage() {
-            try {
-                const novelName = novelNameInput.value.trim();
-                if (!novelName || novelName === "Project") {
-                    displayStatus('dedupeListStatus', "Project Name required to save.", 'danger');
-                return;
+            const novelName = EL.novelNameInput.value.trim();
+             if (!novelName) {
+                displayStatus(EL.dedupeListStatus.id, "Project Name required to save.", CONST.STATUS.DANGER);
+                return false; // Return state
             }
-
-            const linesToSaveFromTextarea = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
-            const isTextareaEmpty = linesToSaveFromTextarea.length === 0;
-            
-            const currentlyStoredLines = getPersistentDedupeLines(novelName);
-            const isStoredListNonEmpty = currentlyStoredLines.length > 0;
-
-            const performSave = () => {
-                // savePersistentDedupeLines handles the actual stringify and setItem, and its own success/failure display for novel name
-                // It also calls updateStoredTermsInfo() internally after successful save or if storage size warning changes.
-                if (savePersistentDedupeLines(novelName, linesToSaveFromTextarea)) { 
-                    displayStatus('dedupeListStatus', `Saved ${linesToSaveFromTextarea.length} lines to '${novelName}' project storage.`, 'success');
-                }
-                // updateStoredTermsInfo() is called by savePersistentDedupeLines, so not strictly needed here again,
-                // but calling it ensures UI consistency if savePersistentDedupeLines's internal call is missed or conditional.
-                updateStoredTermsInfo(); 
-            };
-
-            if (isTextareaEmpty && isStoredListNonEmpty) {
-                showGenericModal(
-                    `Overwrite Project List for '${novelName}'?`,
-                    `The deduplication list textarea is empty. Saving now will replace the currently stored list for project '<strong>${novelName}</strong>' (which contains <strong>${currentlyStoredLines.length} items</strong>) with an empty list. <br><br>Are you sure you want to proceed and overwrite the stored list?`,
-                    () => { // onConfirm
-                        performSave(); 
-                    },
-                    () => { // onCancel
-                        displayStatus('dedupeListStatus', 'Save operation cancelled by user.', 'info');
-                    }
-                );
-            } else {
-                // Textarea is not empty, OR (textarea is empty AND storage is also empty). Safe to save directly.
-                performSave();
+             // CHANGE: Clean before saving
+             cleanDedupeListTextarea(false); // Clean list first, no status
+            const linesToSave = EL.pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
+            if (savePersistentDedupeLines(novelName, linesToSave)) {
+                displayStatus(EL.dedupeListStatus.id, `Saved ${linesToSave.length} lines to '${novelName}' storage.`, CONST.STATUS.SUCCESS);
+                 return true; // Return state
             }
-        } catch (e) {
-            console.error("Critical error in saveDedupeListToPersistentStorage:", e);
-            alert("A critical error occurred in the 'Save Deduplication List' function. Please check the browser console for more details.");
+             return false;
         }
-    }
-        window.saveDedupeListToPersistentStorage = saveDedupeListToPersistentStorage;
-        
+
         function confirmClearStorage() {
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                 displayStatus('storedTermsInfo', "Please enter a valid Project Name to clear its storage.", 'warning'); 
+            const novelName = EL.novelNameInput.value.trim();
+             if (!novelName) {
+                 displayStatus(EL.storedTermsInfo.id, "Please enter a valid Project Name to clear.", CONST.STATUS.WARNING);
                 return;
             }
+             // CHANGE: Use safe HTML for modal message
+            const lineCount = getPersistentDedupeLines(novelName).length;
+            const msgHtml = `This will permanently delete all <strong>${lineCount} stored lines</strong> AND the custom header for this project. This action cannot be undone. The content in the active textbox will NOT be cleared.`;
+
             showGenericModal(
-                `Clear Stored Dedupe List for '${novelName}'?`,
-                `This will permanently delete all <strong>${getPersistentDedupeLines(novelName).length} stored lines</strong> for this project. This action cannot be undone. The content in the textbox will NOT be cleared.`,
-                () => { 
-                    localStorage.removeItem(LS_DEDUPE_PREFIX + novelName);
-                    localStorage.removeItem(LS_SIZE_WARNING_PREFIX + novelName); 
-                    displayStatus('storedTermsInfo', `Stored list for '${novelName}' cleared.`, 'success');
-                    updateStoredTermsInfo();
-                }
+                `Clear Stored Data for '${novelName}'?`,
+                msgHtml,
+                 {
+                     label: 'Delete',
+                     className: 'btn-danger',
+                     action: () => {
+                        safeRemoveItem(CONST.LS_DEDUPE_PREFIX + novelName);
+                        safeRemoveItem(CONST.LS_SIZE_WARNING_PREFIX + novelName);
+                        safeRemoveItem(CONST.LS_HEADER_PREFIX + novelName); // CHANGE: Clear header too
+                        displayStatus(EL.storedTermsInfo.id, `Stored data for '${novelName}' cleared.`, CONST.STATUS.SUCCESS);
+                        loadProjectHeaderState(''); // Reset header to default
+                        updateStoredTermsInfo();
+                    }
+                 }
             );
         }
-        window.confirmClearStorage = confirmClearStorage;
 
         function exportPersistentDedupe() {
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                displayStatus('storedTermsInfo', "Project Name required to export.", 'warning');
+            const novelName = EL.novelNameInput.value.trim();
+             if (!novelName) {
+                displayStatus(EL.storedTermsInfo.id, "Project Name required to export.", CONST.STATUS.WARNING);
                 return;
             }
             const dedupeLines = getPersistentDedupeLines(novelName);
             if (dedupeLines.length === 0) {
-                displayStatus('storedTermsInfo', `No lines stored for '${novelName}' to export.`, 'info');
+                displayStatus(EL.storedTermsInfo.id, `No lines stored for '${novelName}' to export.`, CONST.STATUS.INFO);
                 return;
             }
-
+            // Simple export: just the lines
             const dataStr = JSON.stringify(dedupeLines, null, 2);
+            // Advanced export: include header
+            /* const exportObject = {
+                 projectName: novelName,
+                 headerEnabled: EL.includeCustomHeaderCheckbox.checked,
+                 headerText: EL.editablePresetTextarea.value,
+                 dedupeLines: dedupeLines
+             }
+             const dataStr = JSON.stringify(exportObject, null, 2);
+            */
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
-            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_')}_dedupe_list.json`;
-            
+            // Sanitize filename
+            const exportFileDefaultName = `${novelName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_dedupe.json`;
+
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', url);
             linkElement.setAttribute('download', exportFileDefaultName);
             document.body.appendChild(linkElement);
             linkElement.click();
             document.body.removeChild(linkElement);
-            URL.revokeObjectURL(url);
-            displayStatus('storedTermsInfo', `Exported ${dedupeLines.length} lines for '${novelName}'.`, 'success');
+            URL.revokeObjectURL(url); // Clean up
+            displayStatus(EL.storedTermsInfo.id, `Exported ${dedupeLines.length} lines for '${novelName}'.`, CONST.STATUS.SUCCESS);
         }
-        window.exportPersistentDedupe = exportPersistentDedupe;
 
         function handleImportDedupeFile(fileInput) {
-            // Imports directly into the pastedDedupeListTextarea
-            const importDisplayId = 'fileDisplayText_importDedupe';
-
-            if (fileInput.files.length === 0) {
+            const importDisplayId = EL.fileDisplayText_importDedupe.id;
+            if (!fileInput.files || fileInput.files.length === 0) {
                 updateFileDisplay(fileInput, importDisplayId); return;
             }
             const file = fileInput.files[0];
-            updateFileDisplay(fileInput, importDisplayId);
+            updateFileDisplay(fileInput, importDisplayId); // Show filename immediately
 
             const reader = new FileReader();
             reader.onload = function(event) {
                 try {
                     let importedLines = [];
-                    if (file.name.toLowerCase().endsWith('.json')) {
-                        const parsedJson = JSON.parse(event.target.result);
-                        if (!Array.isArray(parsedJson) || !parsedJson.every(item => typeof item === 'string')) {
-                            throw new Error('Invalid JSON file. Expected an array of strings.');
-                        }
-                        importedLines = parsedJson;
+                    // Basic check if it might be the "advanced" export format
+                    let parsedData;
+                     try { parsedData = JSON.parse(event.target.result); } catch(e) { parsedData = null; }
+
+                    if (file.name.toLowerCase().endsWith('.json') && parsedData) {
+                         // Handle advanced export format: if(Array.isArray(parsedData.dedupeLines)) { ... }
+                         if (!Array.isArray(parsedData) || !parsedData.every(item => typeof item === 'string')) {
+                             // Allow simple text file saved as .json
+                              importedLines = event.target.result.split(/[\r\n]+/).map(l => l.trim()).filter(l => l);
+                              console.warn("JSON file not array of strings, treating as text.");
+                         } else {
+                            importedLines = parsedData;
+                         }
                     } else { // Assume .txt or .csv is line-by-line
-                        importedLines = event.target.result.split('\n').map(l => l.trim()).filter(l => l);
+                        importedLines = event.target.result.split(/[\r\n]+/).map(l => l.trim()).filter(l => l); // handle \r\n and \n
                     }
 
-                    const currentText = pastedDedupeListTextarea.value.trim();
+                     if(importedLines.length === 0) throw new Error("File is empty or format not recognised.");
+
+                    const currentText = EL.pastedDedupeListTextarea.value.trim();
                     const currentLines = currentText ? currentText.split('\n') : [];
 
-                    showImportOptionsModalToTextarea(importedLines, currentLines.length, (action) => {
-                        if (action === 'replace') {
-                            pastedDedupeListTextarea.value = importedLines.join('\n');
-                            displayStatus('dedupeListStatus', `Replaced textbox with ${importedLines.length} imported lines. Remember to SAVE to project storage if needed.`, 'info');
-                        } else if (action === 'merge') {
+                    showImportOptionsModalToTextarea(importedLines, currentLines, (action) => {
+                        if (action === CONST.MODAL.REPLACE) {
+                            EL.pastedDedupeListTextarea.value = importedLines.join('\n');
+                             cleanDedupeListTextarea(false); // Clean
+                            displayStatus(EL.dedupeListStatus.id, `Replaced list with ${importedLines.length} imported lines. Cleaned. Remember to SAVE.`, CONST.STATUS.INFO, null, 6000);
+                        } else if (action === CONST.MODAL.MERGE) {
+                             // CHANGE: Append then Clean for true merge
                             const newText = (currentText ? currentText + '\n' : '') + importedLines.join('\n');
-                            pastedDedupeListTextarea.value = newText;
-                             displayStatus('dedupeListStatus', `Appended ${importedLines.length} imported lines to textbox. Remember to SAVE to project storage if needed.`, 'info');
+                            EL.pastedDedupeListTextarea.value = newText;
+                             const finalCount = cleanDedupeListTextarea(false); // Clean list, get count
+                             displayStatus(EL.dedupeListStatus.id, `Merged ${importedLines.length} lines. List cleaned (Total: ${finalCount}). Remember to SAVE.`, CONST.STATUS.INFO, null, 6000);
                         }
-                        fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
+                        fileInput.value = ''; // Reset input
+                        updateFileDisplay(fileInput, importDisplayId);
                     });
 
                 } catch (e) {
-                    displayStatus('dedupeListStatus', `Error processing import file: ${e.message}`, 'danger');
+                    displayStatus(EL.dedupeListStatus.id, `Error processing import file: ${e.message}`, CONST.STATUS.DANGER);
                     fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
                 }
             };
             reader.onerror = function() {
-                displayStatus('dedupeListStatus', 'Error reading import file.', 'danger');
+                displayStatus(EL.dedupeListStatus.id, 'Error reading import file.', CONST.STATUS.DANGER);
                 fileInput.value = ''; updateFileDisplay(fileInput, importDisplayId);
             };
             reader.readAsText(file);
         }
-        window.handleImportDedupeFile = handleImportDedupeFile;
 
         function clearDedupeListTextarea() {
-            pastedDedupeListTextarea.value = '';
-            hideStatus('dedupeListStatus');
+            EL.pastedDedupeListTextarea.value = '';
+            hideStatus(EL.dedupeListStatus.id);
         }
-        window.clearDedupeListTextarea = clearDedupeListTextarea;
+
+        // MODIFIED FUNCTION: Intelligent deduplication based on raw, translation, and gender
+        function cleanDedupeListTextarea(showStatus = true) {
+            const currentText = EL.pastedDedupeListTextarea.value;
+            if(!currentText.trim()) return 0;
+
+            const lines = currentText.split(/[\r\n]+/).map(l => l.trim()).filter(l => l);
+            const uniqueLines = new Map(); // Use a Map to store unique lines based on a key
+
+            lines.forEach(line => {
+                const parts = line.split(',').map(p => p.trim());
+                // Gracefully handle lines with fewer than 3 parts
+                const raw = parts[0] || '';
+                const translation = parts[1] || '';
+                const gender = parts[2] || ''; // Use empty string if no gender, it's still part of the key
+
+                // Create a composite key from the first 3 parts to identify duplicates
+                const key = `${raw.toLowerCase()},${translation.toLowerCase()},${gender.toLowerCase()}`;
+
+                if (!uniqueLines.has(key)) {
+                    uniqueLines.set(key, line); // Store the original line if the key is new
+                }
+            });
+
+            const uniqueSortedLines = Array.from(uniqueLines.values()).sort((a, b) => a.localeCompare(b));
+            EL.pastedDedupeListTextarea.value = uniqueSortedLines.join('\n');
+
+            if(showStatus) {
+                const removedCount = lines.length - uniqueSortedLines.length;
+                const message = removedCount > 0
+                    ? `List cleaned: ${removedCount} duplicates removed, sorted. (Total: ${uniqueSortedLines.length})`
+                    : `List cleaned and sorted. No duplicates found. (Total: ${uniqueSortedLines.length})`;
+                displayStatus(EL.dedupeListStatus.id, message, CONST.STATUS.SUCCESS, null, 5000);
+            }
+
+            return uniqueSortedLines.length; // return final count
+        }
 
 
         // --- Main Extraction Logic ---
         async function processAllData() {
-            const extractBtn = document.getElementById('mainExtractBtn');
-            extractBtn.classList.add('loading');
-            extractBtn.disabled = true;
+            EL.mainExtractBtn.classList.add('loading');
+            EL.mainExtractBtn.disabled = true;
             clearProcessingLog();
-            hideStatus('jsonStatus'); hideStatus('outputSummary');
-            // document.getElementById('saveToStorageBtnContainer').innerHTML = ''; // Removed this container
-            addProcessingLogStep('Extraction process initiated...', 'info');
-            
-            lastExtractedPureTerms = []; // This will store new `raw,translation,gender` lines
-            const chapterTextareas = document.querySelectorAll('#chapterInputsContainer textarea');
+            hideStatus(EL.jsonStatus.id); hideStatus(EL.outputSummary.id);
+             addProcessingLogStep('Extraction process initiated...', CONST.LOG_TYPE.START);
+
+            lastExtractedPureTerms = [];
+            const chapterTextareas = EL.chapterInputsContainer.querySelectorAll('textarea');
             if (chapterTextareas.length === 0 || Array.from(chapterTextareas).every(ta => !ta.value.trim())) {
-                displayStatus('jsonStatus', "No chapter JSON provided.", 'warning');
-                addProcessingLogStep('No chapter JSON data. Aborted.', 'danger');
-                finalizeExtractionUI(extractBtn); return;
+                displayStatus(EL.jsonStatus.id, "No chapter JSON provided.", CONST.STATUS.WARNING);
+                addProcessingLogStep('No chapter JSON data. Aborted.', CONST.LOG_TYPE.DANGER);
+                finalizeExtractionUI(EL.mainExtractBtn); return;
             }
-            
-            // Build deduplication set for THIS RUN from the pastedDedupeListTextarea
-            const currentDedupeListContent = pastedDedupeListTextarea.value;
+
+            // Build deduplication set for THIS RUN
+             // CHANGE: Ensure list is clean before processing
+             cleanDedupeListTextarea(false);
+            const currentDedupeListContent = EL.pastedDedupeListTextarea.value;
             const dedupeLinesForRun = currentDedupeListContent.split('\n').map(line => line.trim()).filter(line => line);
             const translationsToDeduplicateThisRun = new Set();
             dedupeLinesForRun.forEach(line => {
@@ -1219,80 +1130,90 @@
                     translationsToDeduplicateThisRun.add(translationKey);
                 }
             });
-            addProcessingLogStep(`Using ${translationsToDeduplicateThisRun.size} unique translations from the Deduplication List for current extraction.`, 'info');
+            addProcessingLogStep(`Active list has ${translationsToDeduplicateThisRun.size} unique translations for deduplication.`, CONST.LOG_TYPE.INFO);
 
             let allChunks = [];
             let chaptersParsedCount = 0;
-            for (let i = 0; i < chapterTextareas.length; i++) {
-                const chapterJsonStr = chapterTextareas[i].value;
-                const chapterGroup = chapterTextareas[i].closest('.chapter-input-group');
-                const boxNumber = chapterGroup ? chapterGroup.id.split('_')[1] : i + 1; 
-                
-                if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${boxNumber} empty. Skipping.`, 'info'); continue; }
-                addProcessingLogStep(`Parsing Chapter from Box ${boxNumber}...`, 'info');
-                await new Promise(r => setTimeout(r, 10)); 
+             // CHANGE: Use querySelectorAll and index for label
+             const chapterGroups = EL.chapterInputsContainer.querySelectorAll('.chapter-input-group');
+            for (let i = 0; i < chapterGroups.length; i++) {
+                const chapterGroup = chapterGroups[i];
+                const textarea = chapterGroup.querySelector('textarea');
+                 const boxNumber = i + 1; // Use index for logging
+                 if(!textarea) continue;
+                 const chapterJsonStr = textarea.value;
+
+                if (!chapterJsonStr.trim()) { addProcessingLogStep(`Chapter Box ${boxNumber} empty. Skipping.`, CONST.LOG_TYPE.INFO); continue; }
+                addProcessingLogStep(`Parsing Chapter from Box ${boxNumber}...`, CONST.LOG_TYPE.INFO);
+                await new Promise(r => setTimeout(r, 15)); // UI breathing room
                 try {
                     const parsedChapter = JSON.parse(chapterJsonStr);
-                    // Basic structure validation (can be expanded)
-                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !('terms' in parsedChapter[0]) || !Array.isArray(parsedChapter[0].terms)))) {
-                         addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON structure. Expected array of objects with a 'terms' array. Skipped.`, 'warning'); continue;
+                    if (!Array.isArray(parsedChapter) || (parsedChapter.length > 0 && (typeof parsedChapter[0] !== 'object' || !parsedChapter[0] || !('terms' in parsedChapter[0]) || !Array.isArray(parsedChapter[0].terms)))) {
+                         addProcessingLogStep(`Box ${boxNumber}: Invalid JSON structure. Expected array of objects with 'terms' array. Skipped.`, CONST.LOG_TYPE.WARNING); continue;
                     }
-
                     allChunks.push(...parsedChapter);
                     chaptersParsedCount++;
-                    addProcessingLogStep(`Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, 'success');
-                } catch (e) { 
-                    addProcessingLogStep(`Chapter Box ${boxNumber}: Invalid JSON. Error: "${e.message}". Skipped.`, 'danger'); 
+                    addProcessingLogStep(`Box ${boxNumber}: Parsed ${parsedChapter.length} chunks.`, CONST.LOG_TYPE.SUCCESS);
+                } catch (e) {
+                     // CHANGE: Log message safely
+                    addProcessingLogStep(`Box ${boxNumber}: Invalid JSON. Error: "${e.message}". Skipped.`, CONST.LOG_TYPE.DANGER);
                 }
             }
 
-            if (chaptersParsedCount === 0) {
-                displayStatus('jsonStatus', 'No chapters successfully parsed. Check JSON and Processing Log.', 'danger');
-                addProcessingLogStep('Failed to parse any chapter data. Aborted.', 'danger');
-                finalizeExtractionUI(extractBtn); return;
+            if (chaptersParsedCount === 0 && allChunks.length === 0) { // Check chunks too
+                displayStatus(EL.jsonStatus.id, 'No chapters successfully parsed. Check JSON and Log.', CONST.STATUS.DANGER);
+                addProcessingLogStep('Failed to parse any chapter data. Aborted.', CONST.LOG_TYPE.DANGER);
+                finalizeExtractionUI(EL.mainExtractBtn); return;
             }
-            addProcessingLogStep(`${chaptersParsedCount} chapters parsed. Extracting terms...`, 'info');
+            addProcessingLogStep(`${chaptersParsedCount} chapters parsed. Extracting terms...`, CONST.LOG_TYPE.INFO);
+             await new Promise(r => setTimeout(r, 15)); // UI breathing room
 
             const seenThisRunTranslations = new Set(); // To avoid duplicates within the same extraction run output
             allChunks.forEach(chunk => {
                 if (chunk && Array.isArray(chunk.terms)) {
                     chunk.terms.forEach(term => {
-                        const raw = term.raw, translation = term.translation;
+                        // Ensure raw/translation exist and are not just whitespace
+                        const raw = term.raw ? String(term.raw).trim() : null;
+                        const translation = term.translation ? String(term.translation).trim() : null;
                         if (raw && translation) {
-                            const translationKey = String(translation).toLowerCase(); 
+                            const translationKey = translation.toLowerCase();
                             if (!translationsToDeduplicateThisRun.has(translationKey) && !seenThisRunTranslations.has(translationKey)) {
                                 seenThisRunTranslations.add(translationKey);
-                                let gender = "Neuter"; 
+                                let gender = "Neuter";
                                 if (term.tags && Array.isArray(term.tags)) {
                                     if (term.tags.includes("#male")) gender = "Male";
                                     else if (term.tags.includes("#female")) gender = "Female";
                                 }
-                                lastExtractedPureTerms.push(`${raw},${translation},${gender}`); // Store full line
+                                // Ensure no commas within raw/translation break the format
+                                 const safeRaw = raw.replace(/,/g, ';');
+                                 const safeTranslation = translation.replace(/,/g, ';');
+                                lastExtractedPureTerms.push(`${safeRaw},${safeTranslation},${gender}`);
                             }
                         }
                     });
                 }
             });
+             // CHANGE: Sort extracted terms
+             lastExtractedPureTerms.sort((a,b) => a.localeCompare(b));
 
-            addProcessingLogStep(`Found ${lastExtractedPureTerms.length} new unique terms for this session.`, 'success');
-            
+            addProcessingLogStep(`Found ${lastExtractedPureTerms.length} new unique terms.`, CONST.LOG_TYPE.END);
+
             let finalOutputText = "";
-            const includeHeader = document.getElementById('includeCustomHeaderCheckbox').checked;
-            const headerText = editablePresetTextarea.value.trim();
+            const includeHeader = EL.includeCustomHeaderCheckbox.checked;
+            const headerText = EL.editablePresetTextarea.value.trim();
             if (includeHeader && headerText) {
                 finalOutputText += headerText + "\n\n";
             }
             finalOutputText += lastExtractedPureTerms.join('\n');
-            outputTextarea.value = finalOutputText;
+            EL.outputTextarea.value = finalOutputText;
 
             if (lastExtractedPureTerms.length > 0) {
-                 displayStatus('outputSummary', `Extraction complete: ${lastExtractedPureTerms.length} new unique terms found. Use 'Move Extracted' to add them to the Dedupe List.`, 'success');
+                 displayStatus(EL.outputSummary.id, `Complete: ${lastExtractedPureTerms.length} new unique terms found.`, CONST.STATUS.SUCCESS, null, 8000);
             } else {
-                 displayStatus('outputSummary', 'Extraction complete. No new unique terms found based on current Deduplication List.', 'info');
+                 displayStatus(EL.outputSummary.id, 'Complete. No new unique terms found.', CONST.STATUS.INFO, null, 8000);
             }
-            finalizeExtractionUI(extractBtn);
+            finalizeExtractionUI(EL.mainExtractBtn);
         }
-        window.processAllData = processAllData;
 
         function finalizeExtractionUI(button) {
             button.classList.remove('loading');
@@ -1300,45 +1221,59 @@
         }
 
         // --- Output Handling ---
-        function moveExtractedToDedupeList() {
+         // CHANGE: Added save option
+        function moveExtractedToDedupeList(saveAfterMove = false) {
+             const tooltipId = saveAfterMove ? EL.moveSaveTooltip.id : EL.moveExtractedTooltip.id;
             if (lastExtractedPureTerms.length === 0) {
-                showTooltipMessage('moveExtractedTooltip', "No terms to move!");
+                showTooltipMessage(tooltipId, "No new terms to move!");
                 return;
             }
-            const currentDedupeText = pastedDedupeListTextarea.value.trim();
+            const currentDedupeText = EL.pastedDedupeListTextarea.value.trim();
             const newTermsText = lastExtractedPureTerms.join('\n');
-            
-            pastedDedupeListTextarea.value = (currentDedupeText ? currentDedupeText + '\n' : '') + newTermsText;
-            
-            displayStatus('dedupeListStatus', `${lastExtractedPureTerms.length} extracted terms added to the Deduplication List textbox. Remember to SAVE to project storage if desired.`, 'info');
-            showTooltipMessage('moveExtractedTooltip', "Moved!");
-            lastExtractedPureTerms = []; // Clear after moving
-            outputTextarea.value = document.getElementById('includeCustomHeaderCheckbox').checked ? editablePresetTextarea.value.trim() + "\n\n" : ""; // Clear output or reset to header
-            hideStatus('outputSummary');
-        }
-        window.moveExtractedToDedupeList = moveExtractedToDedupeList;
+            EL.pastedDedupeListTextarea.value = (currentDedupeText ? currentDedupeText + '\n' : '') + newTermsText;
 
-        function copyOutput(mode) { // Only 'withHeader' mode effectively remains for direct copy
-            let textToCopy = outputTextarea.value; // This now includes header if checked, and only new terms
-            let tooltipId = 'copyHeaderTooltip';
-            
-            if (!textToCopy.trim()) { 
-                 showTooltipMessage(tooltipId, "Nothing to copy!"); return;
-            }
-            performCopy(textToCopy, tooltipId);
+             // CHANGE: Clean after moving
+             const finalCount = cleanDedupeListTextarea(false); // Clean the list!
+
+            let statusMsg = `Moved ${lastExtractedPureTerms.length} terms. List cleaned (Total: ${finalCount}). `;
+            let tooltipMsg = "Moved & Cleaned!";
+             let statusType = CONST.STATUS.INFO;
+
+             if(saveAfterMove) {
+                 if(saveDedupeListToPersistentStorage()) { // Call save function
+                     statusMsg += " List SAVED to storage.";
+                     tooltipMsg = "Moved, Cleaned & Saved!";
+                     statusType = CONST.STATUS.SUCCESS;
+                 } else {
+                     statusMsg += " SAVE FAILED (check project name/storage).";
+                     tooltipMsg = "Move OK, Save Failed!";
+                      statusType = CONST.STATUS.WARNING;
+                 }
+             } else {
+                 statusMsg += " Remember to SAVE to storage.";
+             }
+
+            displayStatus(EL.dedupeListStatus.id, statusMsg, statusType, null, 7000);
+            showTooltipMessage(tooltipId, tooltipMsg);
+
+            lastExtractedPureTerms = []; // Clear after moving
+             // Clear output text area, but keep header if checked
+            EL.outputTextarea.value = EL.includeCustomHeaderCheckbox.checked ? EL.editablePresetTextarea.value.trim() + "\n\n" : "";
+            hideStatus(EL.outputSummary.id);
         }
-        window.copyOutput = copyOutput;
-        
-        function copyToClipboard(elementId, tooltipId) { 
-            const el = document.getElementById(elementId);
-            if (!el.value || !el.value.trim()) {
-                showTooltipMessage(tooltipId, "Nothing to copy!"); return;
-            }
-            performCopy(el.value, tooltipId);
+
+        function copyOutput() {
+            performCopy(EL.outputTextarea.value, EL.copyHeaderTooltip.id);
         }
-        window.copyToClipboard = copyToClipboard;
+
+        function copyToClipboard(element, tooltipId) {
+            performCopy(element.value, tooltipId);
+        }
 
         function performCopy(text, tooltipId) {
+             if (!text || !text.trim()) {
+                showTooltipMessage(tooltipId, "Nothing to copy!"); return;
+            }
             navigator.clipboard.writeText(text).then(() => {
                 showTooltipMessage(tooltipId, "Copied!");
             }).catch(err => {
@@ -1347,278 +1282,99 @@
             });
         }
 
+         // CHANGE: Timeout clearing
         function showTooltipMessage(tooltipId, message) {
             const tooltip = document.getElementById(tooltipId);
             if (!tooltip) return;
-            const originalText = tooltip.dataset.originalText || tooltip.textContent; 
+             // Clear previous timeout
+             if(tooltipTimeouts[tooltipId]) {
+                clearTimeout(tooltipTimeouts[tooltipId]);
+                 // Restore original text immediately if interrupted
+                 tooltip.textContent = tooltip.dataset.originalText || tooltip.textContent;
+                delete tooltipTimeouts[tooltipId];
+             }
+
+            const originalText = tooltip.dataset.originalText || tooltip.textContent;
             if (!tooltip.dataset.originalText) tooltip.dataset.originalText = originalText;
 
             tooltip.textContent = message;
-            tooltip.style.visibility = 'visible'; 
-            tooltip.style.opacity = '1';
+             tooltip.classList.add('force-visible'); // Use class
 
-            setTimeout(() => { 
+           tooltipTimeouts[tooltipId] = setTimeout(() => {
                 tooltip.textContent = tooltip.dataset.originalText;
-                tooltip.style.visibility = 'hidden';
-                tooltip.style.opacity = '0';
-            }, 1500);
+                tooltip.classList.remove('force-visible');
+                delete tooltipTimeouts[tooltipId]; // clean up
+            }, 1800);
         }
 
         // --- Modal Logic ---
-        function showGenericModal(title, message, onConfirm, onCancel = null) {
-            modalTitleEl.textContent = title;
-            modalMessageEl.innerHTML = message; 
-            
-            modalActionsContainer.innerHTML = ''; 
+         // CHANGE: More flexible buttons, use textContent
+        function showGenericModal(title, messageHTML, confirmButtonOpts = null, cancelButtonOpts = null) {
+            EL.modalTitleEl.textContent = title; // SAFE
+            EL.modalMessageEl.innerHTML = messageHTML; // CAUTION: Relies on caller providing safe HTML
+            EL.modalActionsContainer.innerHTML = ''; // Clear
 
-            const confirmBtn = document.createElement('button');
-            confirmBtn.className = 'btn btn-danger'; // Default to danger for generic confirm
-            confirmBtn.textContent = 'Confirm';
-            confirmBtn.onclick = () => { if(onConfirm) onConfirm(); hideGenericModal(); };
-            
             const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'btn btn-outline';
-            cancelBtn.textContent = 'Cancel';
-            cancelBtn.onclick = () => { if(onCancel) onCancel(); hideGenericModal(); };
+            cancelBtn.className = `btn ${cancelButtonOpts?.className || 'btn-outline'}`;
+            cancelBtn.textContent = cancelButtonOpts?.label || 'Cancel';
+            cancelBtn.onclick = () => {
+                 if(cancelButtonOpts && typeof cancelButtonOpts.action === 'function') cancelButtonOpts.action();
+                 hideGenericModal();
+            };
+             EL.modalActionsContainer.appendChild(cancelBtn);
 
-            modalActionsContainer.appendChild(cancelBtn);
-            modalActionsContainer.appendChild(confirmBtn);
-            
-            modalOverlay.classList.add('active');
+            if(confirmButtonOpts) {
+                 const confirmBtn = document.createElement('button');
+                 confirmBtn.className = `btn ${confirmButtonOpts.className || 'btn-primary'}`;
+                 confirmBtn.textContent = confirmButtonOpts.label || 'Confirm';
+                 confirmBtn.onclick = () => {
+                     if(typeof confirmButtonOpts.action === 'function') confirmButtonOpts.action();
+                     hideGenericModal();
+                  };
+                 EL.modalActionsContainer.appendChild(confirmBtn);
+            }
+             EL.modalOverlay.classList.add('active');
+             cancelBtn.focus(); // A11y
         }
 
-        function hideGenericModal() {
-            modalOverlay.classList.remove('active');
-            generalConfirmCallback = null; // Clear them
-            generalCancelCallback = null;
-        }
+        function hideGenericModal() { EL.modalOverlay.classList.remove('active'); }
 
-        function showImportOptionsModalToTextarea(importedLines, currentLineCountInTextarea, callbackOnAction) {
-            modalTitleEl.textContent = `Import Lines to Dedupe List Textbox`;
+         // CHANGE: Use generic modal structure, Merge logic
+        function showImportOptionsModalToTextarea(importedLines, currentLines, callbackOnAction) {
             const importCount = importedLines.length;
-            
-            const combinedLines = (pastedDedupeListTextarea.value.trim() ? pastedDedupeListTextarea.value.trim().split('\n') : []).concat(importedLines);
-            const uniqueCombinedLines = Array.from(new Set(combinedLines)); // Simple uniqueness for display
-            const mergedCount = uniqueCombinedLines.length;
-            const newLinesInMerge = mergedCount - currentLineCountInTextarea;
+            const currentLineCount = currentLines.length;
 
+            // CHANGE: Calculate merge count accurately
+            const mergedSet = new Set([...currentLines, ...importedLines]);
+            const mergedCount = mergedSet.size;
 
-            modalMessageEl.innerHTML = `
-                You are importing <strong>${importCount} lines</strong>.
-                The textbox currently has <strong>${currentLineCountInTextarea} lines</strong>.
-                <br><br>Choose an action for the textbox content:
+            const msgHTML = `
+                You are importing <strong>${importCount} lines</strong>.<br>
+                The textbox currently has <strong>${currentLineCount} lines</strong>.
+                <br><br>Choose an action for the textbox content:<br>
+                 - <b>Merge:</b> Add new lines, remove all duplicates, sort (Total: ${mergedCount} lines).<br>
+                 - <b>Replace:</b> Discard current lines (Total: ${importCount} lines).
             `;
-            
-            modalActionsContainer.innerHTML = ''; 
+             EL.modalTitleEl.textContent = `Import Options`;
+             EL.modalMessageEl.innerHTML = msgHTML;
+             EL.modalActionsContainer.innerHTML = ''; // Clear
 
-            const replaceBtn = document.createElement('button');
-            replaceBtn.className = 'btn btn-warning'; // Use warning for replace
-            replaceBtn.innerHTML = `<i class="fas fa-exchange-alt"></i> Replace Textbox (${importCount} total)`;
-            replaceBtn.onclick = () => {
-                if(callbackOnAction) callbackOnAction('replace');
-                hideGenericModal();
-            };
+             const createBtn = (label, icon, className, actionType) => {
+                 const btn = document.createElement('button');
+                 btn.className = `btn ${className}`;
+                 setElementContent(btn, icon, label);
+                  btn.onclick = () => {
+                    if(callbackOnAction) callbackOnAction(actionType);
+                    hideGenericModal();
+                 };
+                 return btn;
+             }
+             EL.modalActionsContainer.appendChild(createBtn('Cancel', 'fa-times', 'btn-outline', CONST.MODAL.CANCEL));
+             EL.modalActionsContainer.appendChild(createBtn(`Merge & Clean (${mergedCount})`, 'fa-object-group', 'btn-primary', CONST.MODAL.MERGE));
+             EL.modalActionsContainer.appendChild(createBtn(`Replace (${importCount})`, 'fa-exchange-alt', 'btn-warning', CONST.MODAL.REPLACE));
 
-            const mergeBtn = document.createElement('button');
-            mergeBtn.className = 'btn btn-primary';
-            mergeBtn.innerHTML = `<i class="fas fa- Mearge"></i> Append to Textbox (+${importCount} lines)`;
-            mergeBtn.onclick = () => {
-                 if(callbackOnAction) callbackOnAction('merge');
-                hideGenericModal();
-            };
-            
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'btn btn-outline';
-            cancelBtn.textContent = 'Cancel Import';
-            cancelBtn.onclick = () => { 
-                if(callbackOnAction) callbackOnAction('cancel'); // Allow callback to know it was cancelled
-                hideGenericModal(); 
-            };
-            
-            modalActionsContainer.appendChild(cancelBtn);
-            modalActionsContainer.appendChild(mergeBtn);
-            modalActionsContainer.appendChild(replaceBtn);
-            
-            modalOverlay.classList.add('active');
+             EL.modalOverlay.classList.add('active');
         }
-        
-        // --- Side Toggle Modal Logic ---
-        const sideToggleButton = document.getElementById('sideToggleButton');
-        const sideToggleModalOverlay = document.getElementById('sideToggleModalOverlay');
-        const closeSideModalBtn = document.getElementById('closeSideModalBtn');
-
-        if (sideToggleButton && sideToggleModalOverlay && closeSideModalBtn) {
-            sideToggleButton.addEventListener('click', () => {
-                sideToggleModalOverlay.classList.toggle('active');
-            });
-
-            closeSideModalBtn.addEventListener('click', () => {
-                sideToggleModalOverlay.classList.remove('active');
-            });
-
-            sideToggleModalOverlay.addEventListener('click', (event) => {
-                if (event.target === sideToggleModalOverlay) { 
-                    sideToggleModalOverlay.classList.remove('active');
-                }
-            });
-        }
-
-        // --- Auto-Save Dedupe List Logic ---
-        let isAutoSaveEnabled = true; 
-        const LS_AUTOSAVE_ENABLED_KEY = 'zenithTermExtractor_autoSaveEnabled';
-        // novelNameInput and pastedDedupeListTextarea are already defined globally in the IIFE
-
-        function updateAutoSaveButtonUI() {
-            const autoSaveToggleBtn = document.getElementById('autoSaveToggleBtn'); // Get fresh reference in case DOM re-renders (though unlikely for this button)
-            if (!autoSaveToggleBtn) return;
-            const icon = autoSaveToggleBtn.querySelector('i');
-            const text = autoSaveToggleBtn.querySelector('span');
-
-            if (isAutoSaveEnabled) {
-                if (icon) icon.className = 'fas fa-sync-alt';
-                if (text) text.textContent = ' Auto-Save: Enabled';
-                autoSaveToggleBtn.classList.remove('btn-danger'); // In case it was set
-                autoSaveToggleBtn.classList.add('btn-success');   // Use success class to indicate active
-            } else {
-                if (icon) icon.className = 'fas fa-ban';
-                if (text) text.textContent = ' Auto-Save: Disabled';
-                autoSaveToggleBtn.classList.remove('btn-success');
-                autoSaveToggleBtn.classList.add('btn-danger');    // Use danger class to indicate inactive
-            }
-        }
-
-        function autoSaveDedupeList() {
-            if (!isAutoSaveEnabled) {
-                // console.log("Auto-save is disabled."); // Optional: for debugging
-                return;
-            }
-
-            const novelName = novelNameInput.value.trim();
-            if (!novelName || novelName === "Project") {
-                // console.log("Auto-save: Project Name required."); // Optional: for debugging
-                // displayStatus('dedupeListStatus', "Auto-save: Project Name required.", 'warning', 'fa-ban'); // Could be too noisy
-                return;
-            }
-            
-            const linesToSave = pastedDedupeListTextarea.value.split('\n').map(line => line.trim()).filter(line => line);
-            
-            if (savePersistentDedupeLines(novelName, linesToSave)) {
-                // Use a unique icon for auto-save to differentiate from manual save status
-                displayStatus('dedupeListStatus', 'Dedupe list auto-saved.', 'info', 'fa-history'); 
-            } else {
-                // savePersistentDedupeLines usually handles its own error display if novelName is missing,
-                // but if it returned false for other reasons, a generic message might be needed.
-                // For now, assuming savePersistentDedupeLines is sufficient for error states.
-            }
-        }
-
-        const debouncedAutoSave = debounce(autoSaveDedupeList, 2500);
-
-        function displayFilteredDedupeResults() {
-            const searchInput = document.getElementById('dedupeSearchInput');
-            const resultsArea = document.getElementById('dedupeFilteredResults');
-            // pastedDedupeListTextarea is already a global const
-
-            if (!searchInput || !resultsArea || !pastedDedupeListTextarea) return;
-
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            resultsArea.innerHTML = ''; // Clear previous results
-
-            if (!searchTerm) {
-                resultsArea.style.display = 'none';
-                return;
-            }
-
-            const allLines = pastedDedupeListTextarea.value.split('\n');
-            const filteredLines = allLines.filter(line => line.trim() !== '' && line.toLowerCase().includes(searchTerm));
-
-            if (filteredLines.length > 0) {
-                filteredLines.forEach(line => {
-                    const lineDiv = document.createElement('div');
-                    lineDiv.textContent = line;
-                    // Optional: Add styling or click handlers to individual result lines later if needed
-                    resultsArea.appendChild(lineDiv);
-                });
-                resultsArea.style.display = 'block';
-            } else {
-                const noResultsDiv = document.createElement('div');
-                noResultsDiv.textContent = 'No matching lines found.';
-                noResultsDiv.style.fontStyle = 'italic';
-                resultsArea.appendChild(noResultsDiv);
-                resultsArea.style.display = 'block';
-            }
-        }
-
-        function sortDedupeList() {
-            // pastedDedupeListTextarea is a global const within this IIFE
-            if (!pastedDedupeListTextarea) return;
-
-            const lines = pastedDedupeListTextarea.value.split('\n').filter(line => line.trim() !== ''); 
-            
-            if (lines.length <= 1) { 
-                displayStatus('dedupeListStatus', 'List has too few items to sort.', 'info');
-                return;
-            }
-
-            lines.sort(); // Default alphabetical sort
-
-            pastedDedupeListTextarea.value = lines.join('\n');
-            // Add a trailing newline if there was content, for consistent formatting
-            if (lines.length > 0) {
-                pastedDedupeListTextarea.value += '\n';
-            }
-            displayStatus('dedupeListStatus', `Deduplication list sorted alphabetically (${lines.length} items).`, 'success', 'fa-sort-alpha-down');
-            
-            // Trigger auto-save after sorting if it's enabled
-            if(isAutoSaveEnabled) {
-                debouncedAutoSave();
-            }
-        }
-
-        // --- Theme Toggle Logic ---
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const defaultTheme = 'light'; // Default to light theme
-
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            if (themeToggleBtn) {
-                const icon = themeToggleBtn.querySelector('i');
-                const text = themeToggleBtn.querySelector('span');
-                if (icon) {
-                    if (theme === 'dark') {
-                        icon.className = 'fas fa-sun';
-                        if(text) text.textContent = ' Light Mode';
-                    } else {
-                        icon.className = 'fas fa-moon';
-                        if(text) text.textContent = ' Dark Mode';
-                    }
-                }
-            }
-        }
-
-        function toggleTheme() {
-            const currentTheme = localStorage.getItem('theme') || defaultTheme;
-            if (currentTheme === 'dark') {
-                applyTheme('light');
-            } else {
-                applyTheme('dark');
-            }
-        }
-
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', toggleTheme);
-        }
-
-        // Apply saved theme on initial load (this should be within DOMContentLoaded or after elements are defined)
-        // Moved theme init to DOMContentLoaded for safety, though global consts for buttons are fine.
-        // const savedTheme = localStorage.getItem('theme'); // This is now inside DOMContentLoaded in the original code
-        // if (savedTheme) {
-        //     applyTheme(savedTheme);
-        // } else {
-        //     applyTheme(defaultTheme); 
-        // }
-
 
     })(); // IIFE End
     </script>
