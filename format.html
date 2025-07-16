@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Text to HTML Converter</title>
+    <style>
+        /* --- General Styling & Theming --- */
+        :root {
+            --bg-color: #1a1a1d;
+            --primary-color: #25282e;
+            --secondary-color: #3b3f4a;
+            --text-color: #e2e2e2;
+            --accent-color: #4a90e2;
+            --accent-hover: #5aa1f2;
+            --border-color: #4a4a4a;
+            --success-color: #7ed321;
+            --danger-color: #d0021b;
+            --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-header h2 {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            font-family: var(--font-family);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            color: white;
+        }
+
+        .btn-primary { background-color: var(--accent-color); }
+        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; transform: translateY(-2px); }
+
+        .btn.copied { background-color: var(--success-color); }
+
+        /* --- Editor & Output Areas --- */
+        .editor-area {
+            padding: 1.5rem;
+            flex-grow: 1;
+            min-height: 50vh;
+            outline: none;
+            overflow-y: auto;
+        }
+
+        #editor[contenteditable=true]:empty:before {
+            content: "Paste your rich text from Word here...";
+            color: #777;
+            cursor: text;
+        }
+
+        #output-container {
+            background-color: var(--secondary-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            body { padding: 1rem; }
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .panel { min-height: 40vh; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Rich Text to Clean HTML</h1>
+        <p>Paste content from Word or any rich text editor and get clean, semantic HTML.</p>
+    </header>
+
+    <main class="container">
+        <!-- Input Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Input</h2>
+                <div class="toolbar">
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+            <div id="editor" class="editor-area" contenteditable="true"></div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Output</h2>
+                <div class="toolbar">
+                    <button id="copyBtn" class="btn btn-primary">Copy HTML</button>
+                </div>
+            </div>
+            <pre id="output-container" class="editor-area"><code id="output-code"></code></pre>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const editor = document.getElementById('editor');
+            const outputCode = document.getElementById('output-code');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // --- Main Event Listeners ---
+            editor.addEventListener('input', processContent);
+            editor.addEventListener('paste', handlePaste);
+            clearBtn.addEventListener('click', clearAll);
+            copyBtn.addEventListener('click', copyHtml);
+
+            /**
+             * Handles the paste event to clean up Word's HTML before insertion.
+             */
+            function handlePaste(e) {
+                e.preventDefault();
+
+                // Get pasted data - prefer 'text/html'
+                const pastedHtml = (e.clipboardData || window.clipboardData).getData('text/html');
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+
+                // If HTML content exists, use it. Otherwise, fall back to plain text.
+                // The plain text fallback wraps the text in a paragraph.
+                const contentToInsert = pastedHtml ? pastedHtml : `<p>${pastedText}</p>`;
+                
+                // Use the deprecated but effective execCommand to insert the HTML.
+                // This preserves the structure that we'll clean up.
+                document.execCommand('insertHTML', false, contentToInsert);
+                
+                // The 'input' event will fire automatically after this,
+                // so processContent() will be called.
+            }
+
+            /**
+             * The core function that processes the content of the editor.
+             */
+            function processContent() {
+                if (editor.innerHTML.trim() === '') {
+                    outputCode.textContent = '';
+                    return;
+                }
+
+                // Create a temporary, in-memory div to safely manipulate the DOM
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = editor.innerHTML;
+
+                // 1. Initial cleanup: Remove Word-specific comments and unwanted tags
+                cleanupNodes(tempDiv);
+                
+                // 2. Process all elements for semantic conversion
+                processAllElements(tempDiv);
+                
+                // 3. Final cleanup and formatting of the HTML string
+                let cleanHtml = formatHtml(tempDiv.innerHTML);
+
+                outputCode.textContent = cleanHtml;
+            }
+
+            /**
+             * Recursively cleans nodes and converts styles to semantic tags.
+             */
+            function processAllElements(element) {
+                // Convert Word's inline styles to semantic tags
+                const elements = element.querySelectorAll('*');
+                elements.forEach(el => {
+                    // Convert bold styles
+                    if (el.style.fontWeight === 'bold' || el.style.fontWeight === '700' || el.tagName === 'B') {
+                        replaceWithTag(el, 'strong');
+                    }
+                    // Convert italic styles
+                    if (el.style.fontStyle === 'italic' || el.tagName === 'I') {
+                        replaceWithTag(el, 'em');
+                    }
+                     // Convert indented paragraphs to blockquotes
+                    if (el.tagName === 'P' && el.style.marginLeft && parseFloat(el.style.marginLeft) > 0) {
+                        const blockquote = document.createElement('blockquote');
+                        // Move the paragraph inside the blockquote
+                        el.parentNode.insertBefore(blockquote, el);
+                        blockquote.appendChild(el);
+                    }
+                });
+            }
+            
+            /**
+             * Replaces an element with a new one (e.g., a <span> with <strong>)
+             * while preserving its inner content.
+             */
+            function replaceWithTag(el, newTagName) {
+                if (el.tagName.toLowerCase() === newTagName) return; // Already correct
+                const newEl = document.createElement(newTagName);
+                while (el.firstChild) {
+                    newEl.appendChild(el.firstChild);
+                }
+                if (el.parentNode) {
+                    el.parentNode.replaceChild(newEl, el);
+                }
+            }
+
+            /**
+             * Removes unwanted attributes, comments, and empty tags.
+             */
+            function cleanupNodes(element) {
+                // Remove Word-specific comments
+                const walker = document.createTreeWalker(element, NodeFilter.SHOW_COMMENT, null, false);
+                let commentNodes = [];
+                while (walker.nextNode()) {
+                    commentNodes.push(walker.currentNode);
+                }
+                commentNodes.forEach(node => node.parentNode.removeChild(node));
+
+                // Remove unwanted attributes from all elements
+                const allElements = element.querySelectorAll('*');
+                allElements.forEach(el => {
+                    // Whitelist attributes you want to keep (e.g., 'href' for links)
+                    const allowedAttrs = ['href', 'src', 'alt'];
+                    for (let i = el.attributes.length - 1; i >= 0; i--) {
+                        const attr = el.attributes[i];
+                        if (!allowedAttrs.includes(attr.name.toLowerCase())) {
+                            el.removeAttribute(attr.name);
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Formats the final HTML string for readability.
+             */
+            function formatHtml(htmlString) {
+                // Remove empty tags that might be left over, but keep block-level tags like <p>
+                let cleaned = htmlString.replace(/<(?!p|h[1-6]|li|blockquote|strong|em|br)([^>]+)>\s*<\/\1>/g, '');
+
+                // Remove Word's empty paragraphs with non-breaking spaces
+                cleaned = cleaned.replace(/<p>(\s| )*<\/p>/gi, '');
+
+                // Basic indentation for block-level elements
+                const blockTags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'div'];
+                blockTags.forEach(tag => {
+                    const regex = new RegExp(`</${tag}>`, 'g');
+                    cleaned = cleaned.replace(regex, `</${tag}>\n`);
+                });
+                
+                // Trim leading/trailing whitespace
+                return cleaned.trim();
+            }
+
+            /**
+             * Clears both the input and output areas.
+             */
+            function clearAll() {
+                editor.innerHTML = '';
+                outputCode.textContent = '';
+            }
+
+            /**
+             * Copies the generated HTML to the clipboard.
+             */
+            function copyHtml() {
+                if (outputCode.textContent.length === 0) return;
+                navigator.clipboard.writeText(outputCode.textContent).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy HTML';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy HTML.');
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
