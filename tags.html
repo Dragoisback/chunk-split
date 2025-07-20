@@ -202,17 +202,42 @@
         }
 
         .output-area {
-            width: 100%;
             min-height: 400px;
             padding: 20px;
             background: var(--bg-primary);
             border: none;
             color: var(--text-primary);
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-            resize: vertical;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
             outline: none;
             flex: 1;
+            overflow-y: auto;
+        }
+
+        .output-area[contenteditable="true"]:empty:before {
+            content: "HTML output will appear here...";
+            color: var(--text-secondary);
+        }
+
+        .output-area h2 {
+            font-size: 1.5em;
+            margin: 0.5em 0;
+            color: var(--accent);
+        }
+
+        .output-area strong {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .output-area em {
+            font-style: italic;
+            color: #818cf8;
+        }
+
+        .output-area p {
+            margin: 0.5em 0;
         }
 
         .status-bar {
@@ -226,35 +251,55 @@
             color: var(--text-secondary);
         }
 
-        .preview-panel {
+        .code-view-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
             background: var(--bg-secondary);
             border-radius: 12px;
+            position: relative;
             border: 1px solid var(--border);
-            overflow: hidden;
-            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
-        .preview-content {
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch-knob {
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-switch-knob {
+            left: 22px;
+        }
+
+        .code-view {
+            display: none;
+            width: 100%;
+            min-height: 400px;
             padding: 20px;
-            min-height: 200px;
             background: var(--bg-primary);
-            line-height: 1.6;
-        }
-
-        .preview-content strong {
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .preview-content em {
-            font-style: italic;
-            color: #818cf8;
-        }
-
-        .preview-content h2 {
-            color: var(--accent);
-            margin: 1em 0 0.5em 0;
-            font-size: 1.5em;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            flex: 1;
         }
 
         .notification {
@@ -408,14 +453,20 @@
                         </svg>
                         HTML Output
                     </div>
+                    <div class="code-view-toggle" onclick="toggleCodeView()">
+                        <span>View Code</span>
+                        <div class="toggle-switch" id="code-toggle">
+                            <div class="toggle-switch-knob"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="toolbar">
-                    <button class="toolbar-btn" onclick="copyToClipboard()" title="Copy (Ctrl+C)">
+                    <button class="toolbar-btn" onclick="copyToClipboard()" title="Copy HTML (Ctrl+C)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
-                        Copy
+                        Copy HTML
                     </button>
                     <button class="toolbar-btn" onclick="pasteFromClipboard()" title="Paste (Ctrl+V)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -499,34 +550,12 @@
                         Clear
                     </button>
                 </div>
-                <textarea id="output-area" class="output-area" placeholder="HTML output will appear here..."></textarea>
+                <div id="output-area" class="output-area" contenteditable="true"></div>
+                <textarea id="code-view" class="code-view" readonly></textarea>
                 <div class="status-bar">
                     <span id="char-count">Characters: 0 | Words: 0</span>
                     <span id="save-status">Ready</span>
                 </div>
-            </div>
-        </div>
-
-        <div class="preview-panel">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    Live Preview
-                </div>
-                <button class="toolbar-btn" onclick="exportHTML()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Export
-                </button>
-            </div>
-            <div id="preview-content" class="preview-content">
-                Your formatted text will appear here...
             </div>
         </div>
     </div>
@@ -549,7 +578,7 @@
             <span class="shortcut-key">Ctrl+I</span>
         </div>
         <div class="shortcut-item">
-            <span>Copy</span>
+            <span>Copy HTML</span>
             <span class="shortcut-key">Ctrl+C</span>
         </div>
         <div class="shortcut-item">
@@ -584,11 +613,13 @@
     <script>
         let undoStack = [];
         let redoStack = [];
+        let htmlContent = '';
         const outputArea = document.getElementById('output-area');
+        const codeView = document.getElementById('code-view');
         const pasteArea = document.getElementById('paste-area');
-        const previewContent = document.getElementById('preview-content');
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
+        let isCodeView = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -601,11 +632,14 @@
             // Add keyboard shortcuts
             document.addEventListener('keydown', handleKeyboardShortcuts);
             
-            // Update character count
-            outputArea.addEventListener('input', updateCharCount);
+            // Intercept copy event
+            outputArea.addEventListener('copy', handleCopy);
+            
+            // Update on content change
+            outputArea.addEventListener('input', handleOutputChange);
             
             // Auto-save
-            setInterval(autoSave, 30000); // Auto-save every 30 seconds
+            setInterval(autoSave, 30000);
         });
 
         function toggleTheme() {
@@ -615,9 +649,7 @@
             
             const icon = document.getElementById('theme-icon');
             if (isLight) {
-                icon.innerHTML = `
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                `;
+                icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
             } else {
                 icon.innerHTML = `
                     <circle cx="12" cy="12" r="5"/>
@@ -633,16 +665,33 @@
             }
         }
 
+        function toggleCodeView() {
+            isCodeView = !isCodeView;
+            const toggle = document.getElementById('code-toggle');
+            
+            if (isCodeView) {
+                toggle.classList.add('active');
+                outputArea.style.display = 'none';
+                codeView.style.display = 'block';
+                codeView.value = htmlContent;
+            } else {
+                toggle.classList.remove('active');
+                outputArea.style.display = 'block';
+                codeView.style.display = 'none';
+            }
+        }
+
         function convertToHTML() {
             const text = pasteArea.value;
             if (!text) {
-                outputArea.value = '';
-                previewContent.innerHTML = 'Your formatted text will appear here...';
+                outputArea.innerHTML = '';
+                htmlContent = '';
+                updateCodeView();
                 return;
             }
 
             // Convert text to HTML
-            let html = text
+            htmlContent = text
                 .split('\n')
                 .map(line => {
                     if (line.trim() === '') return '';
@@ -650,8 +699,8 @@
                 })
                 .join('\n');
 
-            outputArea.value = html;
-            updatePreview();
+            outputArea.innerHTML = htmlContent;
+            updateCodeView();
             updateCharCount();
         }
 
@@ -661,60 +710,109 @@
             return div.innerHTML;
         }
 
+        function handleOutputChange() {
+            // Update HTML content when user edits
+            htmlContent = outputArea.innerHTML;
+            updateCodeView();
+            updateCharCount();
+        }
+
+        function updateCodeView() {
+            if (isCodeView) {
+                codeView.value = htmlContent;
+            }
+        }
+
         function formatText(type) {
-            const start = outputArea.selectionStart;
-            const end = outputArea.selectionEnd;
-            const selectedText = outputArea.value.substring(start, end);
-            
-            if (!selectedText) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) {
                 showNotification('Please select some text first', false);
                 return;
             }
 
             saveState();
             
-            let formattedText = '';
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            
+            let element;
             switch(type) {
                 case 'bold':
-                    formattedText = `<strong>${selectedText}</strong>`;
+                    element = document.createElement('strong');
                     break;
                 case 'italic':
-                    formattedText = `<em>${selectedText}</em>`;
-                    break;
-                case 'center':
-                    formattedText = `<p style="text-align: center;">${selectedText}</p>`;
-                    break;
-                case 'left':
-                    formattedText = `<p style="text-align: left;">${selectedText}</p>`;
+                    element = document.createElement('em');
                     break;
                 case 'h2':
-                    formattedText = `<h2>${selectedText}</h2>`;
+                    element = document.createElement('h2');
+                    break;
+                case 'center':
+                    element = document.createElement('p');
+                    element.style.textAlign = 'center';
+                    break;
+                case 'left':
+                    element = document.createElement('p');
+                    element.style.textAlign = 'left';
                     break;
             }
             
-            outputArea.value = outputArea.value.substring(0, start) + formattedText + outputArea.value.substring(end);
-            outputArea.setSelectionRange(start, start + formattedText.length);
-            outputArea.focus();
+            element.textContent = selectedText;
+            range.deleteContents();
+            range.insertNode(element);
             
-            updatePreview();
+            // Clear selection
+            selection.removeAllRanges();
+            
+            htmlContent = outputArea.innerHTML;
+            updateCodeView();
             updateCharCount();
             showNotification('Text formatted successfully!');
         }
 
+        function handleCopy(e) {
+            e.preventDefault();
+            const selection = window.getSelection();
+            
+            if (selection.isCollapsed) {
+                // Copy all HTML if nothing selected
+                e.clipboardData.setData('text/plain', htmlContent);
+            } else {
+                // Copy selected HTML
+                const range = selection.getRangeAt(0);
+                const container = document.createElement('div');
+                container.appendChild(range.cloneContents());
+                e.clipboardData.setData('text/plain', container.innerHTML);
+            }
+            
+            showNotification('HTML code copied to clipboard!');
+        }
+
         function copyToClipboard() {
-            outputArea.select();
+            // Create a temporary textarea to copy HTML code
+            const textarea = document.createElement('textarea');
+            textarea.value = htmlContent;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
             document.execCommand('copy');
-            showNotification('Copied to clipboard!');
+            document.body.removeChild(textarea);
+            showNotification('HTML code copied to clipboard!');
         }
 
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
-                const start = outputArea.selectionStart;
                 saveState();
-                outputArea.value = outputArea.value.substring(0, start) + text + outputArea.value.substring(start);
-                outputArea.setSelectionRange(start + text.length, start + text.length);
-                updatePreview();
+                
+                // Insert at cursor position
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(text));
+                
+                htmlContent = outputArea.innerHTML;
+                updateCodeView();
                 updateCharCount();
                 showNotification('Pasted from clipboard!');
             } catch (err) {
@@ -723,7 +821,11 @@
         }
 
         function selectAll() {
-            outputArea.select();
+            const range = document.createRange();
+            range.selectNodeContents(outputArea);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
             outputArea.focus();
         }
 
@@ -734,24 +836,16 @@
         }
 
         function clearOutput() {
-            if (outputArea.value && !confirm('Are you sure you want to clear the output?')) return;
+            if (htmlContent && !confirm('Are you sure you want to clear the output?')) return;
             saveState();
-            outputArea.value = '';
-            updatePreview();
+            outputArea.innerHTML = '';
+            htmlContent = '';
+            updateCodeView();
             updateCharCount();
         }
 
-        function updatePreview() {
-            const html = outputArea.value;
-            if (html) {
-                previewContent.innerHTML = html;
-            } else {
-                previewContent.innerHTML = 'Your formatted text will appear here...';
-            }
-        }
-
         function updateCharCount() {
-            const text = outputArea.value;
+            const text = outputArea.textContent || '';
             const charCount = text.length;
             const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
             document.getElementById('char-count').textContent = `Characters: ${charCount} | Words: ${wordCount}`;
@@ -799,7 +893,7 @@
         }
 
         function saveState() {
-            undoStack.push(outputArea.value);
+            undoStack.push(htmlContent);
             redoStack = [];
             if (undoStack.length > 50) {
                 undoStack.shift();
@@ -814,9 +908,10 @@
 
         function undo() {
             if (undoStack.length > 0) {
-                redoStack.push(outputArea.value);
-                outputArea.value = undoStack.pop();
-                updatePreview();
+                redoStack.push(htmlContent);
+                htmlContent = undoStack.pop();
+                outputArea.innerHTML = htmlContent;
+                updateCodeView();
                 updateCharCount();
                 updateUndoRedoButtons();
                 showNotification('Undo successful');
@@ -825,9 +920,10 @@
 
         function redo() {
             if (redoStack.length > 0) {
-                undoStack.push(outputArea.value);
-                outputArea.value = redoStack.pop();
-                updatePreview();
+                undoStack.push(htmlContent);
+                htmlContent = redoStack.pop();
+                outputArea.innerHTML = htmlContent;
+                updateCodeView();
                 updateCharCount();
                 updateUndoRedoButtons();
                 showNotification('Redo successful');
@@ -862,7 +958,7 @@
     </style>
 </head>
 <body>
-${outputArea.value}
+${htmlContent}
 </body>
 </html>`;
             
@@ -877,7 +973,7 @@ ${outputArea.value}
         }
 
         function autoSave() {
-            localStorage.setItem('htmlFormatter_output', outputArea.value);
+            localStorage.setItem('htmlFormatter_output', htmlContent);
             localStorage.setItem('htmlFormatter_input', pasteArea.value);
             document.getElementById('save-status').textContent = 'Auto-saved';
             setTimeout(() => {
@@ -891,8 +987,8 @@ ${outputArea.value}
             const savedInput = localStorage.getItem('htmlFormatter_input');
             
             if (savedOutput) {
-                outputArea.value = savedOutput;
-                updatePreview();
+                htmlContent = savedOutput;
+                outputArea.innerHTML = htmlContent;
                 updateCharCount();
             }
             
@@ -901,11 +997,6 @@ ${outputArea.value}
             }
 
             updateUndoRedoButtons();
-        });
-
-        // Update preview on output change
-        outputArea.addEventListener('input', () => {
-            updatePreview();
         });
     </script>
 </body>
