@@ -178,6 +178,17 @@
             transform: translateY(-1px);
         }
 
+        .toolbar-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .toolbar-btn:disabled:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            transform: none;
+        }
+
         .toolbar-btn svg {
             width: 18px;
             height: 18px;
@@ -238,6 +249,12 @@
         .preview-content em {
             font-style: italic;
             color: #818cf8;
+        }
+
+        .preview-content h2 {
+            color: var(--accent);
+            margin: 1em 0 0.5em 0;
+            font-size: 1.5em;
         }
 
         .notification {
@@ -417,6 +434,28 @@
                         Select All
                     </button>
                     <div class="separator"></div>
+                    <button class="toolbar-btn" id="undo-btn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"/>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                        </svg>
+                        Undo
+                    </button>
+                    <button class="toolbar-btn" id="redo-btn" onclick="redo()" title="Redo (Ctrl+Y)" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Redo
+                    </button>
+                    <div class="separator"></div>
+                    <button class="toolbar-btn" onclick="formatText('h2')" title="Heading 2">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 5v7m0 0v7m0-7h8m0-7v7m0 0v7"/>
+                            <path d="M18 12h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2v0a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2"/>
+                        </svg>
+                        H2
+                    </button>
                     <button class="toolbar-btn" onclick="formatText('bold')" title="Bold (Ctrl+B)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
@@ -521,6 +560,10 @@
             <span>Undo</span>
             <span class="shortcut-key">Ctrl+Z</span>
         </div>
+        <div class="shortcut-item">
+            <span>Redo</span>
+            <span class="shortcut-key">Ctrl+Y</span>
+        </div>
     </div>
 
     <div class="floating-actions">
@@ -544,6 +587,8 @@
         const outputArea = document.getElementById('output-area');
         const pasteArea = document.getElementById('paste-area');
         const previewContent = document.getElementById('preview-content');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -641,6 +686,9 @@
                     break;
                 case 'left':
                     formattedText = `<p style="text-align: left;">${selectedText}</p>`;
+                    break;
+                case 'h2':
+                    formattedText = `<h2>${selectedText}</h2>`;
                     break;
             }
             
@@ -756,6 +804,12 @@
             if (undoStack.length > 50) {
                 undoStack.shift();
             }
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = undoStack.length === 0;
+            redoBtn.disabled = redoStack.length === 0;
         }
 
         function undo() {
@@ -764,6 +818,8 @@
                 outputArea.value = undoStack.pop();
                 updatePreview();
                 updateCharCount();
+                updateUndoRedoButtons();
+                showNotification('Undo successful');
             }
         }
 
@@ -773,6 +829,8 @@
                 outputArea.value = redoStack.pop();
                 updatePreview();
                 updateCharCount();
+                updateUndoRedoButtons();
+                showNotification('Redo successful');
             }
         }
 
@@ -790,6 +848,16 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+        }
+        h2 {
+            color: #333;
+            margin: 1em 0 0.5em 0;
+        }
+        strong {
+            font-weight: 700;
+        }
+        em {
+            font-style: italic;
         }
     </style>
 </head>
@@ -831,6 +899,8 @@ ${outputArea.value}
             if (savedInput) {
                 pasteArea.value = savedInput;
             }
+
+            updateUndoRedoButtons();
         });
 
         // Update preview on output change
