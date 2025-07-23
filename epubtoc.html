@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPUB Chapter Combiner</title>
+    <!-- Using epub.js from a CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.93/epub.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #333;
+            --border-color: #444;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        header p {
+            margin-top: 0.5rem;
+            color: #aaa;
+        }
+
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        input[type="file"], select, input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #252525;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+             background-color: var(--primary-hover);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: #4f4f4f;
+            color: white;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #666;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .output-section {
+            position: relative;
+        }
+        
+        #output-text {
+            width: 100%;
+            height: 50vh;
+            background-color: #252525;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-color);
+            padding: 1rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        #copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+        
+        .navigation-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+            display: none; /* Hidden by default */
+        }
+        
+        #status {
+            text-align: center;
+            color: #aaa;
+            min-height: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* For smaller screens */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>EPUB Chapter Combiner</h1>
+            <p>Upload an EPUB, choose how many chapters to combine, and copy the text.</p>
+        </header>
+
+        <div class="card">
+            <div class="control-group">
+                <label for="epub-file-input">1. Upload your EPUB file</label>
+                <input type="file" id="epub-file-input" accept=".epub">
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        <div class="loader" id="loader"></div>
+
+        <div id="main-controls" class="card" style="display: none;">
+             <div class="controls-grid">
+                <div class="control-group">
+                    <label for="toc-select">2. Start from chapter</label>
+                    <select id="toc-select" disabled></select>
+                </div>
+                <div class="control-group">
+                    <label for="chapter-count">3. Chapters to combine</label>
+                    <input type="number" id="chapter-count" value="2" min="1" disabled>
+                </div>
+            </div>
+            <button id="load-chapters-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" disabled>Load Chapters</button>
+        </div>
+
+        <div id="output-area" class="output-section card" style="display: none;">
+            <label>Combined Text Output</label>
+            <textarea id="output-text" readonly placeholder="Your combined chapter text will appear here..."></textarea>
+            <button id="copy-btn" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1h-15A.5.5 0 0 1-1 8z"/></svg>
+                Copy
+            </button>
+            <div class="navigation-controls">
+                <button id="prev-btn" class="btn btn-secondary" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                    Previous
+                </button>
+                <button id="next-btn" class="btn btn-secondary" disabled>
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
+    const fileInput = document.getElementById('epub-file-input');
+    const tocSelect = document.getElementById('toc-select');
+    const chapterCountInput = document.getElementById('chapter-count');
+    const loadBtn = document.getElementById('load-chapters-btn');
+    const outputText = document.getElementById('output-text');
+    const copyBtn = document.getElementById('copy-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const loader = document.getElementById('loader');
+    const statusDiv = document.getElementById('status');
+    const mainControls = document.getElementById('main-controls');
+    const outputArea = document.getElementById('output-area');
+
+    // --- State Variables ---
+    let book = null;
+    let toc = [];
+    let currentChapterIndex = 0; // The starting index for the next batch
+
+    // --- Event Listeners ---
+    fileInput.addEventListener('change', handleFileSelect);
+    loadBtn.addEventListener('click', () => processChapters(true));
+    tocSelect.addEventListener('change', handleTocChange);
+    nextBtn.addEventListener('click', () => processChapters(true));
+    prevBtn.addEventListener('click', () => processChapters(false));
+    copyBtn.addEventListener('click', copyOutputToClipboard);
+
+    // --- Functions ---
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        resetUI();
+        showLoader(true, 'Loading EPUB...');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            book = ePub(e.target.result);
+            book.ready.then(() => {
+                toc = book.navigation.toc;
+                populateTocSelect();
+                showLoader(false);
+                mainControls.style.display = 'block';
+                enableControls(true);
+            }).catch(err => {
+                showLoader(false, `Error loading EPUB: ${err.message}`);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function populateTocSelect() {
+        tocSelect.innerHTML = ''; // Clear previous options
+        toc.forEach((item, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = item.label.trim();
+            tocSelect.appendChild(option);
+        });
+        currentChapterIndex = 0;
+    }
+    
+    function handleTocChange() {
+        currentChapterIndex = parseInt(tocSelect.value, 10);
+        // When user manually selects a start point, hide the output until they click "Load"
+        outputArea.style.display = 'none';
+        outputText.value = '';
+        updateNavButtons();
+    }
+
+    async function processChapters(isNext) {
+        if (!book || toc.length === 0) return;
+
+        showLoader(true, 'Combining chapters...');
+        const numChaptersToLoad = parseInt(chapterCountInput.value, 10);
+        
+        let startIndex;
+        if (isNext) {
+            startIndex = currentChapterIndex;
+        } else {
+            // Calculate previous batch start index
+            const prevBatchStartIndex = Math.max(0, currentChapterIndex - (2 * numChaptersToLoad));
+            startIndex = prevBatchStartIndex;
+        }
+        
+        const endIndex = Math.min(startIndex + numChaptersToLoad, toc.length);
+        
+        let combinedText = '';
+        const chapterPromises = [];
+
+        for (let i = startIndex; i < endIndex; i++) {
+            const chapterHref = toc[i].href;
+            chapterPromises.push(
+                book.spine.get(chapterHref).load().then(doc => {
+                    const chapterTitle = toc[i].label.trim();
+                    const chapterContent = doc.body.textContent || doc.body.innerText;
+                    return `${chapterTitle}\n\n${chapterContent.trim()}`;
+                }).catch(err => `Error loading chapter: ${toc[i].label}`)
+            );
+        }
+
+        try {
+            const chapterContents = await Promise.all(chapterPromises);
+            combinedText = chapterContents.join('\n\n\n\n\n'); // Generous spacing between chapters
+            outputText.value = combinedText;
+            currentChapterIndex = endIndex; // Set the index for the *next* operation
+            outputArea.style.display = 'block';
+        } catch (error) {
+            statusDiv.textContent = `Error processing chapters: ${error.message}`;
+        } finally {
+            showLoader(false);
+            updateNavButtons();
+        }
+    }
+
+    function updateNavButtons() {
+        const numChaptersToLoad = parseInt(chapterCountInput.value, 10);
+        
+        // Previous button logic
+        prevBtn.disabled = (currentChapterIndex <= numChaptersToLoad && currentChapterIndex <= tocSelect.selectedIndex + numChaptersToLoad);
+        
+        // Next button logic
+        nextBtn.disabled = currentChapterIndex >= toc.length;
+    }
+
+    function copyOutputToClipboard() {
+        if (!outputText.value) return;
+        navigator.clipboard.writeText(outputText.value).then(() => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                Copied!`;
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(err => {
+            alert('Failed to copy text.');
+        });
+    }
+
+    function showLoader(show, message = '') {
+        loader.style.display = show ? 'block' : 'none';
+        statusDiv.textContent = message;
+    }
+    
+    function enableControls(enabled) {
+        tocSelect.disabled = !enabled;
+        chapterCountInput.disabled = !enabled;
+        loadBtn.disabled = !enabled;
+    }
+    
+    function resetUI() {
+        mainControls.style.display = 'none';
+        outputArea.style.display = 'none';
+        outputText.value = '';
+        tocSelect.innerHTML = '';
+        enableControls(false);
+        updateNavButtons();
+    }
+});
+</script>
+
+</body>
+</html>
