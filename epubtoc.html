@@ -4,422 +4,706 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EPUB Chapter Combiner</title>
-    <!-- Using epub.js from a CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.93/epub.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            --bg-color: #1a1a1a;
-            --text-color: #e0e0e0;
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --secondary-color: #333;
-            --border-color: #444;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
         }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .container {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        header {
+        .header {
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
+            margin-bottom: 3rem;
         }
 
-        header h1 {
-            margin: 0;
-            color: var(--text-color);
-            font-weight: 600;
-        }
-        
-        header p {
-            margin-top: 0.5rem;
-            color: #aaa;
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
         }
 
-        .card {
-            background-color: var(--secondary-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
-        .controls-grid {
+        .main-grid {
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
-            align-items: end;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
         }
-        
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-upload.drag-over {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .controls {
+            display: grid;
+            gap: 1rem;
+        }
+
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
 
-        label {
+        .control-group label {
             font-weight: 500;
             font-size: 0.9rem;
-            color: #ccc;
+            color: var(--text-secondary);
         }
 
-        input[type="file"], select, input[type="number"] {
-            width: 100%;
+        .control-group input, .control-group select {
             padding: 0.75rem;
-            background-color: #252525;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-color);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             font-size: 1rem;
+            transition: all 0.2s ease;
         }
-        
-        input[type="file"]::file-selector-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .toc-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+
+        .toc-item {
+            padding: 0.5rem;
             cursor: pointer;
-            transition: background-color 0.2s;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
         }
 
-        input[type="file"]::file-selector-button:hover {
-             background-color: var(--primary-hover);
+        .toc-item:hover {
+            background-color: var(--background);
         }
 
-        .btn {
+        .toc-item.selected {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .button {
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 0.5rem;
+            justify-content: center;
         }
 
-        .btn-primary {
+        .button-primary {
             background-color: var(--primary-color);
             color: white;
         }
-        .btn-primary:hover:not(:disabled) {
+
+        .button-primary:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
-        .btn-secondary {
-            background-color: #4f4f4f;
-            color: white;
+        .button-secondary {
+            background-color: var(--background);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
-        .btn-secondary:hover:not(:disabled) {
-            background-color: #666;
+
+        .button-secondary:hover {
+            background-color: var(--border);
         }
-        
-        .btn:disabled {
+
+        .button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .output-section {
-            position: relative;
-        }
-        
-        #output-text {
-            width: 100%;
-            height: 50vh;
-            background-color: #252525;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-color);
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-        
-        #copy-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-        }
-        
-        .navigation-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
+        .button:disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .output-content {
+            min-height: 500px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background-color: var(--background);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .output-content:empty::before {
+            content: "Combined chapters will appear here...";
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .status-message {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            display: inline-block;
             width: 40px;
             height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 1rem auto;
-            display: none; /* Hidden by default */
-        }
-        
-        #status {
-            text-align: center;
-            color: #aaa;
-            min-height: 20px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
-        
-        /* For smaller screens */
-        @media (max-width: 600px) {
-            body {
-                padding: 1rem;
-            }
-            .controls-grid {
-                grid-template-columns: 1fr;
-            }
+
+        .chapter-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <header>
+        <div class="header">
             <h1>EPUB Chapter Combiner</h1>
-            <p>Upload an EPUB, choose how many chapters to combine, and copy the text.</p>
-        </header>
-
-        <div class="card">
-            <div class="control-group">
-                <label for="epub-file-input">1. Upload your EPUB file</label>
-                <input type="file" id="epub-file-input" accept=".epub">
-            </div>
-        </div>
-        
-        <div id="status"></div>
-        <div class="loader" id="loader"></div>
-
-        <div id="main-controls" class="card" style="display: none;">
-             <div class="controls-grid">
-                <div class="control-group">
-                    <label for="toc-select">2. Start from chapter</label>
-                    <select id="toc-select" disabled></select>
-                </div>
-                <div class="control-group">
-                    <label for="chapter-count">3. Chapters to combine</label>
-                    <input type="number" id="chapter-count" value="2" min="1" disabled>
-                </div>
-            </div>
-            <button id="load-chapters-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" disabled>Load Chapters</button>
+            <p>Load EPUB files and combine multiple chapters for easy reading</p>
         </div>
 
-        <div id="output-area" class="output-section card" style="display: none;">
-            <label>Combined Text Output</label>
-            <textarea id="output-text" readonly placeholder="Your combined chapter text will appear here..."></textarea>
-            <button id="copy-btn" class="btn btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1h-15A.5.5 0 0 1-1 8z"/></svg>
-                Copy
-            </button>
-            <div class="navigation-controls">
-                <button id="prev-btn" class="btn btn-secondary" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
-                    Previous
-                </button>
-                <button id="next-btn" class="btn btn-secondary" disabled>
-                    Next
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
-                </button>
+        <div class="main-grid">
+            <!-- Left Panel -->
+            <div class="panel">
+                <div class="file-upload" id="fileUploadArea">
+                    <input type="file" id="fileInput" accept=".epub">
+                    <div class="file-upload-icon">📚</div>
+                    <p><strong>Click to upload or drag & drop</strong></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">EPUB files only</p>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="chapterCount">Chapters to combine</label>
+                        <input type="number" id="chapterCount" min="1" max="10" value="2">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="startChapter">Start from chapter</label>
+                        <select id="startChapter" disabled>
+                            <option value="">Load EPUB first</option>
+                        </select>
+                    </div>
+
+                    <button class="button button-primary" id="loadChapters" disabled>
+                        Load Chapters
+                    </button>
+                </div>
+
+                <div class="status-message" id="statusMessage"></div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Table of Contents</h3>
+                    <div class="toc-list" id="tocList">
+                        <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
+                            No EPUB loaded
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="panel">
+                <div class="output-header">
+                    <h2>Combined Chapters</h2>
+                    <button class="button button-secondary" id="copyButton" disabled>
+                        <span>📋</span> Copy Text
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem; color: var(--text-secondary);">Loading chapters...</p>
+                </div>
+
+                <div class="output-content" id="outputContent"></div>
+
+                <div class="chapter-info" id="chapterInfo"></div>
+
+                <div class="navigation-buttons">
+                    <button class="button button-secondary" id="prevButton" disabled>
+                        ← Previous
+                    </button>
+                    <button class="button button-primary" id="nextButton" disabled>
+                        Next →
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM Elements ---
-    const fileInput = document.getElementById('epub-file-input');
-    const tocSelect = document.getElementById('toc-select');
-    const chapterCountInput = document.getElementById('chapter-count');
-    const loadBtn = document.getElementById('load-chapters-btn');
-    const outputText = document.getElementById('output-text');
-    const copyBtn = document.getElementById('copy-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const loader = document.getElementById('loader');
-    const statusDiv = document.getElementById('status');
-    const mainControls = document.getElementById('main-controls');
-    const outputArea = document.getElementById('output-area');
+    <!-- Include JSZip library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <script>
+        class EPUBReader {
+            constructor() {
+                this.epub = null;
+                this.toc = [];
+                this.currentIndex = 0;
+                this.chaptersToLoad = 2;
+                this.contentFiles = {};
+                
+                this.initializeElements();
+                this.attachEventListeners();
+            }
 
-    // --- State Variables ---
-    let book = null;
-    let toc = [];
-    let currentChapterIndex = 0; // The starting index for the next batch
+            initializeElements() {
+                this.elements = {
+                    fileInput: document.getElementById('fileInput'),
+                    fileUploadArea: document.getElementById('fileUploadArea'),
+                    chapterCount: document.getElementById('chapterCount'),
+                    startChapter: document.getElementById('startChapter'),
+                    loadChapters: document.getElementById('loadChapters'),
+                    tocList: document.getElementById('tocList'),
+                    outputContent: document.getElementById('outputContent'),
+                    copyButton: document.getElementById('copyButton'),
+                    prevButton: document.getElementById('prevButton'),
+                    nextButton: document.getElementById('nextButton'),
+                    statusMessage: document.getElementById('statusMessage'),
+                    loading: document.getElementById('loading'),
+                    chapterInfo: document.getElementById('chapterInfo')
+                };
+            }
 
-    // --- Event Listeners ---
-    fileInput.addEventListener('change', handleFileSelect);
-    loadBtn.addEventListener('click', () => processChapters(true));
-    tocSelect.addEventListener('change', handleTocChange);
-    nextBtn.addEventListener('click', () => processChapters(true));
-    prevBtn.addEventListener('click', () => processChapters(false));
-    copyBtn.addEventListener('click', copyOutputToClipboard);
+            attachEventListeners() {
+                // File upload
+                this.elements.fileUploadArea.addEventListener('click', () => {
+                    this.elements.fileInput.click();
+                });
 
-    // --- Functions ---
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+                this.elements.fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.loadEPUB(e.target.files[0]);
+                    }
+                });
 
-        resetUI();
-        showLoader(true, 'Loading EPUB...');
+                // Drag and drop
+                this.elements.fileUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.elements.fileUploadArea.classList.add('drag-over');
+                });
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            book = ePub(e.target.result);
-            book.ready.then(() => {
-                toc = book.navigation.toc;
-                populateTocSelect();
-                showLoader(false);
-                mainControls.style.display = 'block';
-                enableControls(true);
-            }).catch(err => {
-                showLoader(false, `Error loading EPUB: ${err.message}`);
-            });
-        };
-        reader.readAsArrayBuffer(file);
-    }
+                this.elements.fileUploadArea.addEventListener('dragleave', () => {
+                    this.elements.fileUploadArea.classList.remove('drag-over');
+                });
 
-    function populateTocSelect() {
-        tocSelect.innerHTML = ''; // Clear previous options
-        toc.forEach((item, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = item.label.trim();
-            tocSelect.appendChild(option);
+                this.elements.fileUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.elements.fileUploadArea.classList.remove('drag-over');
+                    
+                    if (e.dataTransfer.files.length > 0) {
+                        const file = e.dataTransfer.files[0];
+                        if (file.name.toLowerCase().endsWith('.epub')) {
+                            this.loadEPUB(file);
+                        } else {
+                            this.showStatus('Please upload an EPUB file', 'error');
+                        }
+                    }
+                });
+
+                // Controls
+                this.elements.chapterCount.addEventListener('change', () => {
+                    this.chaptersToLoad = parseInt(this.elements.chapterCount.value) || 1;
+                });
+
+                this.elements.startChapter.addEventListener('change', () => {
+                    this.currentIndex = parseInt(this.elements.startChapter.value) || 0;
+                });
+
+                this.elements.loadChapters.addEventListener('click', () => {
+                    this.loadCurrentChapters();
+                });
+
+                this.elements.copyButton.addEventListener('click', () => {
+                    this.copyToClipboard();
+                });
+
+                this.elements.prevButton.addEventListener('click', () => {
+                    this.navigatePrevious();
+                });
+
+                this.elements.nextButton.addEventListener('click', () => {
+                    this.navigateNext();
+                });
+            }
+
+            async loadEPUB(file) {
+                try {
+                    this.showLoading(true);
+                    this.showStatus('Loading EPUB file...', 'success');
+
+                    const zip = new JSZip();
+                    const content = await zip.loadAsync(file);
+                    this.epub = content;
+
+                    // Parse container.xml to find content.opf
+                    const containerXml = await content.file('META-INF/container.xml').async('string');
+                    const parser = new DOMParser();
+                    const containerDoc = parser.parseFromString(containerXml, 'text/xml');
+                    const rootfilePath = containerDoc.querySelector('rootfile').getAttribute('full-path');
+
+                    // Parse content.opf
+                    const opfContent = await content.file(rootfilePath).async('string');
+                    const opfDoc = parser.parseFromString(opfContent, 'text/xml');
+                    
+                    // Extract TOC
+                    await this.extractTOC(opfDoc, rootfilePath);
+                    
+                    this.showStatus('EPUB loaded successfully!', 'success');
+                    this.updateUI();
+                } catch (error) {
+                    console.error('Error loading EPUB:', error);
+                    this.showStatus('Error loading EPUB file', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async extractTOC(opfDoc, opfPath) {
+                const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/') + 1);
+                
+                // Get spine items
+                const spine = opfDoc.querySelector('spine');
+                const manifest = opfDoc.querySelector('manifest');
+                const spineItems = Array.from(spine.querySelectorAll('itemref'));
+                
+                this.toc = [];
+                
+                for (let i = 0; i < spineItems.length; i++) {
+                    const idref = spineItems[i].getAttribute('idref');
+                    const item = manifest.querySelector(`item[id="${idref}"]`);
+                    
+                    if (item) {
+                        const href = item.getAttribute('href');
+                        const fullPath = opfDir + href;
+                        
+                        // Try to get chapter title from the content
+                        try {
+                            const content = await this.epub.file(fullPath).async('string');
+                            const contentDoc = new DOMParser().parseFromString(content, 'text/html');
+                            
+                            // Look for title in various places
+                            let title = contentDoc.querySelector('title')?.textContent ||
+                                       contentDoc.querySelector('h1')?.textContent ||
+                                       contentDoc.querySelector('h2')?.textContent ||
+                                       `Chapter ${i + 1}`;
+                            
+                            this.toc.push({
+                                title: title.trim(),
+                                href: fullPath,
+                                index: i
+                            });
+                        } catch (e) {
+                            this.toc.push({
+                                title: `Chapter ${i + 1}`,
+                                href: fullPath,
+                                index: i
+                            });
+                        }
+                    }
+                }
+            }
+
+            updateUI() {
+                // Update TOC list
+                this.elements.tocList.innerHTML = '';
+                this.toc.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'toc-item';
+                    div.textContent = item.title;
+                    div.addEventListener('click', () => {
+                        this.currentIndex = index;
+                        this.elements.startChapter.value = index;
+                        this.highlightCurrentChapter();
+                    });
+                    this.elements.tocList.appendChild(div);
+                });
+
+                // Update start chapter dropdown
+                this.elements.startChapter.innerHTML = '';
+                this.toc.forEach((item, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = item.title;
+                    this.elements.startChapter.appendChild(option);
+                });
+
+                // Enable controls
+                this.elements.startChapter.disabled = false;
+                this.elements.loadChapters.disabled = false;
+                
+                this.highlightCurrentChapter();
+            }
+
+            highlightCurrentChapter() {
+                const tocItems = this.elements.tocList.querySelectorAll('.toc-item');
+                tocItems.forEach((item, index) => {
+                    if (index >= this.currentIndex && index < this.currentIndex + this.chaptersToLoad) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+
+            async loadCurrentChapters() {
+                try {
+                    this.showLoading(true);
+                    this.elements.outputContent.innerHTML = '';
+                    
+                    let combinedContent = '';
+                    const endIndex = Math.min(this.currentIndex + this.chaptersToLoad, this.toc.length);
+                    
+                    for (let i = this.currentIndex; i < endIndex; i++) {
+                        const chapter = this.toc[i];
+                        const content = await this.epub.file(chapter.href).async('string');
+                        const doc = new DOMParser().parseFromString(content, 'text/html');
+                        
+                        // Extract text content
+                        const body = doc.body || doc.documentElement;
+                        const textContent = this.extractTextContent(body);
+                        
+                        if (combinedContent) {
+                            combinedContent += '\n\n---\n\n';
+                        }
+                        combinedContent += `<h2>${chapter.title}</h2>\n${textContent}`;
+                    }
+                    
+                    this.elements.outputContent.innerHTML = combinedContent;
+                    
+                    // Update navigation
+                    this.updateNavigation();
+                    this.highlightCurrentChapter();
+                    
+                    // Update chapter info
+                    const startChapter = this.toc[this.currentIndex].title;
+                    const endChapter = this.toc[Math.min(endIndex - 1, this.toc.length - 1)].title;
+                    this.elements.chapterInfo.textContent = `Showing: ${startChapter} - ${endChapter}`;
+                    
+                    // Enable copy button
+                    this.elements.copyButton.disabled = false;
+                    
+                } catch (error) {
+                    console.error('Error loading chapters:', error);
+                    this.showStatus('Error loading chapters', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            extractTextContent(element) {
+                // Remove script and style elements
+                const scripts = element.querySelectorAll('script, style');
+                scripts.forEach(el => el.remove());
+                
+                // Convert to readable HTML
+                let html = element.innerHTML;
+                
+                // Clean up the HTML
+                html = html.replace(/<br\s*\/?>/gi, '\n');
+                html = html.replace(/<\/p>/gi, '</p>\n');
+                html = html.replace(/<\/div>/gi, '</div>\n');
+                
+                // Create a temporary element to parse the cleaned HTML
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                
+                return temp.innerHTML;
+            }
+
+            updateNavigation() {
+                const hasNext = this.currentIndex + this.chaptersToLoad < this.toc.length;
+                const hasPrev = this.currentIndex > 0;
+                
+                this.elements.nextButton.disabled = !hasNext;
+                this.elements.prevButton.disabled = !hasPrev;
+            }
+
+            navigateNext() {
+                if (this.currentIndex + this.chaptersToLoad < this.toc.length) {
+                    this.currentIndex += this.chaptersToLoad;
+                    this.elements.startChapter.value = this.currentIndex;
+                    this.loadCurrentChapters();
+                }
+            }
+
+            navigatePrevious() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex = Math.max(0, this.currentIndex - this.chaptersToLoad);
+                    this.elements.startChapter.value = this.currentIndex;
+                    this.loadCurrentChapters();
+                }
+            }
+
+            async copyToClipboard() {
+                try {
+                    const text = this.elements.outputContent.innerText;
+                    await navigator.clipboard.writeText(text);
+                    
+                    // Show feedback
+                    const originalText = this.elements.copyButton.innerHTML;
+                    this.elements.copyButton.innerHTML = '<span>✓</span> Copied!';
+                    setTimeout(() => {
+                        this.elements.copyButton.innerHTML = originalText;
+                    }, 2000);
+                } catch (error) {
+                    this.showStatus('Failed to copy text', 'error');
+                }
+            }
+
+            showStatus(message, type) {
+                this.elements.statusMessage.textContent = message;
+                this.elements.statusMessage.className = `status-message status-${type}`;
+                this.elements.statusMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    this.elements.statusMessage.style.display = 'none';
+                }, 3000);
+            }
+
+            showLoading(show) {
+                this.elements.loading.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Initialize the reader when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EPUBReader();
         });
-        currentChapterIndex = 0;
-    }
-    
-    function handleTocChange() {
-        currentChapterIndex = parseInt(tocSelect.value, 10);
-        // When user manually selects a start point, hide the output until they click "Load"
-        outputArea.style.display = 'none';
-        outputText.value = '';
-        updateNavButtons();
-    }
-
-    async function processChapters(isNext) {
-        if (!book || toc.length === 0) return;
-
-        showLoader(true, 'Combining chapters...');
-        const numChaptersToLoad = parseInt(chapterCountInput.value, 10);
-        
-        let startIndex;
-        if (isNext) {
-            startIndex = currentChapterIndex;
-        } else {
-            // Calculate previous batch start index
-            const prevBatchStartIndex = Math.max(0, currentChapterIndex - (2 * numChaptersToLoad));
-            startIndex = prevBatchStartIndex;
-        }
-        
-        const endIndex = Math.min(startIndex + numChaptersToLoad, toc.length);
-        
-        let combinedText = '';
-        const chapterPromises = [];
-
-        for (let i = startIndex; i < endIndex; i++) {
-            const chapterHref = toc[i].href;
-            chapterPromises.push(
-                book.spine.get(chapterHref).load().then(doc => {
-                    const chapterTitle = toc[i].label.trim();
-                    const chapterContent = doc.body.textContent || doc.body.innerText;
-                    return `${chapterTitle}\n\n${chapterContent.trim()}`;
-                }).catch(err => `Error loading chapter: ${toc[i].label}`)
-            );
-        }
-
-        try {
-            const chapterContents = await Promise.all(chapterPromises);
-            combinedText = chapterContents.join('\n\n\n\n\n'); // Generous spacing between chapters
-            outputText.value = combinedText;
-            currentChapterIndex = endIndex; // Set the index for the *next* operation
-            outputArea.style.display = 'block';
-        } catch (error) {
-            statusDiv.textContent = `Error processing chapters: ${error.message}`;
-        } finally {
-            showLoader(false);
-            updateNavButtons();
-        }
-    }
-
-    function updateNavButtons() {
-        const numChaptersToLoad = parseInt(chapterCountInput.value, 10);
-        
-        // Previous button logic
-        prevBtn.disabled = (currentChapterIndex <= numChaptersToLoad && currentChapterIndex <= tocSelect.selectedIndex + numChaptersToLoad);
-        
-        // Next button logic
-        nextBtn.disabled = currentChapterIndex >= toc.length;
-    }
-
-    function copyOutputToClipboard() {
-        if (!outputText.value) return;
-        navigator.clipboard.writeText(outputText.value).then(() => {
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                Copied!`;
-            setTimeout(() => {
-                copyBtn.innerHTML = originalText;
-            }, 2000);
-        }).catch(err => {
-            alert('Failed to copy text.');
-        });
-    }
-
-    function showLoader(show, message = '') {
-        loader.style.display = show ? 'block' : 'none';
-        statusDiv.textContent = message;
-    }
-    
-    function enableControls(enabled) {
-        tocSelect.disabled = !enabled;
-        chapterCountInput.disabled = !enabled;
-        loadBtn.disabled = !enabled;
-    }
-    
-    function resetUI() {
-        mainControls.style.display = 'none';
-        outputArea.style.display = 'none';
-        outputText.value = '';
-        tocSelect.innerHTML = '';
-        enableControls(false);
-        updateNavButtons();
-    }
-});
-</script>
-
+    </script>
 </body>
 </html>
