@@ -1,1179 +1,641 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zenith Term Processor v6.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-<style>
-  :root {
-    --font-family: 'Inter', sans-serif;
-    --color-bg-light: #f9fafb;
-    --color-bg-dark: #121212;
-    --color-text-light: #1f2937;
-    --color-text-dark: #e5e7eb;
-    --color-primary-light: #3b82f6;
-    --color-primary-dark: #60a5fa;
-    --color-success-light: #d1fae5;
-    --color-success-dark: #064e3b;
-    --color-warning-light: #fef3c7;
-    --color-warning-dark: #78350f;
-    --color-danger-light: #fee2e2;
-    --color-danger-dark: #7f1d1d;
-    --color-info-light: #dbeafe;
-    --color-info-dark: #1e40af;
-    --color-shadow-light: rgba(0,0,0,0.1);
-    --color-shadow-dark: rgba(0,0,0,0.7);
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --border-radius: 0.5rem;
-    --transition-fast: 0.2s ease-in-out;
-    --transition-medium: 0.4s ease-in-out;
-    --shadow-light: 0 2px 8px var(--color-shadow-light);
-    --shadow-dark: 0 2px 12px var(--color-shadow-dark);
-  }
-  html, body {
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-family);
-    background-color: var(--color-bg-light);
-    color: var(--color-text-light);
-    height: 100%;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  body.dark {
-    background-color: var(--color-bg-dark);
-    color: var(--color-text-dark);
-  }
-  a {
-    color: var(--color-primary-light);
-    text-decoration: none;
-  }
-  a:hover, a:focus {
-    text-decoration: underline;
-  }
-  button {
-    font-family: var(--font-family);
-    cursor: pointer;
-    border: none;
-    border-radius: var(--border-radius);
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-weight: 600;
-    transition: background-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    user-select: none;
-  }
-  button:focus {
-    outline: 3px solid var(--color-primary-light);
-    outline-offset: 2px;
-  }
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .btn-primary {
-    background: linear-gradient(45deg, var(--color-primary-light), var(--color-primary-dark));
-    color: white;
-    box-shadow: var(--shadow-light);
-  }
-  body.dark .btn-primary {
-    box-shadow: var(--shadow-dark);
-  }
-  .btn-primary:hover:not(:disabled), .btn-primary:focus:not(:disabled) {
-    background: linear-gradient(45deg, var(--color-primary-dark), var(--color-primary-light));
-  }
-  .btn-secondary {
-    background-color: transparent;
-    color: var(--color-primary-light);
-    border: 2px solid var(--color-primary-light);
-  }
-  .btn-secondary:hover:not(:disabled), .btn-secondary:focus:not(:disabled) {
-    background-color: var(--color-primary-light);
-    color: white;
-  }
-  .btn-success {
-    background-color: var(--color-success-light);
-    color: var(--color-primary-dark);
-  }
-  body.dark .btn-success {
-    background-color: var(--color-success-dark);
-    color: var(--color-success-light);
-  }
-  .btn-success:hover:not(:disabled), .btn-success:focus:not(:disabled) {
-    filter: brightness(0.9);
-  }
-  .btn-danger {
-    background-color: var(--color-danger-light);
-    color: var(--color-danger-dark);
-  }
-  body.dark .btn-danger {
-    background-color: var(--color-danger-dark);
-    color: var(--color-danger-light);
-  }
-  .btn-danger:hover:not(:disabled), .btn-danger:focus:not(:disabled) {
-    filter: brightness(0.9);
-  }
-  .btn-outline {
-    background-color: transparent;
-    border: 2px solid currentColor;
-    color: inherit;
-  }
-  .btn-outline:hover:not(:disabled), .btn-outline:focus:not(:disabled) {
-    background-color: currentColor;
-    color: white;
-  }
-  .btn-icon {
-    background-color: transparent;
-    padding: var(--spacing-xs);
-    font-size: 1.25rem;
-    color: var(--color-primary-light);
-  }
-  .btn-icon:hover:not(:disabled), .btn-icon:focus:not(:disabled) {
-    color: var(--color-primary-dark);
-  }
-  input[type="text"], textarea {
-    font-family: var(--font-family);
-    font-size: 1rem;
-    padding: var(--spacing-sm);
-    border: 2px solid #ccc;
-    border-radius: var(--border-radius);
-    width: 100%;
-    box-sizing: border-box;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-    background-color: white;
-    color: var(--color-text-light);
-    resize: vertical;
-  }
-  body.dark input[type="text"], body.dark textarea {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: var(--color-text-dark);
-  }
-  input[type="text"]:focus, textarea:focus {
-    border-color: var(--color-primary-light);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-    outline: none;
-  }
-  textarea[readonly] {
-    background-color: #e5e7eb;
-    color: #374151;
-  }
-  body.dark textarea[readonly] {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-  .container {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--spacing-md);
-    padding-right: var(--spacing-md);
-  }
-  header {
-    margin-bottom: var(--spacing-xl);
-  }
-  header h1 {
-    font-weight: 700;
-    font-size: 1.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-light);
-  }
-  body.dark header h1 {
-    color: var(--color-text-dark);
-  }
-  .theme-toggle {
-    background-color: var(--color-bg-light);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-sm);
-    font-size: 1.25rem;
-    color: var(--color-primary-light);
-    transition: color var(--transition-fast), background-color var(--transition-fast);
-  }
-  .theme-toggle:hover, .theme-toggle:focus {
-    color: var(--color-primary-dark);
-    background-color: var(--color-bg-dark);
-  }
-  body.dark .theme-toggle {
-    background-color: var(--color-bg-dark);
-    color: var(--color-primary-dark);
-  }
-  body.dark .theme-toggle:hover, body.dark .theme-toggle:focus {
-    color: var(--color-primary-light);
-    background-color: var(--color-bg-light);
-  }
-  /* Grid Layout */
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-gap: var(--spacing-lg);
-  }
-  /* Responsive grid adjustments */
-  @media (max-width: 639px) {
-    .grid-container {
-      grid-template-columns: 1fr;
-    }
-  }
-  @media (min-width: 640px) and (max-width: 1023px) {
-    .grid-container {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  /* Panels */
-  .panel {
-    background-color: var(--color-bg-light);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    padding: var(--spacing-md);
-    display: flex;
-    flex-direction: column;
-    max-height: 80vh;
-  }
-  body.dark .panel {
-    background-color: var(--color-bg-dark);
-    box-shadow: var(--shadow-dark);
-  }
-  .panel-header {
-    font-weight: 600;
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .panel-content {
-    flex-grow: 1;
-    overflow-y: auto;
-  }
-  /* Scrollbar styling */
-  .panel-content::-webkit-scrollbar {
-    width: 8px;
-  }
-  .panel-content::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary-light);
-    border-radius: 4px;
-  }
-  /* Chapter boxes */
-  .chapter-box {
-    margin-bottom: var(--spacing-md);
-    position: relative;
-  }
-  .chapter-label {
-    font-weight: 600;
-    margin-bottom: var(--spacing-xs);
-  }
-  .remove-chapter-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: transparent;
-    border: none;
-    color: var(--color-danger-light);
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    border-radius: var(--border-radius);
-    transition: color var(--transition-fast);
-  }
-  .remove-chapter-btn:hover, .remove-chapter-btn:focus {
-    color: var(--color-danger-dark);
-    outline: none;
-  }
-  /* Textareas */
-  textarea {
-    min-height: 6rem;
-    font-family: var(--font-family);
-  }
-  .large-textarea {
-    min-height: 12rem;
-    font-family: var(--font-family);
-    font-size: 0.9rem;
-    line-height: 1.4;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  textarea[readonly] {
-    cursor: default;
-  }
-  /* Buttons container */
-  .btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
-  }
-  /* Status messages */
-  .status-message {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    animation: fadeIn 0.3s ease forwards;
-  }
-  .status-success {
-    background-color: var(--color-success-light);
-    color: var(--color-primary-dark);
-  }
-  body.dark .status-success {
-    background-color: var(--color-success-dark);
-    color: var(--color-success-light);
-  }
-  .status-warning {
-    background-color: var(--color-warning-light);
-    color: var(--color-warning-dark);
-  }
-  body.dark .status-warning {
-    background-color: var(--color-warning-dark);
-    color: var(--color-warning-light);
-  }
-  .status-danger {
-    background-color: var(--color-danger-light);
-    color: var(--color-danger-dark);
-  }
-  body.dark .status-danger {
-    background-color: var(--color-danger-dark);
-    color: var(--color-danger-light);
-  }
-  .status-info {
-    background-color: var(--color-info-light);
-    color: var(--color-info-dark);
-  }
-  body.dark .status-info {
-    background-color: var(--color-info-dark);
-    color: var(--color-info-light);
-  }
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(-10px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
-  /* Modal styles */
-  .modal-backdrop {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  .modal {
-    background-color: var(--color-bg-light);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    max-width: 400px;
-    width: 90%;
-    padding: var(--spacing-lg);
-    color: var(--color-text-light);
-    font-family: var(--font-family);
-  }
-  body.dark .modal {
-    background-color: var(--color-bg-dark);
-    box-shadow: var(--shadow-dark);
-    color: var(--color-text-dark);
-  }
-  .modal-header {
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: var(--spacing-md);
-  }
-  .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
-  }
-  /* Tooltip styles */
-  [data-tooltip] {
-    position: relative;
-    cursor: pointer;
-  }
-  [data-tooltip]:hover::after, [data-tooltip]:focus::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--color-primary-light);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--border-radius);
-    white-space: nowrap;
-    font-size: 0.75rem;
-    z-index: 1001;
-    opacity: 1;
-    pointer-events: none;
-  }
-  [data-tooltip]:focus::after {
-    outline: none;
-  }
-  /* Loading spinner */
-  .spinner {
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid white;
-    border-radius: 50%;
-    width: 1rem;
-    height: 1rem;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  /* Scrollable output textarea */
-  .output-textarea {
-    min-height: 12rem;
-    font-family: var(--font-family);
-    font-size: 0.9rem;
-    line-height: 1.4;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    resize: vertical;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>EPUB Reader - Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --surface: #ffffff;
+            --background: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            padding-top: var(--safe-area-inset-top);
+        }
+
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface);
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--surface);
+        }
+
+        /* Reader View */
+        .reader-view {
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 1.5rem;
+            padding-bottom: 100px;
+        }
+
+        .reader-content {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .reader-content:empty::before {
+            content: "Upload an EPUB to start reading";
+            color: var(--text-secondary);
+            display: block;
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .reader-content h1, .reader-content h2 {
+            margin: 1.5rem 0 1rem;
+            line-height: 1.3;
+        }
+
+        .reader-content p {
+            margin-bottom: 1rem;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 0.75rem;
+            padding-bottom: calc(0.75rem + var(--safe-area-inset-bottom));
+            z-index: 200;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: var(--background);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            touch-action: manipulation;
+            transition: all 0.2s;
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
+            background: var(--border);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+        }
+
+        .nav-button.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-button.primary:active {
+            background: var(--primary-dark);
+        }
+
+        /* Chapter adjust buttons */
+        .adjust-button {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            font-size: 1.2rem;
+            flex: 0 0 auto;
+            background: var(--background);
+            border: 1px solid var(--border);
+        }
+
+        .adjust-button:active:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 300;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0.75rem auto;
+        }
+
+        .sheet-content {
+            padding: 0 1.5rem 2rem;
+            padding-bottom: calc(2rem + var(--safe-area-inset-bottom));
+            overflow-y: auto;
+            max-height: calc(90vh - 3rem);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* File Upload */
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(37, 99, 235, 0.05);
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .upload-area:active {
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        /* Controls */
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--background);
+            -webkit-appearance: none;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* TOC List */
+        .toc-section {
+            margin-top: 2rem;
+        }
+
+        .toc-header {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toc-list {
+            max-height: 300px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .toc-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+            touch-action: manipulation;
+        }
+
+        .toc-item:active {
+            background: var(--background);
+        }
+
+        .toc-item.selected {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .toc-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 250;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed;
+            top: calc(4.5rem + var(--safe-area-inset-top));
+            left: 1rem;
+            right: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transform: translateY(-120%);
+            transition: transform 0.3s;
+            z-index: 400;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-bar.active {
+            transform: translateY(0);
+        }
+
+        .status-bar.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-bar.error {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Chapter Info */
+        .chapter-info {
+            background: var(--background);
+            padding: 0.75rem 1rem;
+            margin: -1.5rem -1.5rem 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .character-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: var(--surface);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .character-count.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .character-count.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: calc(5rem + var(--safe-area-inset-bottom));
+            right: 1rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+            transition: all 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .reader-content {
+                font-size: 1.2rem;
+                padding: 2rem;
+            }
+            
+            .bottom-sheet {
+                max-width: 500px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100%);
+            }
+            
+            .bottom-sheet.active {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
-<header class="container" style="margin-top:1rem; margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center;">
-  <h1><i class="fas fa-mountain-sun" style="color:#3b82f6; margin-right:0.5rem;"></i> Zenith Term Processor v6.0</h1>
-  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme"><i class="fas fa-moon"></i></button>
-</header>
-<main class="container grid-container" style="grid-template-columns: repeat(12, 1fr); gap: 1.5rem;">
-  <!-- Project Control Panel -->
-  <section id="projectControl" class="panel" style="grid-column: span 3;">
-    <div class="panel-header">Project Control</div>
-    <div class="panel-content">
-      <label for="projectName">Project Name</label>
-      <input type="text" id="projectName" placeholder="Enter project name" autocomplete="off" />
-      <div style="margin-top: 0.5rem; font-size: 0.9rem;" id="storageInfo">Terms saved: 0</div>
-      <div class="btn-group" style="margin-top: 1rem;">
-        <button id="exportBtn" class="btn-secondary" data-tooltip="Export project data as JSON">Export</button>
-        <label for="importFile" class="btn-secondary" data-tooltip="Import project data from file" style="cursor:pointer;">
-          <i class="fas fa-file-import"></i> Import
-        </label>
-        <input type="file" id="importFile" accept=".json,.txt" style="display:none;" />
-        <button id="clearStorageBtn" class="btn-danger" data-tooltip="Clear project storage">Clear Storage</button>
-      </div>
+    <div class="app-container">
+        <header class="header">
+            <h1>EPUB Reader</h1>
+        </header>
+
+        <main class="main-content">
+            <div class="reader-view">
+                <div class="chapter-info" id="chapterInfo" style="display: none;">
+                    <span id="chapterRange"></span>
+                    <span class="character-count" id="characterCount">0 chars</span>
+                </div>
+                <div class="reader-content" id="readerContent"></div>
+            </div>
+            <div class="loading-spinner" id="loadingSpinner"></div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-button adjust-button" id="removeChapterBtn" disabled>
+                <span>−</span>
+            </button>
+            <button class="nav-button" id="prevBtn" disabled>
+                <span>←</span>
+                <span>Previous</span>
+            </button>
+            <button class="nav-button primary" id="menuBtn">
+                <span>📚</span>
+                <span>Menu</span>
+            </button>
+            <button class="nav-button" id="nextBtn" disabled>
+                <span>Next</span>
+                <span>→</span>
+            </button>
+            <button class="nav-button adjust-button" id="addChapterBtn" disabled>
+                <span>+</span>
+            </button>
+        </nav>
+
+        <button class="fab" id="copyBtn" style="display: none;">
+            📋
+        </button>
     </div>
-  </section>
 
-  <!-- Chapter JSON Input Panel -->
-  <section id="chapterInput" class="panel" style="grid-column: span 4;">
-    <div class="panel-header">Chapter JSON Input</div>
-    <div class="panel-content" id="chaptersContainer" tabindex="0" aria-label="Chapter JSON inputs">
-      <!-- Chapter boxes inserted here dynamically -->
+    <!-- Bottom Sheet -->
+    <div class="overlay" id="overlay"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-content">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".epub">
+                <div class="upload-icon">📚</div>
+                <p><strong>Tap to upload EPUB</strong></p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Or use your file manager
+                </p>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="chapterCount">Chapters to combine</label>
+                <input type="number" class="control-input" id="chapterCount" min="1" max="10" value="2">
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="startChapter">Start from</label>
+                <select class="control-input" id="startChapter" disabled>
+                    <option value="">Load EPUB first</option>
+                </select>
+            </div>
+
+            <button class="nav-button primary" id="loadBtn" disabled style="width: 100%; padding: 1rem;">
+                Load Chapters
+            </button>
+
+            <div class="toc-section">
+                <div class="toc-header">
+                    <span>Table of Contents</span>
+                    <span id="tocCount" style="font-size: 0.85rem; color: var(--text-secondary);"></span>
+                </div>
+                <div class="toc-list" id="tocList">
+                    <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                        No EPUB loaded
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-    <button id="addChapterBtn" class="btn-primary" style="margin-top: 1rem;" data-tooltip="Add a new chapter input box">Add Chapter Box</button>
-  </section>
 
-  <!-- Deduplication List & Header Panel -->
-  <section id="deduplicationPanel" class="panel" style="grid-column: span 3; display: flex; flex-direction: column;">
-    <div class="panel-header">Deduplication List & Header</div>
-    <div class="panel-content" style="flex-grow: 1; display: flex; flex-direction: column;">
-      <label for="deduplicationList">Deduplication List</label>
-      <textarea id="deduplicationList" class="large-textarea" spellcheck="false" aria-label="Deduplication list"></textarea>
-      <div class="btn-group" style="margin-top: 0.5rem; flex-wrap: wrap;">
-        <button id="loadListBtn" class="btn-secondary" data-tooltip="Load list from storage">Load</button>
-        <button id="saveListBtn" class="btn-secondary" data-tooltip="Save list to storage">Save</button>
-        <button id="cleanListBtn" class="btn-secondary" data-tooltip="Clean and sort list">Clean List</button>
-        <button id="copyListBtn" class="btn-secondary" data-tooltip="Copy list to clipboard">Copy</button>
-        <button id="clearListBtn" class="btn-danger" data-tooltip="Clear list">Clear</button>
-      </div>
-      <hr style="margin: 1rem 0; border-color: #ccc;" />
-      <label><input type="checkbox" id="headerEnabled" /> Enable Custom Header</label>
-      <textarea id="customHeader" class="large-textarea" placeholder="Enter custom header text here..." spellcheck="false" aria-label="Custom header text" style="margin-top: 0.5rem;" disabled></textarea>
-    </div>
-  </section>
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar"></div>
 
-  <!-- Extraction Actions & Results Panel -->
-  <section id="extractionPanel" class="panel" style="grid-column: span 2; display: flex; flex-direction: column;">
-    <div class="panel-header">Extraction Actions & Results</div>
-    <div class="panel-content" style="flex-grow: 1; display: flex; flex-direction: column;">
-      <button id="extractBtn" class="btn-primary" style="margin-bottom: 1rem;" data-tooltip="Extract unique terms from chapters">Extract <span id="extractSpinner" class="spinner" style="display:none;"></span></button>
-      <div id="processingLog" style="flex-grow: 1; overflow-y: auto; background-color: #f3f4f6; border-radius: var(--border-radius); padding: var(--spacing-sm); font-family: monospace; font-size: 0.85rem; color: #374151;" aria-live="polite" aria-atomic="true"></div>
-      <textarea id="outputArea" class="output-textarea" readonly spellcheck="false" aria-label="Extraction output" style="margin-top: 1rem;"></textarea>
-      <div class="btn-group" style="margin-top: 0.5rem; flex-wrap: wrap;">
-        <button id="copyOutputBtn" class="btn-secondary" data-tooltip="Copy output to clipboard">Copy Output</button>
-        <button id="moveExtractedBtn" class="btn-success" data-tooltip="Move extracted terms to deduplication list">Move Extracted</button>
-        <button id="moveSaveBtn" class="btn-success" data-tooltip="Move extracted terms and save to storage">Move & Save</button>
-      </div>
-    </div>
-  </section>
-</main>
+    <!-- Include JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-<!-- Modal -->
-<div id="modalBackdrop" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="modal" role="document">
-    <div class="modal-header" id="modalTitle">Confirm Action</div>
-    <div id="modalMessage">Are you sure?</div>
-    <div class="modal-buttons">
-      <button id="modalCancelBtn" class="btn-secondary">Cancel</button>
-      <button id="modalConfirmBtn" class="btn-danger">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function() {
-  'use strict';
-
-  // Constants
-  const CONST = {
-    THEME_KEY: 'zenith-theme',
-    STORAGE_PREFIX: 'zenith-',
-    STORAGE_LIST_SUFFIX: 'list',
-    STORAGE_HEADER_SUFFIX: 'header',
-    STORAGE_HEADER_ENABLED_SUFFIX: 'headerEnabled',
-    STATUS_TIMEOUT: 4000,
-    DEBOUNCE_DELAY: 300
-  };
-
-  // Cached DOM elements
-  const EL = {
-    body: document.body,
-    themeToggle: document.getElementById('themeToggle'),
-    projectName: document.getElementById('projectName'),
-    storageInfo: document.getElementById('storageInfo'),
-    exportBtn: document.getElementById('exportBtn'),
-    importFile: document.getElementById('importFile'),
-    clearStorageBtn: document.getElementById('clearStorageBtn'),
-    chaptersContainer: document.getElementById('chaptersContainer'),
-    addChapterBtn: document.getElementById('addChapterBtn'),
-    deduplicationList: document.getElementById('deduplicationList'),
-    loadListBtn: document.getElementById('loadListBtn'),
-    saveListBtn: document.getElementById('saveListBtn'),
-    cleanListBtn: document.getElementById('cleanListBtn'),
-    copyListBtn: document.getElementById('copyListBtn'),
-    clearListBtn: document.getElementById('clearListBtn'),
-    headerEnabled: document.getElementById('headerEnabled'),
-    customHeader: document.getElementById('customHeader'),
-    extractBtn: document.getElementById('extractBtn'),
-    extractSpinner: document.getElementById('extractSpinner'),
-    processingLog: document.getElementById('processingLog'),
-    outputArea: document.getElementById('outputArea'),
-    copyOutputBtn: document.getElementById('copyOutputBtn'),
-    moveExtractedBtn: document.getElementById('moveExtractedBtn'),
-    moveSaveBtn: document.getElementById('moveSaveBtn'),
-    modalBackdrop: document.getElementById('modalBackdrop'),
-    modalMessage: document.getElementById('modalMessage'),
-    modalCancelBtn: document.getElementById('modalCancelBtn'),
-    modalConfirmBtn: document.getElementById('modalConfirmBtn')
-  };
-
-  // State
-  let state = {
-    theme: 'light',
-    projectName: '',
-    chapters: [''],
-    deduplicationList: '',
-    customHeader: '',
-    headerEnabled: false,
-    output: '',
-    isProcessing: false,
-    processingLog: [],
-    modalAction: null,
-    tempImportData: null,
-    statusTimeoutId: null
-  };
-
-  // Utility: debounce
-  function debounce(fn, delay) {
-    let timer = null;
-    return function(...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
-
-  // Utility: set status message
-  function setStatus(type, message) {
-    clearStatus();
-    const div = document.createElement('div');
-    div.className = `status-message status-${type}`;
-    div.textContent = message;
-    div.setAttribute('role', 'alert');
-    div.setAttribute('aria-live', 'assertive');
-    div.style.marginBottom = '1rem';
-    EL.storageInfo.parentNode.insertBefore(div, EL.storageInfo.nextSibling);
-    state.statusTimeoutId = setTimeout(() => {
-      div.style.opacity = '0';
-      setTimeout(() => div.remove(), 500);
-    }, CONST.STATUS_TIMEOUT);
-  }
-  function clearStatus() {
-    if (state.statusTimeoutId) {
-      clearTimeout(state.statusTimeoutId);
-      state.statusTimeoutId = null;
-    }
-    const existing = document.querySelectorAll('.status-message');
-    existing.forEach(el => el.remove());
-  }
-
-  // Theme management
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      EL.body.classList.add('dark');
-      EL.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-      EL.body.classList.remove('dark');
-      EL.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    }
-    state.theme = theme;
-    localStorage.setItem(CONST.THEME_KEY, theme);
-  }
-
-  EL.themeToggle.addEventListener('click', () => {
-    applyTheme(state.theme === 'light' ? 'dark' : 'light');
-  });
-
-  // Storage key helper
-  function getStorageKey(suffix) {
-    if (!state.projectName) return null;
-    return CONST.STORAGE_PREFIX + state.projectName + '-' + suffix;
-  }
-
-  // Load project data from localStorage
-  function loadProjectData() {
-    if (!state.projectName) {
-      setStatus('warning', 'Please enter a project name first');
-      return;
-    }
-    const listKey = getStorageKey(CONST.STORAGE_LIST_SUFFIX);
-    const headerKey = getStorageKey(CONST.STORAGE_HEADER_SUFFIX);
-    const headerEnabledKey = getStorageKey(CONST.STORAGE_HEADER_ENABLED_SUFFIX);
-
-    const savedList = listKey ? localStorage.getItem(listKey) : null;
-    const savedHeader = headerKey ? localStorage.getItem(headerKey) : null;
-    const savedHeaderEnabled = headerEnabledKey ? localStorage.getItem(headerEnabledKey) : null;
-
-    if (savedList !== null) {
-      state.deduplicationList = savedList;
-      EL.deduplicationList.value = savedList;
-      updateStorageInfo();
-      setStatus('success', 'List loaded from storage');
-    }
-    if (savedHeader !== null) {
-      state.customHeader = savedHeader;
-      EL.customHeader.value = savedHeader;
-    }
-    if (savedHeaderEnabled !== null) {
-      state.headerEnabled = savedHeaderEnabled === 'true';
-      EL.headerEnabled.checked = state.headerEnabled;
-      EL.customHeader.disabled = !state.headerEnabled;
-    }
-  }
-
-  // Save project data to localStorage
-  function saveProjectData() {
-    if (!state.projectName) {
-      setStatus('warning', 'Please enter a project name first');
-      return;
-    }
-    const listKey = getStorageKey(CONST.STORAGE_LIST_SUFFIX);
-    const headerKey = getStorageKey(CONST.STORAGE_HEADER_SUFFIX);
-    const headerEnabledKey = getStorageKey(CONST.STORAGE_HEADER_ENABLED_SUFFIX);
-
-    if (listKey) localStorage.setItem(listKey, state.deduplicationList);
-    if (headerKey) localStorage.setItem(headerKey, state.customHeader);
-    if (headerEnabledKey) localStorage.setItem(headerEnabledKey, state.headerEnabled.toString());
-
-    setStatus('success', 'Saved to storage');
-  }
-
-  // Update storage info display
-  function updateStorageInfo() {
-    if (!state.projectName) {
-      EL.storageInfo.textContent = 'Terms saved: 0';
-      return;
-    }
-    const listKey = getStorageKey(CONST.STORAGE_LIST_SUFFIX);
-    if (!listKey) {
-      EL.storageInfo.textContent = 'Terms saved: 0';
-      return;
-    }
-    const list = localStorage.getItem(listKey) || '';
-    const count = list.split('\n').filter(line => line.trim()).length;
-    EL.storageInfo.textContent = `Terms saved: ${count}`;
-  }
-
-  // Chapter management
-  function renderChapters() {
-    EL.chaptersContainer.innerHTML = '';
-    state.chapters.forEach((content, index) => {
-      const box = document.createElement('div');
-      box.className = 'chapter-box';
-
-      const label = document.createElement('label');
-      label.className = 'chapter-label';
-      label.textContent = `Chapter ${index + 1}`;
-      label.setAttribute('for', `chapterTextarea${index}`);
-
-      const textarea = document.createElement('textarea');
-      textarea.id = `chapterTextarea${index}`;
-      textarea.spellcheck = false;
-      textarea.value = content;
-      textarea.className = 'large-textarea';
-      textarea.setAttribute('aria-label', `Chapter ${index + 1} JSON input`);
-
-      textarea.addEventListener('input', debounce((e) => {
-        state.chapters[index] = e.target.value;
-      }, CONST.DEBOUNCE_DELAY));
-
-      box.appendChild(label);
-      box.appendChild(textarea);
-
-      if (index > 0) {
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-chapter-btn';
-        removeBtn.setAttribute('aria-label', `Remove Chapter ${index + 1}`);
-        removeBtn.title = `Remove Chapter ${index + 1}`;
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.addEventListener('click', () => {
-          state.chapters.splice(index, 1);
-          renderChapters();
-        });
-        box.appendChild(removeBtn);
-      }
-
-      EL.chaptersContainer.appendChild(box);
-    });
-  }
-
-  EL.addChapterBtn.addEventListener('click', () => {
-    state.chapters.push('');
-    renderChapters();
-  });
-
-  // Deduplication list textarea input
-  EL.deduplicationList.addEventListener('input', debounce((e) => {
-    state.deduplicationList = e.target.value;
-  }, CONST.DEBOUNCE_DELAY));
-
-  // Custom header checkbox
-  EL.headerEnabled.addEventListener('change', (e) => {
-    state.headerEnabled = e.target.checked;
-    EL.customHeader.disabled = !state.headerEnabled;
-  });
-
-  // Custom header textarea input
-  EL.customHeader.addEventListener('input', debounce((e) => {
-    state.customHeader = e.target.value;
-  }, CONST.DEBOUNCE_DELAY));
-
-  // Project name input
-  EL.projectName.addEventListener('input', debounce((e) => {
-    state.projectName = e.target.value.trim();
-    updateStorageInfo();
-  }, CONST.DEBOUNCE_DELAY));
-
-  // Load list button
-  EL.loadListBtn.addEventListener('click', () => {
-    loadProjectData();
-  });
-
-  // Save list button
-  EL.saveListBtn.addEventListener('click', () => {
-    state.deduplicationList = EL.deduplicationList.value;
-    saveProjectData();
-    updateStorageInfo();
-  });
-
-  // Clean list button
-  EL.cleanListBtn.addEventListener('click', () => {
-    const lines = state.deduplicationList.split('\n').filter(line => line.trim());
-    const uniqueLines = Array.from(new Set(lines)).sort();
-    state.deduplicationList = uniqueLines.join('\n');
-    EL.deduplicationList.value = state.deduplicationList;
-    setStatus('success', 'List cleaned and sorted');
-  });
-
-  // Copy list button
-  EL.copyListBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(state.deduplicationList).then(() => {
-      setStatus('success', 'Deduplication list copied to clipboard');
-    }).catch(() => {
-      setStatus('danger', 'Failed to copy deduplication list');
-    });
-  });
-
-  // Clear list button
-  EL.clearListBtn.addEventListener('click', () => {
-    if (!state.deduplicationList) {
-      setStatus('info', 'Deduplication list is already empty');
-      return;
-    }
-    state.modalAction = 'clearList';
-    EL.modalMessage.textContent = 'Are you sure you want to clear the deduplication list? This action cannot be undone.';
-    showModal();
-  });
-
-  // Extract button
-  EL.extractBtn.addEventListener('click', () => {
-    extractTerms();
-  });
-
-  // Copy output button
-  EL.copyOutputBtn.addEventListener('click', () => {
-    if (!state.output) {
-      setStatus('warning', 'No output to copy');
-      return;
-    }
-    navigator.clipboard.writeText(state.output).then(() => {
-      setStatus('success', 'Output copied to clipboard');
-    }).catch(() => {
-      setStatus('danger', 'Failed to copy output');
-    });
-  });
-
-  // Move extracted button
-  EL.moveExtractedBtn.addEventListener('click', () => {
-    moveExtracted();
-  });
-
-  // Move & save button
-  EL.moveSaveBtn.addEventListener('click', () => {
-    moveExtracted();
-    setTimeout(() => {
-      saveProjectData();
-      updateStorageInfo();
-    }, 100);
-  });
-
-  // Export button
-  EL.exportBtn.addEventListener('click', () => {
-    if (!state.projectName) {
-      setStatus('warning', 'Please enter a project name first');
-      return;
-    }
-    const data = {
-      project: state.projectName,
-      list: state.deduplicationList,
-      header: state.customHeader,
-      headerEnabled: state.headerEnabled
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${state.projectName || 'zenith'}-export.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    setStatus('success', 'Project exported');
-  });
-
-  // Import file input
-  EL.importFile.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const content = ev.target.result;
-      if (file.name.endsWith('.json')) {
-        try {
-          const data = JSON.parse(content);
-          state.tempImportData = data.list || content;
-          state.modalAction = 'import';
-          EL.modalMessage.textContent = 'Import file detected. Do you want to merge with or replace the current deduplication list?';
-          showModal();
-        } catch (err) {
-          setStatus('danger', 'Invalid JSON file');
-        }
-      } else {
-        state.tempImportData = content;
-        state.modalAction = 'import';
-        EL.modalMessage.textContent = 'Import file detected. Do you want to merge with or replace the current deduplication list?';
-        showModal();
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
-
-  // Modal controls
-  EL.modalCancelBtn.addEventListener('click', () => {
-    hideModal();
-  });
-
-  EL.modalConfirmBtn.addEventListener('click', () => {
-    if (state.modalAction === 'clearList') {
-      state.deduplicationList = '';
-      EL.deduplicationList.value = '';
-      hideModal();
-      setStatus('success', 'Deduplication list cleared');
-    } else if (state.modalAction === 'import') {
-      if (confirmMerge) {
-        state.deduplicationList += (state.deduplicationList.trim() ? '\n' : '') + state.tempImportData;
-      } else {
-        state.deduplicationList = state.tempImportData;
-      }
-      EL.deduplicationList.value = state.deduplicationList;
-      hideModal();
-      setStatus('success', 'Data imported');
-    }
-    state.tempImportData = null;
-    state.modalAction = null;
-  });
-
-  // Modal show/hide
-  function showModal() {
-    EL.modalBackdrop.style.display = 'flex';
-    // Focus first button
-    EL.modalCancelBtn.focus();
-  }
-  function hideModal() {
-    EL.modalBackdrop.style.display = 'none';
-  }
-
-  // Modal merge confirmation state
-  let confirmMerge = false;
-
-  // Modal buttons for import: add merge/replace options
-  function setupModalForImport() {
-    EL.modalConfirmBtn.textContent = 'Merge';
-    EL.modalConfirmBtn.className = 'btn-success';
-    EL.modalConfirmBtn.onclick = () => {
-      confirmMerge = true;
-      EL.modalConfirmBtn.onclick = null;
-      EL.modalConfirmBtn.textContent = 'Confirm';
-      EL.modalConfirmBtn.className = 'btn-danger';
-      EL.modalMessage.textContent = 'Are you sure you want to replace the current deduplication list? This action cannot be undone.';
-      EL.modalCancelBtn.textContent = 'Cancel';
-      EL.modalCancelBtn.onclick = () => {
-        confirmMerge = false;
-        hideModal();
-      };
-    };
-    EL.modalCancelBtn.textContent = 'Replace';
-    EL.modalCancelBtn.className = 'btn-danger';
-    EL.modalCancelBtn.onclick = () => {
-      confirmMerge = false;
-      EL.modalConfirmBtn.textContent = 'Confirm';
-      EL.modalConfirmBtn.className = 'btn-danger';
-      EL.modalMessage.textContent = 'Are you sure you want to replace the current deduplication list? This action cannot be undone.';
-      EL.modalCancelBtn.textContent = 'Cancel';
-      EL.modalCancelBtn.onclick = () => {
-        hideModal();
-      };
-    };
-  }
-
-  // Extraction logic
-  async function extractTerms() {
-    if (state.isProcessing) return;
-    state.isProcessing = true;
-    EL.extractBtn.disabled = true;
-    EL.extractSpinner.style.display = 'inline-block';
-    EL.processingLog.textContent = '';
-    EL.outputArea.value = '';
-
-    function log(msg) {
-      const p = document.createElement('div');
-      p.textContent = msg;
-      EL.processingLog.appendChild(p);
-      EL.processingLog.scrollTop = EL.processingLog.scrollHeight;
-    }
-
-    try {
-      const existingTranslations = new Set();
-      state.deduplicationList.split('\n').forEach(line => {
-        const parts = line.split(',');
-        if (parts.length > 1) {
-          existingTranslations.add(parts[1].trim());
-        } else if (line.trim()) {
-          existingTranslations.add(line.trim());
-        }
-      });
-
-      const newTerms = [];
-
-      for (let i = 0; i < state.chapters.length; i++) {
-        const chapterText = state.chapters[i].trim();
-        if (!chapterText) continue;
-        log(`Parsing Chapter ${i + 1}...`);
-        let data;
-        try {
-          data = JSON.parse(chapterText);
-        } catch (e) {
-          log(`Error parsing Chapter ${i + 1}: Invalid JSON`);
-          continue;
-        }
-        let chapterNewCount = 0;
-        if (Array.isArray(data)) {
-          for (const item of data) {
-            if (item.terms && Array.isArray(item.terms)) {
-              for (const term of item.terms) {
-                if (term.translation && !existingTranslations.has(term.translation)) {
-                  const tags = Array.isArray(term.tags) ? term.tags : [];
-                  const gender = tags.includes('#male') ? 'Male' : tags.includes('#female') ? 'Female' : 'Neuter';
-                  const raw = term.raw || '';
-                  const translation = term.translation;
-                  newTerms.push(`${raw},${translation},${gender}`);
-                  existingTranslations.add(translation);
-                  chapterNewCount++;
-                }
-              }
+    <script>
+        class MobileEPUBReader {
+            constructor() {
+                this.epub = null;
+                this.toc = [];
+                this.currentIndex = 0;
+                this.chaptersToLoad = 2;
+                this.actualLoadedChapters = 2; // Track actual loaded chapters for this session
+                this.isLoading = false;
+                this.loadedChapterIndices = []; // Track which chapters are currently loaded
+                
+                this.initElements();
+                this.attachEvents();
+                this.initTouchGestures();
             }
-          }
-        }
-        log(`Found ${chapterNewCount} new terms in Chapter ${i + 1}`);
-      }
 
-      log(`Process complete. Total new terms: ${newTerms.length}`);
+            initElements() {
+                this.elements = {
+                    fileInput: document.getElementById('fileInput'),
+                    uploadArea: document.getElementById('uploadArea'),
+                    chapterCount: document.getElementById('chapterCount'),
+                    startChapter: document.getElementById('startChapter'),
+                    loadBtn: document.getElementById('loadBtn'),
+                    prevBtn: document.getElementById('prevBtn'),
+                    nextBtn: document.getElementById('nextBtn'),
+                    menuBtn: document.getElementById('menuBtn'),
+                    copyBtn: document.getElementById('copyBtn'),
+                    removeChapterBtn: document.getElementById('removeChapterBtn'),
+                    addChapterBtn: document.getElementById('addChapterBtn'),
+                    tocList: document.getElementById('tocList'),
+                    tocCount: document.getElementById('tocCount'),
+                    readerContent: document.getElementById('readerContent'),
+                    chapterInfo: document.getElementById('chapterInfo'),
+                    chapterRange: document.getElementById('chapterRange'),
+                    characterCount: document.getElementById('characterCount'),
+                    bottomSheet: document.getElementById('bottomSheet'),
+                    overlay: document.getElementById('overlay'),
+                    statusBar: document.getElementById('statusBar'),
+                    loadingSpinner: document.getElementById('loadingSpinner')
+                };
+            }
 
-      const outputText = state.headerEnabled && state.customHeader
-        ? state.customHeader + '\n\n' + newTerms.join('\n')
-        : newTerms.join('\n');
+            attachEvents() {
+                // File upload
+                this.elements.uploadArea.addEventListener('click', () => {
+                    this.elements.fileInput.click();
+                });
 
-      state.output = outputText;
-      EL.outputArea.value = outputText;
-      setStatus('success', `Extracted ${newTerms.length} new terms`);
-    } catch (err) {
-      setStatus('danger', 'Error during extraction process');
-    } finally {
-      state.isProcessing = false;
-      EL.extractBtn.disabled = false;
-      EL.extractSpinner.style.display = 'none';
-    }
-  }
+                this.elements.fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.loadEPUB(e.target.files[0]);
+                    }
+                });
 
-  // Move extracted terms to deduplication list
-  function moveExtracted() {
-    if (!state.output) {
-      setStatus('warning', 'No output to move');
-      return;
-    }
-    const lines = state.output.split('\n').filter(line => line.trim() && (!state.headerEnabled || line !== state.customHeader));
-    if (lines.length === 0) {
-      setStatus('info', 'No new terms to move');
-      return;
-    }
-    state.deduplicationList += (state.deduplicationList.trim() ? '\n' : '') + lines.join('\n');
-    EL.deduplicationList.value = state.deduplicationList;
-    // Clean list
-    const uniqueLines = Array.from(new Set(state.deduplicationList.split('\n').filter(l => l.trim()))).sort();
-    state.deduplicationList = uniqueLines.join('\n');
-    EL.deduplicationList.value = state.deduplicationList;
-    state.output = '';
-    EL.outputArea.value = '';
-    setStatus('success', 'Terms moved to deduplication list');
-  }
+                // Navigation
+                this.elements.prevBtn.addEventListener('click', () => this.navigatePrev());
+                this.elements.nextBtn.addEventListener('click', () => this.navigateNext());
+                this.elements.menuBtn.addEventListener('click', () => this.toggleMenu());
+                this.elements.copyBtn.addEventListener('click', () => this.copyContent());
 
-  // Initialization
-  function init() {
-    // Load theme
-    const savedTheme = localStorage.getItem(CONST.THEME_KEY);
-    if (savedTheme === 'dark' || savedTheme === 'light') {
-      applyTheme(savedTheme);
-    } else {
-      applyTheme('light');
-    }
+                // Chapter adjustment buttons
+                this.elements.removeChapterBtn.addEventListener('click', () => this.removeLastChapter());
+                this.elements.addChapterBtn.addEventListener('click', () => this.addNextChapter());
 
-    // Initialize chapters
-    renderChapters();
+                // Bottom sheet
+                this.elements.overlay.addEventListener('click', () => this.toggleMenu(false));
+                
+                // Controls
+                this.elements.chapterCount.addEventListener('change', (e) => {
+                    this.chaptersToLoad = parseInt(e.target.value) || 1;
+                });
 
-    // Initialize project name from input
-    state.projectName = EL.projectName.value.trim();
-    updateStorageInfo();
-  }
+                this.elements.startChapter.addEventListener('change', (e) => {
+                    this.currentIndex = parseInt(e.target.value) || 0;
+                });
 
-  // Modal override for import
-  EL.modalConfirmBtn.addEventListener('click', () => {
-    if (state.modalAction === 'import') {
-      if (confirmMerge) {
-        state.deduplicationList += (state.deduplicationList.trim() ? '\n' : '') + state.tempImportData;
-      } else {
-        state.deduplicationList = state.tempImportData;
-      }
-      EL.deduplicationList.value = state.deduplicationList;
-      hideModal();
-      setStatus('success', 'Data imported');
-      state.tempImportData = null;
-      state.modalAction = null;
-      confirmMerge = false;
-    }
-  });
+                this.elements.loadBtn.addEventListener('click', () => {
+                    this.actualLoadedChapters = this.chaptersToLoad; // Reset to default
+                    this.loadCurrentChapters();
+                    this.toggleMenu(false);
+                });
 
-  EL.modalCancelBtn.addEventListener('click', () => {
-    if (state.modalAction === 'import') {
-      confirmMerge = false;
-      hideModal();
-      state.tempImportData = null;
-      state.modalAction = null;
-    }
-  });
+                // Prevent body scroll when sheet is open
+                this.elements.bottomSheet.addEventListener('touchmove', (e) => {
+                    e.stopPropagation();
+                });
+            }
 
-  // Setup modal buttons for import
-  function setupImportModalButtons() {
-    EL.modalConfirmBtn.textContent = 'Merge';
-    EL.modalConfirmBtn.className = 'btn-success';
-    EL.modalCancelBtn.textContent = 'Replace';
-    EL.modalCancelBtn.className = 'btn-danger';
-
-    EL.modalConfirmBtn.onclick = () => {
-      confirmMerge = true;
-      EL.modalMessage.textContent = 'Click Confirm to merge imported data with current list.';
-      EL.modalConfirmBtn.textContent = 'Confirm';
-      EL.modalConfirmBtn.className = 'btn-danger';
-      EL.modalCancelBtn.textContent = 'Cancel';
-      EL.modalCancelBtn.className = 'btn-secondary';
-      EL.modalCancelBtn.onclick = () => {
-        confirmMerge = false;
-        hideModal();
-      };
-    };
-
-    EL.modalCancelBtn.onclick = () => {
-      confirmMerge = false;
-      EL.modalMessage.textContent = 'Click Confirm to replace current list with imported data.';
-      EL.modalConfirmBtn.textContent = 'Confirm';
-      EL.modalConfirmBtn.className = 'btn-danger';
-      EL.modalCancelBtn.textContent = 'Cancel';
-      EL.modalCancelBtn.className = 'btn-secondary';
-      EL.modalCancelBtn.onclick = () => {
-        hideModal();
-      };
-    };
-  }
-
-  // Show modal with appropriate buttons
-  function showModal() {
-    EL.modalBackdrop.style.display = 'flex';
-    if (state.modalAction === 'import') {
-      setupImportModalButtons();
-    } else {
-      EL.modalConfirmBtn.textContent = 'Confirm';
-      EL.modalConfirmBtn.className = 'btn-danger';
-      EL.modalCancelBtn.textContent = 'Cancel';
-      EL.modalCancelBtn.className = 'btn-secondary';
-      EL.modalCancelBtn.onclick = () => {
-        hideModal();
-      };
-    }
-    EL.modalCancelBtn.focus();
-  }
-
-  function hideModal() {
-    EL.modalBackdrop.style.display = 'none';
-  }
-
-  // Initialize app
-  init();
-
-})();
-</script>
-</body>
-</html>
+            initTouchGestures() {
+                let touchStartX = 0;
+ 
