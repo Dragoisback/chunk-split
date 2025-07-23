@@ -638,4 +638,405 @@
 
             initTouchGestures() {
                 let touchStartX = 0;
- 
+                let touchEndX = 0;
+                const threshold = 100;
+
+                this.elements.readerContent.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                this.elements.readerContent.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    this.handleSwipe(touchStartX, touchEndX, threshold);
+                }, { passive: true });
+            }
+
+            handleSwipe(startX, endX, threshold) {
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0 && !this.elements.nextBtn.disabled) {
+                        // Swipe left - next chapter
+                        this.navigateNext();
+                    } else if (diff < 0 && !this.elements.prevBtn.disabled) {
+                        // Swipe right - previous chapter
+                        this.navigatePrev();
+                    }
+                }
+            }
+
+            async loadEPUB(file) {
+                try {
+                    this.showLoading(true);
+                    this.showStatus('Loading EPUB...', 'success');
+
+                    const zip = new JSZip();
+                    const content = await zip.loadAsync(file);
+                    this.epub = content;
+
+                    // Parse container.xml
+                    const containerXml = await content.file('META-INF/container.xml').async('string');
+                    const parser = new DOMParser();
+                    const containerDoc = parser.parseFromString(containerXml, 'text/xml');
+                    const rootfilePath = containerDoc.querySelector('rootfile').getAttribute('full-path');
+
+                    // Parse content.opf
+                    const opfContent = await content.file(rootfilePath).async('string');
+                    const opfDoc = parser.parseFromString(opfContent, 'text/xml');
+                    
+                    // Extract TOC
+                    await this.extractTOC(opfDoc, rootfilePath);
+                    
+                    this.showStatus('EPUB loaded!', 'success');
+                    this.updateUI();
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showStatus('Failed to load EPUB', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async extractTOC(opfDoc, opfPath) {
+                const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/') + 1);
+                const spine = opfDoc.querySelector('spine');
+                const manifest = opfDoc.querySelector('manifest');
+                const spineItems = Array.from(spine.querySelectorAll('itemref'));
+                
+                this.toc = [];
+                
+                for (let i = 0; i < spineItems.length; i++) {
+                    const idref = spineItems[i].getAttribute('idref');
+                    const item = manifest.querySelector(`item[id="${idref}"]`);
+                    
+                    if (item) {
+                        const href = item.getAttribute('href');
+                        const fullPath = opfDir + href;
+                        
+                        try {
+                            const content = await this.epub.file(fullPath).async('string');
+                            const contentDoc = new DOMParser().parseFromString(content, 'text/html');
+                            
+                            let title = contentDoc.querySelector('title')?.textContent ||
+                                       contentDoc.querySelector('h1')?.textContent ||
+                                       contentDoc.querySelector('h2')?.textContent ||
+                                       `Chapter ${i + 1}`;
+                            
+                            this.toc.push({
+                                title: title.trim(),
+                                href: fullPath,
+                                index: i
+                            });
+                        } catch (e) {
+                            this.toc.push({
+                                title: `Chapter ${i + 1}`,
+                                href: fullPath,
+                                index: i
+                            });
+                        }
+                    }
+                }
+            }
+
+            updateUI() {
+                // Update TOC list
+                this.elements.tocList.innerHTML = '';
+                this.elements.tocCount.textContent = `${this.toc.length} chapters`;
+                
+                this.toc.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'toc-item';
+                    div.textContent = `${index + 1}. ${item.title}`;
+                    div.addEventListener('click', () => {
+                        this.currentIndex = index;
+                        this.elements.startChapter.value = index;
+                        this.updateTOCHighlight();
+                    });
+                    this.elements.tocList.appendChild(div);
+                });
+
+                // Update dropdown
+                this.elements.startChapter.innerHTML = '';
+                this.toc.forEach((item, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${index + 1}. ${item.title}`;
+                    this.elements.startChapter.appendChild(option);
+                });
+
+                // Enable controls
+                this.elements.startChapter.disabled = false;
+                this.elements.loadBtn.disabled = false;
+            }
+
+            updateTOCHighlight() {
+                const items = this.elements.tocList.querySelectorAll('.toc-item');
+                items.forEach((item, index) => {
+                    if (this.loadedChapterIndices.includes(index)) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+
+            async loadCurrentChapters() {
+                try {
+                    this.showLoading(true);
+                    
+                    let combinedContent = '';
+                    const endIndex = Math.min(this.currentIndex + this.actualLoadedChapters, this.toc.length);
+                    
+                    // Track loaded chapters
+                    this.loadedChapterIndices = [];
+                    for (let i = this.currentIndex; i < endIndex; i++) {
+                        this.loadedChapterIndices.push(i);
+                    }
+                    
+                    for (let i = this.currentIndex; i < endIndex; i++) {
+                        const chapter = this.toc[i];
+                        const content = await this.epub.file(chapter.href).async('string');
+                        const doc = new DOMParser().parseFromString(content, 'text/html');
+                        
+                        const body = doc.body || doc.documentElement;
+                        const textContent = this.extractText(body);
+                        
+                        if (combinedContent) {
+                            combinedContent += '<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">';
+                        }
+                        combinedContent += `<h2>${chapter.title}</h2>${textContent}`;
+                    }
+                    
+                    this.elements.readerContent.innerHTML = combinedContent;
+                    
+                    // Update chapter info
+                    this.updateChapterInfo();
+                    
+                    // Update character count
+                    this.updateCharacterCount();
+                    
+                    // Scroll to top
+                    this.elements.readerContent.parentElement.scrollTop = 0;
+                    
+                    // Update navigation and adjustment buttons
+                    this.updateNavigation();
+                    this.updateAdjustmentButtons();
+                    this.updateTOCHighlight();
+                    
+                    // Show copy button
+                    this.elements.copyBtn.style.display = 'flex';
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showStatus('Failed to load chapters', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            updateChapterInfo() {
+                const start = this.currentIndex + 1;
+                const end = this.currentIndex + this.actualLoadedChapters;
+                this.elements.chapterRange.textContent = 
+                    `Chapters ${start}-${Math.min(end, this.toc.length)} of ${this.toc.length}`;
+                this.elements.chapterInfo.style.display = 'flex';
+            }
+
+            updateCharacterCount() {
+                const text = this.elements.readerContent.innerText;
+                const charCount = text.length;
+                
+                // Update count display
+                this.elements.characterCount.textContent = `${charCount.toLocaleString()} chars`;
+                
+                // Add color coding based on character count
+                this.elements.characterCount.classList.remove('warning', 'danger');
+                if (charCount > 10000) {
+                    this.elements.characterCount.classList.add('danger');
+                } else if (charCount > 5000) {
+                    this.elements.characterCount.classList.add('warning');
+                }
+            }
+
+            async removeLastChapter() {
+                if (this.actualLoadedChapters > 1) {
+                    this.actualLoadedChapters--;
+                    await this.reloadChapters();
+                }
+            }
+
+            async addNextChapter() {
+                if (this.currentIndex + this.actualLoadedChapters < this.toc.length) {
+                    this.actualLoadedChapters++;
+                    await this.reloadChapters();
+                }
+            }
+
+            async reloadChapters() {
+                try {
+                    this.showLoading(true);
+                    
+                    let combinedContent = '';
+                    const endIndex = Math.min(this.currentIndex + this.actualLoadedChapters, this.toc.length);
+                    
+                    // Track loaded chapters
+                    this.loadedChapterIndices = [];
+                    for (let i = this.currentIndex; i < endIndex; i++) {
+                        this.loadedChapterIndices.push(i);
+                    }
+                    
+                    for (let i = this.currentIndex; i < endIndex; i++) {
+                        const chapter = this.toc[i];
+                        const content = await this.epub.file(chapter.href).async('string');
+                        const doc = new DOMParser().parseFromString(content, 'text/html');
+                        
+                        const body = doc.body || doc.documentElement;
+                        const textContent = this.extractText(body);
+                        
+                        if (combinedContent) {
+                            combinedContent += '<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">';
+                        }
+                        combinedContent += `<h2>${chapter.title}</h2>${textContent}`;
+                    }
+                    
+                    this.elements.readerContent.innerHTML = combinedContent;
+                    
+                    // Update displays
+                    this.updateChapterInfo();
+                    this.updateCharacterCount();
+                    this.updateAdjustmentButtons();
+                    this.updateTOCHighlight();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showStatus('Failed to adjust chapters', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            extractText(element) {
+                const scripts = element.querySelectorAll('script, style');
+                scripts.forEach(el => el.remove());
+                
+                let html = element.innerHTML;
+                html = html.replace(/<br\s*\/?>/gi, '\n');
+                html = html.replace(/<\/p>/gi, '</p>\n');
+                
+                return html;
+            }
+
+            updateNavigation() {
+                const hasNext = this.currentIndex + this.chaptersToLoad < this.toc.length;
+                const hasPrev = this.currentIndex > 0;
+                
+                this.elements.nextBtn.disabled = !hasNext;
+                this.elements.prevBtn.disabled = !hasPrev;
+            }
+
+            updateAdjustmentButtons() {
+                // Disable remove button if only 1 chapter loaded
+                this.elements.removeChapterBtn.disabled = this.actualLoadedChapters <= 1;
+                
+                // Disable add button if no more chapters available
+                this.elements.addChapterBtn.disabled = 
+                    this.currentIndex + this.actualLoadedChapters >= this.toc.length;
+            }
+
+            navigateNext() {
+                if (this.currentIndex + this.chaptersToLoad < this.toc.length) {
+                    this.currentIndex += this.chaptersToLoad;
+                    this.elements.startChapter.value = this.currentIndex;
+                    this.actualLoadedChapters = this.chaptersToLoad; // Reset to default
+                    this.loadCurrentChapters();
+                }
+            }
+
+            navigatePrev() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex = Math.max(0, this.currentIndex - this.chaptersToLoad);
+                    this.elements.startChapter.value = this.currentIndex;
+                    this.actualLoadedChapters = this.chaptersToLoad; // Reset to default
+                    this.loadCurrentChapters();
+                }
+            }
+
+            toggleMenu(show = null) {
+                const isActive = this.elements.bottomSheet.classList.contains('active');
+                const shouldShow = show !== null ? show : !isActive;
+                
+                if (shouldShow) {
+                    this.elements.overlay.classList.add('active');
+                    this.elements.bottomSheet.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    this.elements.overlay.classList.remove('active');
+                    this.elements.bottomSheet.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            async copyContent() {
+                try {
+                    const text = this.elements.readerContent.innerText;
+                    await navigator.clipboard.writeText(text);
+                    
+                    // Visual feedback
+                    this.elements.copyBtn.textContent = '✓';
+                    this.showStatus('Copied to clipboard!', 'success');
+                    
+                    setTimeout(() => {
+                        this.elements.copyBtn.textContent = '📋';
+                    }, 2000);
+                } catch (error) {
+                    this.showStatus('Failed to copy', 'error');
+                }
+            }
+
+            showStatus(message, type) {
+                this.elements.statusBar.textContent = message;
+                this.elements.statusBar.className = `status-bar ${type} active`;
+                
+                setTimeout(() => {
+                    this.elements.statusBar.classList.remove('active');
+                }, 3000);
+            }
+
+            showLoading(show) {
+                if (show) {
+                    this.elements.loadingSpinner.classList.add('active');
+                    this.isLoading = true;
+                } else {
+                    this.elements.loadingSpinner.classList.remove('active');
+                    this.isLoading = false;
+                }
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            new MobileEPUBReader();
+            
+            // Prevent double-tap zoom
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+
+        // Handle viewport height changes
+        const setVH = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', setVH);
+    </script>
+</body>
+</html>
