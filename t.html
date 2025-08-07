@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
+  />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>EPUB Reader • Mobile</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-700: #1d4ed8;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --background: #f3f4f6;
+      --text: #0f172a;
+      --text-2: #475569;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+
+      --reader-font-size: 18px;
+      --reader-line-height: 1.8;
+      --reader-max-width: 720px;
+      --reader-paragraph-spacing: 0.9rem;
+      --reader-page-padding: 20px;
+      --reader-justify: start; /* start | justify */
+      --reader-margin: 16px;
+
+      --safe-area-top: env(safe-area-inset-top);
+      --safe-area-bottom: env(safe-area-inset-bottom);
+    }
+
+    [data-theme="dark"] {
+      --surface: #0b1220;
+      --surface-2: #0f172a;
+      --background: #0b1220;
+      --text: #e5e7eb;
+      --text-2: #94a3b8;
+      --border: #1f2a44;
+      --primary: #60a5fa;
+      --primary-700: #3b82f6;
+    }
+
+    [data-theme="sepia"] {
+      --surface: #f7f0e1;
+      --surface-2: #fbf6ec;
+      --background: #f2eadc;
+      --text: #3f2f1f;
+      --text-2: #6b5137;
+      --border: #e5d8c1;
+      --primary: #ad6a00;
+      --primary-700: #8f5700;
+    }
+
+    [data-theme="contrast"] {
+      --surface: #ffffff;
+      --surface-2: #ffffff;
+      --background: #ffffff;
+      --text: #000000;
+      --text-2: #111111;
+      --border: #000000;
+      --primary: #000000;
+      --primary-700: #000000;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    .app {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* Header / toolbar */
+    .header {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: calc(8px + var(--safe-area-top)) 12px 8px;
+      z-index: 100;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .left, .right { display: flex; gap: 6px; align-items: center; }
+    .title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.2;
+    }
+    .app-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.2px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .book-title {
+      font-size: 12px;
+      color: var(--text-2);
+      max-width: 70vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn {
+      -webkit-appearance: none;
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+      touch-action: manipulation;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn.primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .btn.icon { width: 40px; height: 40px; padding: 0; border-radius: 10px; }
+
+    /* Progress bar */
+    .progress {
+      height: 6px;
+      border-radius: 99px;
+      background: var(--surface-2);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), #7c3aed);
+      transition: width 0.3s ease;
+    }
+
+    /* Reader area */
+    .reader {
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--surface);
+    }
+    .reader-inner {
+      max-width: var(--reader-max-width);
+      margin: 0 auto;
+      padding: var(--reader-page-padding);
+      padding-bottom: calc(120px + var(--safe-area-bottom));
+      font-size: var(--reader-font-size);
+      line-height: var(--reader-line-height);
+    }
+    .reader-inner p { margin: 0 0 var(--reader-paragraph-spacing); text-align: var(--reader-justify); }
+    .reader-inner img { max-width: 100%; height: auto; display: block; margin: 12px auto; }
+    .reader-inner h1, .reader-inner h2, .reader-inner h3 {
+      margin: 1.2rem 0 0.7rem;
+      line-height: 1.25;
+    }
+    .chapter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--text-2);
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    .chapter-sep {
+      margin: 1.8rem 0;
+      border: none;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* Bottom actions */
+    .footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 8px calc(8px + var(--safe-area-bottom));
+      z-index: 80;
+    }
+    .footer-actions {
+      display: grid;
+      grid-template-columns: 48px 1fr 1fr 48px;
+      gap: 8px;
+    }
+    .btn.adjust { background: var(--surface-2); }
+
+    /* Bottom sheet (modal) */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.25s;
+      z-index: 150;
+    }
+    .overlay.active { opacity: 1; visibility: visible; }
+
+    .sheet {
+      position: fixed;
+      left: 50%;
+      transform: translate(-50%, 100%);
+      bottom: 0;
+      width: min(620px, 100vw);
+      max-height: 90vh;
+      background: var(--surface);
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+      transition: transform 0.3s ease;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+    }
+    .sheet.active { transform: translate(-50%, 0); }
+    .sheet-handle { width: 48px; height: 5px; background: var(--border); border-radius: 99px; margin: 8px auto; }
+    .sheet-tabs { display: flex; gap: 6px; padding: 6px 12px; border-bottom: 1px solid var(--border); }
+    .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: var(--surface-2); cursor: pointer; }
+    .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .sheet-body { overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px; }
+
+    .group { margin-bottom: 14px; }
+    .label { font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+    .input, select, .slider {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row > * { flex: 1; }
+    .switch {
+      display: inline-flex; gap: 8px; align-items: center; font-size: 14px;
+    }
+    .toc-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .toc-item {
+      padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer;
+      background: var(--surface);
+    }
+    .toc-item:last-child { border-bottom: 0; }
+    .toc-item.active { background: rgba(37,99,235,0.12); color: var(--primary); font-weight: 600; }
+
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(37,99,235,0.06);
+      cursor: pointer;
+    }
+
+    /* Search panel */
+    .search-panel {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(680px, calc(100vw - 16px));
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      z-index: 220;
+      display: none;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.25);
+    }
+    .search-panel.active { display: block; }
+    .search-top { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid var(--border); }
+    .search-input { flex: 1; }
+    .search-results { max-height: 50vh; overflow: auto; padding: 8px; }
+    .result { padding: 10px; border-radius: 8px; cursor: pointer; }
+    .result:hover { background: var(--surface-2); }
+    .muted { color: var(--text-2); font-size: 12px; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: calc(66px + var(--safe-area-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--text);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      opacity: 0;
+      transition: 0.25s;
+      z-index: 250;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+
+    /* Immersive toggle */
+    .hidden-chrome .header, .hidden-chrome .footer { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app" id="app" data-theme="light">
+    <header class="header">
+      <div class="toolbar">
+        <div class="left">
+          <button class="btn icon" id="menuBtn" aria-label="Open menu">📚</button>
+          <button class="btn icon" id="openBtn" aria-label="Open EPUB">📂</button>
+        </div>
+        <div class="title-wrap">
+          <div class="app-title">EPUB Reader</div>
+          <div class="book-title" id="bookTitle">No book loaded</div>
+        </div>
+        <div class="right">
+          <button class="btn icon" id="themeBtn" aria-label="Toggle theme">🌓</button>
+          <button class="btn icon" id="fontDecBtn" aria-label="Smaller text">A−</button>
+          <button class="btn icon" id="fontIncBtn" aria-label="Larger text">A+</button>
+          <button class="btn icon" id="searchBtn" aria-label="Search">🔎</button>
+          <button class="btn icon" id="bookmarkBtn" aria-label="Bookmark">🔖</button>
+        </div>
+      </div>
+      <div class="progress"><div id="progressInner"></div></div>
+    </header>
+
+    <main class="reader" id="reader">
+      <div class="reader-inner" id="readerContent" aria-live="polite">
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept=".epub" hidden>
+          <div style="font-size: 42px; margin-bottom: 8px;">📚</div>
+          <div style="font-weight:600;">Tap to upload EPUB</div>
+          <div class="muted" style="margin-top:6px;">Or use your file manager</div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-actions">
+        <button class="btn icon adjust" id="removeChapterBtn" title="Combine fewer" aria-label="Combine fewer">−</button>
+        <button class="btn" id="prevBtn" disabled>← Previous</button>
+        <button class="btn" id="nextBtn" disabled>Next →</button>
+        <button class="btn icon adjust" id="addChapterBtn" title="Combine more" aria-label="Combine more">+</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Overlay + Sheet -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTabs">
+    <div class="sheet-handle"></div>
+    <div class="sheet-tabs" id="sheetTabs">
+      <div class="tab active" data-tab="library">Library</div>
+      <div class="tab" data-tab="appearance">Appearance</div>
+      <div class="tab" data-tab="chapters">Chapters</div>
+      <div class="tab" data-tab="toc">TOC</div>
+      <div class="tab" data-tab="bookmarks">Bookmarks</div>
+    </div>
+    <div class="sheet-body">
+      <!-- Library -->
+      <section class="tab-panel" data-panel="library">
+        <div class="group">
+          <div class="upload-area" id="uploadArea2">
+            <input type="file" id="fileInput2" accept=".epub" hidden>
+            <div style="font-size: 42px; margin-bottom: 8px;">📚</div>
+            <div style="font-weight:600;">Open EPUB</div>
+            <div class="muted" style="margin-top:6px;">Drag & drop not supported on all mobile browsers</div>
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn" id="exportBtn">Export current text</button>
+          <button class="btn" id="copyBtn" disabled>Copy to clipboard</button>
+        </div>
+      </section>
+
+      <!-- Appearance -->
+      <section class="tab-panel" data-panel="appearance" hidden>
+        <div class="group">
+          <div class="label">Theme</div>
+          <div class="row">
+            <button class="btn" data-theme="light">Light</button>
+            <button class="btn" data-theme="dark">Dark</button>
+            <button class="btn" data-theme="sepia">Sepia</button>
+            <button class="btn" data-theme="contrast">Contrast</button>
+          </div>
+        </div>
+        <div class="group">
+          <div class="label">Font Family</div>
+          <select id="fontFamily" class="input">
+            <option value="system-ui">System UI</option>
+            <option value="serif">Serif (Georgia)</option>
+            <option value="sans">Sans (Inter/Arial)</option>
+            <option value="mono">Monospace</option>
+          </select>
+        </div>
+        <div class="group">
+          <div class="label">Font size</div>
+          <input type="range" id="fontSize" min="14" max="26" value="18" class="slider">
+        </div>
+        <div class="group">
+          <div class="label">Line height</div>
+          <input type="range" id="lineHeight" min="1.4" max="2.2" step="0.1" value="1.8" class="slider">
+        </div>
+        <div class="group">
+          <div class="label">Margins</div>
+          <input type="range" id="margins" min="8" max="28" value="16" class="slider">
+        </div>
+        <div class="group row">
+          <label class="switch"><input type="checkbox" id="justifyToggle"> Justify text</label>
+          <label class="switch"><input type="checkbox" id="imagesToggle" checked> Show images</label>
+        </div>
+      </section>
+
+      <!-- Chapters -->
+      <section class="tab-panel" data-panel="chapters" hidden>
+        <div class="group">
+          <div class="label">Chapters to combine (page size)</div>
+          <input type="number" id="chapterCount" class="input" min="1" max="10" value="2">
+        </div>
+        <div class="group">
+          <div class="label">Start from</div>
+          <select id="startChapter" class="input" disabled>
+            <option>Load EPUB first</option>
+          </select>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="loadBtn" disabled>Load</button>
+          <button class="btn" id="prefetchBtn" disabled>Prefetch next</button>
+        </div>
+      </section>
+
+      <!-- TOC -->
+      <section class="tab-panel" data-panel="toc" hidden>
+        <div class="label" id="tocCount">No EPUB loaded</div>
+        <div class="toc-list" id="tocList">
+          <div class="toc-item">Open a book to see TOC</div>
+        </div>
+      </section>
+
+      <!-- Bookmarks -->
+      <section class="tab-panel" data-panel="bookmarks" hidden>
+        <div class="label">Your bookmarks</div>
+        <div id="bookmarksList" class="toc-list">
+          <div class="toc-item muted">No bookmarks yet</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-panel" id="searchPanel" role="dialog" aria-modal="true">
+    <div class="search-top">
+      <input type="text" id="searchInput" class="input search-input" placeholder="Search in book…">
+      <button class="btn" id="searchAllBtn" title="Search all chapters">Search all</button>
+      <button class="btn icon" id="searchCloseBtn" aria-label="Close search">✖️</button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <div class="muted" style="padding:8px;">Type to search…</div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Vendor libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
+
+  <script>
+  class EPUBReaderApp {
+    constructor() {
+      this.zip = null;
+      this.opfPath = null;
+      this.opfDir = '';
+      this.manifest = new Map();
+      this.spine = [];
+      this.toc = [];
+
+      this.currentIndex = 0;
+      this.chaptersPageSize = 2;
+      this.actualLoadedChapters = 2;
+      this.loadedIndices = [];
+      this.isLoading = false;
+
+      this.chapterCache = new Map(); // href -> { html, text, title, chapterDir }
+      this.blobUrlCache = new Map(); // zipPath -> objectURL
+
+      this.settings = this.loadSettings();
+
+      this.initElements();
+      this.bindEvents();
+      this.applySettingsToUI();
+      this.applyAppearance();
+
+      // Immersive mode taps
+      this.initGestureNav();
+    }
+
+    initElements() {
+      this.el = {
+        app: document.getElementById('app'),
+        reader: document.getElementById('reader'),
+        readerContent: document.getElementById('readerContent'),
+        bookTitle: document.getElementById('bookTitle'),
+        progressInner: document.getElementById('progressInner'),
+
+        // Toolbar buttons
+        menuBtn: document.getElementById('menuBtn'),
+        openBtn: document.getElementById('openBtn'),
+        themeBtn: document.getElementById('themeBtn'),
+        fontDecBtn: document.getElementById('fontDecBtn'),
+        fontIncBtn: document.getElementById('fontIncBtn'),
+        searchBtn: document.getElementById('searchBtn'),
+        bookmarkBtn: document.getElementById('bookmarkBtn'),
+
+        // Footer nav
+        prevBtn: document.getElementById('prevBtn'),
+        nextBtn: document.getElementById('nextBtn'),
+        addChapterBtn: document.getElementById('addChapterBtn'),
+        removeChapterBtn: document.getElementById('removeChapterBtn'),
+
+        // Overlay + sheet
+        overlay: document.getElementById('overlay'),
+        sheet: document.getElementById('sheet'),
+        tabs: document.querySelectorAll('.tab'),
+        panels: document.querySelectorAll('.tab-panel'),
+
+        // Library
+        uploadArea: document.getElementById('uploadArea'),
+        fileInput: document.getElementById('fileInput'),
+        uploadArea2: document.getElementById('uploadArea2'),
+        fileInput2: document.getElementById('fileInput2'),
+        exportBtn: document.getElementById('exportBtn'),
+        copyBtn: document.getElementById('copyBtn'),
+
+        // Appearance
+        fontFamily: document.getElementById('fontFamily'),
+        fontSize: document.getElementById('fontSize'),
+        lineHeight: document.getElementById('lineHeight'),
+        margins: document.getElementById('margins'),
+        justifyToggle: document.getElementById('justifyToggle'),
+        imagesToggle: document.getElementById('imagesToggle'),
+
+        // Chapters
+        chapterCount: document.getElementById('chapterCount'),
+        startChapter: document.getElementById('startChapter'),
+        loadBtn: document.getElementById('loadBtn'),
+        prefetchBtn: document.getElementById('prefetchBtn'),
+
+        // TOC
+        tocList: document.getElementById('tocList'),
+        tocCount: document.getElementById('tocCount'),
+
+        // Bookmarks
+        bookmarksList: document.getElementById('bookmarksList'),
+
+        // Search
+        searchPanel: document.getElementById('searchPanel'),
+        searchInput: document.getElementById('searchInput'),
+        searchAllBtn: document.getElementById('searchAllBtn'),
+        searchCloseBtn: document.getElementById('searchCloseBtn'),
+        searchResults: document.getElementById('searchResults'),
+
+        // Toast
+        toast: document.getElementById('toast')
+      };
+    }
+
+    bindEvents() {
+      // Open menus
+      this.el.menuBtn.addEventListener('click', () => this.toggleSheet(true));
+      this.el.overlay.addEventListener('click', () => this.toggleSheet(false));
+
+      // Upload handlers
+      const openPicker = () => this.el.fileInput.click();
+      this.el.openBtn.addEventListener('click', openPicker);
+      this.el.uploadArea.addEventListener('click', openPicker);
+      this.el.uploadArea2.addEventListener('click', () => this.el.fileInput2.click());
+
+      this.el.fileInput.addEventListener('change', (e) => this.handleFile(e));
+      this.el.fileInput2.addEventListener('change', (e) => this.handleFile(e));
+
+      // Tabs
+      this.el.tabs.forEach(tab => {
+        tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+      });
+
+      // Appearance controls
+      document.querySelectorAll('[data-theme]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.settings.theme = btn.dataset.theme;
+          this.saveSettings();
+          this.applyAppearance();
+        });
+      });
+      this.el.themeBtn.addEventListener('click', () => {
+        const order = ['light','dark','sepia','contrast'];
+        const next = order[(order.indexOf(this.settings.theme) + 1) % order.length];
+        this.settings.theme = next; this.saveSettings(); this.applyAppearance();
+        this.showToast(`Theme: ${next}`, 'success');
+      });
+      this.el.fontFamily.addEventListener('change', () => {
+        this.settings.fontFamily = this.el.fontFamily.value; this.saveSettings(); this.applyAppearance();
+      });
+      this.el.fontSize.addEventListener('input', () => {
+        this.settings.fontSize = +this.el.fontSize.value; this.saveSettings(); this.applyAppearance();
+      });
+      this.el.lineHeight.addEventListener('input', () => {
+        this.settings.lineHeight = +this.el.lineHeight.value; this.saveSettings(); this.applyAppearance();
+      });
+      this.el.margins.addEventListener('input', () => {
+        this.settings.margins = +this.el.margins.value; this.saveSettings(); this.applyAppearance();
+      });
+      this.el.justifyToggle.addEventListener('change', () => {
+        this.settings.justify = this.el.justifyToggle.checked; this.saveSettings(); this.applyAppearance();
+      });
+      this.el.imagesToggle.addEventListener('change', async () => {
+        this.settings.showImages = this.el.imagesToggle.checked; this.saveSettings();
+        if (this.zip) await this.reloadChapters(); // reprocess images
+      });
+
+      // Font quick actions
+      this.el.fontIncBtn.addEventListener('click', () => {
+        this.el.fontSize.value = Math.min(+this.el.fontSize.value + 1, +this.el.fontSize.max);
+        this.el.fontSize.dispatchEvent(new Event('input'));
+      });
+      this.el.fontDecBtn.addEventListener('click', () => {
+        this.el.fontSize.value = Math.max(+this.el.fontSize.value - 1, +this.el.fontSize.min);
+        this.el.fontSize.dispatchEvent(new Event('input'));
+      });
+
+      // Chapters
+      this.el.chapterCount.addEventListener('change', () => {
+        const v = Math.max(1, Math.min(10, parseInt(this.el.chapterCount.value || '1', 10)));
+        this.chaptersPageSize = v;
+      });
+      this.el.startChapter.addEventListener('change', () => {
+        this.currentIndex = parseInt(this.el.startChapter.value || '0', 10);
+      });
+      this.el.loadBtn.addEventListener('click', async () => {
+        this.actualLoadedChapters = this.chaptersPageSize;
+        await this.loadCurrentPage();
+        this.toggleSheet(false);
+      });
+      this.el.prefetchBtn.addEventListener('click', () => this.prefetchNextPage());
+
+      // Nav
+      this.el.prevBtn.addEventListener('click', () => this.navigate(-1));
+      this.el.nextBtn.addEventListener('click', () => this.navigate(1));
+      this.el.addChapterBtn.addEventListener('click', async () => {
+        if (this.currentIndex + this.actualLoadedChapters < this.toc.length) {
+          this.actualLoadedChapters++; await this.reloadChapters();
+        }
+      });
+      this.el.removeChapterBtn.addEventListener('click', async () => {
+        if (this.actualLoadedChapters > 1) {
+          this.actualLoadedChapters--; await this.reloadChapters();
+        }
+      });
+
+      // Search
+      this.el.searchBtn.addEventListener('click', () => this.toggleSearch(true));
+      this.el.searchCloseBtn.addEventListener('click', () => this.toggleSearch(false));
+      this.el.searchInput.addEventListener('input', () => this.searchCurrent());
+      this.el.searchAllBtn.addEventListener('click', () => this.searchAll());
+
+      // Copy/export
+      this.el.copyBtn.addEventListener('click', () => this.copyCombined());
+      this.el.exportBtn.addEventListener('click', () => this.exportCombined());
+
+      // Bookmark
+      this.el.bookmarkBtn.addEventListener('click', () => this.toggleBookmark());
+      this.renderBookmarks();
+
+      // Scroll updates
+      this.el.reader.addEventListener('scroll', () => this.updateProgressBar(), { passive: true });
+
+      // Keyboard (desktop)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') this.navigate(1);
+        if (e.key === 'ArrowLeft') this.navigate(-1);
+        if (e.key === 'Escape') { this.toggleSheet(false); this.toggleSearch(false); }
+      });
+    }
+
+    initGestureNav() {
+      let touchStartX = 0, touchEndX = 0, touchStartY = 0;
+      const threshold = 80;
+
+      this.el.readerContent.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      this.el.readerContent.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const dx = touchStartX - touchEndX;
+        const dy = Math.abs(e.changedTouches[0].screenY - touchStartY);
+        if (Math.abs(dx) > threshold && dy < 60) {
+          if (dx > 0) this.navigate(1);
+          else this.navigate(-1);
+        }
+      }, { passive: true });
+
+      // Tap zones: left/right navigate, center toggles chrome
+      this.el.readerContent.addEventListener('click', (e) => {
+        const rect = this.el.readerContent.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const zone = rect.width / 3;
+        if (x < zone) this.navigate(-1);
+        else if (x > 2 * zone) this.navigate(1);
+        else this.toggleChrome();
+      });
+    }
+
+    toggleChrome() {
+      this.el.app.classList.toggle('hidden-chrome');
+    }
+
+    async handleFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      await this.loadEPUB(file);
+      // Reset inputs so the same file can be chosen again
+      e.target.value = '';
+    }
+
+    async loadEPUB(file) {
+      try {
+        this.guardLoading(true);
+        this.showToast('Loading EPUB…');
+
+        this.resetState();
+
+        const zip = await new JSZip().loadAsync(file);
+        this.zip = zip;
+
+        // Parse container.xml
+        const containerXml = await zip.file('META-INF/container.xml').async('string');
+        const containerDoc = new DOMParser().parseFromString(containerXml, 'text/xml');
+        const rootfileEl = containerDoc.querySelector('rootfile');
+        if (!rootfileEl) throw new Error('OPF not found');
+        this.opfPath = rootfileEl.getAttribute('full-path');
+        this.opfDir = this.opfPath.substring(0, this.opfPath.lastIndexOf('/') + 1);
+
+        // Parse OPF
+        const opfStr = await zip.file(this.opfPath).async('string');
+        const opfDoc = new DOMParser().parseFromString(opfStr, 'text/xml');
+        this.parseManifestAndSpine(opfDoc);
+        await this.buildTOC(opfDoc);
+
+        // Update UI
+        const titleMeta = opfDoc.querySelector('metadata > title, dc\\:title, title')?.textContent?.trim();
+        this.el.bookTitle.textContent = titleMeta || file.name.replace(/\.epub$/i, '');
+        this.populateTOC();
+        this.populateStartDropdown();
+        this.el.loadBtn.disabled = false;
+        this.el.prefetchBtn.disabled = false;
+        this.el.copyBtn.disabled = false;
+        this.showToast('Book loaded!', 'success');
+      } catch (err) {
+        console.error(err);
+        this.showToast('Failed to load EPUB', 'error');
+      } finally {
+        this.guardLoading(false);
+      }
+    }
+
+    resetState() {
+      this.opfPath = null; this.opfDir = '';
+      this.manifest.clear(); this.spine = []; this.toc = [];
+      this.currentIndex = 0; this.chaptersPageSize = this.settings.pageSize || 2;
+      this.actualLoadedChapters = this.chaptersPageSize;
+      this.loadedIndices = []; this.chapterCache.clear();
+      // Revoke blob URLs
+      for (const url of this.blobUrlCache.values()) URL.revokeObjectURL(url);
+      this.blobUrlCache.clear();
+      // Reset UI
+      this.el.readerContent.innerHTML = `
+        <div class="upload-area" id="uploadArea">
+          <div style="font-size: 42px; margin-bottom: 8px;">📚</div>
+          <div style="font-weight:600;">Tap to upload EPUB</div>
+          <div class="muted" style="margin-top:6px;">Or use your file manager</div>
+        </div>`;
+      this.el.bookTitle.textContent = 'No book loaded';
+      this.el.tocList.innerHTML = '<div class="toc-item">Open a book to see TOC</div>';
+      this.el.tocCount.textContent = 'No EPUB loaded';
+      this.el.startChapter.innerHTML = '<option>Load EPUB first</option>';
+      this.el.startChapter.disabled = true;
+      this.el.prevBtn.disabled = true; this.el.nextBtn.disabled = true;
+      this.el.removeChapterBtn.disabled = true; this.el.addChapterBtn.disabled = true;
+    }
+
+    parseManifestAndSpine(opfDoc) {
+      const manifestEls = opfDoc.querySelectorAll('manifest > item');
+      manifestEls.forEach(item => {
+        this.manifest.set(item.getAttribute('id'), {
+          id: item.getAttribute('id'),
+          href: item.getAttribute('href'),
+          mediaType: item.getAttribute('media-type'),
+          properties: item.getAttribute('properties') || ''
+        });
+      });
+
+      const spineEls = opfDoc.querySelectorAll('spine > itemref');
+      this.spine = Array.from(spineEls).map((el, idx) => ({
+        index: idx,
+        idref: el.getAttribute('idref'),
+        linear: (el.getAttribute('linear') || 'yes').toLowerCase() !== 'no'
+      }));
+    }
+
+    async buildTOC(opfDoc) {
+      // Try EPUB3 nav.xhtml
+      const navItem = [...this.manifest.values()].find(it => (it.properties || '').split(' ').includes('nav'));
+      if (navItem) {
+        const href = this.resolvePath(this.opfDir, navItem.href);
+        const navStr = await this.zip.file(href)?.async('string');
+        if (navStr) {
+          const navDoc = new DOMParser().parseFromString(navStr, 'text/html');
+          const nav = navDoc.querySelector('nav[epub\\:type="toc"], nav[role="doc-toc"], nav');
+          const list = nav?.querySelector('ol, ul');
+          if (list) {
+            const items = list.querySelectorAll('a[href]');
+            const navMap = [];
+            items.forEach(a => {
+              const href = a.getAttribute('href');
+              navMap.push({
+                title: a.textContent.trim(),
+                hrefResolved: this.resolvePath(this.opfDir, href)
+              });
+            });
+            this.toc = this.spine
+              .filter(s => s.linear)
+              .map((s, idx) => {
+                const spineItem = this.manifest.get(s.idref);
+                const full = this.resolvePath(this.opfDir, spineItem.href);
+                const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
+                return {
+                  index: idx,
+                  href: full,
+                  title: match?.title || `Chapter ${idx + 1}`
+                };
+              });
+            if (this.toc.length) return;
+          }
+        }
+      }
+
+      // Try NCX (EPUB2)
+      const ncxItem = [...this.manifest.values()].find(it => it.mediaType === 'application/x-dtbncx+xml');
+      if (ncxItem) {
+        try {
+          const ncxPath = this.resolvePath(this.opfDir, ncxItem.href);
+          const ncxStr = await this.zip.file(ncxPath).async('string');
+          const ncxDoc = new DOMParser().parseFromString(ncxStr, 'text/xml');
+          const points = ncxDoc.querySelectorAll('navMap navPoint content[src]');
+          const navMap = Array.from(points).map(p => {
+            const title = p.querySelector('navLabel text')?.textContent?.trim();
+            const href = p.querySelector('content').getAttribute('src');
+            return { title: title || 'Untitled', hrefResolved: this.resolvePath(this.opfDir, href) };
+          });
+
+          this.toc = this.spine
+            .filter(s => s.linear)
+            .map((s, idx) => {
+              const spineItem = this.manifest.get(s.idref);
+              const full = this.resolvePath(this.opfDir, spineItem.href);
+              const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
+              return { index: idx, href: full, title: match?.title || `Chapter ${idx + 1}` };
+            });
+          if (this.toc.length) return;
+        } catch {}
+      }
+
+      // Fallback: spine titles from chapter HTML
+      this.toc = [];
+      for (const s of this.spine) {
+        if (!s.linear) continue;
+        const item = this.manifest.get(s.idref);
+        const full = this.resolvePath(this.opfDir, item.href);
+        try {
+          const { title } = await this.readChapter(full);
+          this.toc.push({ index: s.index, href: full, title: title || `Chapter ${s.index + 1}` });
+        } catch {
+          this.toc.push({ index: s.index, href: full, title: `Chapter ${s.index + 1}` });
+        }
+      }
+    }
+
+    populateTOC() {
+      this.el.tocList.innerHTML = '';
+      this.el.tocCount.textContent = `${this.toc.length} chapters`;
+      this.toc.forEach((ch, idx) => {
+        const div = document.createElement('div');
+        div.className = 'toc-item';
+        div.textContent = `${idx + 1}. ${ch.title}`;
+        div.addEventListener('click', async () => {
+          this.currentIndex = idx;
+          this.actualLoadedChapters = this.chaptersPageSize;
+          this.el.startChapter.value = String(idx);
+          await this.loadCurrentPage();
+          this.toggleSheet(false);
+        });
+        this.el.tocList.appendChild(div);
+      });
+      this.updateTOCHighlight();
+    }
+
+    populateStartDropdown() {
+      this.el.startChapter.innerHTML = '';
+      this.toc.forEach((ch, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = `${idx + 1}. ${ch.title}`;
+        this.el.startChapter.appendChild(opt);
+      });
+      this.el.startChapter.disabled = false;
+    }
+
+    updateTOCHighlight() {
+      const items = this.el.tocList.querySelectorAll('.toc-item');
+      items.forEach((node, idx) => {
+        const isLoaded = this.loadedIndices.includes(idx);
+        node.classList.toggle('active', isLoaded);
+      });
+    }
+
+    // Main rendering
+    async loadCurrentPage() {
+      if (!this.zip || this.isLoading) return;
+      this.guardLoading(true);
+      try {
+        const start = this.currentIndex;
+        const end = Math.min(start + this.actualLoadedChapters, this.toc.length);
+
+        this.loadedIndices = [];
+        for (let i = start; i < end; i++) this.loadedIndices.push(i);
+
+        let html = '';
+        for (let i = start; i < end; i++) {
+          const ch = this.toc[i];
+          const { html: chapterHTML, title, text } = await this.readChapter(ch.href);
+          const words = this.countWords(text);
+          const readTime = Math.max(1, Math.round(words / (this.settings.wpm || 220)));
+          html += `
+            <div class="chapter-header">
+              <div>${i + 1}. ${title}</div>
+              <div>${words.toLocaleString()} words • ~${readTime} min</div>
+            </div>
+            <h2>${title}</h2>
+            ${chapterHTML}
+            ${i < end - 1 ? '<hr class="chapter-sep"/>' : ''}
+          `;
+        }
+
+        this.el.readerContent.innerHTML = html;
+        this.updateNavButtons();
+        this.updateAdjustButtons();
+        this.updateProgressBar();
+        this.updateTOCHighlight();
+        this.el.reader.scrollTop = 0;
+      } catch (e) {
+        console.error(e);
+        this.showToast('Failed to load chapters', 'error');
+      } finally {
+        this.guardLoading(false);
+      }
+    }
+
+    async reloadChapters() {
+      return this.loadCurrentPage();
+    }
+
+    updateNavButtons() {
+      const hasPrev = this.currentIndex > 0;
+      const hasNext = this.currentIndex + this.chaptersPageSize < this.toc.length;
+      this.el.prevBtn.disabled = !hasPrev;
+      this.el.nextBtn.disabled = !hasNext;
+    }
+
+    updateAdjustButtons() {
+      this.el.removeChapterBtn.disabled = this.actualLoadedChapters <= 1;
+      this.el.addChapterBtn.disabled = this.currentIndex + this.actualLoadedChapters >= this.toc.length;
+    }
+
+    updateProgressBar() {
+      if (!this.toc.length) { this.el.progressInner.style.width = '0%'; return; }
+      const start = this.currentIndex;
+      const within = this.el.reader.scrollTop / Math.max(1, (this.el.readerContent.scrollHeight - this.el.reader.clientHeight));
+      const chapterSpan = this.actualLoadedChapters / this.toc.length;
+      const percent = ((start / this.toc.length) + within * chapterSpan) * 100;
+      this.el.progressInner.style.width = Math.min(100, Math.max(0, percent)) + '%';
+    }
+
+    navigate(dir) {
+      if (!this.zip) return;
+      const step = this.chaptersPageSize;
+      if (dir > 0 && this.currentIndex + step < this.toc.length) {
+        this.currentIndex += step;
+      } else if (dir < 0 && this.currentIndex > 0) {
+        this.currentIndex = Math.max(0, this.currentIndex - step);
+      } else {
+        return;
+      }
+      this.el.startChapter.value = String(this.currentIndex);
+      this.actualLoadedChapters = this.chaptersPageSize;
+      this.loadCurrentPage();
+      this.prefetchNextPage();
+    }
+
+    // Search
+    toggleSearch(show) {
+      this.el.searchPanel.classList.toggle('active', !!show);
+      if (show) {
+        this.el.searchInput.value = '';
+        this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Type to search…</div>';
+        this.el.searchInput.focus();
+      }
+    }
+
+    searchCurrent() {
+      const q = this.el.searchInput.value.trim();
+      if (!q) {
+        this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Type to search…</div>';
+        return;
+      }
+      const start = this.currentIndex;
+      const end = Math.min(start + this.actualLoadedChapters, this.toc.length);
+      const results = [];
+      for (let i = start; i < end; i++) {
+        const ch = this.toc[i];
+        const cache = this.chapterCache.get(ch.href);
+        const text = cache?.text || '';
+        const idx = text.toLowerCase().indexOf(q.toLowerCase());
+        if (idx >= 0) {
+          results.push({ i, title: ch.title, snippet: this.snippet(text, idx, q.length) });
+        }
+      }
+      this.renderSearchResults(q, results);
+    }
+
+    async searchAll() {
+      const q = this.el.searchInput.value.trim();
+      if (!q) return;
+      this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Searching…</div>';
+      const results = [];
+      for (let i = 0; i < this.toc.length; i++) {
+        const ch = this.toc[i];
+        const { text } = await this.readChapter(ch.href); // cached
+        const idx = text.toLowerCase().indexOf(q.toLowerCase());
+        if (idx >= 0) results.push({ i, title: ch.title, snippet: this.snippet(text, idx, q.length) });
+      }
+      this.renderSearchResults(q, results);
+    }
+
+    renderSearchResults(q, results) {
+      if (!results.length) {
+        this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">No matches</div>';
+        return;
+      }
+      this.el.searchResults.innerHTML = '';
+      results.slice(0, 100).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'result';
+        div.innerHTML = `<div style="font-weight:600;">${r.i+1}. ${r.title}</div>
+                         <div class="muted">${r.snippet.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+        div.addEventListener('click', async () => {
+          this.currentIndex = r.i;
+          this.actualLoadedChapters = this.chaptersPageSize;
+          await this.loadCurrentPage();
+          this.toggleSearch(false);
+        });
+        this.el.searchResults.appendChild(div);
+      });
+    }
+
+    snippet(text, idx, len) {
+      const start = Math.max(0, idx - 50);
+      const end = Math.min(text.length, idx + len + 50);
+      return text.slice(start, idx) + '[' + text.slice(idx, idx + len) + ']' + text.slice(idx + len, end);
+    }
+
+    // Bookmarks
+    getBookmarks() {
+      try { return JSON.parse(localStorage.getItem('epub_bookmarks') || '[]'); } catch { return []; }
+    }
+    setBookmarks(list) { localStorage.setItem('epub_bookmarks', JSON.stringify(list)); }
+    renderBookmarks() {
+      const list = this.getBookmarks();
+      this.el.bookmarksList.innerHTML = '';
+      if (!list.length) {
+        this.el.bookmarksList.innerHTML = '<div class="toc-item muted">No bookmarks yet</div>';
+        return;
+      }
+      list.forEach(b => {
+        const div = document.createElement('div');
+        div.className = 'toc-item';
+        const date = new Date(b.t).toLocaleString();
+        div.innerHTML = `${b.i+1}. ${b.title} <span class="muted">— ${date}</span>`;
+        div.addEventListener('click', async () => {
+          this.currentIndex = b.i;
+          this.actualLoadedChapters = this.chaptersPageSize;
+          await this.loadCurrentPage();
+          this.toggleSheet(false);
+        });
+        this.el.bookmarksList.appendChild(div);
+      });
+    }
+    toggleBookmark() {
+      if (!this.toc.length) return;
+      const list = this.getBookmarks();
+      const exists = list.find(b => b.i === this.currentIndex);
+      if (exists) {
+        const next = list.filter(b => b.i !== this.currentIndex);
+        this.setBookmarks(next); this.showToast('Bookmark removed', 'success');
+      } else {
+        const b = { i: this.currentIndex, title: this.toc[this.currentIndex].title, t: Date.now() };
+        list.unshift(b); this.setBookmarks(list); this.showToast('Bookmarked', 'success');
+      }
+      this.renderBookmarks();
+    }
+
+    // Copy/export
+    async copyCombined() {
+      try {
+        const text = this.el.readerContent.innerText;
+        await navigator.clipboard.writeText(text);
+        this.showToast('Copied to clipboard!', 'success');
+      } catch {
+        this.showToast('Copy failed (HTTPS required on some browsers)', 'error');
+      }
+    }
+
+    exportCombined() {
+      const text = this.el.readerContent.innerText || '';
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = (this.el.bookTitle.textContent || 'book') + ' - selection.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Prefetch
+    async prefetchNextPage() {
+      if (!this.zip) return;
+      const start = this.currentIndex + this.chaptersPageSize;
+      const end = Math.min(start + this.chaptersPageSize, this.toc.length);
+      for (let i = start; i < end; i++) {
+        await this.readChapter(this.toc[i].href).catch(()=>{});
+      }
+      this.showToast('Prefetched next page', 'success');
+    }
+
+    // Read chapter: sanitize, cache, rewrite images if needed
+    async readChapter(href) {
+      const cached = this.chapterCache.get(href);
+      if (cached) return cached;
+
+      const file = this.zip.file(href);
+      if (!file) throw new Error('Missing chapter: ' + href);
+      const str = await file.async('string');
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+
+      // Extract title
+      const title =
+        doc.querySelector('title')?.textContent?.trim() ||
+        doc.querySelector('h1')?.textContent?.trim() ||
+        doc.querySelector('h2')?.textContent?.trim() ||
+        'Untitled';
+
+      // Remove scripts/styles/iframes/embeds for safety
+      doc.querySelectorAll('script, style, iframe, object, embed').forEach(n => n.remove());
+
+      // Process resources
+      const chapterDir = href.substring(0, href.lastIndexOf('/') + 1);
+      if (this.settings.showImages) {
+        await this.rewriteImages(doc, chapterDir);
+      } else {
+        doc.querySelectorAll('img, picture, source').forEach(n => n.remove());
+      }
+      // Links: open externally, sanitize href
+      doc.querySelectorAll('a[href]').forEach(a => {
+        const href = a.getAttribute('href');
+        if (href?.startsWith('#')) return; // in-document
+        if (/^https?:\/\//i.test(href)) {
+          a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
+        } else {
+          // intra-book link — we could resolve and allow navigation later
+          a.removeAttribute('href');
+        }
+      });
+
+      // Serialize body content
+      const body = doc.body || doc.documentElement;
+      const rawHtml = body.innerHTML;
+
+      // Sanitize
+      const clean = DOMPurify.sanitize(rawHtml, {
+        USE_PROFILES: { html: true },
+        ALLOWED_TAGS: [
+          'p','br','hr','h1','h2','h3','h4','h5','h6','strong','em','b','i','u','small','sub','sup',
+          'ul','ol','li','blockquote','pre','code','span','div','img','a'
+        ],
+        ALLOWED_ATTR: ['src','alt','title','href']
+      });
+
+      // Plain text for search/estimates
+      const text = this.htmlToText(clean);
+
+      const out = { html: clean, text, title, chapterDir };
+      this.chapterCache.set(href, out);
+      return out;
+    }
+
+    async rewriteImages(doc, baseDir) {
+      const imgs = [...doc.querySelectorAll('img[src]')];
+      for (const img of imgs) {
+        const src = img.getAttribute('src');
+        if (!src) continue;
+        if (/^https?:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) continue;
+        const path = this.resolvePath(baseDir, src);
+        const blobUrl = await this.getBlobUrl(path).catch(()=>null);
+        if (blobUrl) img.setAttribute('src', blobUrl);
+        else img.remove();
+      }
+    }
+
+    async getBlobUrl(zipPath) {
+      if (this.blobUrlCache.has(zipPath)) return this.blobUrlCache.get(zipPath);
+      const file = this.zip.file(zipPath);
+      if (!file) throw new Error('Resource not found: ' + zipPath);
+      const blob = await file.async('blob');
+      const url = URL.createObjectURL(blob);
+      this.blobUrlCache.set(zipPath, url);
+      return url;
+    }
+
+    resolvePath(baseDir, rel) {
+      // baseDir like "OEBPS/" or "OEBPS/chapter/"
+      const url = new URL(rel, 'https://x/' + baseDir);
+      return decodeURIComponent(url.pathname.replace(/^\/+/, ''));
+    }
+
+    // Utils
+    htmlToText(html) {
+      const tmp = document.createElement('div'); tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+    countWords(text) {
+      return (text.trim().match(/\b\w+\b/g) || []).length;
+    }
+
+    // Sheet
+    toggleSheet(show = null) {
+      const active = this.el.sheet.classList.contains('active');
+      const next = show === null ? !active : show;
+      this.el.sheet.classList.toggle('active', next);
+      this.el.overlay.classList.toggle('active', next);
+      this.el.overlay.setAttribute('aria-hidden', String(!next));
+      if (next) this.switchTab(document.querySelector('.tab.active')?.dataset.tab || 'library');
+    }
+    switchTab(name) {
+      this.el.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      this.el.panels.forEach(p => p.hidden = p.dataset.panel !== name);
+    }
+
+    // Appearance
+    applySettingsToUI() {
+      this.el.fontFamily.value = this.settings.fontFamily || 'system-ui';
+      this.el.fontSize.value = this.settings.fontSize || 18;
+      this.el.lineHeight.value = this.settings.lineHeight || 1.8;
+      this.el.margins.value = this.settings.margins || 16;
+      this.el.justifyToggle.checked = !!this.settings.justify;
+      this.el.imagesToggle.checked = this.settings.showImages !== false;
+      if (this.settings.pageSize) this.el.chapterCount.value = this.settings.pageSize;
+      this.chaptersPageSize = parseInt(this.el.chapterCount.value, 10);
+    }
+    applyAppearance() {
+      const theme = this.settings.theme || 'light';
+      this.el.app.setAttribute('data-theme', theme);
+
+      const ff = this.settings.fontFamily || 'system-ui';
+      const family =
+        ff === 'serif' ? 'Georgia, Cambria, "Times New Roman", serif' :
+        ff === 'sans' ? 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif' :
+        ff === 'mono' ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' :
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, Arial, sans-serif';
+
+      document.documentElement.style.setProperty('--reader-font-size', (this.settings.fontSize || 18) + 'px');
+      document.documentElement.style.setProperty('--reader-line-height', String(this.settings.lineHeight || 1.8));
+      document.documentElement.style.setProperty('--reader-margin', (this.settings.margins || 16) + 'px');
+      document.documentElement.style.setProperty('--reader-page-padding', (this.settings.margins || 16) + 'px');
+      document.documentElement.style.setProperty('--reader-justify', this.settings.justify ? 'justify' : 'start');
+      document.body.style.fontFamily = family;
+
+      // Persist page size
+      this.settings.pageSize = this.chaptersPageSize;
+      this.saveSettings();
+    }
+
+    saveSettings() {
+      localStorage.setItem('epub_settings', JSON.stringify(this.settings));
+    }
+    loadSettings() {
+      try { return JSON.parse(localStorage.getItem('epub_settings') || '{}'); } catch { return {}; }
+    }
+
+    // UI feedback
+    showToast(msg, type = '') {
+      this.el.toast.textContent = msg;
+      this.el.toast.className = 'toast ' + (type || '');
+      requestAnimationFrame(() => {
+        this.el.toast.classList.add('show');
+        setTimeout(() => this.el.toast.classList.remove('show'), 2200);
+      });
+    }
+    guardLoading(flag) {
+      this.isLoading = flag;
+      // Optionally disable buttons
+    }
+  }
+
+  // Boot
+  const app = new EPUBReaderApp();
+  </script>
+</body>
+</html>
