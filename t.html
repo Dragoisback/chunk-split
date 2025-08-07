@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
+    content="width=device-width, initial-scale=1, maximum-scale=5, interactive-widget=resizes-content, viewport-fit=cover"
   />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>EPUB Reader • Mobile</title>
+  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>EPUB Reader • Android</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -28,11 +29,12 @@
       --reader-max-width: 720px;
       --reader-paragraph-spacing: 0.9rem;
       --reader-page-padding: 20px;
-      --reader-justify: start; /* start | justify */
+      --reader-justify: start;
       --reader-margin: 16px;
 
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
+      --vvh: 100dvh; /* visualViewport height fallback */
     }
 
     [data-theme="dark"] {
@@ -57,30 +59,23 @@
       --primary-700: #8f5700;
     }
 
-    [data-theme="contrast"] {
-      --surface: #ffffff;
-      --surface-2: #ffffff;
-      --background: #ffffff;
-      --text: #000000;
-      --text-2: #111111;
-      --border: #000000;
-      --primary: #000000;
-      --primary-700: #000000;
-    }
-
     * { box-sizing: border-box; }
     html, body {
       height: 100%;
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, Arial, sans-serif;
+      font-family: Roboto, "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, Arial, sans-serif;
       background: var(--background);
       color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none; /* avoid glow/chain on Android */
     }
+    body { height: 100dvh; }
 
     .app {
-      height: 100%;
+      height: min(var(--vvh), 100dvh);
       display: grid;
       grid-template-rows: auto 1fr auto;
+      background: var(--surface);
     }
 
     /* Header / toolbar */
@@ -91,6 +86,7 @@
       border-bottom: 1px solid var(--border);
       padding: calc(8px + var(--safe-area-top)) 12px 8px;
       z-index: 100;
+      will-change: transform;
     }
     .toolbar {
       display: grid;
@@ -99,75 +95,42 @@
       align-items: center;
     }
     .left, .right { display: flex; gap: 6px; align-items: center; }
-    .title-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1.2;
-    }
+    .title-wrap { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
     .app-title {
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 0.2px;
+      font-weight: 800; font-size: 16px; letter-spacing: 0.2px;
       background: linear-gradient(135deg, var(--primary), #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     .book-title {
-      font-size: 12px;
-      color: var(--text-2);
-      max-width: 70vw;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 12px; color: var(--text-2);
+      max-width: 70vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
     .btn {
-      -webkit-appearance: none;
       appearance: none;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--text);
-      border-radius: 10px;
-      padding: 8px 10px;
+      border-radius: 12px;
+      padding: 12px 14px; /* 48dp tap target */
+      min-height: 48px;
+      min-width: 48px;
       font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       cursor: pointer;
       transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
       touch-action: manipulation;
     }
-    .btn:active { transform: scale(0.96); }
-    .btn.primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-    .btn.icon { width: 40px; height: 40px; padding: 0; border-radius: 10px; }
+    .btn:active { transform: scale(0.97); }
+    .btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn.icon { width: 48px; padding: 0; border-radius: 12px; }
 
     /* Progress bar */
-    .progress {
-      height: 6px;
-      border-radius: 99px;
-      background: var(--surface-2);
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .progress > div {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--primary), #7c3aed);
-      transition: width 0.3s ease;
-    }
+    .progress { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 8px; }
+    .progress > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #7c3aed); transition: width 0.2s ease; }
 
     /* Reader area */
-    .reader {
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      background: var(--surface);
-    }
+    .reader { overflow: auto; -webkit-overflow-scrolling: touch; }
     .reader-inner {
       max-width: var(--reader-max-width);
       margin: 0 auto;
@@ -178,125 +141,77 @@
     }
     .reader-inner p { margin: 0 0 var(--reader-paragraph-spacing); text-align: var(--reader-justify); }
     .reader-inner img { max-width: 100%; height: auto; display: block; margin: 12px auto; }
-    .reader-inner h1, .reader-inner h2, .reader-inner h3 {
-      margin: 1.2rem 0 0.7rem;
-      line-height: 1.25;
+    .reader-inner h1, .reader-inner h2, .reader-inner h3 { margin: 1.2rem 0 0.7rem; line-height: 1.25; }
+
+    .chapter {
+      content-visibility: auto; /* Android Chrome: virtualize offscreen */
+      contain-intrinsic-size: 1000px auto;
+      contain: content;
+      will-change: contents;
     }
     .chapter-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface-2);
-      color: var(--text-2);
-      font-size: 13px;
-      margin: 12px 0;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 12px; background: var(--surface-2); color: var(--text-2); font-size: 13px; margin: 12px 0;
     }
-    .chapter-sep {
-      margin: 1.8rem 0;
-      border: none;
-      border-top: 1px dashed var(--border);
-    }
+    .chapter-sep { margin: 1.8rem 0; border: none; border-top: 1px dashed var(--border); }
 
-    /* Bottom actions */
+    /* Footer */
     .footer {
-      position: sticky;
-      bottom: 0;
-      background: var(--surface);
+      position: sticky; bottom: 0; background: var(--surface);
       border-top: 1px solid var(--border);
       padding: 8px 8px calc(8px + var(--safe-area-bottom));
       z-index: 80;
     }
-    .footer-actions {
-      display: grid;
-      grid-template-columns: 48px 1fr 1fr 48px;
-      gap: 8px;
-    }
-    .btn.adjust { background: var(--surface-2); }
+    .footer-actions { display: grid; grid-template-columns: 48px 1fr 1fr 48px; gap: 8px; }
 
-    /* Bottom sheet (modal) */
+    /* Overlay + Sheet */
     .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 7, 18, 0.55);
-      opacity: 0;
-      visibility: hidden;
-      transition: 0.25s;
-      z-index: 150;
+      position: fixed; inset: 0; background: rgba(3,7,18,0.55);
+      opacity: 0; visibility: hidden; transition: 0.2s; z-index: 150;
     }
     .overlay.active { opacity: 1; visibility: visible; }
 
     .sheet {
-      position: fixed;
-      left: 50%;
-      transform: translate(-50%, 100%);
-      bottom: 0;
+      position: fixed; left: 50%; bottom: 0; transform: translate(-50%, 100%);
       width: min(620px, 100vw);
-      max-height: 90vh;
-      background: var(--surface);
-      border-radius: 16px 16px 0 0;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
-      transition: transform 0.3s ease;
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
+      max-height: calc(min(var(--vvh), 100dvh) * 0.9); /* keyboard-safe */
+      background: var(--surface); border-radius: 18px 18px 0 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.25); transition: transform 0.25s ease; z-index: 200;
+      display: flex; flex-direction: column; will-change: transform;
     }
     .sheet.active { transform: translate(-50%, 0); }
     .sheet-handle { width: 48px; height: 5px; background: var(--border); border-radius: 99px; margin: 8px auto; }
     .sheet-tabs { display: flex; gap: 6px; padding: 6px 12px; border-bottom: 1px solid var(--border); }
-    .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: var(--surface-2); cursor: pointer; }
+    .tab { flex: 1; padding: 12px; text-align: center; border-radius: 12px; background: var(--surface-2); cursor: pointer; }
     .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
     .sheet-body { overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px; }
 
     .group { margin-bottom: 14px; }
     .label { font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
     .input, select, .slider {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 14px;
-      color: var(--text);
+      width: 100%; border: 1px solid var(--border); background: var(--surface-2);
+      border-radius: 12px; padding: 12px; font-size: 14px; color: var(--text); min-height: 48px;
     }
     .row { display: flex; gap: 8px; align-items: center; }
     .row > * { flex: 1; }
-    .switch {
-      display: inline-flex; gap: 8px; align-items: center; font-size: 14px;
-    }
-    .toc-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .toc-item {
-      padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer;
-      background: var(--surface);
-    }
+    .switch { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; }
+    .toc-list { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .toc-item { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; background: var(--surface); }
     .toc-item:last-child { border-bottom: 0; }
     .toc-item.active { background: rgba(37,99,235,0.12); color: var(--primary); font-weight: 600; }
 
     .upload-area {
-      border: 2px dashed var(--primary);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      background: rgba(37,99,235,0.06);
-      cursor: pointer;
+      border: 2px dashed var(--primary); border-radius: 12px; padding: 20px; text-align: center;
+      background: rgba(37,99,235,0.06); cursor: pointer;
     }
 
-    /* Search panel */
+    /* Search */
     .search-panel {
-      position: fixed;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
       width: min(680px, calc(100vw - 16px));
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      z-index: 220;
-      display: none;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.25);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      z-index: 220; display: none; box-shadow: 0 10px 30px rgba(2,6,23,0.25);
     }
     .search-panel.active { display: block; }
     .search-top { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid var(--border); }
@@ -308,24 +223,20 @@
 
     /* Toast */
     .toast {
-      position: fixed;
-      top: calc(66px + var(--safe-area-top));
-      left: 50%;
+      position: fixed; top: calc(66px + var(--safe-area-top)); left: 50%;
       transform: translateX(-50%) translateY(-20px);
-      background: var(--text);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      opacity: 0;
-      transition: 0.25s;
-      z-index: 250;
+      background: var(--text); color: white; padding: 10px 14px; border-radius: 12px;
+      font-size: 14px; opacity: 0; transition: 0.2s; z-index: 250;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.success { background: var(--success); }
     .toast.error { background: var(--danger); }
 
-    /* Immersive toggle */
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .sheet, .progress > div, .btn { transition: none !important; }
+    }
+
     .hidden-chrome .header, .hidden-chrome .footer { display: none; }
   </style>
 </head>
@@ -365,10 +276,10 @@
 
     <footer class="footer">
       <div class="footer-actions">
-        <button class="btn icon adjust" id="removeChapterBtn" title="Combine fewer" aria-label="Combine fewer">−</button>
+        <button class="btn icon" id="removeChapterBtn" title="Combine fewer" aria-label="Combine fewer">−</button>
         <button class="btn" id="prevBtn" disabled>← Previous</button>
         <button class="btn" id="nextBtn" disabled>Next →</button>
-        <button class="btn icon adjust" id="addChapterBtn" title="Combine more" aria-label="Combine more">+</button>
+        <button class="btn icon" id="addChapterBtn" title="Combine more" aria-label="Combine more">+</button>
       </div>
     </footer>
   </div>
@@ -392,12 +303,16 @@
             <input type="file" id="fileInput2" accept=".epub" hidden>
             <div style="font-size: 42px; margin-bottom: 8px;">📚</div>
             <div style="font-weight:600;">Open EPUB</div>
-            <div class="muted" style="margin-top:6px;">Drag & drop not supported on all mobile browsers</div>
+            <div class="muted" style="margin-top:6px;">Optimized for Android Chrome</div>
           </div>
         </div>
         <div class="row">
           <button class="btn" id="exportBtn">Export current text</button>
           <button class="btn" id="copyBtn" disabled>Copy to clipboard</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="wakeLockBtn">Keep screen on</button>
+          <button class="btn" id="installBtn" style="display:none;">Install app</button>
         </div>
       </section>
 
@@ -409,7 +324,6 @@
             <button class="btn" data-theme="light">Light</button>
             <button class="btn" data-theme="dark">Dark</button>
             <button class="btn" data-theme="sepia">Sepia</button>
-            <button class="btn" data-theme="contrast">Contrast</button>
           </div>
         </div>
         <div class="group">
@@ -495,14 +409,27 @@
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
 
   <script>
+  // Simple LRU for Android memory friendliness
+  class LRUCache {
+    constructor(limit = 30) { this.limit = limit; this.map = new Map(); }
+    get(k) { if (!this.map.has(k)) return; const v = this.map.get(k); this.map.delete(k); this.map.set(k, v); return v; }
+    set(k, v) {
+      if (this.map.has(k)) this.map.delete(k);
+      this.map.set(k, v);
+      if (this.map.size > this.limit) {
+        const first = this.map.keys().next().value;
+        const evicted = this.map.get(first);
+        this.map.delete(first);
+        if (evicted?.revoke) try { evicted.revoke(); } catch {}
+      }
+    }
+    clear() { this.map.clear(); }
+  }
+
   class EPUBReaderApp {
     constructor() {
-      this.zip = null;
-      this.opfPath = null;
-      this.opfDir = '';
-      this.manifest = new Map();
-      this.spine = [];
-      this.toc = [];
+      this.zip = null; this.opfPath = null; this.opfDir = '';
+      this.manifest = new Map(); this.spine = []; this.toc = [];
 
       this.currentIndex = 0;
       this.chaptersPageSize = 2;
@@ -510,18 +437,22 @@
       this.loadedIndices = [];
       this.isLoading = false;
 
-      this.chapterCache = new Map(); // href -> { html, text, title, chapterDir }
-      this.blobUrlCache = new Map(); // zipPath -> objectURL
+      this.chapterCache = new LRUCache(40); // tuned for Android mid-range
+      this.blobUrlCache = new LRUCache(80);
 
       this.settings = this.loadSettings();
+
+      this.deferredPrompt = null; // A2HS
+      this.wakeLock = null;
 
       this.initElements();
       this.bindEvents();
       this.applySettingsToUI();
       this.applyAppearance();
-
-      // Immersive mode taps
       this.initGestureNav();
+      this.initVisualViewport();
+      this.initPWA();
+      this.backButtonIntegration();
     }
 
     initElements() {
@@ -532,7 +463,6 @@
         bookTitle: document.getElementById('bookTitle'),
         progressInner: document.getElementById('progressInner'),
 
-        // Toolbar buttons
         menuBtn: document.getElementById('menuBtn'),
         openBtn: document.getElementById('openBtn'),
         themeBtn: document.getElementById('themeBtn'),
@@ -541,19 +471,16 @@
         searchBtn: document.getElementById('searchBtn'),
         bookmarkBtn: document.getElementById('bookmarkBtn'),
 
-        // Footer nav
         prevBtn: document.getElementById('prevBtn'),
         nextBtn: document.getElementById('nextBtn'),
         addChapterBtn: document.getElementById('addChapterBtn'),
         removeChapterBtn: document.getElementById('removeChapterBtn'),
 
-        // Overlay + sheet
         overlay: document.getElementById('overlay'),
         sheet: document.getElementById('sheet'),
         tabs: document.querySelectorAll('.tab'),
         panels: document.querySelectorAll('.tab-panel'),
 
-        // Library
         uploadArea: document.getElementById('uploadArea'),
         fileInput: document.getElementById('fileInput'),
         uploadArea2: document.getElementById('uploadArea2'),
@@ -561,7 +488,6 @@
         exportBtn: document.getElementById('exportBtn'),
         copyBtn: document.getElementById('copyBtn'),
 
-        // Appearance
         fontFamily: document.getElementById('fontFamily'),
         fontSize: document.getElementById('fontSize'),
         lineHeight: document.getElementById('lineHeight'),
@@ -569,189 +495,141 @@
         justifyToggle: document.getElementById('justifyToggle'),
         imagesToggle: document.getElementById('imagesToggle'),
 
-        // Chapters
         chapterCount: document.getElementById('chapterCount'),
         startChapter: document.getElementById('startChapter'),
         loadBtn: document.getElementById('loadBtn'),
         prefetchBtn: document.getElementById('prefetchBtn'),
 
-        // TOC
         tocList: document.getElementById('tocList'),
         tocCount: document.getElementById('tocCount'),
 
-        // Bookmarks
         bookmarksList: document.getElementById('bookmarksList'),
 
-        // Search
         searchPanel: document.getElementById('searchPanel'),
         searchInput: document.getElementById('searchInput'),
         searchAllBtn: document.getElementById('searchAllBtn'),
         searchCloseBtn: document.getElementById('searchCloseBtn'),
         searchResults: document.getElementById('searchResults'),
 
-        // Toast
-        toast: document.getElementById('toast')
+        toast: document.getElementById('toast'),
+
+        wakeLockBtn: document.getElementById('wakeLockBtn'),
+        installBtn: document.getElementById('installBtn')
       };
     }
 
     bindEvents() {
-      // Open menus
       this.el.menuBtn.addEventListener('click', () => this.toggleSheet(true));
       this.el.overlay.addEventListener('click', () => this.toggleSheet(false));
 
-      // Upload handlers
       const openPicker = () => this.el.fileInput.click();
       this.el.openBtn.addEventListener('click', openPicker);
       this.el.uploadArea.addEventListener('click', openPicker);
       this.el.uploadArea2.addEventListener('click', () => this.el.fileInput2.click());
-
       this.el.fileInput.addEventListener('change', (e) => this.handleFile(e));
       this.el.fileInput2.addEventListener('change', (e) => this.handleFile(e));
 
-      // Tabs
-      this.el.tabs.forEach(tab => {
-        tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
-      });
+      this.el.tabs.forEach(tab => tab.addEventListener('click', () => this.switchTab(tab.dataset.tab)));
 
-      // Appearance controls
       document.querySelectorAll('[data-theme]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          this.settings.theme = btn.dataset.theme;
-          this.saveSettings();
-          this.applyAppearance();
-        });
+        btn.addEventListener('click', () => { this.settings.theme = btn.dataset.theme; this.saveSettings(); this.applyAppearance(); });
       });
       this.el.themeBtn.addEventListener('click', () => {
-        const order = ['light','dark','sepia','contrast'];
-        const next = order[(order.indexOf(this.settings.theme) + 1) % order.length];
-        this.settings.theme = next; this.saveSettings(); this.applyAppearance();
-        this.showToast(`Theme: ${next}`, 'success');
-      });
-      this.el.fontFamily.addEventListener('change', () => {
-        this.settings.fontFamily = this.el.fontFamily.value; this.saveSettings(); this.applyAppearance();
-      });
-      this.el.fontSize.addEventListener('input', () => {
-        this.settings.fontSize = +this.el.fontSize.value; this.saveSettings(); this.applyAppearance();
-      });
-      this.el.lineHeight.addEventListener('input', () => {
-        this.settings.lineHeight = +this.el.lineHeight.value; this.saveSettings(); this.applyAppearance();
-      });
-      this.el.margins.addEventListener('input', () => {
-        this.settings.margins = +this.el.margins.value; this.saveSettings(); this.applyAppearance();
-      });
-      this.el.justifyToggle.addEventListener('change', () => {
-        this.settings.justify = this.el.justifyToggle.checked; this.saveSettings(); this.applyAppearance();
-      });
-      this.el.imagesToggle.addEventListener('change', async () => {
-        this.settings.showImages = this.el.imagesToggle.checked; this.saveSettings();
-        if (this.zip) await this.reloadChapters(); // reprocess images
+        const order = ['light','dark','sepia']; const next = order[(order.indexOf(this.settings.theme || 'light') + 1) % order.length];
+        this.settings.theme = next; this.saveSettings(); this.applyAppearance(); this.showToast(`Theme: ${next}`, 'success');
       });
 
-      // Font quick actions
-      this.el.fontIncBtn.addEventListener('click', () => {
-        this.el.fontSize.value = Math.min(+this.el.fontSize.value + 1, +this.el.fontSize.max);
-        this.el.fontSize.dispatchEvent(new Event('input'));
-      });
-      this.el.fontDecBtn.addEventListener('click', () => {
-        this.el.fontSize.value = Math.max(+this.el.fontSize.value - 1, +this.el.fontSize.min);
-        this.el.fontSize.dispatchEvent(new Event('input'));
-      });
+      this.el.fontFamily.addEventListener('change', () => { this.settings.fontFamily = this.el.fontFamily.value; this.saveSettings(); this.applyAppearance(); });
+      this.el.fontSize.addEventListener('input', () => { this.settings.fontSize = +this.el.fontSize.value; this.saveSettings(); this.applyAppearance(); });
+      this.el.lineHeight.addEventListener('input', () => { this.settings.lineHeight = +this.el.lineHeight.value; this.saveSettings(); this.applyAppearance(); });
+      this.el.margins.addEventListener('input', () => { this.settings.margins = +this.el.margins.value; this.saveSettings(); this.applyAppearance(); });
+      this.el.justifyToggle.addEventListener('change', () => { this.settings.justify = this.el.justifyToggle.checked; this.saveSettings(); this.applyAppearance(); });
+      this.el.imagesToggle.addEventListener('change', async () => { this.settings.showImages = this.el.imagesToggle.checked; this.saveSettings(); if (this.zip) await this.reloadChapters(); });
 
-      // Chapters
-      this.el.chapterCount.addEventListener('change', () => {
-        const v = Math.max(1, Math.min(10, parseInt(this.el.chapterCount.value || '1', 10)));
-        this.chaptersPageSize = v;
-      });
-      this.el.startChapter.addEventListener('change', () => {
-        this.currentIndex = parseInt(this.el.startChapter.value || '0', 10);
-      });
-      this.el.loadBtn.addEventListener('click', async () => {
-        this.actualLoadedChapters = this.chaptersPageSize;
-        await this.loadCurrentPage();
-        this.toggleSheet(false);
-      });
+      this.el.fontIncBtn.addEventListener('click', () => { this.el.fontSize.value = Math.min(+this.el.fontSize.value + 1, +this.el.fontSize.max); this.el.fontSize.dispatchEvent(new Event('input')); });
+      this.el.fontDecBtn.addEventListener('click', () => { this.el.fontSize.value = Math.max(+this.el.fontSize.value - 1, +this.el.fontSize.min); this.el.fontSize.dispatchEvent(new Event('input')); });
+
+      this.el.chapterCount.addEventListener('change', () => { const v = Math.max(1, Math.min(10, parseInt(this.el.chapterCount.value || '1', 10))); this.chaptersPageSize = v; });
+      this.el.startChapter.addEventListener('change', () => { this.currentIndex = parseInt(this.el.startChapter.value || '0', 10); });
+      this.el.loadBtn.addEventListener('click', async () => { this.actualLoadedChapters = this.chaptersPageSize; await this.loadCurrentPage(); this.toggleSheet(false); });
       this.el.prefetchBtn.addEventListener('click', () => this.prefetchNextPage());
 
-      // Nav
       this.el.prevBtn.addEventListener('click', () => this.navigate(-1));
       this.el.nextBtn.addEventListener('click', () => this.navigate(1));
-      this.el.addChapterBtn.addEventListener('click', async () => {
-        if (this.currentIndex + this.actualLoadedChapters < this.toc.length) {
-          this.actualLoadedChapters++; await this.reloadChapters();
-        }
-      });
-      this.el.removeChapterBtn.addEventListener('click', async () => {
-        if (this.actualLoadedChapters > 1) {
-          this.actualLoadedChapters--; await this.reloadChapters();
-        }
-      });
+      this.el.addChapterBtn.addEventListener('click', async () => { if (this.currentIndex + this.actualLoadedChapters < this.toc.length) { this.actualLoadedChapters++; await this.reloadChapters(); this.haptic(); } });
+      this.el.removeChapterBtn.addEventListener('click', async () => { if (this.actualLoadedChapters > 1) { this.actualLoadedChapters--; await this.reloadChapters(); this.haptic(); } });
 
-      // Search
       this.el.searchBtn.addEventListener('click', () => this.toggleSearch(true));
       this.el.searchCloseBtn.addEventListener('click', () => this.toggleSearch(false));
       this.el.searchInput.addEventListener('input', () => this.searchCurrent());
       this.el.searchAllBtn.addEventListener('click', () => this.searchAll());
 
-      // Copy/export
       this.el.copyBtn.addEventListener('click', () => this.copyCombined());
       this.el.exportBtn.addEventListener('click', () => this.exportCombined());
 
-      // Bookmark
-      this.el.bookmarkBtn.addEventListener('click', () => this.toggleBookmark());
+      this.el.bookmarkBtn.addEventListener('click', () => { this.toggleBookmark(); this.haptic(); });
       this.renderBookmarks();
 
-      // Scroll updates
-      this.el.reader.addEventListener('scroll', () => this.updateProgressBar(), { passive: true });
+      this.el.reader.addEventListener('scroll', () => { this.updateProgressBar(); this.saveReadingPositionThrottled(); }, { passive: true });
 
-      // Keyboard (desktop)
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') this.navigate(1);
-        if (e.key === 'ArrowLeft') this.navigate(-1);
-        if (e.key === 'Escape') { this.toggleSheet(false); this.toggleSearch(false); }
-      });
+      window.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') this.navigate(1); if (e.key === 'ArrowLeft') this.navigate(-1); if (e.key === 'Escape') { this.toggleSheet(false); this.toggleSearch(false); } });
+
+      // Wake Lock & A2HS
+      this.el.wakeLockBtn.addEventListener('click', () => this.toggleWakeLock());
+      this.el.installBtn.addEventListener('click', () => this.installPWA());
     }
 
     initGestureNav() {
-      let touchStartX = 0, touchEndX = 0, touchStartY = 0;
+      let sx=0, sy=0;
       const threshold = 80;
-
-      this.el.readerContent.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
-      }, { passive: true });
-
+      this.el.readerContent.addEventListener('touchstart', (e) => { sx = e.changedTouches[0].screenX; sy = e.changedTouches[0].screenY; }, { passive: true });
       this.el.readerContent.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        const dx = touchStartX - touchEndX;
-        const dy = Math.abs(e.changedTouches[0].screenY - touchStartY);
-        if (Math.abs(dx) > threshold && dy < 60) {
-          if (dx > 0) this.navigate(1);
-          else this.navigate(-1);
-        }
+        const dx = sx - e.changedTouches[0].screenX; const dy = Math.abs(e.changedTouches[0].screenY - sy);
+        if (Math.abs(dx) > threshold && dy < 60) { dx > 0 ? this.navigate(1) : this.navigate(-1); this.haptic(5); }
       }, { passive: true });
 
-      // Tap zones: left/right navigate, center toggles chrome
       this.el.readerContent.addEventListener('click', (e) => {
-        const rect = this.el.readerContent.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const zone = rect.width / 3;
+        const rect = this.el.readerContent.getBoundingClientRect(); const zone = rect.width / 3; const x = e.clientX - rect.left;
         if (x < zone) this.navigate(-1);
-        else if (x > 2 * zone) this.navigate(1);
+        else if (x > 2*zone) this.navigate(1);
         else this.toggleChrome();
       });
     }
 
-    toggleChrome() {
-      this.el.app.classList.toggle('hidden-chrome');
+    toggleChrome() { this.el.app.classList.toggle('hidden-chrome'); }
+
+    initVisualViewport() {
+      const updateVVH = () => {
+        if (window.visualViewport) {
+          document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+        }
+      };
+      updateVVH();
+      window.visualViewport?.addEventListener('resize', updateVVH);
     }
 
-    async handleFile(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      await this.loadEPUB(file);
-      // Reset inputs so the same file can be chosen again
-      e.target.value = '';
+    initPWA() {
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); this.deferredPrompt = e; this.el.installBtn.style.display = 'inline-flex';
+      });
     }
+    async installPWA() {
+      if (!this.deferredPrompt) return;
+      this.deferredPrompt.prompt(); const { outcome } = await this.deferredPrompt.userChoice;
+      this.deferredPrompt = null; this.el.installBtn.style.display = 'none';
+      this.showToast(outcome === 'accepted' ? 'App installed' : 'Install dismissed');
+    }
+
+    backButtonIntegration() {
+      // Close sheet/search before navigating away
+      window.addEventListener('popstate', () => {
+        if (this.el.searchPanel.classList.contains('active')) { this.toggleSearch(false, false); return; }
+        if (this.el.sheet.classList.contains('active')) { this.toggleSheet(false, false); return; }
+      });
+    }
+
+    async handleFile(e) { const file = e.target.files?.[0]; if (!file) return; await this.loadEPUB(file); e.target.value = ''; }
 
     async loadEPUB(file) {
       try {
@@ -763,7 +641,6 @@
         const zip = await new JSZip().loadAsync(file);
         this.zip = zip;
 
-        // Parse container.xml
         const containerXml = await zip.file('META-INF/container.xml').async('string');
         const containerDoc = new DOMParser().parseFromString(containerXml, 'text/xml');
         const rootfileEl = containerDoc.querySelector('rootfile');
@@ -771,13 +648,12 @@
         this.opfPath = rootfileEl.getAttribute('full-path');
         this.opfDir = this.opfPath.substring(0, this.opfPath.lastIndexOf('/') + 1);
 
-        // Parse OPF
         const opfStr = await zip.file(this.opfPath).async('string');
         const opfDoc = new DOMParser().parseFromString(opfStr, 'text/xml');
+
         this.parseManifestAndSpine(opfDoc);
         await this.buildTOC(opfDoc);
 
-        // Update UI
         const titleMeta = opfDoc.querySelector('metadata > title, dc\\:title, title')?.textContent?.trim();
         this.el.bookTitle.textContent = titleMeta || file.name.replace(/\.epub$/i, '');
         this.populateTOC();
@@ -785,13 +661,15 @@
         this.el.loadBtn.disabled = false;
         this.el.prefetchBtn.disabled = false;
         this.el.copyBtn.disabled = false;
+
+        this.restoreReadingPosition(); // Android-friendly auto restore
         this.showToast('Book loaded!', 'success');
+
+        // Idle prefetch next page for smoothness
+        (window.requestIdleCallback || window.setTimeout)(() => this.prefetchNextPage(), 50);
       } catch (err) {
-        console.error(err);
-        this.showToast('Failed to load EPUB', 'error');
-      } finally {
-        this.guardLoading(false);
-      }
+        console.error(err); this.showToast('Failed to load EPUB', 'error');
+      } finally { this.guardLoading(false); }
     }
 
     resetState() {
@@ -799,16 +677,12 @@
       this.manifest.clear(); this.spine = []; this.toc = [];
       this.currentIndex = 0; this.chaptersPageSize = this.settings.pageSize || 2;
       this.actualLoadedChapters = this.chaptersPageSize;
-      this.loadedIndices = []; this.chapterCache.clear();
-      // Revoke blob URLs
-      for (const url of this.blobUrlCache.values()) URL.revokeObjectURL(url);
-      this.blobUrlCache.clear();
-      // Reset UI
+      this.loadedIndices = []; this.chapterCache.clear(); this.blobUrlCache.clear();
       this.el.readerContent.innerHTML = `
         <div class="upload-area" id="uploadArea">
           <div style="font-size: 42px; margin-bottom: 8px;">📚</div>
           <div style="font-weight:600;">Tap to upload EPUB</div>
-          <div class="muted" style="margin-top:6px;">Or use your file manager</div>
+          <div class="muted" style="margin-top:6px;">Optimized for Android</div>
         </div>`;
       this.el.bookTitle.textContent = 'No book loaded';
       this.el.tocList.innerHTML = '<div class="toc-item">Open a book to see TOC</div>';
@@ -820,8 +694,7 @@
     }
 
     parseManifestAndSpine(opfDoc) {
-      const manifestEls = opfDoc.querySelectorAll('manifest > item');
-      manifestEls.forEach(item => {
+      opfDoc.querySelectorAll('manifest > item').forEach(item => {
         this.manifest.set(item.getAttribute('id'), {
           id: item.getAttribute('id'),
           href: item.getAttribute('href'),
@@ -829,53 +702,31 @@
           properties: item.getAttribute('properties') || ''
         });
       });
-
-      const spineEls = opfDoc.querySelectorAll('spine > itemref');
-      this.spine = Array.from(spineEls).map((el, idx) => ({
-        index: idx,
-        idref: el.getAttribute('idref'),
-        linear: (el.getAttribute('linear') || 'yes').toLowerCase() !== 'no'
+      this.spine = Array.from(opfDoc.querySelectorAll('spine > itemref')).map((el, idx) => ({
+        index: idx, idref: el.getAttribute('idref'), linear: (el.getAttribute('linear') || 'yes').toLowerCase() !== 'no'
       }));
     }
 
     async buildTOC(opfDoc) {
-      // Try EPUB3 nav.xhtml
       const navItem = [...this.manifest.values()].find(it => (it.properties || '').split(' ').includes('nav'));
       if (navItem) {
         const href = this.resolvePath(this.opfDir, navItem.href);
         const navStr = await this.zip.file(href)?.async('string');
         if (navStr) {
           const navDoc = new DOMParser().parseFromString(navStr, 'text/html');
-          const nav = navDoc.querySelector('nav[epub\\:type="toc"], nav[role="doc-toc"], nav');
-          const list = nav?.querySelector('ol, ul');
+          const nav = navDoc.querySelector('nav[epub\\:type="toc"], nav[role="doc-toc"], nav'); const list = nav?.querySelector('ol, ul');
           if (list) {
             const items = list.querySelectorAll('a[href]');
-            const navMap = [];
-            items.forEach(a => {
-              const href = a.getAttribute('href');
-              navMap.push({
-                title: a.textContent.trim(),
-                hrefResolved: this.resolvePath(this.opfDir, href)
-              });
+            const navMap = []; items.forEach(a => navMap.push({ title: a.textContent.trim(), hrefResolved: this.resolvePath(this.opfDir, a.getAttribute('href')) }));
+            this.toc = this.spine.filter(s => s.linear).map((s, idx) => {
+              const spineItem = this.manifest.get(s.idref); const full = this.resolvePath(this.opfDir, spineItem.href);
+              const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
+              return { index: idx, href: full, title: match?.title || `Chapter ${idx + 1}` };
             });
-            this.toc = this.spine
-              .filter(s => s.linear)
-              .map((s, idx) => {
-                const spineItem = this.manifest.get(s.idref);
-                const full = this.resolvePath(this.opfDir, spineItem.href);
-                const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
-                return {
-                  index: idx,
-                  href: full,
-                  title: match?.title || `Chapter ${idx + 1}`
-                };
-              });
             if (this.toc.length) return;
           }
         }
       }
-
-      // Try NCX (EPUB2)
       const ncxItem = [...this.manifest.values()].find(it => it.mediaType === 'application/x-dtbncx+xml');
       if (ncxItem) {
         try {
@@ -888,48 +739,30 @@
             const href = p.querySelector('content').getAttribute('src');
             return { title: title || 'Untitled', hrefResolved: this.resolvePath(this.opfDir, href) };
           });
-
-          this.toc = this.spine
-            .filter(s => s.linear)
-            .map((s, idx) => {
-              const spineItem = this.manifest.get(s.idref);
-              const full = this.resolvePath(this.opfDir, spineItem.href);
-              const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
-              return { index: idx, href: full, title: match?.title || `Chapter ${idx + 1}` };
-            });
+          this.toc = this.spine.filter(s => s.linear).map((s, idx) => {
+            const spineItem = this.manifest.get(s.idref); const full = this.resolvePath(this.opfDir, spineItem.href);
+            const match = navMap.find(n => n.hrefResolved.split('#')[0] === full);
+            return { index: idx, href: full, title: match?.title || `Chapter ${idx + 1}` };
+          });
           if (this.toc.length) return;
         } catch {}
       }
-
-      // Fallback: spine titles from chapter HTML
+      // Fallback
       this.toc = [];
       for (const s of this.spine) {
         if (!s.linear) continue;
         const item = this.manifest.get(s.idref);
         const full = this.resolvePath(this.opfDir, item.href);
-        try {
-          const { title } = await this.readChapter(full);
-          this.toc.push({ index: s.index, href: full, title: title || `Chapter ${s.index + 1}` });
-        } catch {
-          this.toc.push({ index: s.index, href: full, title: `Chapter ${s.index + 1}` });
-        }
+        try { const { title } = await this.readChapter(full); this.toc.push({ index: s.index, href: full, title: title || `Chapter ${s.index + 1}` }); }
+        catch { this.toc.push({ index: s.index, href: full, title: `Chapter ${s.index + 1}` }); }
       }
     }
 
     populateTOC() {
-      this.el.tocList.innerHTML = '';
-      this.el.tocCount.textContent = `${this.toc.length} chapters`;
+      this.el.tocList.innerHTML = ''; this.el.tocCount.textContent = `${this.toc.length} chapters`;
       this.toc.forEach((ch, idx) => {
-        const div = document.createElement('div');
-        div.className = 'toc-item';
-        div.textContent = `${idx + 1}. ${ch.title}`;
-        div.addEventListener('click', async () => {
-          this.currentIndex = idx;
-          this.actualLoadedChapters = this.chaptersPageSize;
-          this.el.startChapter.value = String(idx);
-          await this.loadCurrentPage();
-          this.toggleSheet(false);
-        });
+        const div = document.createElement('div'); div.className = 'toc-item'; div.textContent = `${idx + 1}. ${ch.title}`;
+        div.addEventListener('click', async () => { this.currentIndex = idx; this.actualLoadedChapters = this.chaptersPageSize; this.el.startChapter.value = String(idx); await this.loadCurrentPage(); this.toggleSheet(false); });
         this.el.tocList.appendChild(div);
       });
       this.updateTOCHighlight();
@@ -938,9 +771,7 @@
     populateStartDropdown() {
       this.el.startChapter.innerHTML = '';
       this.toc.forEach((ch, idx) => {
-        const opt = document.createElement('option');
-        opt.value = String(idx);
-        opt.textContent = `${idx + 1}. ${ch.title}`;
+        const opt = document.createElement('option'); opt.value = String(idx); opt.textContent = `${idx + 1}. ${ch.title}`;
         this.el.startChapter.appendChild(opt);
       });
       this.el.startChapter.disabled = false;
@@ -948,13 +779,9 @@
 
     updateTOCHighlight() {
       const items = this.el.tocList.querySelectorAll('.toc-item');
-      items.forEach((node, idx) => {
-        const isLoaded = this.loadedIndices.includes(idx);
-        node.classList.toggle('active', isLoaded);
-      });
+      items.forEach((node, idx) => node.classList.toggle('active', this.loadedIndices.includes(idx)));
     }
 
-    // Main rendering
     async loadCurrentPage() {
       if (!this.zip || this.isLoading) return;
       this.guardLoading(true);
@@ -962,16 +789,19 @@
         const start = this.currentIndex;
         const end = Math.min(start + this.actualLoadedChapters, this.toc.length);
 
-        this.loadedIndices = [];
-        for (let i = start; i < end; i++) this.loadedIndices.push(i);
+        this.loadedIndices = []; for (let i=start; i<end; i++) this.loadedIndices.push(i);
 
-        let html = '';
+        const frag = document.createDocumentFragment();
+
         for (let i = start; i < end; i++) {
           const ch = this.toc[i];
           const { html: chapterHTML, title, text } = await this.readChapter(ch.href);
           const words = this.countWords(text);
           const readTime = Math.max(1, Math.round(words / (this.settings.wpm || 220)));
-          html += `
+
+          const section = document.createElement('section');
+          section.className = 'chapter';
+          section.innerHTML = `
             <div class="chapter-header">
               <div>${i + 1}. ${title}</div>
               <div>${words.toLocaleString()} words • ~${readTime} min</div>
@@ -980,31 +810,37 @@
             ${chapterHTML}
             ${i < end - 1 ? '<hr class="chapter-sep"/>' : ''}
           `;
+          frag.appendChild(section);
         }
 
-        this.el.readerContent.innerHTML = html;
-        this.updateNavButtons();
-        this.updateAdjustButtons();
-        this.updateProgressBar();
-        this.updateTOCHighlight();
+        this.el.readerContent.innerHTML = '';
+        this.el.readerContent.appendChild(frag);
+
+        this.postRenderOptimizations(); // Android perf tweaks
+        this.updateNavButtons(); this.updateAdjustButtons(); this.updateProgressBar(); this.updateTOCHighlight();
         this.el.reader.scrollTop = 0;
+
+        // Save immediately for restore
+        this.saveReadingPosition();
+        this.haptic(10);
       } catch (e) {
-        console.error(e);
-        this.showToast('Failed to load chapters', 'error');
-      } finally {
-        this.guardLoading(false);
-      }
+        console.error(e); this.showToast('Failed to load chapters', 'error');
+      } finally { this.guardLoading(false); }
     }
 
-    async reloadChapters() {
-      return this.loadCurrentPage();
+    async reloadChapters() { return this.loadCurrentPage(); }
+
+    postRenderOptimizations() {
+      // Ensure images are lazy + async decode
+      this.el.readerContent.querySelectorAll('img').forEach(img => {
+        img.loading = 'lazy'; img.decoding = 'async';
+      });
     }
 
     updateNavButtons() {
       const hasPrev = this.currentIndex > 0;
       const hasNext = this.currentIndex + this.chaptersPageSize < this.toc.length;
-      this.el.prevBtn.disabled = !hasPrev;
-      this.el.nextBtn.disabled = !hasNext;
+      this.el.prevBtn.disabled = !hasPrev; this.el.nextBtn.disabled = !hasNext;
     }
 
     updateAdjustButtons() {
@@ -1024,23 +860,20 @@
     navigate(dir) {
       if (!this.zip) return;
       const step = this.chaptersPageSize;
-      if (dir > 0 && this.currentIndex + step < this.toc.length) {
-        this.currentIndex += step;
-      } else if (dir < 0 && this.currentIndex > 0) {
-        this.currentIndex = Math.max(0, this.currentIndex - step);
-      } else {
-        return;
-      }
+      if (dir > 0 && this.currentIndex + step < this.toc.length) this.currentIndex += step;
+      else if (dir < 0 && this.currentIndex > 0) this.currentIndex = Math.max(0, this.currentIndex - step);
+      else return;
       this.el.startChapter.value = String(this.currentIndex);
       this.actualLoadedChapters = this.chaptersPageSize;
       this.loadCurrentPage();
-      this.prefetchNextPage();
+      (window.requestIdleCallback || window.setTimeout)(() => this.prefetchNextPage(), 100);
     }
 
     // Search
-    toggleSearch(show) {
+    toggleSearch(show, pushHistory = true) {
       this.el.searchPanel.classList.toggle('active', !!show);
       if (show) {
+        if (pushHistory) history.pushState({ modal: 'search' }, '');
         this.el.searchInput.value = '';
         this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Type to search…</div>';
         this.el.searchInput.focus();
@@ -1049,194 +882,108 @@
 
     searchCurrent() {
       const q = this.el.searchInput.value.trim();
-      if (!q) {
-        this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Type to search…</div>';
-        return;
-      }
-      const start = this.currentIndex;
-      const end = Math.min(start + this.actualLoadedChapters, this.toc.length);
+      if (!q) { this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Type to search…</div>'; return; }
+      const start = this.currentIndex; const end = Math.min(start + this.actualLoadedChapters, this.toc.length);
       const results = [];
       for (let i = start; i < end; i++) {
-        const ch = this.toc[i];
-        const cache = this.chapterCache.get(ch.href);
-        const text = cache?.text || '';
-        const idx = text.toLowerCase().indexOf(q.toLowerCase());
-        if (idx >= 0) {
-          results.push({ i, title: ch.title, snippet: this.snippet(text, idx, q.length) });
-        }
-      }
-      this.renderSearchResults(q, results);
-    }
-
-    async searchAll() {
-      const q = this.el.searchInput.value.trim();
-      if (!q) return;
-      this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Searching…</div>';
-      const results = [];
-      for (let i = 0; i < this.toc.length; i++) {
-        const ch = this.toc[i];
-        const { text } = await this.readChapter(ch.href); // cached
+        const ch = this.toc[i]; const cache = this.chapterCache.get(ch.href); const text = cache?.text || '';
         const idx = text.toLowerCase().indexOf(q.toLowerCase());
         if (idx >= 0) results.push({ i, title: ch.title, snippet: this.snippet(text, idx, q.length) });
       }
       this.renderSearchResults(q, results);
     }
-
-    renderSearchResults(q, results) {
-      if (!results.length) {
-        this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">No matches</div>';
-        return;
+    async searchAll() {
+      const q = this.el.searchInput.value.trim(); if (!q) return;
+      this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">Searching…</div>';
+      const results = [];
+      for (let i = 0; i < this.toc.length; i++) {
+        const ch = this.toc[i]; const { text } = await this.readChapter(ch.href);
+        const idx = text.toLowerCase().indexOf(q.toLowerCase());
+        if (idx >= 0) results.push({ i, title: ch.title, snippet: this.snippet(text, idx, q.length) });
       }
+      this.renderSearchResults(q, results);
+    }
+    renderSearchResults(q, results) {
+      if (!results.length) { this.el.searchResults.innerHTML = '<div class="muted" style="padding:8px;">No matches</div>'; return; }
       this.el.searchResults.innerHTML = '';
       results.slice(0, 100).forEach(r => {
         const div = document.createElement('div');
         div.className = 'result';
-        div.innerHTML = `<div style="font-weight:600;">${r.i+1}. ${r.title}</div>
-                         <div class="muted">${r.snippet.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
-        div.addEventListener('click', async () => {
-          this.currentIndex = r.i;
-          this.actualLoadedChapters = this.chaptersPageSize;
-          await this.loadCurrentPage();
-          this.toggleSearch(false);
-        });
+        div.innerHTML = `<div style="font-weight:600;">${r.i+1}. ${r.title}</div><div class="muted">${r.snippet.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+        div.addEventListener('click', async () => { this.currentIndex = r.i; this.actualLoadedChapters = this.chaptersPageSize; await this.loadCurrentPage(); this.toggleSearch(false); });
         this.el.searchResults.appendChild(div);
       });
     }
-
-    snippet(text, idx, len) {
-      const start = Math.max(0, idx - 50);
-      const end = Math.min(text.length, idx + len + 50);
-      return text.slice(start, idx) + '[' + text.slice(idx, idx + len) + ']' + text.slice(idx + len, end);
-    }
+    snippet(text, idx, len) { const start = Math.max(0, idx - 50); const end = Math.min(text.length, idx + len + 50); return text.slice(start, idx) + '[' + text.slice(idx, idx + len) + ']' + text.slice(idx + len, end); }
 
     // Bookmarks
-    getBookmarks() {
-      try { return JSON.parse(localStorage.getItem('epub_bookmarks') || '[]'); } catch { return []; }
-    }
+    getBookmarks() { try { return JSON.parse(localStorage.getItem('epub_bookmarks') || '[]'); } catch { return []; } }
     setBookmarks(list) { localStorage.setItem('epub_bookmarks', JSON.stringify(list)); }
     renderBookmarks() {
-      const list = this.getBookmarks();
-      this.el.bookmarksList.innerHTML = '';
-      if (!list.length) {
-        this.el.bookmarksList.innerHTML = '<div class="toc-item muted">No bookmarks yet</div>';
-        return;
-      }
+      const list = this.getBookmarks(); this.el.bookmarksList.innerHTML = '';
+      if (!list.length) { this.el.bookmarksList.innerHTML = '<div class="toc-item muted">No bookmarks yet</div>'; return; }
       list.forEach(b => {
-        const div = document.createElement('div');
-        div.className = 'toc-item';
-        const date = new Date(b.t).toLocaleString();
-        div.innerHTML = `${b.i+1}. ${b.title} <span class="muted">— ${date}</span>`;
-        div.addEventListener('click', async () => {
-          this.currentIndex = b.i;
-          this.actualLoadedChapters = this.chaptersPageSize;
-          await this.loadCurrentPage();
-          this.toggleSheet(false);
-        });
+        const div = document.createElement('div'); div.className = 'toc-item';
+        const date = new Date(b.t).toLocaleString(); div.innerHTML = `${b.i+1}. ${b.title} <span class="muted">— ${date}</span>`;
+        div.addEventListener('click', async () => { this.currentIndex = b.i; this.actualLoadedChapters = this.chaptersPageSize; await this.loadCurrentPage(); this.toggleSheet(false); });
         this.el.bookmarksList.appendChild(div);
       });
     }
     toggleBookmark() {
       if (!this.toc.length) return;
-      const list = this.getBookmarks();
-      const exists = list.find(b => b.i === this.currentIndex);
-      if (exists) {
-        const next = list.filter(b => b.i !== this.currentIndex);
-        this.setBookmarks(next); this.showToast('Bookmark removed', 'success');
-      } else {
-        const b = { i: this.currentIndex, title: this.toc[this.currentIndex].title, t: Date.now() };
-        list.unshift(b); this.setBookmarks(list); this.showToast('Bookmarked', 'success');
-      }
+      const list = this.getBookmarks(); const exists = list.find(b => b.i === this.currentIndex);
+      if (exists) { const next = list.filter(b => b.i !== this.currentIndex); this.setBookmarks(next); this.showToast('Bookmark removed', 'success'); }
+      else { const b = { i: this.currentIndex, title: this.toc[this.currentIndex].title, t: Date.now() }; list.unshift(b); this.setBookmarks(list); this.showToast('Bookmarked', 'success'); }
       this.renderBookmarks();
     }
 
     // Copy/export
     async copyCombined() {
-      try {
-        const text = this.el.readerContent.innerText;
-        await navigator.clipboard.writeText(text);
-        this.showToast('Copied to clipboard!', 'success');
-      } catch {
-        this.showToast('Copy failed (HTTPS required on some browsers)', 'error');
-      }
+      try { const text = this.el.readerContent.innerText; await navigator.clipboard.writeText(text); this.showToast('Copied to clipboard!', 'success'); }
+      catch { this.showToast('Copy failed (HTTPS required on some browsers)', 'error'); }
     }
-
     exportCombined() {
-      const text = this.el.readerContent.innerText || '';
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = (this.el.bookTitle.textContent || 'book') + ' - selection.txt';
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
+      const text = this.el.readerContent.innerText || ''; const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = (this.el.bookTitle.textContent || 'book') + ' - selection.txt';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
 
     // Prefetch
     async prefetchNextPage() {
       if (!this.zip) return;
-      const start = this.currentIndex + this.chaptersPageSize;
-      const end = Math.min(start + this.chaptersPageSize, this.toc.length);
-      for (let i = start; i < end; i++) {
-        await this.readChapter(this.toc[i].href).catch(()=>{});
-      }
-      this.showToast('Prefetched next page', 'success');
+      const start = this.currentIndex + this.chaptersPageSize; const end = Math.min(start + this.chaptersPageSize, this.toc.length);
+      for (let i = start; i < end; i++) { await this.readChapter(this.toc[i].href).catch(()=>{}); }
     }
 
-    // Read chapter: sanitize, cache, rewrite images if needed
+    // Read chapter: sanitize, cache, rewrite images
     async readChapter(href) {
-      const cached = this.chapterCache.get(href);
-      if (cached) return cached;
+      const cached = this.chapterCache.get(href); if (cached) return cached;
+      const file = this.zip.file(href); if (!file) throw new Error('Missing chapter: ' + href);
+      const str = await file.async('string'); const doc = new DOMParser().parseFromString(str, 'text/html');
 
-      const file = this.zip.file(href);
-      if (!file) throw new Error('Missing chapter: ' + href);
-      const str = await file.async('string');
-      const doc = new DOMParser().parseFromString(str, 'text/html');
+      const title = doc.querySelector('title')?.textContent?.trim() || doc.querySelector('h1')?.textContent?.trim() || doc.querySelector('h2')?.textContent?.trim() || 'Untitled';
 
-      // Extract title
-      const title =
-        doc.querySelector('title')?.textContent?.trim() ||
-        doc.querySelector('h1')?.textContent?.trim() ||
-        doc.querySelector('h2')?.textContent?.trim() ||
-        'Untitled';
-
-      // Remove scripts/styles/iframes/embeds for safety
       doc.querySelectorAll('script, style, iframe, object, embed').forEach(n => n.remove());
 
-      // Process resources
       const chapterDir = href.substring(0, href.lastIndexOf('/') + 1);
-      if (this.settings.showImages) {
-        await this.rewriteImages(doc, chapterDir);
-      } else {
-        doc.querySelectorAll('img, picture, source').forEach(n => n.remove());
-      }
-      // Links: open externally, sanitize href
+      if (this.settings.showImages) await this.rewriteImages(doc, chapterDir);
+      else doc.querySelectorAll('img, picture, source').forEach(n => n.remove());
+
       doc.querySelectorAll('a[href]').forEach(a => {
-        const href = a.getAttribute('href');
-        if (href?.startsWith('#')) return; // in-document
-        if (/^https?:\/\//i.test(href)) {
-          a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
-        } else {
-          // intra-book link — we could resolve and allow navigation later
-          a.removeAttribute('href');
-        }
+        const hr = a.getAttribute('href'); if (hr?.startsWith('#')) return;
+        if (/^https?:\/\//i.test(hr)) { a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); }
+        else a.removeAttribute('href');
       });
 
-      // Serialize body content
       const body = doc.body || doc.documentElement;
       const rawHtml = body.innerHTML;
-
-      // Sanitize
       const clean = DOMPurify.sanitize(rawHtml, {
         USE_PROFILES: { html: true },
-        ALLOWED_TAGS: [
-          'p','br','hr','h1','h2','h3','h4','h5','h6','strong','em','b','i','u','small','sub','sup',
-          'ul','ol','li','blockquote','pre','code','span','div','img','a'
-        ],
-        ALLOWED_ATTR: ['src','alt','title','href']
+        ALLOWED_TAGS: ['p','br','hr','h1','h2','h3','h4','h5','h6','strong','em','b','i','u','small','sub','sup','ul','ol','li','blockquote','pre','code','span','div','img','a'],
+        ALLOWED_ATTR: ['src','alt','title','href','loading','decoding']
       });
 
-      // Plain text for search/estimates
       const text = this.htmlToText(clean);
-
       const out = { html: clean, text, title, chapterDir };
       this.chapterCache.set(href, out);
       return out;
@@ -1245,56 +992,29 @@
     async rewriteImages(doc, baseDir) {
       const imgs = [...doc.querySelectorAll('img[src]')];
       for (const img of imgs) {
-        const src = img.getAttribute('src');
-        if (!src) continue;
-        if (/^https?:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) continue;
+        const src = img.getAttribute('src'); if (!src) continue;
+        if (/^https?:\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) { img.loading='lazy'; img.decoding='async'; continue; }
         const path = this.resolvePath(baseDir, src);
-        const blobUrl = await this.getBlobUrl(path).catch(()=>null);
-        if (blobUrl) img.setAttribute('src', blobUrl);
-        else img.remove();
+        try {
+          const blobUrl = await this.getBlobUrl(path);
+          img.setAttribute('src', blobUrl);
+          img.setAttribute('loading','lazy');
+          img.setAttribute('decoding','async');
+        } catch { img.remove(); }
       }
     }
 
     async getBlobUrl(zipPath) {
-      if (this.blobUrlCache.has(zipPath)) return this.blobUrlCache.get(zipPath);
-      const file = this.zip.file(zipPath);
-      if (!file) throw new Error('Resource not found: ' + zipPath);
-      const blob = await file.async('blob');
-      const url = URL.createObjectURL(blob);
-      this.blobUrlCache.set(zipPath, url);
+      const cached = this.blobUrlCache.get(zipPath); if (cached) return cached.url || cached;
+      const file = this.zip.file(zipPath); if (!file) throw new Error('Resource not found: ' + zipPath);
+      const blob = await file.async('blob'); const url = URL.createObjectURL(blob);
+      this.blobUrlCache.set(zipPath, { url, revoke: () => URL.revokeObjectURL(url) });
       return url;
     }
 
-    resolvePath(baseDir, rel) {
-      // baseDir like "OEBPS/" or "OEBPS/chapter/"
-      const url = new URL(rel, 'https://x/' + baseDir);
-      return decodeURIComponent(url.pathname.replace(/^\/+/, ''));
-    }
+    resolvePath(baseDir, rel) { const url = new URL(rel, 'https://x/' + baseDir); return decodeURIComponent(url.pathname.replace(/^\/+/, '')); }
 
-    // Utils
-    htmlToText(html) {
-      const tmp = document.createElement('div'); tmp.innerHTML = html;
-      return tmp.textContent || tmp.innerText || '';
-    }
-    countWords(text) {
-      return (text.trim().match(/\b\w+\b/g) || []).length;
-    }
-
-    // Sheet
-    toggleSheet(show = null) {
-      const active = this.el.sheet.classList.contains('active');
-      const next = show === null ? !active : show;
-      this.el.sheet.classList.toggle('active', next);
-      this.el.overlay.classList.toggle('active', next);
-      this.el.overlay.setAttribute('aria-hidden', String(!next));
-      if (next) this.switchTab(document.querySelector('.tab.active')?.dataset.tab || 'library');
-    }
-    switchTab(name) {
-      this.el.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-      this.el.panels.forEach(p => p.hidden = p.dataset.panel !== name);
-    }
-
-    // Appearance
+    // Settings/Appearance
     applySettingsToUI() {
       this.el.fontFamily.value = this.settings.fontFamily || 'system-ui';
       this.el.fontSize.value = this.settings.fontSize || 18;
@@ -1310,11 +1030,10 @@
       this.el.app.setAttribute('data-theme', theme);
 
       const ff = this.settings.fontFamily || 'system-ui';
-      const family =
-        ff === 'serif' ? 'Georgia, Cambria, "Times New Roman", serif' :
-        ff === 'sans' ? 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif' :
-        ff === 'mono' ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' :
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, Arial, sans-serif';
+      const family = ff === 'serif' ? 'Georgia, Cambria, "Times New Roman", serif'
+        : ff === 'sans' ? 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+        : ff === 'mono' ? 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace'
+        : 'Roboto, "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, Arial, sans-serif';
 
       document.documentElement.style.setProperty('--reader-font-size', (this.settings.fontSize || 18) + 'px');
       document.documentElement.style.setProperty('--reader-line-height', String(this.settings.lineHeight || 1.8));
@@ -1323,30 +1042,67 @@
       document.documentElement.style.setProperty('--reader-justify', this.settings.justify ? 'justify' : 'start');
       document.body.style.fontFamily = family;
 
-      // Persist page size
       this.settings.pageSize = this.chaptersPageSize;
       this.saveSettings();
     }
+    saveSettings() { localStorage.setItem('epub_settings', JSON.stringify(this.settings)); }
+    loadSettings() { try { return JSON.parse(localStorage.getItem('epub_settings') || '{}'); } catch { return {}; } }
 
-    saveSettings() {
-      localStorage.setItem('epub_settings', JSON.stringify(this.settings));
+    // Reading position
+    get bookKey() { return this.opfPath ? 'epub_pos:' + this.opfPath : null; }
+    saveReadingPosition() {
+      if (!this.bookKey) return;
+      const pos = { i: this.currentIndex, pageSize: this.chaptersPageSize, scroll: this.el.reader.scrollTop };
+      localStorage.setItem(this.bookKey, JSON.stringify(pos));
     }
-    loadSettings() {
-      try { return JSON.parse(localStorage.getItem('epub_settings') || '{}'); } catch { return {}; }
+    saveReadingPositionThrottled() {
+      clearTimeout(this._savePosT);
+      this._savePosT = setTimeout(() => this.saveReadingPosition(), 200);
+    }
+    async restoreReadingPosition() {
+      if (!this.bookKey) return;
+      const saved = JSON.parse(localStorage.getItem(this.bookKey) || 'null');
+      if (saved) {
+        this.currentIndex = saved.i || 0; this.chaptersPageSize = saved.pageSize || this.chaptersPageSize; this.actualLoadedChapters = this.chaptersPageSize;
+        await this.loadCurrentPage();
+        // small delay to ensure layout settled
+        requestAnimationFrame(() => { this.el.reader.scrollTop = saved.scroll || 0; });
+      }
     }
 
-    // UI feedback
+    // UI helpers
+    toggleSheet(show = null, pushHistory = true) {
+      const active = this.el.sheet.classList.contains('active');
+      const next = show === null ? !active : show;
+      this.el.sheet.classList.toggle('active', next);
+      this.el.overlay.classList.toggle('active', next);
+      this.el.overlay.setAttribute('aria-hidden', String(!next));
+      if (next && pushHistory) history.pushState({ modal: 'sheet' }, '');
+      if (next) this.switchTab(document.querySelector('.tab.active')?.dataset.tab || 'library');
+    }
+    switchTab(name) { this.el.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name)); this.el.panels.forEach(p => p.hidden = p.dataset.panel !== name); }
+
+    // Utils
+    htmlToText(html) { const tmp = document.createElement('div'); tmp.innerHTML = html; return tmp.textContent || tmp.innerText || ''; }
+    countWords(text) { return (text.trim().match(/\b\w+\b/g) || []).length; }
+
+    haptic(ms = 8) { if (navigator.vibrate) navigator.vibrate(ms); }
+
     showToast(msg, type = '') {
       this.el.toast.textContent = msg;
       this.el.toast.className = 'toast ' + (type || '');
-      requestAnimationFrame(() => {
-        this.el.toast.classList.add('show');
-        setTimeout(() => this.el.toast.classList.remove('show'), 2200);
-      });
+      requestAnimationFrame(() => { this.el.toast.classList.add('show'); setTimeout(() => this.el.toast.classList.remove('show'), 1800); });
     }
-    guardLoading(flag) {
-      this.isLoading = flag;
-      // Optionally disable buttons
+
+    guardLoading(flag) { this.isLoading = flag; }
+
+    async toggleWakeLock() {
+      try {
+        if (!this.wakeLock) {
+          if ('wakeLock' in navigator) { this.wakeLock = await navigator.wakeLock.request('screen'); this.el.wakeLockBtn.textContent = 'Screen lock: ON'; this.showToast('Screen will stay on', 'success'); }
+          else this.showToast('Wake Lock not supported', 'error');
+        } else { await this.wakeLock.release?.(); this.wakeLock = null; this.el.wakeLockBtn.textContent = 'Keep screen on'; this.showToast('Screen lock released'); }
+      } catch { this.showToast('Wake Lock error', 'error'); }
     }
   }
 
