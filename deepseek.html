@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Translation Stripper · Glossary Forge Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3ead8;
+    --bg-grain: #ebe0c7;
+    --paper: #fbf6e9;
+    --ink: #1d1a14;
+    --ink-soft: #4a4338;
+    --ink-mute: #877c69;
+    --rule: #c9bfa6;
+    --accent: #a4332a;
+    --accent-soft: #c46a5e;
+    --gold: #b08945;
+    --shadow: 0 1px 0 rgba(29,26,20,0.04), 0 8px 24px -12px rgba(29,26,20,0.18);
+    --radius: 4px;
+  }
+  [data-theme="dark"] {
+    --bg: #14110d;
+    --bg-grain: #1c1813;
+    --paper: #1a1611;
+    --ink: #ece2cb;
+    --ink-soft: #b8ac90;
+    --ink-mute: #6b6051;
+    --rule: #2f2920;
+    --accent: #d97a6c;
+    --accent-soft: #b85948;
+    --gold: #d4a85f;
+    --shadow: 0 1px 0 rgba(0,0,0,0.3), 0 12px 32px -16px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.55;
+    background-image:
+      radial-gradient(circle at 20% 0%, var(--bg-grain) 0%, transparent 40%),
+      radial-gradient(circle at 80% 100%, var(--bg-grain) 0%, transparent 40%);
+    background-attachment: fixed;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 28px;
+  }
+
+  .brand h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(28px, 5vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .brand h1 .accent {
+    color: var(--accent);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .brand p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+    max-width: 520px;
+  }
+
+  .brand .seal {
+    display: inline-block;
+    color: var(--gold);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .theme-toggle {
+    appearance: none;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--ink-mute); }
+
+  .field {
+    margin-bottom: 22px;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+
+  label {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  label .num {
+    color: var(--accent);
+    font-style: italic;
+    font-weight: 400;
+    margin-right: 6px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-style: italic;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow);
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(164, 51, 42, 0.1), var(--shadow);
+  }
+
+  #topInput { min-height: 100px; }
+  #mainInput { min-height: 220px; }
+  #output { min-height: 280px; background: var(--bg-grain); }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 22px 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  button.btn {
+    appearance: none;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -6px rgba(0,0,0,0.25); }
+  button.btn:active { transform: translateY(0); }
+
+  button.btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fdf7e8;
+  }
+  button.btn.ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border-color: var(--rule);
+  }
+  button.btn.ghost:hover { color: var(--ink); border-color: var(--ink-mute); }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .options label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .options input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+  }
+
+  .status {
+    min-height: 22px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    margin-top: 10px;
+    color: var(--ink-mute);
+  }
+  .status.ok { color: var(--gold); }
+  .status.err { color: var(--accent); }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+
+  footer .stats { color: var(--ink-soft); }
+
+  /* ornament */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 1em;
+    padding: 4px 0 2px;
+    user-select: none;
+  }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 24px 16px 60px; }
+    header { flex-direction: column; }
+    .actions { gap: 8px; }
+    button.btn { flex: 1 1 calc(50% - 4px); padding: 10px 12px; font-size: 12px; }
+    button.btn.primary { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Translation <span class="accent">Stripper</span></h1>
+        <p>Strip English translations from chunked JSON while preserving the raw Chinese text and glossary terms. A companion utility for re-translation passes and glossary curation.</p>
+        <span class="seal">— 净本工具 · clean-slate edition —</span>
+      </div>
+      <button class="theme-toggle" id="themeBtn" type="button">switch theme</button>
+    </header>
+
+    <div class="field">
+      <div class="label-row">
+        <label><span class="num">i.</span>Add to Top</label>
+        <span class="hint">JSON array → prepended as entries · plain text → prepended as a header line</span>
+      </div>
+      <textarea id="topInput" placeholder='Optional. Paste another JSON array of chunks to merge above, or any plain text to prepend as a comment.'></textarea>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label><span class="num">ii.</span>Main Input</label>
+        <span class="hint">paste the full JSON array of chunks here</span>
+      </div>
+      <textarea id="mainInput" placeholder='[ { "id": 0, "raw": "...", "translation": "...", "terms": [ ... ] }, ... ]'></textarea>
+    </div>
+
+    <div class="options">
+      <label><input type="checkbox" id="optResetDone" checked /> Also reset <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink)">done: false</code></label>
+      <label><input type="checkbox" id="optClearEditing" checked /> Reset <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink)">editing: false</code></label>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="processBtn" type="button">Process</button>
+      <button class="btn" id="copyBtn" type="button">Copy Output</button>
+      <button class="btn ghost" id="downloadBtn" type="button">Download .json</button>
+      <button class="btn ghost" id="clearBtn" type="button">Clear All</button>
+    </div>
+
+    <div class="ornament">· · ·</div>
+
+    <div class="field">
+      <div class="label-row">
+        <label><span class="num">iii.</span>Output</label>
+        <span class="hint" id="charHint"></span>
+      </div>
+      <textarea id="output" readonly placeholder="Stripped JSON will appear here…"></textarea>
+      <div class="status" id="status"></div>
+    </div>
+
+    <footer>
+      <span>Glossary preserved · translations cleared · structure intact</span>
+      <span class="stats" id="stats"></span>
+    </footer>
+  </div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Theme ----------
+  const THEME_KEY = 'ts_theme';
+  function applyTheme(t) {
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+  }
+  const saved = (function () {
+    try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+  })();
+  applyTheme(saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  $('themeBtn').addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  });
+
+  // ---------- Status helpers ----------
+  function setStatus(msg, kind) {
+    const el = $('status');
+    el.textContent = msg || '';
+    el.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  // ---------- Core stripping ----------
+  function stripEntry(entry, opts) {
+    if (entry === null || typeof entry !== 'object') return entry;
+    const out = Object.assign({}, entry);
+    if ('translation' in out) out.translation = '';
+    if (opts.resetDone && 'done' in out) out.done = false;
+    if (opts.clearEditing && 'editing' in out) out.editing = false;
+    return out;
+  }
+
+  function tryParseJson(str) {
+    try {
+      return { ok: true, value: JSON.parse(str) };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  function process() {
+    const topRaw = $('topInput').value.trim();
+    const mainRaw = $('mainInput').value.trim();
+    const opts = {
+      resetDone: $('optResetDone').checked,
+      clearEditing: $('optClearEditing').checked,
+    };
+
+    if (!mainRaw) {
+      setStatus('Main input is empty — paste your JSON array of chunks.', 'err');
+      $('output').value = '';
+      $('stats').textContent = '';
+      $('charHint').textContent = '';
+      return;
+    }
+
+    const mainParsed = tryParseJson(mainRaw);
+    if (!mainParsed.ok) {
+      setStatus('Main input isn\u2019t valid JSON: ' + mainParsed.error, 'err');
+      return;
+    }
+    if (!Array.isArray(mainParsed.value)) {
+      setStatus('Main input must be a JSON array of chunk objects.', 'err');
+      return;
+    }
+
+    let prependEntries = null;
+    let prependHeader = null;
+
+    if (topRaw) {
+      const topParsed = tryParseJson(topRaw);
+      if (topParsed.ok && Array.isArray(topParsed.value)) {
+        prependEntries = topParsed.value;
+      } else if (topParsed.ok && topParsed.value && typeof topParsed.value === 'object') {
+        // single object → wrap as array
+        prependEntries = [topParsed.value];
+      } else {
+        // plain text or invalid JSON → prepend as comment header
+        prependHeader = topRaw;
+      }
+    }
+
+    const merged = (prependEntries ? prependEntries : []).concat(mainParsed.value);
+    const stripped = merged.map((e) => stripEntry(e, opts));
+
+    let outStr = JSON.stringify(stripped, null, 2);
+    if (prependHeader) {
+      outStr = '/*\n' + prependHeader + '\n*/\n' + outStr;
+    }
+
+    $('output').value = outStr;
+
+    const total = stripped.length;
+    const fromTop = prependEntries ? prependEntries.length : 0;
+    const fromMain = mainParsed.value.length;
+    const termCount = stripped.reduce((acc, e) => acc + (Array.isArray(e && e.terms) ? e.terms.length : 0), 0);
+
+    setStatus(
+      'Processed ' + total + ' chunk' + (total === 1 ? '' : 's') +
+      (fromTop ? ' (' + fromTop + ' prepended + ' + fromMain + ' main)' : '') +
+      (prependHeader ? ' · header prepended as comment' : '') +
+      ' · ' + termCount + ' glossary term' + (termCount === 1 ? '' : 's') + ' preserved.',
+      'ok'
+    );
+    $('stats').textContent = total + ' chunks · ' + termCount + ' terms';
+    $('charHint').textContent = outStr.length.toLocaleString() + ' chars';
+  }
+
+  // ---------- Buttons ----------
+  $('processBtn').addEventListener('click', process);
+
+  $('copyBtn').addEventListener('click', async () => {
+    const txt = $('output').value;
+    if (!txt) { setStatus('Nothing to copy yet — process first.', 'err'); return; }
+    try {
+      await navigator.clipboard.writeText(txt);
+      setStatus('Copied to clipboard.', 'ok');
+    } catch (e) {
+      // fallback
+      const ta = $('output');
+      ta.removeAttribute('readonly');
+      ta.select();
+      try { document.execCommand('copy'); setStatus('Copied to clipboard.', 'ok'); }
+      catch (e2) { setStatus('Copy failed — please select and copy manually.', 'err'); }
+      ta.setAttribute('readonly', 'readonly');
+      window.getSelection().removeAllRanges();
+    }
+  });
+
+  $('downloadBtn').addEventListener('click', () => {
+    const txt = $('output').value;
+    if (!txt) { setStatus('Nothing to download yet — process first.', 'err'); return; }
+    const blob = new Blob([txt], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    a.download = 'stripped-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus('Downloaded.', 'ok');
+  });
+
+  $('clearBtn').addEventListener('click', () => {
+    $('topInput').value = '';
+    $('mainInput').value = '';
+    $('output').value = '';
+    setStatus('Cleared.', '');
+    $('stats').textContent = '';
+    $('charHint').textContent = '';
+  });
+
+  // ---------- Keyboard ----------
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      process();
+    }
+  });
+})();
+</script>
+</body>
+</html>
