@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chunk Processor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e2e4ea;
+    --text-dim: #8b8fa3;
+    --accent: #6c8aff;
+    --accent-hover: #8da4ff;
+    --green: #4ade80;
+    --red: #f87171;
+    --orange: #fb923c;
+    --tag-male: #60a5fa;
+    --tag-female: #f472b6;
+    --tag-default: #a78bfa;
+    --radius: 8px;
+    --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+    line-height: 1.6;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Input Section */
+  .input-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 800px) {
+    .input-section { grid-template-columns: 1fr; }
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  textarea {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  textarea:focus {
+    border-color: var(--accent);
+  }
+
+  #chunkInput { min-height: 220px; }
+  #headerInput { min-height: 220px; }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+  .btn-copy {
+    background: var(--surface2);
+    color: var(--green);
+    border: 1px solid var(--border);
+  }
+  .btn-copy:hover { background: var(--border); }
+  .btn-copy.copied { color: #fff; background: var(--green); border-color: var(--green); }
+
+  .btn-clear {
+    background: var(--surface2);
+    color: var(--red);
+    border: 1px solid var(--border);
+  }
+  .btn-clear:hover { background: var(--border); }
+
+  /* Output */
+  .output-section {
+    position: relative;
+  }
+
+  .output-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .output-label .chunk-count {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  #outputArea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    min-height: 200px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    max-height: 70vh;
+    overflow-y: auto;
+    color: var(--text);
+  }
+
+  #outputArea:empty::before {
+    content: 'Processed output will appear here...';
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: #000;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: all 0.35s ease;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Error */
+  .error-msg {
+    color: var(--red);
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+  }
+
+  /* Glossary styling inside output */
+  .glossary-line { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📜 Chunk Processor</h1>
+  <p class="subtitle">Paste JSON chunks → get raw text + glossary with your custom header</p>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label for="chunkInput">📋 Paste JSON Chunks</label>
+      <textarea id="chunkInput" placeholder='Paste your JSON array of chunks here...'></textarea>
+    </div>
+    <div class="input-group">
+      <label for="headerInput">📝 Chunk Header (prepended to output)</label>
+      <textarea id="headerInput">You are an expert translator and editor specializing in Chinese fantasy (xianxia, wuxia, and xuanhuan) web novels.
+
+Your primary mission is to produce an English translation that is faithful, dynamic, and polished. The final text must read like a professional English fantasy novel.
+
+# Core Translation Principles (Absolute Constraints)
+
+1.  Natural Language First: The final output must be fluent, idiomatic English. Glossary terms must be adapted for grammar, context, and natural flow (e.g., plurals, tenses). Natural flow takes precedence over literal term insertion.
+
+2.  Fidelity Constraint: The translation MUST preserve the original plot, lore, character intent, and structural integrity.
+
+    -   Do not add, remove, or significantly alter the core informational content, descriptions, or imagery. Refinement is for fluency and tone, not expansion.
+
+    -   The translation MUST maintain the original sentence count and paragraph breaks of the source text. Do not merge or split paragraphs or sentences.
+
+# Internal Workflow Directive
+
+Before producing the final output, you must internally follow a strict process:
+
+1.  Literal Mapping: Analyze the source text, map terms to the provided `Glossary`, and draft a highly accurate, literal translation.
+
+2.  Refinement: Elevate the literal draft into a polished narrative by applying the `Style Directives` below. Critically audit all literal glossary uses, rewriting for natural English according to the Natural Language First principle.
+
+3.  Final Audit: Check for absolute adherence to all constraints: fidelity, structural integrity, glossary consistency, fluency, and `Output/Formatting Rules`.
+
+# Style Directives
+
+-   Tone: Use evocative, genre-fitting language (flair) for titles, skills, and unique items. Elevate the tone beyond mere literal translation.
+
+-   Narrative Flow: Use varied sentence length and rhythm for immersion. Dialogue must be natural, idiomatic English.
+
+-   Cultural Concepts: Convey cultural concepts (like karma, destiny, "face") naturally in context-sensitive English without footnotes.
+
+# Naming and Terminology Rules
+
+-   Personal Names: Remain in Pinyin without tonal marks (e.g., Li Xiaoyao, Chen Feng).
+
+-   Place Names &amp; Generic Titles: Translate descriptive names into English (e.g., 青云宗 → Azure Cloud Sect), unless overridden by glossary.
+
+-   Dao Distinctions: Use *"[Name] Dao"* for specific paths; *Dao Lineage* for inherited branches; *Daoist Tradition/Orthodoxy* for major systems.
+
+# Output &amp; Formatting Rules
+
+-   NEVER output Chinese characters or tonal Pinyin.
+
+-   Use either full English translations or standardized Pinyin (capitalized, no tones).
+
+-   Follow the glossary intelligently.
+
+-   No bold formatting.
+
+-   italics for internal thoughts.
+
+-   "single quotes" for spoken dialogue.
+
+-   Only one Markdown heading in the response: the chapter title (if provided).
+
+-   Response must be in plain Markdown source.</textarea>
+    </div>
+  </div>
+
+  <p class="error-msg" id="errorMsg"></p>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="processChunks()">⚙️ Process</button>
+    <button class="btn-copy" id="copyBtn" onclick="copyOutput()">📋 Copy Output</button>
+    <button class="btn-clear" onclick="clearAll()">🗑️ Clear All</button>
+  </div>
+
+  <div class="output-section">
+    <div class="output-label">
+      <span>✅ Output</span>
+      <span class="chunk-count" id="chunkCount"></span>
+    </div>
+    <div id="outputArea"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function setError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+function processChunks() {
+  setError('');
+  const raw = document.getElementById('chunkInput').value.trim();
+  const header = document.getElementById('headerInput').value;
+
+  if (!raw) {
+    setError('Please paste JSON chunks first.');
+    return;
+  }
+
+  let chunks;
+  try {
+    chunks = JSON.parse(raw);
+  } catch (e) {
+    setError('Invalid JSON: ' + e.message);
+    return;
+  }
+
+  if (!Array.isArray(chunks)) {
+    chunks = [chunks];
+  }
+
+  // Collect all unique glossary terms across all chunks
+  const glossaryMap = new Map(); // raw -> { translation, tags }
+  const allRaws = [];
+
+  for (const chunk of chunks) {
+    // Collect raw text
+    if (chunk.raw && typeof chunk.raw === 'string') {
+      allRaws.push(chunk.raw);
+    }
+
+    // Collect glossary terms
+    if (Array.isArray(chunk.terms)) {
+      for (const term of chunk.terms) {
+        if (term.raw && term.translation) {
+          // Use raw as key, keep first occurrence (or overwrite — they should be consistent)
+          const key = term.raw;
+          if (!glossaryMap.has(key)) {
+            glossaryMap.set(key, {
+              translation: term.translation,
+              tags: Array.isArray(term.tags) ? term.tags : []
+            });
+          }
+        }
+      }
+    }
+  }
+
+  if (allRaws.length === 0) {
+    setError('No "raw" fields found in the JSON chunks.');
+    return;
+  }
+
+  // Build glossary section
+  let glossaryLines = [];
+  for (const [raw, info] of glossaryMap) {
+    let line = `${raw} = ${info.translation}`;
+    if (info.tags.length > 0) {
+      line += ` (${info.tags.join(', ')})`;
+    }
+    glossaryLines.push(line);
+  }
+
+  // Build final output
+  let output = '';
+
+  // Header
+  if (header.trim()) {
+    output += header.trim() + '\n\n';
+  }
+
+  // Glossary
+  if (glossaryLines.length > 0) {
+    output += '# Glossary\n\n';
+    output += glossaryLines.join('\n');
+    output += '\n\n';
+  }
+
+  // Raw texts
+  output += '# Source Text\n\n';
+  output += allRaws.join('\n\n');
+
+  document.getElementById('outputArea').textContent = output;
+  document.getElementById('chunkCount').textContent = `${chunks.length} chunk(s) · ${glossaryMap.size} glossary term(s)`;
+}
+
+function copyOutput() {
+  const outputArea = document.getElementById('outputArea');
+  const text = outputArea.textContent;
+
+  if (!text) {
+    showToast('Nothing to copy!');
+    return;
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.textContent = '✅ Copied!';
+    showToast('Copied to clipboard!');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋 Copy Output';
+    }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard!');
+  });
+}
+
+function clearAll() {
+  document.getElementById('chunkInput').value = '';
+  document.getElementById('outputArea').textContent = '';
+  document.getElementById('chunkCount').textContent = '';
+  setError('');
+}
+</script>
+
+</body>
+</html>
